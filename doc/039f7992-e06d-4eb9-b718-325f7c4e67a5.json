@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the necessary modules, defines render_params as an empty dictionary, and uses jinja_utils to load a template from \"template.j2\" into \"output.txt\", without formatting, for the banner \"test_neverundefined\".",
+    "details": [
+        {
+            "comment": "This code imports the necessary modules, defines render_params as an empty dictionary, and uses jinja_utils to load a template from \"template.j2\" into \"output.txt\", without formatting, for the banner \"test_neverundefined\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_neverundefined/test.py\":0-4",
+            "content": "import sys\nsys.path.append(\"../\")\nimport jinja_utils\nrender_params = dict()\njinja_utils.load_render_and_format(\"template.j2\", \"output.txt\", render_params = render_params, banner = \"test_neverundefined\", needFormat=False)"
+        }
+    ]
+}

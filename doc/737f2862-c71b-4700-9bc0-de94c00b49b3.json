@@ -1,0 +1,10 @@
+{
+    "summary": "The code sets the Python encoding to UTF-16 and then generates a PDF from a Python script with docstrings using pdoc, while also saving the output as an MD file in the specified folder. This could be useful for generating formatted documentation or technical specifications.",
+    "details": [
+        {
+            "comment": "The code sets the Python encoding to UTF-16 and then generates a PDF from a Python script with docstrings using pdoc, while also saving the output as an MD file in the specified folder. This could be useful for generating formatted documentation or technical specifications.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/export_pdf_word_pdoc.ps1\":0-1",
+            "content": "$Env:PYTHONIOENCODING=\"utf-16\" # useful. really?\npdoc --pdf .\\example_docstring.py | tee .\\output_pdf\\example_docstring.md"
+        }
+    ]
+}

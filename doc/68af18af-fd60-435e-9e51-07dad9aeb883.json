@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines devices, their ports, and working conditions. It also establishes rules for using devices based on port status and wind speed. The code includes predicates to enumerate all working conditions and apply rules to a set of ports and conditions.",
+    "details": [
+        {
+            "comment": "This code defines devices, their ports, and working conditions. It also establishes rules for using devices based on port status and wind speed. The code includes predicates to enumerate all working conditions and apply rules to a set of ports and conditions.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_examaple.pro\":0-26",
+            "content": "% Define the devices and their ports\ndevice(solar_panel, [port1]).\ndevice(battery, [port1, port2]).\ndevice(wind_turbine, [port1]).\n% Define the working conditions for each device\nworking_condition(solar_panel, [port1, day]).\nworking_condition(battery, [port1, port2, day, night]).\nworking_condition(wind_turbine, [port1, wind_speed]).\n% Define the rules for using the devices\nrule_solar_panel(port1, day).\nrule_battery(_).\nrule_wind_turbine(port1, WindSpeed) :- WindSpeed > 5.\n% Define a predicate to enumerate all working conditions\nenumerate_working_conditions(Conditions) :-\n    findall(Device-Ports-Conditions, (\n        device(Device, Ports),\n        working_condition(Device, Conditions),\n        apply_rules(Ports, Conditions)\n    ), Conditions).\n% Define a predicate to apply the rules to a set of ports and conditions\napply_rules(Ports, Conditions) :-\n    forall((member(Port, Ports), rule(Device, Port, Condition)),\n           member(Device-Condition, Conditions))."
+        }
+    ]
+}

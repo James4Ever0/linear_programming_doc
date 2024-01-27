@@ -1,0 +1,10 @@
+{
+    "summary": "The code defines two lambda functions, `url_optim` and `url_simul`, which generate URLs for downloading component ports. The URLs include a page parameter that can be customized for different pages. It is uncertain if this function is necessary or not.",
+    "details": [
+        {
+            "comment": "The code defines two lambda functions, `url_optim` and `url_simul`, which generate URLs for downloading component ports. The URLs include a page parameter that can be customized for different pages. It is uncertain if this function is necessary or not.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_download_component_ports.py\":0-3",
+            "content": "url_optim = lambda page: f'https://ies.cloudpss.net:8201/editor/componentheatList/?page={page}'\nurl_simul = lambda page: f'https://ies.cloudpss.net:8202/editor/componentheatList/?page={page}'\n# maybe it is not needed"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the 'docplex.mp.model' module and creates a new instance of the Model class with the name \"MIP model\". This will be used to define and solve a Mixed Integer Programming (MIP) problem using Docplex library.",
+    "details": [
+        {
+            "comment": "The code imports the 'docplex.mp.model' module and creates a new instance of the Model class with the name \"MIP model\". This will be used to define and solve a Mixed Integer Programming (MIP) problem using Docplex library.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/docplex_test.py\":0-4",
+            "content": "# https://blog.csdn.net/VickyVivan/article/details/116429954\nimport docplex.mp.model as Model1\nopt_model = Model1.Model(name=\"MIP model\")"
+        }
+    ]
+}

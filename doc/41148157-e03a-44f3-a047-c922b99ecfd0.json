@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports and prints variable 'b' from circular_import_b.py, sets variable 'a' to 1.",
+    "details": [
+        {
+            "comment": "This code imports and prints variable 'b' from circular_import_b.py, sets variable 'a' to 1.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/circular_import_a.py\":0-4",
+            "content": "a = 1\nfrom circular_import_b import b\nprint(b)"
+        }
+    ]
+}

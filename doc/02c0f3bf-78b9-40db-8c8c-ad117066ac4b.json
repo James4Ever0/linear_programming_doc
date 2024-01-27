@@ -1,0 +1,10 @@
+{
+    "summary": "The code is using the Markdown Python library to convert a markdown file (example_docstring_utf8.md) into HTML, applying multiple extensions such as abbr, attr_list, def_list, fenced_code, tables, admonition, smarty, and toc, and storing the result in example_docstring_utf8.html.",
+    "details": [
+        {
+            "comment": "The code is using the Markdown Python library to convert a markdown file (example_docstring_utf8.md) into HTML, applying multiple extensions such as abbr, attr_list, def_list, fenced_code, tables, admonition, smarty, and toc, and storing the result in example_docstring_utf8.html.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/generate_html.sh\":0-8",
+            "content": "markdown_py  --extension=abbr         \\\n                --extension=attr_list    \\\n                --extension=def_list     \\\n                --extension=fenced_code  \\\n                --extension=tables       \\\n                --extension=admonition   \\\n                --extension=smarty       \\\n                --extension=toc          \\\n                example_docstring_utf8.md > example_docstring_utf8.html"
+        }
+    ]
+}

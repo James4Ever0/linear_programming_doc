@@ -1,0 +1,10 @@
+{
+    "summary": "This code appears to be written in Chinese. It seems to define a model named \"abcd\" and includes several constants (a, b, C) and a constant list (d, e).",
+    "details": [
+        {
+            "comment": "This code appears to be written in Chinese. It seems to define a model named \"abcd\" and includes several constants (a, b, C) and a constant list (d, e).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/sample.ies\":0-8",
+            "content": "\u6a21\u578b\u540d\u79f0\n    abcd\n\u5e38\u91cf\n    a\n    <| b\n    >> C\n\u5e38\u91cf\u5217\u8868\n    >> d\n    >> e"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "summary": "The code utilizes Jinja2 templating to generate files using IDs and access paths from JSON, rendering templates for each combination and writing content to new output files.",
+    "details": [
+        {
+            "comment": "The code defines templates for different types of components, retrieves IDs from JSON files, removes existing output files, and then generates new files using Jinja2 templating. The access paths are used to generate files based on the selected options.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/curl_component_get.py\":0-39",
+            "content": "template_paths = dict(\n    optim=\"curl_optim_component_get.sh.j2\", simu=\"curl_simu_component_get.sh.j2\"\n)\nid_paths = dict(\n    optim=\"cloudpss_component_optimize_ports.json\",\n    simu=\"cloudpss_component_ports.json\"\n)\nimport json\ndef get_ids(id_path:str):\n    ids = []\n    with open(id_path) as f:\n        data = json.loads(f.read())\n        cmp = data['cmp']\n        for component in cmp:\n            _id = component['id']\n            ids.append(_id)\n    return ids\nids = {key: get_ids(val) for key, val in id_paths.items()}\nimport jinja2\nfrom jinja2 import StrictUndefined\nimport subprocess\noutput_script_path = \"script.sh\"\ncmd = ['bash', output_script_path]\n# access_paths = ['CPS','Heat']\naccess_paths = ['Heat']\n# there is no component using 'CPS'\n# simply add a new line after each call.\nimport os\nfor key, template_path in template_paths.items():\n    output_path = f\"cloudpss_{key}.mjson\"\n    os.system(f\"rm -rf {output_path}\")\n    with open(template_path,'r', encoding='utf-8') as f:\n        source = f.read()\n        template = jinja2.Template(source = source, undefined=StrictUndefined)"
+        },
+        {
+            "comment": "The code iterates over IDs and access paths, rendering a template for each combination. It then writes the rendered content to a file, executes a command, prints the first 20 characters of output along with the access path and ID, and appends a newline character to an output file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/curl_component_get.py\":40-49",
+            "content": "        for _id in ids[key]:\n            for access_path in access_paths:\n                script_content = template.render(access_path=access_path, id=_id, output_path=output_path)\n                with open(output_script_path, 'w+') as f0:\n                    f0.write(script_content)\n                output = subprocess.getoutput(cmd)\n                print(\"ACCESS PATH:\", access_path, \"ID:\", _id)\n                print(\"OUTPUT?\", output[:20])\n                with open(output_path, 'a+', encoding='utf-8') as f1:\n                    f1.write('\\n')"
+        }
+    ]
+}

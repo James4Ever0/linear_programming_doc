@@ -1,0 +1,10 @@
+{
+    "summary": "This code iterates over transformation classes in Pyomo, retrieves their documentation and source file locations.",
+    "details": [
+        {
+            "comment": "This code iterates over transformation classes in Pyomo, retrieves their documentation and source file locations.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/print_all_transformation_documentation.py\":0-17",
+            "content": "from pyomo.environ import *\ndoc_dict = TransformationFactory._doc \nimport inspect\nfor transform_name, transform_doc in doc_dict.items():\n    cls = TransformationFactory._cls[transform_name]\n    sourcefile_path = inspect.getsourcefile(cls)\n    _, sourcelineno = inspect.getsourcelines(cls)\n    print(f'name: {transform_name}')\n    print(f'source: \"{sourcefile_path}:{sourcelineno}\"')\n    # print(f'doc:')\n    # class_doc = cls.__doc__\n    # if class_doc is None:\n    #     class_doc = transform_doc\n    # for line in class_doc.split('\\n'):\n    #     print('\\t'+line)\n    print('doc:', transform_doc)\n    print('='*60)"
+        }
+    ]
+}

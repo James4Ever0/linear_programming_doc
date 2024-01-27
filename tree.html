@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="github-markdown.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Project structure of: YuPan4188/jubilant-adventure</title>
+    <style>
+        .directory:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        :target {
+            background-color: yellow !important;
+        }
+
+        .folded::before {
+            content: '\25B6';
+            margin-right: 8px;
+            /* Add space between marker and text */
+        }
+
+        .expanded::before {
+            content: '\25BC';
+            margin-right: 8px;
+            /* Add space between marker and text */
+        }
+    </style>
+    <script>
+        function toggleVisibility(element) {
+            let mclass = element.getAttribute("class");
+            if (mclass == "expanded") {
+                element.setAttribute('class', 'folded');
+            } else {
+                element.setAttribute('class', 'expanded');
+            }
+            const siblings = element.parentNode.children;
+            for (const sibling of siblings) {
+                if (sibling !== element) {
+                    sibling.style.display = (sibling.style.display === 'none') ? 'block' : 'none';
+                }
+            }
+        }
+    </script>
+    <style>
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+
+            .partial-repository-url {
+                display: none;
+            }
+        }
+
+        ul {
+            list-style: none;
+        }
+        #feeling-lucky:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <article class="markdown-body">
+        <h2>Project structure<span hierarchy="0" class="partial-repository-url"> of: YuPan4188/jubilant-adventure</span><div style="float: right;"><a title="Document index" style="margin:3.5px;" href="index.html"><i class="bi bi-search"></i></a><a title="Feeling lucky" style="margin:3.5px;" id="feeling-lucky" href="#"><i class="bi bi-dice-3"></i></a><a title="Expand tree" style="margin:3.5px;" href="tree.html?full=true" id="expand-tree"><i class="bi bi-caret-down-square"></i></a></div></h2>
+<ul>
+<li><span hierarchy="0" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/"><code>jubilant-adventure</code></strong> <em>Energy and finance optimization tools</em></span><ul>
+<li><a class="file_link" href="index.html?q=/auto_question_device_params.py" id="/auto_question_device_params.py"><code>auto&UnderBar;question&UnderBar;device&UnderBar;params&period;py</code></a> <em>Auto-question device parameters importer, prompter, logger.</em></li>
+<li><a class="file_link" href="index.html?q=/celery_client_test.py" id="/celery_client_test.py"><code>celery&UnderBar;client&UnderBar;test&period;py</code></a> <em>Test Celery client using requests, checks task status and prints results.</em></li>
+<li><a class="file_link" href="index.html?q=/celery_fastapi_test.py" id="/celery_fastapi_test.py"><code>celery&UnderBar;fastapi&UnderBar;test&period;py</code></a> <em>Celery-managed FastAPI app for task status updates</em></li>
+<li><a class="file_link" href="index.html?q=/celery_test.py" id="/celery_test.py"><code>celery&UnderBar;test&period;py</code></a> <em>Celery app, Redis lock, Pydantic models, concurrency concerns.</em></li>
+<li><a class="file_link" href="index.html?q=/check_non_convex_quadratic_constraint_in_model.py" id="/check_non_convex_quadratic_constraint_in_model.py"><code>check&UnderBar;non&UnderBar;convex&UnderBar;quadratic&UnderBar;constraint&UnderBar;in&UnderBar;model&period;py</code></a> <em>Check non-convex quadratic constraint in model.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_config2.py" id="/cloudpss_config2.py"><code>cloudpss&UnderBar;config2&period;py</code></a> <em>Pandas DataFrame creator for JSON device parameters.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_config_curl_get.py" id="/cloudpss_config_curl_get.py"><code>cloudpss&UnderBar;config&UnderBar;curl&UnderBar;get&period;py</code></a> <em>Cloud-based electrical device simulation using Python and JSON</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_download_component_ports.py" id="/cloudpss_download_component_ports.py"><code>cloudpss&UnderBar;download&UnderBar;component&UnderBar;ports&period;py</code></a> <em>Download component ports URL generator</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_extract_component_ports.py" id="/cloudpss_extract_component_ports.py"><code>cloudpss&UnderBar;extract&UnderBar;component&UnderBar;ports&period;py</code></a> <em>Extracts component ports data from XML.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_jinja_code_generator.py" id="/cloudpss_jinja_code_generator.py"><code>cloudpss&UnderBar;jinja&UnderBar;code&UnderBar;generator&period;py</code></a> <em>Jinja template generator with unit conversion and data handling</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_model_revised.py" id="/cloudpss_model_revised.py"><code>cloudpss&UnderBar;model&UnderBar;revised&period;py</code></a> <em>Pyomo PV device model with PyDantic and environmental settings</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_model_template.py.j2" id="/cloudpss_model_template.py.j2"><code>cloudpss&UnderBar;model&UnderBar;template&period;py&period;j2</code></a> <em>Power system simulation model template</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_port_get.sh" id="/cloudpss_port_get.sh"><code>cloudpss&UnderBar;port&UnderBar;get&period;sh</code></a> <em>GET request to CloudPSS editor component with headers, cookies, and CORS.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_sdk_demo.py" id="/cloudpss_sdk_demo.py"><code>cloudpss&UnderBar;sdk&UnderBar;demo&period;py</code></a> <em>Design and implement Algo services APIs with CloudPSS SDK.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_unit_conversions_test.py" id="/cloudpss_unit_conversions_test.py"><code>cloudpss&UnderBar;unit&UnderBar;conversions&UnderBar;test&period;py</code></a> <em>Pint-powered unit conversions and compatibility tests.</em></li>
+<li><a class="file_link" href="index.html?q=/cloudpss_unit_create_convert_compatible.py" id="/cloudpss_unit_create_convert_compatible.py"><code>cloudpss&UnderBar;unit&UnderBar;create&UnderBar;convert&UnderBar;compatible&period;py</code></a> <em>Python code uses pint library for unit conversion and compatible unit detection.</em></li>
+<li><a class="file_link" href="index.html?q=/cmd_startup.cmd" id="/cmd_startup.cmd"><code>cmd&UnderBar;startup&period;cmd</code></a> <em>Autorun script points to D:\project\jubilant-adventure\startup.cmd</em></li>
+<li><a class="file_link" href="index.html?q=/cmd_startup.reg" id="/cmd_startup.reg"><code>cmd&UnderBar;startup&period;reg</code></a> <em>Startup.cmd runs on system startup.</em></li>
+<li><a class="file_link" href="index.html?q=/commit.py" id="/commit.py"><code>commit&period;py</code></a> <em>Calculates MD5 checksums, modifies sys.excepthook, counts modifications for Git commits on Windows and Unix systems.</em></li>
+<li><a class="file_link" href="index.html?q=/config.py" id="/config.py"><code>config&period;py</code></a> <em>Configures simulation parameters and debug settings.</em></li>
+<li><a class="file_link" href="index.html?q=/create_shim_for_ipopt.ps1" id="/create_shim_for_ipopt.ps1"><code>create&UnderBar;shim&UnderBar;for&UnderBar;ipopt&period;ps1</code></a> <em>Create shim file for IPOPT, copy pandoc.exe to ipopt.exe.</em></li>
+<li><a class="file_link" href="index.html?q=/create_shim_for_nodejs.ps1" id="/create_shim_for_nodejs.ps1"><code>create&UnderBar;shim&UnderBar;for&UnderBar;nodejs&period;ps1</code></a> <em>Create shims for Node.js in specified directory with npx.</em></li>
+<li><a class="file_link" href="index.html?q=/create_shim_for_shot.ps1" id="/create_shim_for_shot.ps1"><code>create&UnderBar;shim&UnderBar;for&UnderBar;shot&period;ps1</code></a> <em>Create shim for shot and copy pandoc</em></li>
+<li><a class="file_link" href="index.html?q=/curl_component_get.py" id="/curl_component_get.py"><code>curl&UnderBar;component&UnderBar;get&period;py</code></a> <em>Jinja2 templates, IDs, access paths, JSON rendering.</em></li>
+<li><a class="file_link" href="index.html?q=/curl_optim_component_get.sh.j2" id="/curl_optim_component_get.sh.j2"><code>curl&UnderBar;optim&UnderBar;component&UnderBar;get&period;sh&period;j2</code></a> <em>CURL optimized component retrieval script</em></li>
+<li><a class="file_link" href="index.html?q=/curl_simu_component_get.sh.j2" id="/curl_simu_component_get.sh.j2"><code>curl&UnderBar;simu&UnderBar;component&UnderBar;get&period;sh&period;j2</code></a> <em>curl script to fetch component data using API endpoint</em></li>
+<li><a class="file_link" href="index.html?q=/data_visualize_utils.py" id="/data_visualize_utils.py"><code>data&UnderBar;visualize&UnderBar;utils&period;py</code></a> <em>Data visualization module with matplotlib, binary focus.</em></li>
+<li><a class="file_link" href="index.html?q=/demo_utils.py" id="/demo_utils.py"><code>demo&UnderBar;utils&period;py</code></a> <em>Energy system setup, constraint registration, device initialization with debugging options using NumPy for hourly load data.</em></li>
+<li><a class="file_link" href="index.html?q=/docplex_test.py" id="/docplex_test.py"><code>docplex&UnderBar;test&period;py</code></a> <em>Docplex MIP model creation for solving problems.</em></li>
+<li><a class="file_link" href="index.html?q=/draw_sankey_diagram.py" id="/draw_sankey_diagram.py"><code>draw&UnderBar;sankey&UnderBar;diagram&period;py</code></a> <em>PyECharts Sankey diagram creator with two depth levels, savable as "sankey.png".</em></li>
+<li><a class="file_link" href="index.html?q=/dump_pydantic_to_json.py" id="/dump_pydantic_to_json.py"><code>dump&UnderBar;pydantic&UnderBar;to&UnderBar;json&period;py</code></a> <em>Dump Pydantic object to JSON.</em></li>
+<li><a class="file_link" href="index.html?q=/example.py" id="/example.py"><code>example&period;py</code></a> <em>CPLEX-based problem optimization with print results.</em></li>
+<li><a class="file_link" href="index.html?q=/example_docstring.py" id="/example_docstring.py"><code>example&UnderBar;docstring&period;py</code></a> <em>Dog class, global vars, function, pdoc notes, var setting, finished.</em></li>
+<li><a class="file_link" href="index.html?q=/export_pdf_word_pdoc.ps1" id="/export_pdf_word_pdoc.ps1"><code>export&UnderBar;pdf&UnderBar;word&UnderBar;pdoc&period;ps1</code></a> <em>Script generates PDF docs, UTF-16, saves as MD.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_celery_client_test.py" id="/fastapi_celery_client_test.py"><code>fastapi&UnderBar;celery&UnderBar;client&UnderBar;test&period;py</code></a> <em>FastAPI Celery client for task cancellation testing.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_celery_server.py" id="/fastapi_celery_server.py"><code>fastapi&UnderBar;celery&UnderBar;server&period;py</code></a> <em>FastAPI Celery server, energy flow graph calculation.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_client_generated_test.py" id="/fastapi_client_generated_test.py"><code>fastapi&UnderBar;client&UnderBar;generated&UnderBar;test&period;py</code></a> <em>FastAPI client, POST requests, subprocess execution.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_client_generator.py" id="/fastapi_client_generator.py"><code>fastapi&UnderBar;client&UnderBar;generator&period;py</code></a> <em>FastAPI client generator from JSON file</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_client_test.py" id="/fastapi_client_test.py"><code>fastapi&UnderBar;client&UnderBar;test&period;py</code></a> <em>Send POST request to FastAPI server, print response and status code.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_datamodel_template.py" id="/fastapi_datamodel_template.py"><code>fastapi&UnderBar;datamodel&UnderBar;template&period;py</code></a> <em>Curves, microgrid, simulation models with graphs and tasks.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_generate_nodejs_client_typescript.cmd" id="/fastapi_generate_nodejs_client_typescript.cmd"><code>fastapi&UnderBar;generate&UnderBar;nodejs&UnderBar;client&UnderBar;typescript&period;cmd</code></a> <em>Generate TypeScript client for FastAPI server using openapi-typescript-codegen</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_server_template.py" id="/fastapi_server_template.py"><code>fastapi&UnderBar;server&UnderBar;template&period;py</code></a> <em>IES system simulation &amp; optimization service with FastAPI &amp; Celery.</em></li>
+<li><a class="file_link" href="index.html?q=/fastapi_server_with_doc.py" id="/fastapi_server_with_doc.py"><code>fastapi&UnderBar;server&UnderBar;with&UnderBar;doc&period;py</code></a> <em>FastAPI server, user/item CRUD, error for "foo", OpenAPI schema.</em></li>
+<li><a class="file_link" href="index.html?q=/generate_call_graph.cmd" id="/generate_call_graph.cmd"><code>generate&UnderBar;call&UnderBar;graph&period;cmd</code></a> <em>Generates call graph of Python files using pyan3 tool.</em></li>
+<li><a class="file_link" href="index.html?q=/generate_document.cmd" id="/generate_document.cmd"><code>generate&UnderBar;document&period;cmd</code></a> <em>Python doc generation and archiving tool</em></li>
+<li><a class="file_link" href="index.html?q=/get_class_name.py" id="/get_class_name.py"><code>get&UnderBar;class&UnderBar;name&period;py</code></a> <em>Class A initializes, asserts property value, prints name, updates dict with 'someProperty'.</em></li>
+<li><a class="file_link" href="index.html?q=/get_requirements.cmd" id="/get_requirements.cmd"><code>get&UnderBar;requirements&period;cmd</code></a> <em>Concatenate Python files, list unique imports.</em></li>
+<li><a class="file_link" href="index.html?q=/host_document.cmd" id="/host_document.cmd"><code>host&UnderBar;document&period;cmd</code></a> <em>Hosting Python docs on localhost:8021</em></li>
+<li><a class="file_link" href="index.html?q=/install_gsudo.ps1" id="/install_gsudo.ps1"><code>install&UnderBar;gsudo&period;ps1</code></a> <em>gsudo installer, secure, prompt restart</em></li>
+<li><a class="file_link" href="index.html?q=/jinja_test.j2" id="/jinja_test.j2"><code>jinja&UnderBar;test&period;j2</code></a> <em>Jinja2 loop, macros, variables.</em></li>
+<li><a class="file_link" href="index.html?q=/linearization_config.py" id="/linearization_config.py"><code>linearization&UnderBar;config&period;py</code></a> <em>Imports NumPy, defines variable bounds and sample sizes.</em></li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/matlab_code/"><code>matlab&UnderBar;code</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/matlab_code/matlab_to_python_howto.md" id="/matlab_code/matlab_to_python_howto.md"><code>matlab&UnderBar;to&UnderBar;python&UnderBar;howto&period;md</code></a> <em>Convert MATLAB to Python with matlab2python tool</em></li>
+</ul>
+</li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/"><code>microgrid&UnderBar;base</code></strong> <em>Microgrid tools &amp; control optimization base</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/__init__.py" id="/microgrid_base/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Microgrid base module imports.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/adaptive_sampling/"><code>adaptive&UnderBar;sampling</code></strong> <em>Microgrid-based adaptive sampling.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test.py" id="/microgrid_base/adaptive_sampling/test.py"><code>test&period;py</code></a> <em>Optimize hyperopt objective with 100 evaluations.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_adaptive_piecewise_approximation.py" id="/microgrid_base/adaptive_sampling/test_adaptive_piecewise_approximation.py"><code>test&UnderBar;adaptive&UnderBar;piecewise&UnderBar;approximation&period;py</code></a> <em>Piecewise linear fit, four segments, predicts values.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_bisect.py" id="/microgrid_base/adaptive_sampling/test_bisect.py"><code>test&UnderBar;bisect&period;py</code></a> <em>Adaptive piecewise approximation with error threshold.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_decision_tree_linear_regression.py" id="/microgrid_base/adaptive_sampling/test_decision_tree_linear_regression.py"><code>test&UnderBar;decision&UnderBar;tree&UnderBar;linear&UnderBar;regression&period;py</code></a> <em>Decision Tree Linear Regression, Piecewise Approximation</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_get_breakpoints.py" id="/microgrid_base/adaptive_sampling/test_get_breakpoints.py"><code>test&UnderBar;get&UnderBar;breakpoints&period;py</code></a> <em>Generates data, fits model, finds breakpoints, and plots.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_mlinsights.py" id="/microgrid_base/adaptive_sampling/test_mlinsights.py"><code>test&UnderBar;mlinsights&period;py</code></a> <em>PiecewiseRegressor with DecisionTree in matplotlib demo</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_np_piecewise_curve_fit.py" id="/microgrid_base/adaptive_sampling/test_np_piecewise_curve_fit.py"><code>test&UnderBar;np&UnderBar;piecewise&UnderBar;curve&UnderBar;fit&period;py</code></a> <em>Piecewise linear function fitting, plotting.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_piecewise_regression.py" id="/microgrid_base/adaptive_sampling/test_piecewise_regression.py"><code>test&UnderBar;piecewise&UnderBar;regression&period;py</code></a> <em>Test adaptive sampling piecewise regression with sinusoidal data.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_shift.py" id="/microgrid_base/adaptive_sampling/test_shift.py"><code>test&UnderBar;shift&period;py</code></a> <em>Optimizes subsection shifts for lowest error using adaptive sampling.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/adaptive_sampling/test_torchpwl.py" id="/microgrid_base/adaptive_sampling/test_torchpwl.py"><code>test&UnderBar;torchpwl&period;py</code></a> <em>Test PWL function with 5 channels and 3 breakpoints.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/arbitrary_topology_generation.py" id="/microgrid_base/arbitrary_topology_generation.py"><code>arbitrary&UnderBar;topology&UnderBar;generation&period;py</code></a> <em>Randomly generates microgrid topology using NetworkX and Barabasi-Albert model</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/celery_test.py" id="/microgrid_base/celery_test.py"><code>celery&UnderBar;test&period;py</code></a> <em>Test Celery script for microgrid base. Loads, modifies JSON, sends POST requests. Interacts with EnergyFlowGraph objects.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/chatgpt_convert_latex_to_python/"><code>chatgpt&UnderBar;convert&UnderBar;latex&UnderBar;to&UnderBar;python</code></strong> <em>Converts Latex to Python/HTML with Markdown support.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/convert_code_to_webpage.cmd" id="/microgrid_base/chatgpt_convert_latex_to_python/convert_code_to_webpage.cmd"><code>convert&UnderBar;code&UnderBar;to&UnderBar;webpage&period;cmd</code></a> <em>Convert Latex to Python, HTML output.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md" id="/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md"><code>example&UnderBar;snippet&period;md</code></a> <em>HTML, CSS, SymPy code snippet for math-enabled text editors with Latex conversion.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/extract_line_range_from_html.py" id="/microgrid_base/chatgpt_convert_latex_to_python/extract_line_range_from_html.py"><code>extract&UnderBar;line&UnderBar;range&UnderBar;from&UnderBar;html&period;py</code></a> <em>Extracts line range from HTML and modifies.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/highlight_html.py" id="/microgrid_base/chatgpt_convert_latex_to_python/highlight_html.py"><code>highlight&UnderBar;html&period;py</code></a> <em>BeautifulSoup HTML parsing, highlighting, and saving.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/highlight_line.css" id="/microgrid_base/chatgpt_convert_latex_to_python/highlight_line.css"><code>highlight&UnderBar;line&period;css</code></a> <em>Highlight lines, green background, orange text.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md" id="/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md"><code>jump&UnderBar;to&UnderBar;line&period;md</code></a> <em>Convert Latex maths to Python code, variable constraints.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/README.md" id="/microgrid_base/chatgpt_convert_latex_to_python/README.md"><code>README&period;md</code></a> <em>LaTeX to Python conversion API demo with highlighting</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_to_html.cmd" id="/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_to_html.cmd"><code>render&UnderBar;markdown&UnderBar;to&UnderBar;html&period;cmd</code></a> <em>Convert Markdown with LaTeX to formats using various methods.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_with_latex.py" id="/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_with_latex.py"><code>render&UnderBar;markdown&UnderBar;with&UnderBar;latex&period;py</code></a> <em>Convert Markdown with LaTeX to HTML.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/chatgpt_convert_latex_to_python/test_code.py" id="/microgrid_base/chatgpt_convert_latex_to_python/test_code.py"><code>test&UnderBar;code&period;py</code></a> <em>Code tests SymPy functions, manipulates expressions and intervals.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/code_checker.py" id="/microgrid_base/code_checker.py"><code>code&UnderBar;checker&period;py</code></a> <em>Automated Python code checker for microgrid base.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/conda_init.sh" id="/microgrid_base/conda_init.sh"><code>conda&UnderBar;init&period;sh</code></a> <em>Removes packages, installs Python 3.11.2 in cplex conda env.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/config.py" id="/microgrid_base/config.py"><code>config&period;py</code></a> <em>Imports modules, retrieves IESEnv data instance.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/config_dataclasses.py" id="/microgrid_base/config_dataclasses.py"><code>config&UnderBar;dataclasses&period;py</code></a> <em>IES algorithm configurations and Docker processes classes.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/conflict_utils.py" id="/microgrid_base/conflict_utils.py"><code>conflict&UnderBar;utils&period;py</code></a> <em>Conflict resolution for optimization models using CPLEX.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/constants.py" id="/microgrid_base/constants.py"><code>constants&period;py</code></a> <em>Configure solver options and CLI commands for microgrid optimization.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/cplex_abnormal_exit_condition_debug/"><code>cplex&UnderBar;abnormal&UnderBar;exit&UnderBar;condition&UnderBar;debug</code></strong> <em>Analyzing and resolving CPLEX microgrid irregularities</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py"><code>alternative&UnderBar;solver&period;py</code></a> <em>Alternative solver initializes model, adds constraints, defines objective, handles options &amp; exceptions.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/arithmatic_prolog.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/arithmatic_prolog.pro"><code>arithmatic&UnderBar;prolog&period;pro</code></a> <em>Code defines two solve functions, constraint programming.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py"><code>associativity&UnderBar;attr&UnderBar;model&period;py</code></a> <em>Pyomo model defines variables, constraints, writes to file, and prints solution symbols.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/cbc_persistent.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/cbc_persistent.py"><code>cbc&UnderBar;persistent&period;py</code></a> <em>Microgrid CyClpSimplex optimization class</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro"><code>chatgpt&UnderBar;typesys&UnderBar;bat&UnderBar;smiple&period;pro</code></a> <em>Code defines devices, rules for use, and adder presence predicate.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_examaple.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_examaple.pro"><code>chatgpt&UnderBar;typesys&UnderBar;examaple&period;pro</code></a> <em>Devices, ports, rules, wind speed, predicates.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py"><code>check&UnderBar;invalid&UnderBar;var&UnderBar;and&UnderBar;constraints&period;py</code></a> <em>Debugging CPLEX abnormal exits in microgrid Pyomo model.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py"><code>check&UnderBar;unbounded&UnderBar;model&period;py</code></a> <em>Identifies abnormal CPLEX exit conditions in linear programming.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model_import_external.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model_import_external.py"><code>check&UnderBar;unbounded&UnderBar;model&UnderBar;import&UnderBar;external&period;py</code></a> <em>Imports modules, defines model, solves problem, checks unbounded or infeasible.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/conjugate_load_combinations_reduce.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/conjugate_load_combinations_reduce.py"><code>conjugate&UnderBar;load&UnderBar;combinations&UnderBar;reduce&period;py</code></a> <em>Generates and stores conjugate load combinations.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/coptampl_test.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/coptampl_test.py"><code>coptampl&UnderBar;test&period;py</code></a> <em>Pyomo, COptAMPL, mathematical model, solver, results</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/cplex_persistent.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/cplex_persistent.py"><code>cplex&UnderBar;persistent&period;py</code></a> <em>Solves optimized model, prints status and solution.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/dill_pickle_model.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/dill_pickle_model.py"><code>dill&UnderBar;pickle&UnderBar;model&period;py</code></a> <em>Dill Pickle serializes Pyomo model</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py"><code>docplex&UnderBar;conflict&UnderBar;refiner&period;py</code></a> <em>Debugs CPLEX process conflicts and errors.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.cmd"><code>docplex&UnderBar;feasopt&period;cmd</code></a> <em>Live stream Dash optimization script execution, unbuffered.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py"><code>docplex&UnderBar;feasopt&period;py</code></a> <em>Docplex: Feasopt for Docplex constraint optimization.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/get_feasopt_sol.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/get_feasopt_sol.cmd"><code>get&UnderBar;feasopt&UnderBar;sol&period;cmd</code></a> <em>Command-line script to run CPLEX with feasopt solver.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/get_iis_cplex.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/get_iis_cplex.cmd"><code>get&UnderBar;iis&UnderBar;cplex&period;cmd</code></a> <em>Reads CPLEX conflict info from "conflict" file.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/highspy_solve.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/highspy_solve.py"><code>highspy&UnderBar;solve&period;py</code></a> <em>Highs solver, MPS file, optimization, model status</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/init.sh" id="/microgrid_base/cplex_abnormal_exit_condition_debug/init.sh"><code>init&period;sh</code></a> <em>Moves temporary files for further use/analysis.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/ipopt_persistent.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/ipopt_persistent.py"><code>ipopt&UnderBar;persistent&period;py</code></a> <em>Imports IPOPT library for optimization solving.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/load_feasopt_sol.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/load_feasopt_sol.py"><code>load&UnderBar;feasopt&UnderBar;sol&period;py</code></a> <em>Extraction, storage, JSON, and print of feasopt.sol data.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py"><code>logical&UnderBar;constraint&UnderBar;demo&period;py</code></a> <em>Pyomo model with 4 int vars, disjuncts for units 1 &amp; 2, solves with CPLEX/IPOPT</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/lp_to_mps.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/lp_to_mps.py"><code>lp&UnderBar;to&UnderBar;mps&period;py</code></a> <em>Python script converts model to MPS or LP format using Pyomo, CPLEX</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/mps_analyze.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/mps_analyze.cmd"><code>mps&UnderBar;analyze&period;cmd</code></a> <em>Troubleshooting incompatible .mps file.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_cp_sat.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_cp_sat.py"><code>or&UnderBar;tools&UnderBar;cp&UnderBar;sat&period;py</code></a> <em>Solves CP problem, prints status &amp; objective</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_load_custom_model.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_load_custom_model.py"><code>or&UnderBar;tools&UnderBar;load&UnderBar;custom&UnderBar;model&period;py</code></a> <em>Custom model import, solve, and debug.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_solver.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_solver.py"><code>or&UnderBar;tools&UnderBar;solver&period;py</code></a> <em>Worker-task optimization with OR-Tools.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/override_method_by_copy.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/override_method_by_copy.py"><code>override&UnderBar;method&UnderBar;by&UnderBar;copy&period;py</code></a> <em>Code demonstrates function overriding through copying.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/parse_scip_solution.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/parse_scip_solution.py"><code>parse&UnderBar;scip&UnderBar;solution&period;py</code></a> <em>Parses and prints solution from XML files.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/print_all_transformation_documentation.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/print_all_transformation_documentation.py"><code>print&UnderBar;all&UnderBar;transformation&UnderBar;documentation&period;py</code></a> <em>Transformation class documentation printer</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro"><code>prolog&UnderBar;gen&period;pro</code></a> <em>Microgrid system control code with port status predicates.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2" id="/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2"><code>prolog&UnderBar;gen&period;pro&period;j2</code></a> <em>Microgrid simulation templating language</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py"><code>prolog&UnderBar;gen&period;py</code></a> <em>Generates Prolog code with Jinja templates for energy system verification.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py"><code>prolog&UnderBar;typesys&UnderBar;dynamic&UnderBar;verification&period;py</code></a> <em>Prolog-based dynamic verification with exception handling.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/python_mip_conflict.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/python_mip_conflict.py"><code>python&UnderBar;mip&UnderBar;conflict&period;py</code></a> <em>Debugging Python MIP conflict with filters.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/read_lp_and_solve_copt.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/read_lp_and_solve_copt.cmd"><code>read&UnderBar;lp&UnderBar;and&UnderBar;solve&UnderBar;copt&period;cmd</code></a> <em>Read MPS, feasibility, optimize, exit.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/README.md" id="/microgrid_base/cplex_abnormal_exit_condition_debug/README.md"><code>README&period;md</code></a> <em>Debug CPLEX abnormal exit condition devices.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py"><code>resolve&UnderBar;task&UnderBar;dependency&period;py</code></a> <em>Optimally resolves task dependencies.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py"><code>rewrite&UnderBar;prolog&UnderBar;as&UnderBar;python&period;py</code></a> <em>Generate energy combinations, check adders, validate I/O, visualize results.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/run_docplex.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/run_docplex.cmd"><code>run&UnderBar;docplex&period;cmd</code></a> <em>Run Python script with Conda, no output capture.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro"><code>sample&UnderBar;prolog&period;pro</code></a> <em>Debugging sample code for microgrid Prolog.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/scip_get_relaxed_sol.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/scip_get_relaxed_sol.cmd"><code>scip&UnderBar;get&UnderBar;relaxed&UnderBar;sol&period;cmd</code></a> <em>Solves MPS constraints, finds 1 solution, writes relaxed.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py"><code>scip&UnderBar;persistent&period;py</code></a> <em>PySCIPOpt integer programming framework for SCIP solver.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py"><code>solve&UnderBar;as&UnderBar;simplex&period;py</code></a> <em>Solves MILP with CPLEX, clones, compares, records.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/solve_miniature_ies_system.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/solve_miniature_ies_system.py"><code>solve&UnderBar;miniature&UnderBar;ies&UnderBar;system&period;py</code></a> <em>Miniature IES system solving, abnormal exit condition debugging.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue.py"><code>task&UnderBar;queue&period;py</code></a> <em>Python script uses RedisHuey for Celery-like task queue with retries and timeouts.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_test.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_test.py"><code>task&UnderBar;queue&UnderBar;test&period;py</code></a> <em>Debugging microgrid CPLEX abnormal exit conditions with task queue testing.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_worker.cmd" id="/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_worker.cmd"><code>task&UnderBar;queue&UnderBar;worker&period;cmd</code></a> <em>Run Huey consumer for task processing in Python.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_arithmatic_prolog.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_arithmatic_prolog.py"><code>test&UnderBar;arithmatic&UnderBar;prolog&period;py</code></a> <em>Test script for solvable arithmetic problems using Prolog.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query.pro"><code>test&UnderBar;iterative&UnderBar;query&period;pro</code></a> <em>Dog facts: pet, animal, cute.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query_prolog.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query_prolog.py"><code>test&UnderBar;iterative&UnderBar;query&UnderBar;prolog&period;py</code></a> <em>Iterative query Prolog database asynchronously, print results.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py"><code>test&UnderBar;method&UnderBar;registry&period;py</code></a> <em>MethodRegistry class for managing methods in a decorator registry</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro"><code>test&UnderBar;prolog&period;pro</code></a> <em>Test Prolog code with CLP(FD) for device compatibility.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog_advanced.pro" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog_advanced.pro"><code>test&UnderBar;prolog&UnderBar;advanced&period;pro</code></a> <em>Test advanced dictionary operations with key-value pairs and common tag values.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py"><code>test&UnderBar;stepwise&period;py</code></a> <em>Debugging CPLEX abnormal exit in stepwise model.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/transform_tests.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/transform_tests.py"><code>transform&UnderBar;tests&period;py</code></a> <em>Pyomo model, CPLEX solver, nonlinear constraints</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py"><code>translate&UnderBar;model&UnderBar;var&UnderBar;name&UnderBar;unicode&period;py</code></a> <em>Translate variable names using flashtext, print values.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py"><code>visualize&UnderBar;decomposition&UnderBar;pygcgopt&period;py</code></a> <em>Visualize decomposed Capacitated Multiple-Depot Routing Problem model.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_abnormal_exit_condition_debug/word_counter.py" id="/microgrid_base/cplex_abnormal_exit_condition_debug/word_counter.py"><code>word&UnderBar;counter&period;py</code></a> <em>Word counter script for keyword analysis.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/cplex_test.sh" id="/microgrid_base/cplex_test.sh"><code>cplex&UnderBar;test&period;sh</code></a> <em>Sets PATH, enables better exceptions for running Python script test_topo_check.py.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/csv_utils.py" id="/microgrid_base/csv_utils.py"><code>csv&UnderBar;utils&period;py</code></a> <em>CSV reader appends commas, creates DataFrame.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/debug_utils.py" id="/microgrid_base/debug_utils.py"><code>debug&UnderBar;utils&period;py</code></a> <em>Debugging, logging, error handling, micro challenge context manager.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/det_failsafe_reload.sh" id="/microgrid_base/det_failsafe_reload.sh"><code>det&UnderBar;failsafe&UnderBar;reload&period;sh</code></a> <em>Deterministic Failsafe Mode Initiated</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/det_synth_mock_reload.sh" id="/microgrid_base/det_synth_mock_reload.sh"><code>det&UnderBar;synth&UnderBar;mock&UnderBar;reload&period;sh</code></a> <em>Runs bash script with deterministic mock enabled</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/device_whitelist.py" id="/microgrid_base/device_whitelist.py"><code>device&UnderBar;whitelist&period;py</code></a> <em>Define whitelist of microgrid devices in Chinese terms.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/diesel_topo_check.py" id="/microgrid_base/diesel_topo_check.py"><code>diesel&UnderBar;topo&UnderBar;check&period;py</code></a> <em>Diesel generator topology check and results calculation</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/docker_launch.py" id="/microgrid_base/docker_launch.py"><code>docker&UnderBar;launch&period;py</code></a> <em>Docker management tool for updating, stopping, and tagging images.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_backup" id="/microgrid_base/Dockerfile_backup"><code>Dockerfile&UnderBar;backup</code></a> <em>Install Ubuntu, packages, setup Miniconda3 CPLEX for microgrid base.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_init" id="/microgrid_base/Dockerfile_init"><code>Dockerfile&UnderBar;init</code></a> <em>Dockerfile: Ubuntu 22.04, Conda, CPLEX setup for microgrid env.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_main" id="/microgrid_base/Dockerfile_main"><code>Dockerfile&UnderBar;main</code></a> <em>Microgrid base Dockerfile: configures CPLEX, bash files, self-updates.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_patch" id="/microgrid_base/Dockerfile_patch"><code>Dockerfile&UnderBar;patch</code></a> <em>Installs Python, CPLEX for microgrid_docplex.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_update" id="/microgrid_base/Dockerfile_update"><code>Dockerfile&UnderBar;update</code></a> <em>Updates microgrid base, installs packages, sets env vars, copies files.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Dockerfile_update_self" id="/microgrid_base/Dockerfile_update_self"><code>Dockerfile&UnderBar;update&UnderBar;self</code></a> <em>Updates base image, installs packages, sets env vars.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/download_openapi_json.sh" id="/microgrid_base/download_openapi_json.sh"><code>download&UnderBar;openapi&UnderBar;json&period;sh</code></a> <em>Downloads OpenAPI JSON file and saves it.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/dsl_parser/"><code>dsl&UnderBar;parser</code></strong> <em>Microgrid DSL parser for simulation and code generation.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/ast_utils.py" id="/microgrid_base/dsl_parser/ast_utils.py"><code>ast&UnderBar;utils&period;py</code></a> <em>Recursive function for flattening models.</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/dsl_parser/erglang_test/"><code>erglang&UnderBar;test</code></strong> <em>Erlang tests and functions directory</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/erglang_test/mytest.er" id="/microgrid_base/dsl_parser/erglang_test/mytest.er"><code>mytest&period;er</code></a> <em>Generate random val between 0 and 10.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/erglang_test/sample_external_func.d.er" id="/microgrid_base/dsl_parser/erglang_test/sample_external_func.d.er"><code>sample&UnderBar;external&UnderBar;func&period;d&period;er</code></a> <em>External function in Erlang takes natural input, returns output.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/erglang_test/sample_external_func.py" id="/microgrid_base/dsl_parser/erglang_test/sample_external_func.py"><code>sample&UnderBar;external&UnderBar;func&period;py</code></a> <em>Lambda function for x+1</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/functional_base.py.j2" id="/microgrid_base/dsl_parser/functional_base.py.j2"><code>functional&UnderBar;base&period;py&period;j2</code></a> <em>Checks and appends non-executable statements to IES/LES lists.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/generate_code.py" id="/microgrid_base/dsl_parser/generate_code.py"><code>generate&UnderBar;code&period;py</code></a> <em>Generates microgrid base code using templates</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/grammar.tx" id="/microgrid_base/dsl_parser/grammar.tx"><code>grammar&period;tx</code></a> <em>Microgrid input data grammar definition</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/lex_yacc.py" id="/microgrid_base/dsl_parser/lex_yacc.py"><code>lex&UnderBar;yacc&period;py</code></a> <em>LexMeta class defines consistent token attributes for PLY lexer/parser.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/Makefile" id="/microgrid_base/dsl_parser/Makefile"><code>Makefile</code></a> <em>Test Makefile for DSL parser project</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/mylang.ies" id="/microgrid_base/dsl_parser/mylang.ies"><code>mylang&period;ies</code></a> <em>Introduces microgrid simulation language with advanced features.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/pyomo_reduce_inequalities.py" id="/microgrid_base/dsl_parser/pyomo_reduce_inequalities.py"><code>pyomo&UnderBar;reduce&UnderBar;inequalities&period;py</code></a> <em>Pyomo CPLEX, solve inequalities, abnormal exit conditions.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/README.md" id="/microgrid_base/dsl_parser/README.md"><code>README&period;md</code></a> <em>Automatic unit conversion in functional programming language.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/sample.ies" id="/microgrid_base/dsl_parser/sample.ies"><code>sample&period;ies</code></a> <em>Chinese code, defines "abcd" model with constants a, b, C and list d, e.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/suppress_strict_inequalities.py" id="/microgrid_base/dsl_parser/suppress_strict_inequalities.py"><code>suppress&UnderBar;strict&UnderBar;inequalities&period;py</code></a> <em>Suppresses strict inequalities, solves Pyomo model.</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/dsl_parser/test/"><code>test</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/test/test_dsl.py" id="/microgrid_base/dsl_parser/test/test_dsl.py"><code>test&UnderBar;dsl&period;py</code></a> <em>Testing DSL parsing functionality with JSON fixtures.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/textx_syntax.py" id="/microgrid_base/dsl_parser/textx_syntax.py"><code>textx&UnderBar;syntax&period;py</code></a> <em>Parses grammar, constructs metamodel, and prints parsed model structure.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/yacc_init.py" id="/microgrid_base/dsl_parser/yacc_init.py"><code>yacc&UnderBar;init&period;py</code></a> <em>Yacc-based parser with Ply lexer import.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/your_model_name.lp" id="/microgrid_base/dsl_parser/your_model_name.lp"><code>your&UnderBar;model&UnderBar;name&period;lp</code></a> <em>Pyomo optimization model: minimize x, constrain y, z, h</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/dsl_parser/%E6%9F%B4%E6%B2%B9.ies" id="/microgrid_base/dsl_parser/柴油.ies"><code>柴油&period;ies</code></a> <em>柴油燃料模型代码</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/enum_class_as_literal_type.py" id="/microgrid_base/enum_class_as_literal_type.py"><code>enum&UnderBar;class&UnderBar;as&UnderBar;literal&UnderBar;type&period;py</code></a> <em>Enum, Literal, Pydantic: validate input data constants.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/enumerate_possible_states.py" id="/microgrid_base/enumerate_possible_states.py"><code>enumerate&UnderBar;possible&UnderBar;states&period;py</code></a> <em>Generates and checks all state combinations.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/export_format_units.py" id="/microgrid_base/export_format_units.py"><code>export&UnderBar;format&UnderBar;units&period;py</code></a> <em>Microgrid units class for energy source/device exports.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/export_format_units.py.j2" id="/microgrid_base/export_format_units.py.j2"><code>export&UnderBar;format&UnderBar;units&period;py&period;j2</code></a> <em>Generates device classes with params and units.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/export_format_validate.py" id="/microgrid_base/export_format_validate.py"><code>export&UnderBar;format&UnderBar;validate&period;py</code></a> <em>Microgrid simulation with PV, wind, battery, and hydrogen support.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/export_format_validate.py.j2" id="/microgrid_base/export_format_validate.py.j2"><code>export&UnderBar;format&UnderBar;validate&period;py&period;j2</code></a> <em>Microgrid simulation, efficiency, cost, exports data.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/expr_utils.py" id="/microgrid_base/expr_utils.py"><code>expr&UnderBar;utils&period;py</code></a> <em>Simplifies and evaluates symbolic expressions using regex and SymPy.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/extra_models.py" id="/microgrid_base/extra_models.py"><code>extra&UnderBar;models&period;py</code></a> <em>Imports extra models, defines logger_print.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/failsafe_reload.sh" id="/microgrid_base/failsafe_reload.sh"><code>failsafe&UnderBar;reload&period;sh</code></a> <em>Failsafe microgrid reload script.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/failsafe_synth_mock_reload.sh" id="/microgrid_base/failsafe_synth_mock_reload.sh"><code>failsafe&UnderBar;synth&UnderBar;mock&UnderBar;reload&period;sh</code></a> <em>Failsafe microgrid script: sets FAILSAFE, runs synth_mock_reload.sh.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/failsafe_utils.py" id="/microgrid_base/failsafe_utils.py"><code>failsafe&UnderBar;utils&period;py</code></a> <em>Microgrid failsafe utilities with logger, solver scripting.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_celery_functions.py" id="/microgrid_base/fastapi_celery_functions.py"><code>fastapi&UnderBar;celery&UnderBar;functions&period;py</code></a> <em>Calculates microgrid energy flow graph and handles exceptions.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_celery_server.py" id="/microgrid_base/fastapi_celery_server.py"><code>fastapi&UnderBar;celery&UnderBar;server&period;py</code></a> <em>Celery app setup for microgrid, exception handling, task functions. Log issues.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_datamodel_template.py" id="/microgrid_base/fastapi_datamodel_template.py"><code>fastapi&UnderBar;datamodel&UnderBar;template&period;py</code></a> <em>FastAPI data model template for microgrid objects.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_server_template.py" id="/microgrid_base/fastapi_server_template.py"><code>fastapi&UnderBar;server&UnderBar;template&period;py</code></a> <em>FastAPI server for microgrid optimization with Celery tasks and Pareto curve support.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_terminate_service.sh" id="/microgrid_base/fastapi_terminate_service.sh"><code>fastapi&UnderBar;terminate&UnderBar;service&period;sh</code></a> <em>Kills RabbitMQ, Redis, then terminates remaining panes with TMX.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_tmuxp.sh" id="/microgrid_base/fastapi_tmuxp.sh"><code>fastapi&UnderBar;tmuxp&period;sh</code></a> <em>Cross-platform tmuxp config loader.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/fastapi_tmuxp.yml" id="/microgrid_base/fastapi_tmuxp.yml"><code>fastapi&UnderBar;tmuxp&period;yml</code></a> <em>FastAPI Tmux session with multiple windows and panes running various commands.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/financial/"><code>financial</code></strong> <em>Microgrid financial calculations with sympy</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/financial/financial_calc.py" id="/microgrid_base/financial/financial_calc.py"><code>financial&UnderBar;calc&period;py</code></a> <em>Annuity factor financial calc function using sympy</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/financial/financial_equation_solve.py" id="/microgrid_base/financial/financial_equation_solve.py"><code>financial&UnderBar;equation&UnderBar;solve&period;py</code></a> <em>Solves financial equations using sympy.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/generate_basic_params.sh" id="/microgrid_base/generate_basic_params.sh"><code>generate&UnderBar;basic&UnderBar;params&period;sh</code></a> <em>Generates code from scripts, checks errors.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/generate_makefile.py" id="/microgrid_base/generate_makefile.py"><code>generate&UnderBar;makefile&period;py</code></a> <em>Generate Python makefile from directory.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/generate_microgrid_device_names.py" id="/microgrid_base/generate_microgrid_device_names.py"><code>generate&UnderBar;microgrid&UnderBar;device&UnderBar;names&period;py</code></a> <em>Prepares microgrid device names from CSV.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/get_poly_degree_decompose_expression.py" id="/microgrid_base/get_poly_degree_decompose_expression.py"><code>get&UnderBar;poly&UnderBar;degree&UnderBar;decompose&UnderBar;expression&period;py</code></a> <em>Converts expression to Sympy format and simplifies</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/heatpump_code_reference/"><code>heatpump&UnderBar;code&UnderBar;reference</code></strong> <em>Microgrid heat pump optimization &amp; models.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/chained_submodel.py" id="/microgrid_base/heatpump_code_reference/chained_submodel.py"><code>chained&UnderBar;submodel&period;py</code></a> <em>Chained submodel, CPLEX optimization with mutable parameters.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/example.py" id="/microgrid_base/heatpump_code_reference/example.py"><code>example&period;py</code></a> <em>Solves MIP problem using CPLEX, handles errors.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/Machine_para_fit2.py" id="/microgrid_base/heatpump_code_reference/Machine_para_fit2.py"><code>Machine&UnderBar;para&UnderBar;fit2&period;py</code></a> <em>Heat pump model training and COP prediction.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/plot_arr.py" id="/microgrid_base/heatpump_code_reference/plot_arr.py"><code>plot&UnderBar;arr&period;py</code></a> <em>Plots temperature data, saves figure with title.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/print_profile.py" id="/microgrid_base/heatpump_code_reference/print_profile.py"><code>print&UnderBar;profile&period;py</code></a> <em>Prints sorted, filtered profile stats</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/profile_code.py" id="/microgrid_base/heatpump_code_reference/profile_code.py"><code>profile&UnderBar;code&period;py</code></a> <em>Heat pump profile code: Profiles model building, logs results</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py" id="/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py"><code>pyomo&UnderBar;piecewise&UnderBar;set&period;py</code></a> <em>Pyomo piecewise set model: Minimize sum 'cy', considering bounds and conditions. Fast execution time.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/pyomo_piecewise_set_concrete.py" id="/microgrid_base/heatpump_code_reference/pyomo_piecewise_set_concrete.py"><code>pyomo&UnderBar;piecewise&UnderBar;set&UnderBar;concrete&period;py</code></a> <em>Concrete model, set [1,2], piecewise function, valid variables.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/result_processlib.py" id="/microgrid_base/heatpump_code_reference/result_processlib.py"><code>result&UnderBar;processlib&period;py</code></a> <em>Processes variable values in solution objects</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/run_profile.cmd" id="/microgrid_base/heatpump_code_reference/run_profile.cmd"><code>run&UnderBar;profile&period;cmd</code></a> <em>Runs profile_code.py with 2 conda envs and live-stream output.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py" id="/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py"><code>self&UnderBar;contained&UnderBar;class&UnderBar;which&UnderBar;trace&UnderBar;the&UnderBar;caller&period;py</code></a> <em>Traces caller of class methods in self-contained Python classes.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/heatpump_code_reference/SoilSource_new.py" id="/microgrid_base/heatpump_code_reference/SoilSource_new.py"><code>SoilSource&UnderBar;new&period;py</code></a> <em>Heat pump model with coefficients, optimization, and Tfav storage.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/HOW_TO_DEBUG.md" id="/microgrid_base/HOW_TO_DEBUG.md"><code>HOW&UnderBar;TO&UnderBar;DEBUG&period;md</code></a> <em>Debugging MILP models for microgrids: categorize, adjust objective, isolate errors.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/ies_optim.py" id="/microgrid_base/ies_optim.py"><code>ies&UnderBar;optim&period;py</code></a> <em>Optimize IES with imported functions from modules.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/ies_optim_legacy.py.j2" id="/microgrid_base/ies_optim_legacy.py.j2"><code>ies&UnderBar;optim&UnderBar;legacy&period;py&period;j2</code></a> <em>Microgrid optimization program with data validation and features.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init.sh" id="/microgrid_base/init.sh"><code>init&period;sh</code></a> <em>Initialize microgrid base, APT, solver, and Conda.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_apt_environ.sh" id="/microgrid_base/init_apt_environ.sh"><code>init&UnderBar;apt&UnderBar;environ&period;sh</code></a> <em>Initialize package installation, update if needed.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_docker_launch.sh" id="/microgrid_base/init_docker_launch.sh"><code>init&UnderBar;docker&UnderBar;launch&period;sh</code></a> <em>Installs Docker, uninstalls packages, reinstalls new ones.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_solver.sh" id="/microgrid_base/init_solver.sh"><code>init&UnderBar;solver&period;sh</code></a> <em>Installs libraries for conda's "cplex" environment.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_update_conda.sh" id="/microgrid_base/init_update_conda.sh"><code>init&UnderBar;update&UnderBar;conda&period;sh</code></a> <em>Initialize/update Conda packages (cplex, docplex)</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_update_conda_cplex.sh" id="/microgrid_base/init_update_conda_cplex.sh"><code>init&UnderBar;update&UnderBar;conda&UnderBar;cplex&period;sh</code></a> <em>Configures global index URL, installs packages.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/init_update_conda_docplex.sh" id="/microgrid_base/init_update_conda_docplex.sh"><code>init&UnderBar;update&UnderBar;conda&UnderBar;docplex&period;sh</code></a> <em>Install DOCPLEX via pip in Conda, real-time updates.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/install_cplex.sh" id="/microgrid_base/install_cplex.sh"><code>install&UnderBar;cplex&period;sh</code></a> <em>Installs CPLEX binary via script</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/install_docker.sh" id="/microgrid_base/install_docker.sh"><code>install&UnderBar;docker&period;sh</code></a> <em>Installs Docker on Ubuntu, dry-run option available</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/jinja_template_model_generator.py" id="/microgrid_base/jinja_template_model_generator.py"><code>jinja&UnderBar;template&UnderBar;model&UnderBar;generator&period;py</code></a> <em>Jinja template-based microgrid code generator</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/jinja_utils.py" id="/microgrid_base/jinja_utils.py"><code>jinja&UnderBar;utils&period;py</code></a> <em>Python Jinja templating utilities with error handling</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/json_utils.py" id="/microgrid_base/json_utils.py"><code>json&UnderBar;utils&period;py</code></a> <em>JSON update function with copy and traversal</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/lib_parse_params.py" id="/microgrid_base/lib_parse_params.py"><code>lib&UnderBar;parse&UnderBar;params&period;py</code></a> <em>Parse, repair, extract, filter, update JSON.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/log_infeasible.py" id="/microgrid_base/log_infeasible.py"><code>log&UnderBar;infeasible&period;py</code></a> <em>Pyomo model, SolverFactory, infeasible constraint logging for microgrid.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/log_infeasible.sh" id="/microgrid_base/log_infeasible.sh"><code>log&UnderBar;infeasible&period;sh</code></a> <em>Sets PATH, runs CPLEX script for optimization problems.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/macro_test.j2" id="/microgrid_base/macro_test.j2"><code>macro&UnderBar;test&period;j2</code></a> <em>Jinja2 macros customization and usage.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/macro_test.py" id="/microgrid_base/macro_test.py"><code>macro&UnderBar;test&period;py</code></a> <em>Macro test imports, renders template, logs result.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Makefile" id="/microgrid_base/Makefile"><code>Makefile</code></a> <em>Configure microgrid server, install dependencies, and build tasks.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/Makefile.j2" id="/microgrid_base/Makefile.j2"><code>Makefile&period;j2</code></a> <em>Macro-defined Makefile for Python files, looping and rule creation.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/makefile_ninja_pytest_incremental_test/"><code>makefile&UnderBar;ninja&UnderBar;pytest&UnderBar;incremental&UnderBar;test</code></strong> <em>Automated testing Microgrid base with incremental Ninja.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/construct_ninja_file.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/construct_ninja_file.py"><code>construct&UnderBar;ninja&UnderBar;file&period;py</code></a> <em>Creates Ninja file with comment text using Writer class.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/dodo.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/dodo.py"><code>dodo&period;py</code></a> <em>Random task execution.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/generic.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/generic.py"><code>generic&period;py</code></a> <em>Generic typing for flexible data types.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/lfnf.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/lfnf.py"><code>lfnf&period;py</code></a> <em>Testing equality of 1 and 1, 2 and 1. One failed.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/Makefile.j2" id="/microgrid_base/makefile_ninja_pytest_incremental_test/Makefile.j2"><code>Makefile&period;j2</code></a> <em>Jinja-powered, boilerplate-reducing Makefile template</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/mytest.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/mytest.py"><code>mytest&period;py</code></a> <em>Test pytest with Ninja, Protocol class, and fixtures.</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/"><code>platform&UnderBar;detect&UnderBar;makefile</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/Makefile" id="/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/Makefile"><code>Makefile</code></a> <em>Detects platform using Python script, assigns to PLATFORM.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/test_buffer.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/test_buffer.py"><code>test&UnderBar;buffer&period;py</code></a> <em>Infinite loop, "OUTPUT" printed every second.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py"><code>type&UnderBar;check&period;py</code></a> <em>NewType, namedtuple, arithmetic ops, subscription access, list length.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/makefile_ninja_pytest_incremental_test/typecheck.py" id="/microgrid_base/makefile_ninja_pytest_incremental_test/typecheck.py"><code>typecheck&period;py</code></a> <em>Type-check function arguments for expected types.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/metaclass_field_verification.py" id="/microgrid_base/metaclass_field_verification.py"><code>metaclass&UnderBar;field&UnderBar;verification&period;py</code></a> <em>Metaclass-based multiplication and abstract methods.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/microgrid_topo_check.py" id="/microgrid_base/microgrid_topo_check.py"><code>microgrid&UnderBar;topo&UnderBar;check&period;py</code></a> <em>Prepares environment, defines microgrid topology and optimizes parameters.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/mock_data_test.py" id="/microgrid_base/mock_data_test.py"><code>mock&UnderBar;data&UnderBar;test&period;py</code></a> <em>Mock data generation for energy flow graphs testing.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/mock_reload.sh" id="/microgrid_base/mock_reload.sh"><code>mock&UnderBar;reload&period;sh</code></a> <em>Mock reload, delete logs, extract files, create history directory, run scripts in mock environment.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/mock_utils.py" id="/microgrid_base/mock_utils.py"><code>mock&UnderBar;utils&period;py</code></a> <em>Mock utilities for microgrid modeling.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/modify_bashrc_for_mamba.py" id="/microgrid_base/modify_bashrc_for_mamba.py"><code>modify&UnderBar;bashrc&UnderBar;for&UnderBar;mamba&period;py</code></a> <em>Modify .bashrc for Mamba initialization.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/natural_gas_generator_template.py" id="/microgrid_base/natural_gas_generator_template.py"><code>natural&UnderBar;gas&UnderBar;generator&UnderBar;template&period;py</code></a> <em>Natural gas generator template demo</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/packup_type_system.sh" id="/microgrid_base/packup_type_system.sh"><code>packup&UnderBar;type&UnderBar;system&period;sh</code></a> <em>Creates "type_system.7z" archive with microgrid files and text file</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/param_base.py" id="/microgrid_base/param_base.py"><code>param&UnderBar;base&period;py</code></a> <em>Configures microgrid simulation parameters and devices.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/parse_export_format.py" id="/microgrid_base/parse_export_format.py"><code>parse&UnderBar;export&UnderBar;format&period;py</code></a> <em>Microgrid simulation code processes Excel data to JSON format.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/parse_frontend_sim_param_translation.py" id="/microgrid_base/parse_frontend_sim_param_translation.py"><code>parse&UnderBar;frontend&UnderBar;sim&UnderBar;param&UnderBar;translation&period;py</code></a> <em>Maps Chinese names to English from JS file.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/parse_optim_constraints.py" id="/microgrid_base/parse_optim_constraints.py"><code>parse&UnderBar;optim&UnderBar;constraints&period;py</code></a> <em>Parses microgrid optimizer constraints and logs types, names.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/parse_params.py" id="/microgrid_base/parse_params.py"><code>parse&UnderBar;params&period;py</code></a> <em>CSV XLSX JSON parsing and conversion tool</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/parse_units_and_names.py" id="/microgrid_base/parse_units_and_names.py"><code>parse&UnderBar;units&UnderBar;and&UnderBar;names&period;py</code></a> <em>Parse, format, retrieve, process, update, convert, categorize, populate, ensure compatibility.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/passwords_template.py" id="/microgrid_base/passwords_template.py"><code>passwords&UnderBar;template&period;py</code></a> <em>Password-initialized, logger_print imported.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/plot_utils.py" id="/microgrid_base/plot_utils.py"><code>plot&UnderBar;utils&period;py</code></a> <em>Plots microgrid topologies and devices.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/prolog_gen.pro.j2" id="/microgrid_base/prolog_gen.pro.j2"><code>prolog&UnderBar;gen&period;pro&period;j2</code></a> <em>Prolog code for energy-based microgrid logic and list manipulation</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/pyomo_environ.py" id="/microgrid_base/pyomo_environ.py"><code>pyomo&UnderBar;environ&period;py</code></a> <em>Imports, checks, transforms disjunctive models.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/pyomo_patch.py" id="/microgrid_base/pyomo_patch.py"><code>pyomo&UnderBar;patch&period;py</code></a> <em>Patch adds strict inequality support, maintains compatibility, and customizes _BlockData class.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/pyright_utils.py" id="/microgrid_base/pyright_utils.py"><code>pyright&UnderBar;utils&period;py</code></a> <em>Monkey-patched Pyright testing functions and error handling.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/README.md" id="/microgrid_base/README.md"><code>README&period;md</code></a> <em>Python-based microgrid system using IESLang.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/reduce_demo_data_size.py" id="/microgrid_base/reduce_demo_data_size.py"><code>reduce&UnderBar;demo&UnderBar;data&UnderBar;size&period;py</code></a> <em>Reduce JSON data size with specific transformations.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/reload.sh" id="/microgrid_base/reload.sh"><code>reload&period;sh</code></a> <em>Updates APT, installs 7z, unpacks release, sets environment for Docker launch.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/render_and_packup_report.py" id="/microgrid_base/render_and_packup_report.py"><code>render&UnderBar;and&UnderBar;packup&UnderBar;report&period;py</code></a> <em>Reports generation, packing, logging, and copying.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/render_type_utils.py" id="/microgrid_base/render_type_utils.py"><code>render&UnderBar;type&UnderBar;utils&period;py</code></a> <em>Manages microgrid systems with classes, dictionaries, and functions.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/report_template.md.j2" id="/microgrid_base/report_template.md.j2"><code>report&UnderBar;template&period;md&period;j2</code></a> <em>Microgrid report template generator</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/setup_docker.sh" id="/microgrid_base/setup_docker.sh"><code>setup&UnderBar;docker&period;sh</code></a> <em>Install Docker and dependencies script.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/shared_datamodels.py" id="/microgrid_base/shared_datamodels.py"><code>shared&UnderBar;datamodels&period;py</code></a> <em>Refine conflict parameters in microgrid base.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/solve_model.py" id="/microgrid_base/solve_model.py"><code>solve&UnderBar;model&period;py</code></a> <em>Solve microgrid models with CPLEX optimization.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/synth_mock_reload.sh" id="/microgrid_base/synth_mock_reload.sh"><code>synth&UnderBar;mock&UnderBar;reload&period;sh</code></a> <em>Set GENERATED_MOCK to True, run reload.sh script.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/test/"><code>test</code></strong> <em>Evaluates, fixes and optimizes cost-effective microgrid components.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/circular_import_a.py" id="/microgrid_base/test/circular_import_a.py"><code>circular&UnderBar;import&UnderBar;a&period;py</code></a> <em>Circular import of a and b, print 'b'.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/circular_import_b.py" id="/microgrid_base/test/circular_import_b.py"><code>circular&UnderBar;import&UnderBar;b&period;py</code></a> <em>Circular import error in circular_import_b.py</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/common_fixtures.py.j2" id="/microgrid_base/test/common_fixtures.py.j2"><code>common&UnderBar;fixtures&period;py&period;j2</code></a> <em>Microgrid test fixtures template for NumPy, Jinja.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/conic_problem.py" id="/microgrid_base/test/conic_problem.py"><code>conic&UnderBar;problem&period;py</code></a> <em>Conic problem: find min/max values of x*y - 2(x+y)</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/dev_info_tmp_gen.py" id="/microgrid_base/test/dev_info_tmp_gen.py"><code>dev&UnderBar;info&UnderBar;tmp&UnderBar;gen&period;py</code></a> <em>Generates device info for microgrid system.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/generate_test_model.py" id="/microgrid_base/test/generate_test_model.py"><code>generate&UnderBar;test&UnderBar;model&period;py</code></a> <em>Generates test model using Jinja utils.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/Makefile" id="/microgrid_base/test/Makefile"><code>Makefile</code></a> <em>Set up environment, define exec methods, run tests. Makefile with rules for files needed by tests.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/mapping_relationship_in_enum_classes.py" id="/microgrid_base/test/mapping_relationship_in_enum_classes.py"><code>mapping&UnderBar;relationship&UnderBar;in&UnderBar;enum&UnderBar;classes&period;py</code></a> <em>Enum class mapping relationships. Mapping between A and B, new member creation.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/read_yaml.py" id="/microgrid_base/test/read_yaml.py"><code>read&UnderBar;yaml&period;py</code></a> <em>YAML configuration file reader and printer</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/run_test.sh" id="/microgrid_base/test/run_test.sh"><code>run&UnderBar;test&period;sh</code></a> <em>Runs CPLEX test with pytest flags and parameters.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/runtime_override_stepwise.py" id="/microgrid_base/test/runtime_override_stepwise.py"><code>runtime&UnderBar;override&UnderBar;stepwise&period;py</code></a> <em>Stepwise code manipulation for testing.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_common_fixtures.py" id="/microgrid_base/test/test_common_fixtures.py"><code>test&UnderBar;common&UnderBar;fixtures&period;py</code></a> <em>Fixture function for pytest framework, returns "FIXTURE VAL".</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_dict_fallback.py" id="/microgrid_base/test/test_dict_fallback.py"><code>test&UnderBar;dict&UnderBar;fallback&period;py</code></a> <em>Test: Defaultdict with fallback "default"</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_export.py.j2" id="/microgrid_base/test/test_export.py.j2"><code>test&UnderBar;export&period;py&period;j2</code></a> <em>Microgrid base test script.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_failsafe.py" id="/microgrid_base/test/test_failsafe.py"><code>test&UnderBar;failsafe&period;py</code></a> <em>Microgrid failsafe testing in Python.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_getter_setter_dynamic_property.py" id="/microgrid_base/test/test_getter_setter_dynamic_property.py"><code>test&UnderBar;getter&UnderBar;setter&UnderBar;dynamic&UnderBar;property&period;py</code></a> <em>TestClass: slots, getter/setter, unexpected behavior with unrelated property.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_model.py.j2" id="/microgrid_base/test/test_model.py.j2"><code>test&UnderBar;model&period;py&period;j2</code></a> <em>Testing, optimizing, and solving power models. Efficiency and cost analysis.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_model_info.py" id="/microgrid_base/test/test_model_info.py"><code>test&UnderBar;model&UnderBar;info&period;py</code></a> <em>Test Hydra-based microgrid config utility</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_pwire_select.py" id="/microgrid_base/test/test_pwire_select.py"><code>test&UnderBar;pwire&UnderBar;select&period;py</code></a> <em>Power wire selection algorithm.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_setting_calculated_value.py" id="/microgrid_base/test/test_setting_calculated_value.py"><code>test&UnderBar;setting&UnderBar;calculated&UnderBar;value&period;py</code></a> <em>Code sets attribute 'a' to 2 when setting attribute 'b'.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test/test_use_fixture.py" id="/microgrid_base/test/test_use_fixture.py"><code>test&UnderBar;use&UnderBar;fixture&period;py</code></a> <em>Tests "my_fixture" from "test_common_fixtures".</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_class.py" id="/microgrid_base/test_class.py"><code>test&UnderBar;class&period;py</code></a> <em>Graph creation and analysis with NetworkX, JSON conversion.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_json_input_format.py" id="/microgrid_base/test_json_input_format.py"><code>test&UnderBar;json&UnderBar;input&UnderBar;format&period;py</code></a> <em>Test script for JSON input format in microgrid simulation.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/microgrid_base/test_neverundefined/"><code>test&UnderBar;neverundefined</code></strong> <em>Microgrid base test, never undefined.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_neverundefined/template.j2" id="/microgrid_base/test_neverundefined/template.j2"><code>template&period;j2</code></a> <em>Macro "mtest" expects 3 arguments, called without any, causing error.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_neverundefined/test.py" id="/microgrid_base/test_neverundefined/test.py"><code>test&period;py</code></a> <em>Test script imports, defines empty dictionary, loads template into "output.txt".</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_neverundefined/test_strict.py" id="/microgrid_base/test_neverundefined/test_strict.py"><code>test&UnderBar;strict&period;py</code></a> <em>Jinja2 strict undefined test.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_replace_logger.py.j2" id="/microgrid_base/test_replace_logger.py.j2"><code>test&UnderBar;replace&UnderBar;logger&period;py&period;j2</code></a> <em>Unused loggers in both functions</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_replace_logger_no_template.py" id="/microgrid_base/test_replace_logger_no_template.py"><code>test&UnderBar;replace&UnderBar;logger&UnderBar;no&UnderBar;template&period;py</code></a> <em>No logger, duplicate prints.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_topo_check.py" id="/microgrid_base/test_topo_check.py"><code>test&UnderBar;topo&UnderBar;check&period;py</code></a> <em>Microgrid ops, PV-diesel, JSON topology check, constraint verification.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_wrapper.py" id="/microgrid_base/test_wrapper.py"><code>test&UnderBar;wrapper&period;py</code></a> <em>Celery app, task function, resource constraints.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/test_wrapper_celery.py" id="/microgrid_base/test_wrapper_celery.py"><code>test&UnderBar;wrapper&UnderBar;celery&period;py</code></a> <em>Monitor task execution progress with Celery app.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/topo_check.py" id="/microgrid_base/topo_check.py"><code>topo&UnderBar;check&period;py</code></a> <em>Microgrid base topology checker.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/topo_check_v1.py.j2" id="/microgrid_base/topo_check_v1.py.j2"><code>topo&UnderBar;check&UnderBar;v1&period;py&period;j2</code></a> <em>Microgrid network validation and topology initialization.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/topo_check_v2.py.j2" id="/microgrid_base/topo_check_v2.py.j2"><code>topo&UnderBar;check&UnderBar;v2&period;py&period;j2</code></a> <em>Microgrid topology management and network analysis.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/type_def.py" id="/microgrid_base/type_def.py"><code>type&UnderBar;def&period;py</code></a> <em>StrEnum definitions for energy, water, and refrigerants. Type resolver function included.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/type_system.md" id="/microgrid_base/type_system.md"><code>type&UnderBar;system&period;md</code></a> <em>Microgrid device type system: rules, formats, connection relationships.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/type_system.py" id="/microgrid_base/type_system.py"><code>type&UnderBar;system&period;py</code></a> <em>Manages device ports, connection lines, and microgrid types.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/type_system_v2.py" id="/microgrid_base/type_system_v2.py"><code>type&UnderBar;system&UnderBar;v2&period;py</code></a> <em>Microgrid system type 2 with config, matrices, params, and graph visualization.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/type_utils.py.j2" id="/microgrid_base/type_utils.py.j2"><code>type&UnderBar;utils&period;py&period;j2</code></a> <em>Microgrid system Prolog environment verification and validation.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/typical_day_calc.py" id="/microgrid_base/typical_day_calc.py"><code>typical&UnderBar;day&UnderBar;calc&period;py</code></a> <em>Microgrid daily load calculations and day lists.</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/unit_utils.py" id="/microgrid_base/unit_utils.py"><code>unit&UnderBar;utils&period;py</code></a> <em>Unit conversion tool using pint's UnitRegistry and logging</em></li>
+<li><a class="file_link" href="index.html?q=/microgrid_base/violation_utils.py" id="/microgrid_base/violation_utils.py"><code>violation&UnderBar;utils&period;py</code></a> <em>Microgrid system violation analysis and constraints handling.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/mini_data_log_utils.py" id="/mini_data_log_utils.py"><code>mini&UnderBar;data&UnderBar;log&UnderBar;utils&period;py</code></a> <em>Solves IntegratedEnergySystem models, handles conflicts, returns solution or error.</em></li>
+<li><a class="file_link" href="index.html?q=/mini_heat_system.py" id="/mini_heat_system.py"><code>mini&UnderBar;heat&UnderBar;system&period;py</code></a> <em>Mini-heat system initialization, device creation, and visualization.</em></li>
+<li><a class="file_link" href="index.html?q=/mini_ies_test.py" id="/mini_ies_test.py"><code>mini&UnderBar;ies&UnderBar;test&period;py</code></a> <em>Microgrid simulation with CPLEX and EnergyStorageSystem.</em></li>
+<li><a class="file_link" href="index.html?q=/mini_ies_topology.py" id="/mini_ies_topology.py"><code>mini&UnderBar;ies&UnderBar;topology&period;py</code></a> <em>Python script visualizes network graph with nodes PV, BESS, LOAD, NODE1, GRID</em></li>
+<li><a class="file_link" href="index.html?q=/mini_refrigeration_system.py" id="/mini_refrigeration_system.py"><code>mini&UnderBar;refrigeration&UnderBar;system&period;py</code></a> <em>Mini refrigeration system with LiBr model, photothermal plate.</em></li>
+<li><a class="file_link" href="index.html?q=/network_visualize_packup.cmd" id="/network_visualize_packup.cmd"><code>network&UnderBar;visualize&UnderBar;packup&period;cmd</code></a> <em>Compresses Python files into archive. More commands coming.</em></li>
+<li><a class="file_link" href="index.html?q=/neural_network_demo.py" id="/neural_network_demo.py"><code>neural&UnderBar;network&UnderBar;demo&period;py</code></a> <em>Neural network model with Hardtanh, 3 layers.</em></li>
+<li><a class="file_link" href="index.html?q=/neural_network_linearize_nonlinear_function_test.py" id="/neural_network_linearize_nonlinear_function_test.py"><code>neural&UnderBar;network&UnderBar;linearize&UnderBar;nonlinear&UnderBar;function&UnderBar;test&period;py</code></a> <em>Trains neural network, MSE loss, Adam optimizer, forward/backward pass.</em></li>
+<li><a class="file_link" href="index.html?q=/neural_network_loading_convert_to_numpy_matrix.py" id="/neural_network_loading_convert_to_numpy_matrix.py"><code>neural&UnderBar;network&UnderBar;loading&UnderBar;convert&UnderBar;to&UnderBar;numpy&UnderBar;matrix&period;py</code></a> <em>Load, convert, apply activation, generate test data, forward propagate, verify results.</em></li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/output_pdf/"><code>output&UnderBar;pdf</code></strong> <em>Tools for PDF conversion and Markdown customization</em></span><ul>
+<li><a class="file_link" href="index.html?q=/output_pdf/convert_utf8.py" id="/output_pdf/convert_utf8.py"><code>convert&UnderBar;utf8&period;py</code></a> <em>UTF-16 to UTF-8 converter script</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/output_pdf/docx_concat/"><code>docx&UnderBar;concat</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/output_pdf/docx_concat/concat_index_with_article.py" id="/output_pdf/docx_concat/concat_index_with_article.py"><code>concat&UnderBar;index&UnderBar;with&UnderBar;article&period;py</code></a> <em>Combines two DOCX files, potential broken links.</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/output_pdf/docx_reference_convert/"><code>docx&UnderBar;reference&UnderBar;convert</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/output_pdf/docx_reference_convert/test_convert.sh" id="/output_pdf/docx_reference_convert/test_convert.sh"><code>test&UnderBar;convert&period;sh</code></a> <em>Pandoc tool converts DOCX files with references</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/output_pdf/export_docx.ps1" id="/output_pdf/export_docx.ps1"><code>export&UnderBar;docx&period;ps1</code></a> <em>Delete, convert UTF-8, generate DOCX.</em></li>
+<li><a class="file_link" href="index.html?q=/output_pdf/export_pdf.ps1" id="/output_pdf/export_pdf.ps1"><code>export&UnderBar;pdf&period;ps1</code></a> <em>Sets PATH, converts markdown to PDF with Pandoc.</em></li>
+<li><a class="file_link" href="index.html?q=/output_pdf/generate_html.ps1" id="/output_pdf/generate_html.ps1"><code>generate&UnderBar;html&period;ps1</code></a> <em>Generate Python docs with pdoc.</em></li>
+<li><a class="file_link" href="index.html?q=/output_pdf/generate_html.sh" id="/output_pdf/generate_html.sh"><code>generate&UnderBar;html&period;sh</code></a> <em>Markdown to HTML conversion with extensions</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/output_pdf/html/"><code>html</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/output_pdf/html/process_output_html.py" id="/output_pdf/html/process_output_html.py"><code>process&UnderBar;output&UnderBar;html&period;py</code></a> <em>Streamlines HTML structure with sidebar, removes title &amp; footer.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/output_pdf/html_to_pdf.sh" id="/output_pdf/html_to_pdf.sh"><code>html&UnderBar;to&UnderBar;pdf&period;sh</code></a> <em>Convert HTML to PDF with Playwright, 3 input files</em></li>
+<li><a class="file_link" href="index.html?q=/output_pdf/original_html_to_docx.sh" id="/output_pdf/original_html_to_docx.sh"><code>original&UnderBar;html&UnderBar;to&UnderBar;docx&period;sh</code></a> <em>Pandoc script converts HTML to DOCX</em></li>
+<li><a class="file_link" href="index.html?q=/output_pdf/pdf_to_docx.sh" id="/output_pdf/pdf_to_docx.sh"><code>pdf&UnderBar;to&UnderBar;docx&period;sh</code></a> <em>Converts PDF to DOCX with Mutool, issues mentioned.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/packup.sh" id="/packup.sh"><code>packup&period;sh</code></a> <em>Archives .py, .j2, .json, .txt and removes existing archive.7z</em></li>
+<li><a class="file_link" href="index.html?q=/parse_device_parameters_excel.py" id="/parse_device_parameters_excel.py"><code>parse&UnderBar;device&UnderBar;parameters&UnderBar;excel&period;py</code></a> <em>Excel font color data gatherer</em></li>
+<li><a class="file_link" href="index.html?q=/parse_device_parameters_excel_v2.py" id="/parse_device_parameters_excel_v2.py"><code>parse&UnderBar;device&UnderBar;parameters&UnderBar;excel&UnderBar;v2&period;py</code></a> <em>Extracts Excel device parameters, formats JSON.</em></li>
+<li><a class="file_link" href="index.html?q=/pendulum.jl" id="/pendulum.jl"><code>pendulum&period;jl</code></a> <em>Pendulum model, ODE problem, solve and calculate.</em></li>
+<li><a class="file_link" href="index.html?q=/pendulum.py" id="/pendulum.py"><code>pendulum&period;py</code></a> <em>Pendulum motion simulated with Python and Scipy library.</em></li>
+<li><a class="file_link" href="index.html?q=/pendulum_finite_differentiate.py" id="/pendulum_finite_differentiate.py"><code>pendulum&UnderBar;finite&UnderBar;differentiate&period;py</code></a> <em>Pendulum finite differences, Matplotlib plot.</em></li>
+<li><a class="file_link" href="index.html?q=/piecewise_approximation_test.py" id="/piecewise_approximation_test.py"><code>piecewise&UnderBar;approximation&UnderBar;test&period;py</code></a> <em>Piecewise approximation using linear interpolation, sine and power functions.</em></li>
+<li><a class="file_link" href="index.html?q=/pint_convert_units.py" id="/pint_convert_units.py"><code>pint&UnderBar;convert&UnderBar;units&period;py</code></a> <em>Converts units using pint library.</em></li>
+<li><a class="file_link" href="index.html?q=/pint_merge_units.py" id="/pint_merge_units.py"><code>pint&UnderBar;merge&UnderBar;units&period;py</code></a> <em>Merge units with Pint. Compatibility check and printing.</em></li>
+<li><a class="file_link" href="index.html?q=/plot_arr.py" id="/plot_arr.py"><code>plot&UnderBar;arr&period;py</code></a> <em>Plots non-zero values from array, labels axes, creates legend, saves figure.</em></li>
+<li><a class="file_link" href="index.html?q=/pydantic_validator_test.py" id="/pydantic_validator_test.py"><code>pydantic&UnderBar;validator&UnderBar;test&period;py</code></a> <em>Pydantic data validation and modeling demonstration.</em></li>
+<li><a class="file_link" href="index.html?q=/pyomo_define_array_list.py" id="/pyomo_define_array_list.py"><code>pyomo&UnderBar;define&UnderBar;array&UnderBar;list&period;py</code></a> <em>Pyomo array, parameters, bounds, constraints, objective, solve with CPLEX</em></li>
+<li><a class="file_link" href="index.html?q=/pyomo_shot_test.py" id="/pyomo_shot_test.py"><code>pyomo&UnderBar;shot&UnderBar;test&period;py</code></a> <em>Pyomo shot test: Imports, model, constraint, IPOPT fail.</em></li>
+<li><a class="file_link" href="index.html?q=/pyomo_test_solve_nonlinear_cplex.py" id="/pyomo_test_solve_nonlinear_cplex.py"><code>pyomo&UnderBar;test&UnderBar;solve&UnderBar;nonlinear&UnderBar;cplex&period;py</code></a> <em>Pyomo model, ConcreteModel, solver "mindtpy"</em></li>
+<li><a class="file_link" href="index.html?q=/pyomo_triangulate_multivariate_linearization.py" id="/pyomo_triangulate_multivariate_linearization.py"><code>pyomo&UnderBar;triangulate&UnderBar;multivariate&UnderBar;linearization&period;py</code></a> <em>Python script triangulates multivariate linear functions for optimization.</em></li>
+<li><a class="file_link" href="index.html?q=/questions.md" id="/questions.md"><code>questions&period;md</code></a> <em>Financial modeling of CloudPSS project using Pyomo.</em></li>
+<li><a class="file_link" href="index.html?q=/questions_packup.cmd" id="/questions_packup.cmd"><code>questions&UnderBar;packup&period;cmd</code></a> <em>Deletes, zips, and archives specified files.</em></li>
+<li><a class="file_link" href="index.html?q=/README.md" id="/README.md"><code>README&period;md</code></a> <em>Linear approximation of nonlinear multivariate functions in IES framework.</em></li>
+<li><a class="file_link" href="index.html?q=/regex_extract_bracket.py" id="/regex_extract_bracket.py"><code>regex&UnderBar;extract&UnderBar;bracket&period;py</code></a> <em>Regular expression extracts parentheses text.</em></li>
+<li><a class="file_link" href="index.html?q=/reset_codepage.reg" id="/reset_codepage.reg"><code>reset&UnderBar;codepage&period;reg</code></a> <em>Reset command prompt settings.</em></li>
+<li><a class="file_link" href="index.html?q=/result_processlib.py" id="/result_processlib.py"><code>result&UnderBar;processlib&period;py</code></a> <em>Imports docplex, defines Value class for variable values.</em></li>
+<li><a class="file_link" href="index.html?q=/runhide.vbs" id="/runhide.vbs"><code>runhide&period;vbs</code></a> <em>Runs hidden, verifies syntax, displays credit, exits with code.</em></li>
+<li><a class="file_link" href="index.html?q=/schedule_update.cmd" id="/schedule_update.cmd"><code>schedule&UnderBar;update&period;cmd</code></a> <em>Update Task Scheduler: Run "scheduled_commit.cmd" every 5 minutes as "IES_Modeling".</em></li>
+<li><a class="file_link" href="index.html?q=/scheduled_commit.cmd" id="/scheduled_commit.cmd"><code>scheduled&UnderBar;commit&period;cmd</code></a> <em>Executes script, hides console, logs output.</em></li>
+<li><a class="file_link" href="index.html?q=/script.sh" id="/script.sh"><code>script&period;sh</code></a> <em>Fetch, set headers, append to file.</em></li>
+<li><a class="file_link" href="index.html?q=/serve_pydoc.ps1" id="/serve_pydoc.ps1"><code>serve&UnderBar;pydoc&period;ps1</code></a> <em>Serve Python docs via web server using pdoc3.</em></li>
+<li><a class="file_link" href="index.html?q=/setup_gptcommit.cmd" id="/setup_gptcommit.cmd"><code>setup&UnderBar;gptcommit&period;cmd</code></a> <em>Configure GPTCommit with OpenAI, install, update periodically.</em></li>
+<li><a class="file_link" href="index.html?q=/setup_gptcommit.sh" id="/setup_gptcommit.sh"><code>setup&UnderBar;gptcommit&period;sh</code></a> <em>Automatically configures GPTcommit for OpenAI with local API key.</em></li>
+<li><a class="file_link" href="index.html?q=/subversion_sync.cmd" id="/subversion_sync.cmd"><code>subversion&UnderBar;sync&period;cmd</code></a> <em>Subversion update, copy files, commit "update"</em></li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/symlinks/"><code>symlinks</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/symlinks/create_symlink.cmd" id="/symlinks/create_symlink.cmd"><code>create&UnderBar;symlink&period;cmd</code></a> <em>Creates symlink "dwg_blueprint" to C:\Users\ss\input_dwg.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/system_topology_utils.py" id="/system_topology_utils.py"><code>system&UnderBar;topology&UnderBar;utils&period;py</code></a> <em>Energy system graph generator, saves and displays flexibly.</em></li>
+<li><a class="file_link" href="index.html?q=/taylor_series_expansion_approximation_nonlinear_function_piecewise.py" id="/taylor_series_expansion_approximation_nonlinear_function_piecewise.py"><code>taylor&UnderBar;series&UnderBar;expansion&UnderBar;approximation&UnderBar;nonlinear&UnderBar;function&UnderBar;piecewise&period;py</code></a> <em>Approximates sin(x) using Taylor series &amp; piecewise power calculations.</em></li>
+<li><a class="file_link" href="index.html?q=/test_add_lower_and_upper_bounds.py" id="/test_add_lower_and_upper_bounds.py"><code>test&UnderBar;add&UnderBar;lower&UnderBar;and&UnderBar;upper&UnderBar;bounds&period;py</code></a> <em>Test model with variable "var" bound between 5 and 15, check for conflicts.</em></li>
+<li><a class="file_link" href="index.html?q=/test_class_create.py" id="/test_class_create.py"><code>test&UnderBar;class&UnderBar;create&period;py</code></a> <em>Class: Test, Attributes: Data, Value, Methods: Execute_init, Print.</em></li>
+<li><a class="file_link" href="index.html?q=/test_client.py" id="/test_client.py"><code>test&UnderBar;client&period;py</code></a> <em>Imports, reads data, sets ID, makes GET request, prints JSON.</em></li>
+<li><a class="file_link" href="index.html?q=/test_cpexample.cmd" id="/test_cpexample.cmd"><code>test&UnderBar;cpexample&period;cmd</code></a> <em>Sets PATH, executes PowerShell script, logs output.</em></li>
+<li><a class="file_link" href="index.html?q=/test_cpexample.ps1" id="/test_cpexample.ps1"><code>test&UnderBar;cpexample&period;ps1</code></a> <em>Executes Python script, outputs to console and file.</em></li>
+<li><a class="file_link" href="index.html?q=/test_decorate_class_method.py" id="/test_decorate_class_method.py"><code>test&UnderBar;decorate&UnderBar;class&UnderBar;method&period;py</code></a> <em>Class method decorator wraps and logs function calls.</em></li>
+<li><a class="file_link" href="index.html?q=/test_linearization_max_zeros.py" id="/test_linearization_max_zeros.py"><code>test&UnderBar;linearization&UnderBar;max&UnderBar;zeros&period;py</code></a> <em>Maximizes zeros in y without objective function.</em></li>
+<li><a class="file_link" href="index.html?q=/test_loading_light_intensity_data.py" id="/test_loading_light_intensity_data.py"><code>test&UnderBar;loading&UnderBar;light&UnderBar;intensity&UnderBar;data&period;py</code></a> <em>Reads, prints, and fails to concatenate radiation data.</em></li>
+<li><a class="file_link" href="index.html?q=/test_plot.jl" id="/test_plot.jl"><code>test&UnderBar;plot&period;jl</code></a> <em>Imports Plots, creates array, no plot, prints values.</em></li>
+<li><a class="file_link" href="index.html?q=/test_server.py" id="/test_server.py"><code>test&UnderBar;server&period;py</code></a> <em>Asynchronous API endpoints, global lock, uvicorn server.</em></li>
+<li><a class="file_link" href="index.html?q=/test_server_client_configs.py" id="/test_server_client_configs.py"><code>test&UnderBar;server&UnderBar;client&UnderBar;configs&period;py</code></a> <em>Server, endpoints, URLs, task limit, upload graphs.</em></li>
+<li><a class="file_link" href="index.html?q=/test_timedelta.py" id="/test_timedelta.py"><code>test&UnderBar;timedelta&period;py</code></a> <em>Calculate date difference in days.</em></li>
+<li><a class="file_link" href="index.html?q=/test_undefined.py" id="/test_undefined.py"><code>test&UnderBar;undefined&period;py</code></a> <em>Undefined variable assignment.</em></li>
+<li><a class="file_link" href="index.html?q=/topology_conversion.py" id="/topology_conversion.py"><code>topology&UnderBar;conversion&period;py</code></a> <em>Topology conversion, adds nodes and edges.</em></li>
+<li><a class="file_link" href="index.html?q=/validity_check.py" id="/validity_check.py"><code>validity&UnderBar;check&period;py</code></a> <em>Iterates, validates function calls, prints success/failure.</em></li>
+</ul>
+</li>
+</ul>
+    </article>
+    <script type="text/javascript">
+        function getQueryParams() {
+            var search = window.location.search.substring(1); // Remove leading '?'
+            var queryParams = {};
+            search.split('&').forEach(function (pair) {
+                var parts = pair.split('=');
+                var key = decodeURIComponent(parts[0]);
+                var value = decodeURIComponent(parts[1]);
+                queryParams[key] = value;
+            });
+            return queryParams;
+        }
+
+        const queryParams = getQueryParams(window.location.search);
+        const show_full = queryParams.full == "true";
+        //const is_random = queryParams.random == 'true';
+        function feelingLucky() {
+            var elements = document.getElementsByClassName("file_link");
+            var randomIndex = Math.floor(Math.random() * elements.length);
+            window.location = elements[randomIndex].href;
+        }
+        //if (is_random) {feelingLucky();}
+        document.getElementById("feeling-lucky").onclick = feelingLucky;
+        if (!show_full) {
+            const spans = document.querySelectorAll('span');
+            for (let span of spans) {
+                if (span.getAttribute("hierarchy") == '0') { continue }
+                toggleVisibility(span);
+            }
+        } else {
+            const expand_elem = document.getElementById('expand-tree');
+            expand_elem.setAttribute("href", "tree.html");
+            expand_elem.setAttribute("title", "Undo expand");
+            expand_elem.innerHTML = '<i class="bi bi-caret-up-square"></i>'
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+{
+    "summary": "The function `walkModel` recursively walks through a model, returning the flattened version of it. If the type is a basic type (str, int, float, bool), it returns itself. For iterable types like tuple or list, it applies the function to each element. For other types, it treats it as a dictionary and recursively gets its attributes.",
+    "details": [
+        {
+            "comment": "The function `walkModel` recursively walks through a model, returning the flattened version of it. If the type is a basic type (str, int, float, bool), it returns itself. For iterable types like tuple or list, it applies the function to each element. For other types, it treats it as a dictionary and recursively gets its attributes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/ast_utils.py\":0-11",
+            "content": "from typing import Iterable\ndef walkModel(model):\n    modelType = type(model)\n    if modelType in [str, int, float, bool]: return model\n    # elif modelType in [tuple, list]:\n    elif isinstance(model, Iterable):\n        return [walkModel(elem) for elem in model]\n    else:\n        attrs = [attr for attr in dir(model) if not (attr.startswith(\"_\") or attr == \"parent\")]\n        # walk over attributes. treat it as dict.\n        return {attr: walkModel(getattr(model, attr)) for attr in attrs}"
+        }
+    ]
+}

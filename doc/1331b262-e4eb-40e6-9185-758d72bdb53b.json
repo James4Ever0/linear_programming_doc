@@ -1,0 +1,10 @@
+{
+    "summary": "This code detects the platform by executing a Python script that prints the operating system name. If the result is empty, it tries with Python 3 on macOS, and finally assigns the value to PLATFORM variable. The main target echoes the platform value for testing purposes.",
+    "details": [
+        {
+            "comment": "This code detects the platform by executing a Python script that prints the operating system name. If the result is empty, it tries with Python 3 on macOS, and finally assigns the value to PLATFORM variable. The main target echoes the platform value for testing purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/Makefile\":0-7",
+            "content": "PLATFORM := $(shell python -c \"import os; print(os.name)\")\nifeq (${PLATFORM}, )\nPLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\nendif\n# macos: posix.\nmain:\n\techo ${PLATFORM}"
+        }
+    ]
+}

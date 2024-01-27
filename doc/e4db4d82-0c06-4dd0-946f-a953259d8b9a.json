@@ -1,0 +1,10 @@
+{
+    "summary": "Code reads a grammar file, constructs a metamodel from it, and parses an input file to create a model using that metamodel. Then, it prints the structure of the parsed model and accesses specific elements like constants and constant lists in submodels. It uses 'rich' library for printing formatted output.",
+    "details": [
+        {
+            "comment": "Code reads a grammar file, constructs a metamodel from it, and parses an input file to create a model using that metamodel. Then, it prints the structure of the parsed model and accesses specific elements like constants and constant lists in submodels. It uses 'rich' library for printing formatted output.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/textx_syntax.py\":0-37",
+            "content": "import textx\n# TODO: perform unittest on serialized AST\n# STRING is something quoted. not plain words.\n# define and use TOKEN or VARNAME instead.\n# shall you name collected items to retrieve them.\nwith open(\"grammar.tx\", \"r\") as f:\n    grammar = f.read()\nmetamodel = textx.metamodel_from_str(grammar)\nwith open(fp := \"sample.ies\", \"r\") as f:\n    content = f.read()\nfrom ast_utils import walkModel\nmodel = metamodel.model_from_str(content)\n# print(dir(model))\n# breakpoint()\nimport rich\ntree = walkModel(model)\nrich.print(tree)\nbreakpoint()\ncn = lambda i: i.__class__.__name__\nprint(model.modelInfo)\nfor subModel in model.subModels:\n    print(subModel)\n    if cn(subModel) == \"Constants\":\n        print(subModel.constants)\n    elif cn(subModel) == \"ConstantLists\":\n        print(subModel.constantLists)\n# import rich\n# rich.print(model.__dict__)\n# breakpoint()"
+        }
+    ]
+}

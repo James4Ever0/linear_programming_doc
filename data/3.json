@@ -1,0 +1,536 @@
+{
+    "300": {
+        "file_id": 38,
+        "content": "/fastapi_client_generator.py",
+        "type": "filepath"
+    },
+    "301": {
+        "file_id": 38,
+        "content": "This code generates a FastAPI client using the openapi-python-client tool. It takes a JSON file (fastapi_openapi.json) as input, and generates a Python client code (fastapi_client_generated.py). It also automatically generates an __init__.py file for organizing multiple API callers in the same namespace.",
+        "type": "summary"
+    },
+    "302": {
+        "file_id": 38,
+        "content": "target_file = \"fastapi_client_generated.py\"\n# let's generate the client from this json.\nimport os\n# suggest you to clean this openapi json (the function name) first:\n# https://fastapi.tiangolo.com/advanced/generate-clients/\n#\njson_file_path = 'fastapi_openapi.json'\n# also try to automatically generate appropriate `__init__.py` file so we can have multiple api callers in the same namespace.\ncmd = f'openapi-python-client generate --path {json_file_path}' # generate to: chimichang-app-client, with chimichang_app_client wrapped inside.\nos.system(cmd)",
+        "type": "code",
+        "location": "/fastapi_client_generator.py:1-16"
+    },
+    "303": {
+        "file_id": 38,
+        "content": "This code generates a FastAPI client using the openapi-python-client tool. It takes a JSON file (fastapi_openapi.json) as input, and generates a Python client code (fastapi_client_generated.py). It also automatically generates an __init__.py file for organizing multiple API callers in the same namespace.",
+        "type": "comment"
+    },
+    "304": {
+        "file_id": 39,
+        "content": "/fastapi_client_test.py",
+        "type": "filepath"
+    },
+    "305": {
+        "file_id": 39,
+        "content": "This code is sending a POST request to a FastAPI server with the given base URL and port. It includes data in JSON format with key-value pairs for name, price, offer status, and nested dictionaries. The response from the server is then printed along with the status code of the request.",
+        "type": "summary"
+    },
+    "306": {
+        "file_id": 39,
+        "content": "from fastapi_server_with_doc import port\nimport requests\nbaseurl = f\"http://127.0.0.1:{port}/\"\nurl = baseurl + \"items\"\njson_data = dict(\n    name=\"hello\", price=1, is_offer=False, myDict={\"mydict\": {\"more\": [1, 2, 3]}}\n)\nr = requests.post(url, json=json_data)\nresponse = r.json()\nprint(\"RESP:\", response)\nprint(\"STATUS_CODE\", r.status_code)",
+        "type": "code",
+        "location": "/fastapi_client_test.py:1-13"
+    },
+    "307": {
+        "file_id": 39,
+        "content": "This code is sending a POST request to a FastAPI server with the given base URL and port. It includes data in JSON format with key-value pairs for name, price, offer status, and nested dictionaries. The response from the server is then printed along with the status code of the request.",
+        "type": "comment"
+    },
+    "308": {
+        "file_id": 40,
+        "content": "/fastapi_datamodel_template.py",
+        "type": "filepath"
+    },
+    "309": {
+        "file_id": 40,
+        "content": "This code defines Pydantic models for representing curves, microgrid systems and simulation results with performance metrics. It includes graph models for energy flow graph modeling, and classes for asynchronous calculation tasks and revocation statuses.",
+        "type": "summary"
+    },
+    "310": {
+        "file_id": 40,
+        "content": "from pydantic import BaseModel, Field\nfrom networkx.readwrite import json_graph\nfrom typing import Mapping, List, Tuple, Union, Dict, Any\ntry:\n    from typing import Literal\nexcept:\n    from typing_extensions import Literal\nimport networkx\n# from celery.states import PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED\n# question: how to convert pydantic models to json?\n# to json: json.dumps(model.dict())\nfrom microgrid_base.ies_optim import EnergyFlowGraph\nclass 曲线(BaseModel):\n    x: List[float] = Field(title=\"x轴数据\")\n    y: List[float] = Field(title=\"y轴数据\")\nclass 出力曲线(BaseModel):\n    name: str = Field(title=\"出力曲线标题\")\n    abbr: str = Field(title=\"出力曲线缩写\")\n    data: 曲线 = Field(title=\"曲线数据\")\nclass 设备出力曲线(BaseModel):\n    name: str = Field(title=\"设备名称\")\n    plot_list: List[出力曲线] = Field(title=\"出力曲线列表\")\nclass 单次计算结果(BaseModel):\n    performanceDataList: List[设备出力曲线] = Field(\n        title=\"设备出力曲线列表\",\n        example=[\n            {\n                \"name\": \"Any\",\n                \"plot_list\": [\n                    {",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:1-41"
+    },
+    "311": {
+        "file_id": 40,
+        "content": "This code defines several Pydantic models for representing various types of curves and calculation results related to a microgrid system. The models include properties such as x and y axis data, curve names, abbreviations, and device performance data. These classes can be used to store and validate data in the application.",
+        "type": "comment"
+    },
+    "312": {
+        "file_id": 40,
+        "content": "                        \"name\": \"plotName\",\n                        \"abbr\": \"plotAbbr\",\n                        \"data\": {\"x\": [], \"y\": []},\n                    }\n                ],\n            }\n        ],\n    )\n    simulationResultTable: List[Dict[str, Any]] = Field(\n        title=\"仿真结果列表\",\n        example=[\n            {\n                \"name\": \"Any\",\n                \"modelNumber\": \"Any\",\n                \"equiCounts\": 1,\n                \"coolingCapacity\": 1,\n                \"coolingLoad\": 1,\n                \"electricSupply\": 1,\n                \"electricLoad\": 1,\n                \"heatingLoad\": 1,\n                \"heatLoad\": 1,\n                \"steamProduction\": 1,\n                \"steamLoad\": 1,\n                \"hydrogenProduction\": 1,\n                \"hydrogenConsumption\": 1,\n                \"dieselConsumption\": 1,\n                \"dieselConsumptionCosts\": 1,\n                \"naturalGasConsumption\": 1,\n                \"naturalGasConsumptionCosts\": 1,\n                \"averageEfficiency\": 1,\n                \"equipmentMaintenanceCosts\": 1,",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:42-72"
+    },
+    "313": {
+        "file_id": 40,
+        "content": "This code defines a data model for simulation results of an unknown system. It includes attributes such as \"name\", \"modelNumber\", and various performance metrics like \"coolingCapacity\", \"electricLoad\", and \"dieselConsumption\". The model also contains a list of plots with x and y coordinates, potentially representing graphical data visualizations.",
+        "type": "comment"
+    },
+    "314": {
+        "file_id": 40,
+        "content": "                \"coldIncome\": 1,\n                \"hotIncome\": 1,\n                \"eletricncome\": 1,\n                \"steamIncome\": 1,\n                \"hydrogenIncome\": 1,\n            }\n        ],\n    )\nclass CalculationResult(BaseModel):\n    resultList: List[单次计算结果]\n    success: bool\n    error_log: str\n# class EnergyFlowGraph(BaseModel):\n#     \"\"\"\n#     用于仿真和优化计算的能流拓扑图，仿真和优化所需要的参数模型和变量定义会有所不同。\n#     \"\"\"\n#     graph: Mapping = Field(\n#         title=\"能流拓扑图的附加属性\",\n#         description=\"仿真和优化所需的模型参数字典\",\n#         examples=dict(\n#             建模仿真=dict(\n#                 summary=\"建模仿真所需参数\",\n#                 description=\"建模仿真需要知道仿真步长和起始时间\",\n#                 value={\n#                     \"模型类型\": \"建模仿真\",\n#                     \"仿真步长\": 60,\n#                     \"开始时间\": \"2023-3-1\",  # shall you parse this into `datetime.datetime`\n#                     \"结束时间\": \"2024-3-1\",\n#                 },\n#             ),\n#             规划设计=dict(\n#                 summary=\"规划设计所需参数\",\n#                 description=\"规划设计不需要知道仿真步长和起始时间,会根据不同优化指标事先全部计算，不需要在此指出\",",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:73-110"
+    },
+    "315": {
+        "file_id": 40,
+        "content": "This code defines two classes: CalculationResult and EnergyFlowGraph. CalculationResult contains resultList, success boolean, and error_log string. EnergyFlowGraph is a mapping class for energy flow graph used in simulation and optimization calculations with different parameters and variables. It includes examples for modeling simulation and planning design.",
+        "type": "comment"
+    },
+    "316": {
+        "file_id": 40,
+        "content": "#                 value={\"模型类型\": \"规划设计\"},\n#             ),\n#         ),\n#     )\n#     nodes: List[Mapping] = Field(\n#         title=\"节点\",\n#         description=\"由所有节点ID和属性字典组成的列表\",\n#         example=[\n#             {\"id\": \"a\", \"node_type\": \"load\"},\n#             {\"id\": \"b\", \"node_type\": \"device\"},\n#             {\"id\": \"c\", \"node_type\": \"load\"},\n#             {\"id\": \"d\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#             {\"id\": \"e\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#             {\"id\": \"f\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#         ],\n#     )\n#     adjacency: List[List[Mapping]] = Field(\n#         title=\"边\",\n#         description=\"由能流图中节点互相连接的边组成的列表\",\n#         example=[\n#             [{\"id\": \"b\"}, {\"id\": \"d\"}],\n#             [{\"id\": \"a\"}, {\"id\": \"e\"}],\n#             [{\"id\": \"c\"}, {\"id\": \"f\"}],\n#             [{\"id\": \"d\"}, {\"id\": \"e\"}],\n#             [{\"id\", \"d\"}, {\"id\": \"f\"}],\n#         ],\n#     )\n#     def to_graph(self, directed=False) -> networkx.Graph:\n#         \"\"\"\n#         输出`networkx`计算图",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:111-141"
+    },
+    "317": {
+        "file_id": 40,
+        "content": "The code defines a model for representing an AC network graph with nodes and edges. The nodes are of different types like load, device, and port. The nodes are represented as dictionaries with id and type. The edges represent connections between nodes in the graph. The to_graph method converts the model into a NetworkX graph object.",
+        "type": "comment"
+    },
+    "318": {
+        "file_id": 40,
+        "content": "#         Arguments:\n#             directed (bool): 是否返回有向图\n#         Returns:\n#             G (Graph): `networkx`计算图\n#         \"\"\"\n#         graph: List[Tuple] = [(k, v) for k, v in self.graph.items()]\n#         graph_dict = dict(\n#             directed=directed,\n#             multigraph=False,\n#             graph=graph,\n#             nodes=self.nodes,\n#             adjacency=self.adjacency,\n#         )\n#         G = json_graph.adjacency_graph(graph_dict, directed=directed)\n#         return G\nclass CalculationAsyncSubmitResult(BaseModel):\n    \"\"\"\n    异步计算提交结果返回类\n    \"\"\"\n    calculation_id: Union[None, str] = Field(\n        description=\"如果成功注册计算任务，返回ID，否则为空\", title=\"计算ID\"\n    )\n    submit_result: Literal[\"success\", \"failed\"] = Field(\n        description='如果成功提交，返回\"success\"，否则返回\"failed\"', title=\"提交结果\"\n    )\nclass CalculationStateResult(BaseModel):\n    \"\"\"\n    包含计算任务状态的数据类\n    \"\"\"\n    calculation_state: Literal[\n        None,\n        \"PENDING\",\n        \"RECEIVED\",\n        \"STARTED\",\n        \"SUCCESS\",\n        \"FAILURE\",\n        \"RETRY\",",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:143-188"
+    },
+    "319": {
+        "file_id": 40,
+        "content": "The code defines a method that takes a graph and returns a NetworkX graph object, allowing for directed or undirected graphs. It also includes two model classes - CalculationAsyncSubmitResult for storing calculation IDs and submit result statuses and CalculationStateResult for storing calculation task states such as pending, received, started, success, failure, and retry.",
+        "type": "comment"
+    },
+    "320": {
+        "file_id": 40,
+        "content": "        \"REVOKED\",\n        \"NOT_CREATED\",\n    ] = Field(description=\"Celery内置任务状态，如果是null则表示不存在该任务\", title=\"计算任务状态\")\n# would you transfer this thing over celery, or you need to build it?\n# i'd rather build it.\nclass CalculationAsyncResult(CalculationStateResult):\n    \"\"\"\n    异步计算任务查询返回结果\n    \"\"\"\n    calculation_result: Union[None, CalculationResult] = Field(\n        description=\"如果没有计算完或者不存在返回空，否则返回计算结果字典\", title=\"计算结果\"\n    )\nclass RevokeResult(CalculationStateResult):\n    \"\"\"\n    撤销返回结果\n    \"\"\"\n    revoke_result: Literal[\"success\", \"failed\"] = Field(\n        description='如果成功撤销任务，返回\"success\"，否则返回\"failed\"', title=\"撤销结果\"\n    )",
+        "type": "code",
+        "location": "/fastapi_datamodel_template.py:189-213"
+    },
+    "321": {
+        "file_id": 40,
+        "content": "This code defines two classes: `CalculationAsyncResult` and `RevokeResult`, both extending from the `CalculationStateResult`. These classes represent the results of an asynchronous calculation task and a task revocation, respectively. The `calculation_result` field in `CalculationAsyncResult` can be either a null (no result) or a `CalculationResult` instance, while the `revoke_result` field in `RevokeResult` stores either \"success\" or \"failed\" strings representing the revocation status.",
+        "type": "comment"
+    },
+    "322": {
+        "file_id": 41,
+        "content": "/fastapi_generate_nodejs_client_typescript.cmd",
+        "type": "filepath"
+    },
+    "323": {
+        "file_id": 41,
+        "content": "This code installs required dependencies and generates a TypeScript client for a FastAPI server using the openapi-typescript-codegen tool, based on the provided fastapi_openapi.json file.",
+        "type": "summary"
+    },
+    "324": {
+        "file_id": 41,
+        "content": "REM install the thing first.\nREM npm i -g openapi openapi-typescript-codegen \nopenapi --file fastapi_openapi.json --output-dir typescript_fastapi_client",
+        "type": "code",
+        "location": "/fastapi_generate_nodejs_client_typescript.cmd:1-3"
+    },
+    "325": {
+        "file_id": 41,
+        "content": "This code installs required dependencies and generates a TypeScript client for a FastAPI server using the openapi-typescript-codegen tool, based on the provided fastapi_openapi.json file.",
+        "type": "comment"
+    },
+    "326": {
+        "file_id": 42,
+        "content": "/fastapi_server_template.py",
+        "type": "filepath"
+    },
+    "327": {
+        "file_id": 42,
+        "content": "The code sets up a FastAPI server with Celery for task management in an IES system simulation and optimization service, allowing asynchronous task submission, cancellation, and state retrieval.",
+        "type": "summary"
+    },
+    "328": {
+        "file_id": 42,
+        "content": "# suggestion: use fastapi for self-documented server, use celery for task management.\n# celery reference: https://github.com/GregaVrbancic/fastapi-celery/blob/master/app/main.py\nport = 9870\nhost = \"0.0.0.0\"\nimport traceback\nimport celery\nappName = \"IES Optim Server Template\"\nversion = \"0.0.1\"\ntags_metadata = [\n    {\"name\": \"async\", \"description\": \"异步接口，调用后立即返回\"},\n    {\"name\": \"sync\", \"description\": \"同步接口，调用后需等待一段时间才返回\"},\n]\ndescription = f\"\"\"\nIES系统仿真和优化算法服务器\nOpenAPI描述文件(可导入Apifox): https://{host}:{port}/openapi.json\nAPI文档: https://{host}:{port}/docs\n\"\"\"\nimport traceback\nfrom fastapi import FastAPI\nfrom fastapi_datamodel_template import (\n    CalculationAsyncResult,\n    CalculationAsyncSubmitResult,\n    CalculationResult,\n    EnergyFlowGraph,\n    RevokeResult,\n    CalculationStateResult,\n)\n# define the input structure here.\nfrom pydantic import BaseModel\nfrom typing import List  # , Union , Literal, Dict\n# solved or not?\nimport datetime\nfrom celery.result import AsyncResult\nfrom typing import Dict, Any, Union\nfrom fastapi_celery_server import app as celery_app",
+        "type": "code",
+        "location": "/fastapi_server_template.py:1-43"
+    },
+    "329": {
+        "file_id": 42,
+        "content": "This code sets up a FastAPI server for an IES system simulation and optimization service, using Celery for task management. The server listens on port 9870 at address 0.0.0.0. It provides both async and sync APIs with descriptions available in the openapi.json file or through the API documentation link. The code also imports necessary modules and defines input structures for handling calculations and energy flow graphs, as well as setting up a Celery app instance.",
+        "type": "comment"
+    },
+    "330": {
+        "file_id": 42,
+        "content": "# remember these things won't persist.\n# remove any task without any update for 24 hours.\n# celery has the default of 24 hours. you handle it again here.\n# also has default task time of 1200 seconds. you may experiment.\ntaskDict: Dict[str, AsyncResult] = {}\n\"\"\"\n任务ID和任务对象的字典\n\"\"\"\ntaskInfo: Dict[str, datetime.datetime] = {}\n\"\"\"\n任务ID和任务最近更新时间的字典\n\"\"\"\ntaskResult: Dict[str, Any] = {}\n\"\"\"\n任务ID和任务结果的字典\n\"\"\"\ndef remove_stale_tasks():\n    \"\"\"\n    遍历并清除24小时未更新的任务\n    \"\"\"\n    now = datetime.datetime.now()\n    remove_keys = []\n    for key, value in taskInfo.items():\n        if (now - value).total_seconds() > 3600 * 24:\n            remove_keys.append(key)\n    for key in remove_keys:\n        if key in taskDict.keys():\n            del taskDict[key]\n        if key in taskInfo.keys():\n            del taskInfo[key]\n        if key in taskResult.keys():\n            del taskResult[key]\ndef remove_stale_tasks_decorator(function):\n    \"\"\"\n    清除过期任务装饰器\n    \"\"\"\n    def inner_function(*args, **kwargs):\n        remove_stale_tasks()\n        return function(*args, **kwargs)",
+        "type": "code",
+        "location": "/fastapi_server_template.py:45-88"
+    },
+    "331": {
+        "file_id": 42,
+        "content": "This code defines functions for removing stale tasks after 24 hours without updates. It includes a dictionary for task IDs and their associated objects, update times, and results. The `remove_stale_tasks` function iterates through the dictionaries to identify stale tasks based on the difference between the current time and their last update. It then removes those stale tasks from the dictionaries. The `remove_stale_tasks_decorator` function is a decorator that calls `remove_stale_tasks` before executing any decorated function, ensuring stale tasks are cleaned up before running tasks.",
+        "type": "comment"
+    },
+    "332": {
+        "file_id": 42,
+        "content": "    return inner_function\ndef celery_on_message(body: dict):\n    \"\"\"\n    Celery任务信息更新回调函数\n    Args:\n        body (dict): 更新的任务信息\n    \"\"\"\n    print(\"BODY TYPE?\", type(body))\n    print(\"ON MESSAGE?\", body)\n    task_id = body[\"task_id\"]\n    status = body[\"status\"]\n    print(\"TASK STATUS?\", status)\n    taskInfo[task_id] = datetime.datetime.now()\n    ###\n    # BODY TYPE? <class 'dict'>\n    # ON MESSAGE? {'status': 'STARTED', 'result': {'pid': 74297, 'hostname': 'celery@MacBook-Air-M1.local'}, 'traceback': None, 'children': [], 'date_done': None, 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\n    ###\n    # BODY TYPE? <class 'dict'>\n    # ON MESSAGE? {'status': 'SUCCESS', 'result': '14', 'traceback': None, 'children': [], 'date_done': '2023-03-28T09:26:50.382791', 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\ndef background_on_message(task: AsyncResult):\n    \"\"\"\n    后台获取任务计算结果的方法\n    Args:\n        task (AsyncResult): 任务对象\n    \"\"\"\n    value = task.get(on_message=celery_on_message, propagate=False)\n    # shall you not check here.",
+        "type": "code",
+        "location": "/fastapi_server_template.py:90-126"
+    },
+    "333": {
+        "file_id": 42,
+        "content": "The code defines a callback function called `celery_on_message` which is triggered when a Celery task status changes. The function receives a dictionary `body` containing the updated task information. The task ID and status are extracted from the body, and the timestamp of the message is stored in a `taskInfo` dictionary. Additionally, there's another function called `background_on_message` that retrieves the result of a background task using the `get()` method with the specified callback and propagation settings.",
+        "type": "comment"
+    },
+    "334": {
+        "file_id": 42,
+        "content": "    # and not the message callback.\n    # status = task.status\n    # print(\"TASK STATUS?\", status)\n    taskResult[task.id] = value\n    print(\"VALUE TYPE?\", type(value))  # str, '14'\n    print(\"TASK VALUE?\", value)\nfrom typing import Any\nimport orjson\nfrom starlette.responses import JSONResponse\nclass ORJSONResponse(JSONResponse):\n    media_type = \"application/json\"\n    def render(self, content: Any) -> bytes:\n        return orjson.dumps(content)\napp = FastAPI(\n    description=description,\n    version=version,\n    tags_metadata=tags_metadata,\n    default_response_class=ORJSONResponse,\n)\n@remove_stale_tasks_decorator\n@app.post(\n    \"/calculate_async\",\n    tags=[\"async\"],\n    description=\"填写数据并提交拓扑图，如果还有计算资源，提交状态为成功，返回计算ID，否则不返回计算ID，提交状态为失败\",\n    summary=\"异步提交能流拓扑图\",\n    response_description=\"提交状态以及模型计算ID,根据ID获取计算结果\",\n    response_model=CalculationAsyncSubmitResult,\n)\ndef calculate_async(graph: EnergyFlowGraph) -> CalculationAsyncSubmitResult:\n    # use celery\n    submit_result = \"failed\"\n    calculation_id = None\n    try:",
+        "type": "code",
+        "location": "/fastapi_server_template.py:127-168"
+    },
+    "335": {
+        "file_id": 42,
+        "content": "This code defines a FastAPI server that accepts an EnergyFlowGraph and submits it for asynchronous calculation. It uses Celery to handle the task submission and returns the calculation ID if successful, or a \"failed\" status if no resources are available. The ORJSONResponse class is used for JSON responses with the \"application/json\" media type.",
+        "type": "comment"
+    },
+    "336": {
+        "file_id": 42,
+        "content": "        function_id = \"fastapi_celery.calculate_energyflow_graph\"\n        task = celery_app.send_task(function_id, args=(graph.dict(),))\n        taskInfo[task.id] = datetime.datetime.now()\n        taskDict[task.id] = task\n        calculation_id = task.id\n    except:\n        traceback.print_exc()\n    submit_result = \"success\"\n    return CalculationAsyncSubmitResult(\n        calculation_id=calculation_id, submit_result=submit_result\n    )\n@remove_stale_tasks_decorator\n@app.get(\n    \"/get_calculation_state\",\n    tags=[\"async\"],\n    response_model=CalculationStateResult,\n    response_description=\"Celery内置任务状态，如果是null则表示不存在该任务\",\n    summary=\"获取计算状态\",\n    description=\"根据计算ID获取计算状态\",\n)\ndef get_calculation_state(calculation_id: str) -> CalculationStateResult:\n    \"\"\"\n    根据计算ID获取计算状态\n    Args:\n        calculation_id (str): 计算ID\n    Returns:\n        calculation_state (CalculationStateResult): 计算状态\n    \"\"\"\n    calculation_state = None\n    task = taskDict.get(calculation_id, None)\n    if task is not None:\n        calculation_state = task.state",
+        "type": "code",
+        "location": "/fastapi_server_template.py:169-204"
+    },
+    "337": {
+        "file_id": 42,
+        "content": "This code snippet is part of a FastAPI server template for an asynchronous calculation submission. It defines two functions: `CalculationAsyncSubmitResult` and `get_calculation_state`. The first function handles the async task submission by sending a Celery task, storing relevant information about the task, and returning a result object with the task ID. The second function retrieves the current state of an asynchronous calculation based on its ID and returns it in the form of a `CalculationStateResult` object.",
+        "type": "comment"
+    },
+    "338": {
+        "file_id": 42,
+        "content": "        return CalculationStateResult(calculation_state=calculation_state)\n    else:\n        return CalculationStateResult(calculation_state=\"NOT_CREATED\")\n@remove_stale_tasks_decorator\n@app.get(\n    \"/get_calculation_result_async\",\n    tags=[\"async\"],\n    description=\"提交计算ID，返回计算状态，如果计算完毕会一起返回数据，否则数据为空\",\n    summary=\"异步获取能流拓扑计算结果\",\n    response_description=\"计算状态和计算结果\",\n    response_model=CalculationAsyncResult,\n)\ndef get_calculation_result_async(calculation_id: str):\n    calculation_result = taskResult.get(calculation_id, None)\n    calculation_result = CalculationResult.parse_obj(calculation_result)\n    return CalculationAsyncResult(\n        calculation_state=get_calculation_state(calculation_id).calculation_state,\n        calculation_result=calculation_result,\n    )\n@remove_stale_tasks_decorator\n@app.get(\n    \"/revoke_calculation\",\n    tags=[\"async\"],\n    description=\"提交计算ID，撤销计算\",\n    summary=\"撤销计算任务\",\n    response_description=\"返回撤销计算状态\",\n    response_model=RevokeResult,\n    # different code and different response models.",
+        "type": "code",
+        "location": "/fastapi_server_template.py:205-237"
+    },
+    "339": {
+        "file_id": 42,
+        "content": "This code defines two routes for a FastAPI server. The first route, \"/get_calculation_result_async\", returns the calculation state and result if the calculation is complete, or empty data otherwise. It requires a calculation ID as input. The second route, \"/revoke_calculation\", cancels a calculation with the given ID and returns a revocation status. Both routes are decorated with @remove_stale_tasks_decorator and belong to the \"async\" tags.",
+        "type": "comment"
+    },
+    "340": {
+        "file_id": 42,
+        "content": "    # so you would return in different models and the api will handle the code.\n    # by default there are some reserved code, for every api. no need to define your own? or the system will merge the custom response code with default ones automatically?\n    # responses={\"200\": {\"description\": \"撤销成功\", \"model\": RevokeResult}},\n)\ndef revoke_calculation(calculation_id: str):\n    revoke_result = \"failed\"\n    calculation_state = None\n    if calculation_id in taskDict.keys():\n        print(\"TERMINATING TASK:\", calculation_id)\n        taskDict[calculation_id].revoke(terminate=True)\n        revoke_result = \"success\"\n        calculation_state = get_calculation_state(calculation_id).calculation_state\n    else:\n        print(\"TASK DOES NOT EXIST:\", calculation_id)\n        calculation_state = \"NOT_CREATED\"\n    return RevokeResult(\n        revoke_result=revoke_result, calculation_state=calculation_state\n    )\nfrom typing import List\n@app.get(\n    \"/get_calculation_ids\",\n    tags=[\"async\"],\n    response_model=List[str],\n    response_description=\"缓存中可查询的任务ID列表\",",
+        "type": "code",
+        "location": "/fastapi_server_template.py:238-266"
+    },
+    "341": {
+        "file_id": 42,
+        "content": "This code defines a function `revoke_calculation` that handles task revocation. If the specified calculation ID exists, it terminates the task and returns a success result. Otherwise, it returns a \"NOT_CREATED\" state. The API endpoint \"/get_calculation_ids\" returns a list of cacheable calculation IDs.",
+        "type": "comment"
+    },
+    "342": {
+        "file_id": 42,
+        "content": "    description=\"任务如果24小时内没有状态更新会被清出缓存，检查缓存中的所有可查询任务ID\",\n    summary=\"查询任务ID\",\n)\ndef get_calculation_ids() -> List[str]:\n    calculation_ids = list(taskDict.keys())\n    return calculation_ids\nimport uvicorn\nuvicorn.run(app, host=host, port=port)",
+        "type": "code",
+        "location": "/fastapi_server_template.py:267-277"
+    },
+    "343": {
+        "file_id": 42,
+        "content": "The code defines a function \"get_calculation_ids\" that retrieves all task IDs from the \"taskDict\" dictionary and returns them as a list. This function has a description saying it checks for tasks with no updates in 24 hours and clears them from cache. The code uses the FastAPI framework, and uvicorn module is imported to run the app on specified host and port.",
+        "type": "comment"
+    },
+    "344": {
+        "file_id": 43,
+        "content": "/fastapi_server_with_doc.py",
+        "type": "filepath"
+    },
+    "345": {
+        "file_id": 43,
+        "content": "FastAPI server with user and item metadata, read/create item endpoints, raises error for \"foo\" name, OpenAPI schema, uvicorn import, and server setup.",
+        "type": "summary"
+    },
+    "346": {
+        "file_id": 43,
+        "content": "# test to create a server with fastapi, generate doc automatically.\n# code from: https://fastapi.tiangolo.com/tutorial/metadata/\n# notice: after you've done developing server, you can generate client automatically.\n# reference: https://fastapi.tiangolo.com/advanced/generate-clients/\n# custom the way to generate client functions.\nport = 9982\nif __name__ == \"__main__\":\n    from fastapi import FastAPI, HTTPException\n    import rich\n    AppName = \"ChimichangApp\"\n    tags_metadata = [\n        {\n            \"name\": \"users\",\n            \"description\": \"Operations with users. The **login** logic is also here.\",\n            \"externalDocs\": {\n                \"description\": \"Items external docs\",\n                \"url\": \"https://fastapi.tiangolo.com/\",\n            },\n        },\n        {\n            \"name\": \"items\",\n            \"description\": \"Manage items. So _fancy_ they have their own docs.\",\n            \"externalDocs\": {\n                \"description\": \"Items external docs\",\n                \"url\": \"https://fastapi.tiangolo.com/\",",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:1-29"
+    },
+    "347": {
+        "file_id": 43,
+        "content": "This code imports necessary modules and sets a server port number. It is written for the FastAPI framework, which automatically generates documentation. The code also provides metadata for two tags (users and items), including their descriptions and external documentation links.",
+        "type": "comment"
+    },
+    "348": {
+        "file_id": 43,
+        "content": "            },\n        },\n    ]\n    description = f\"\"\"\n    {AppName} API helps you do awesome stuff. 🚀\n    ## Items\n    You can **read items**.\n    ## Users\n    You will be able to:\n    * **Create users** (_not implemented_).\n    * **Read users** (_not implemented_).\n    \"\"\"  # this is not docstring. this is passed as parameter.\n    app = FastAPI(\n        title=AppName,\n        description=description,\n        version=\"0.0.1\",\n        terms_of_service=\"http://example.com/terms/\",\n        tags_metadata=tags_metadata,\n        contact={\n            \"name\": \"Deadpoolio the Amazing\",\n            \"url\": \"http://x-force.example.com/contact/\",\n            \"email\": \"dp@x-force.example.com\",\n        },  # contact?\n        license_info={\n            \"name\": \"Apache 2.0\",\n            \"url\": \"https://www.apache.org/licenses/LICENSE-2.0.html\",\n        },\n    )\n    from fastapi import Query\n    @app.get(\n        \"/items/\",\n        response_description=\"get response example\",\n        summary=\"summary for get items\",\n        tags=[\"users\"],  # this gets it into a folder.",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:30-73"
+    },
+    "349": {
+        "file_id": 43,
+        "content": "This code sets up a FastAPI server for an app, specifying title, description, version, terms of service, tags_metadata, contact information, and license info. It also includes an endpoint (\"/items/\") to get items, with summary, tags, and response description provided. However, creating and reading users are not implemented yet.",
+        "type": "comment"
+    },
+    "350": {
+        "file_id": 43,
+        "content": "    )  # what is dependencies anyway?\n    async def read_items(\n        q: int = Query(\n            description=\"magic query number\",\n            default=42,\n            examples=dict(\n                e1=dict(summary=\"sum e1\", description=\"desc e1\", value=12),\n                e2=dict(summary=\"sum e2\", description=\"desc e2\", value=23),\n                e3=dict(summary=\"sum e3\", description=\"desc e3\", value=34),\n            ),\n        )\n    ):\n        print(\"MAGIC NUMBER?\", q)\n        return [{\"name\": \"Katana\"}]\n    from pydantic import BaseModel, Field\n    from typing import Mapping\n    class Item(BaseModel):\n        \"\"\"\n        can this item thing have any schema description?\n        \"\"\"\n        name: str\n        price: float\n        \"\"\"\n        how to insert mock data and data entry description?\n        \"\"\"\n        is_offer: bool = Field(\n            title=\"IS_OFFER_TITLE\",  # this will be generated if not passed\n            description=\"is offer description\",\n        )\n        myDict: Mapping  # it is mapping, not dict.",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:74-106"
+    },
+    "351": {
+        "file_id": 43,
+        "content": "This code defines a FastAPI server with a single endpoint for reading items. The query parameter `q` is used to specify the number of items to return, defaulting to 42. The function returns a list of item names and prints the magic number. The class `Item` represents an item with name, price, and a boolean value for \"is_offer\". A mapping is also included but its type is not fully defined.",
+        "type": "comment"
+    },
+    "352": {
+        "file_id": 43,
+        "content": "        # if it is clear, you don't have to do this. if unclear, you do something different.\n    inventory = []\n    class ResponseModel(BaseModel):\n        \"\"\"model summary or description? example response model\"\"\"\n        ans: str = Field(description=\"pydantic description\", example=\"ans example\")\n        \"\"\"ans doc, not working though\"\"\"\n        ans_1: str\n        class Config:\n            schema_extra = {\"example\": {\"ans\": \"Foo\", \"ans_1\": \"ans_1 data\"}}\n    from typing_extensions import Annotated  # python 3.7\n    from fastapi import Body\n    # when it is async, no parallelism!\n    # but who needs that?\n    @app.post(\n        \"/items/\",\n        description=\"api for creating an item\",\n        summary=\"summary for creating an item\",\n        response_description=\"respond if creation is successful.\",\n        response_model=Annotated[  # can this work?\n            ResponseModel,\n            Body(\n                description=\"create item response model\",\n                examples={\"normal\": {\"ans\": \"ans data\", \"ans_1\": \"ans_1 data\"}},",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:107-135"
+    },
+    "353": {
+        "file_id": 43,
+        "content": "This code defines a FastAPI route for creating an item. It includes a ResponseModel class that serves as the response model for the API, with fields ans and ans_1. The schema_extra provides example values for the fields in the response. The code also imports Annotated from typing_extensions and Body from fastapi for use in defining the route's parameters and examples for the response. The description and summary provide information about the API's purpose, and the response_description explains what the response should indicate if creation is successful.",
+        "type": "comment"
+    },
+    "354": {
+        "file_id": 43,
+        "content": "            ),\n        ],\n        name=\"post_item_api_name\",\n    )\n    async def create_item(\n        item: Annotated[\n            Item,\n            Body(\n                description=\"create item input param item\",\n                example=Item(name=\"name\", price=2, is_offer=False, myDict={\"m\": 1}),\n            ),\n        ]\n    ):\n        \"\"\"\n        Create a new item.\n        ## Parameters\n        - **item**: Item object to create.\n        ## Returns\n        The created item.\n        ## Errors\n        - **400 Bad Request**: Invalid request data.\n        \"\"\"\n        print(\"RECV ITEM:\")\n        rich.print(item)\n        print()\n        if item.name == \"foo\":\n            raise HTTPException(status_code=400, detail=\"Item name cannot be foo.\")\n        inventory.append(item)\n        return ResponseModel(ans=\"1\", ans_1=\"2\")\n    # how to generate doc?\n    # visit: http://<host_ip>:9981/docs\n    #\n    # how to export doc?\n    #\n    # By default, the OpenAPI schema is served at /openapi.json\n    # this json file is needed to create project in apifox.",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:136-172"
+    },
+    "355": {
+        "file_id": 43,
+        "content": "Endpoint for creating a new item. It receives an Item object in the request body and upon successful creation, it returns the created item. If the item's name is \"foo\", a 400 Bad Request error is raised. The OpenAPI schema is served at /openapi.json for API documentation purposes.",
+        "type": "comment"
+    },
+    "356": {
+        "file_id": 43,
+        "content": "    # what is that json anyway?\n    import uvicorn\n    uvicorn.run(app, host=\"0.0.0.0\", port=port)",
+        "type": "code",
+        "location": "/fastapi_server_with_doc.py:173-177"
+    },
+    "357": {
+        "file_id": 43,
+        "content": "The code is importing the \"uvicorn\" library and running a FastAPI app on the specified host and port. This sets up the server for the app to handle incoming HTTP requests.",
+        "type": "comment"
+    },
+    "358": {
+        "file_id": 44,
+        "content": "/generate_call_graph.cmd",
+        "type": "filepath"
+    },
+    "359": {
+        "file_id": 44,
+        "content": "This code generates a call graph of Python files using the pyan3 tool and saves it in DOT format. It iterates through each filepath, creates a command to execute pyan3 on each file with specific options, and executes the commands using os.system(). The resulting call graphs are saved as myuses_ followed by the file's base name without its extension.",
+        "type": "summary"
+    },
+    "360": {
+        "file_id": 44,
+        "content": "@REM filepaths= [\"cpExample.py data_visualize_utils.py\", \"integratedEnergySystemPrototypes.py\", \"config.py\"] \n@REM import os\n@REM for filepath in filepaths:\n@REM     command = f\"pyan3 {filepath} --uses --no-defines --colored --grouped --annotated --dot > myuses_{filepath.split('.')[0]}.dot\"\n@REM     os.system(command)\n@REM pycallgraph graphviz -- cpExample.py\ncode2flow cpExample.py data_visualize_utils.py integratedEnergySystemPrototypes.py config.py",
+        "type": "code",
+        "location": "/generate_call_graph.cmd:1-7"
+    },
+    "361": {
+        "file_id": 44,
+        "content": "This code generates a call graph of Python files using the pyan3 tool and saves it in DOT format. It iterates through each filepath, creates a command to execute pyan3 on each file with specific options, and executes the commands using os.system(). The resulting call graphs are saved as myuses_ followed by the file's base name without its extension.",
+        "type": "comment"
+    },
+    "362": {
+        "file_id": 45,
+        "content": "/generate_document.cmd",
+        "type": "filepath"
+    },
+    "363": {
+        "file_id": 45,
+        "content": "The code generates a PDoc documentation for specified Python files, then archives the Python files along with the generated HTML documentation into a compressed 7z file named \"ies_planning.7z\".",
+        "type": "summary"
+    },
+    "364": {
+        "file_id": 45,
+        "content": "@REM pdoc --http 0.0.0.0:8021 integratedEnergySystemPrototypes.py demo_utils.py cpExample.py\npdoc --html integratedEnergySystemPrototypes.py demo_utils.py cpExample.py config.py\n7z a ies_planning.7z integratedEnergySystemPrototypes.py demo_utils.py cpExample.py config.py html",
+        "type": "code",
+        "location": "/generate_document.cmd:1-4"
+    },
+    "365": {
+        "file_id": 45,
+        "content": "The code generates a PDoc documentation for specified Python files, then archives the Python files along with the generated HTML documentation into a compressed 7z file named \"ies_planning.7z\".",
+        "type": "comment"
+    },
+    "366": {
+        "file_id": 46,
+        "content": "/get_class_name.py",
+        "type": "filepath"
+    },
+    "367": {
+        "file_id": 46,
+        "content": "Class A initializes and asserts the property value, prints class name, updates its own dictionary with 'someProperty', assigns and prints the value of 'someProperty'.",
+        "type": "summary"
+    },
+    "368": {
+        "file_id": 46,
+        "content": "class A:\n    property = 1\n    def __init__(self):\n        A.property +=1\n        assert A.property == self.__class__.property\n        print(\"CLASS NAME?\", self.__class__.__name__)\n        self.__dict__.update({'someProperty':1})\n        val = self.someProperty # type: ignore \n        print(\"VALUE?\",val)\nA()",
+        "type": "code",
+        "location": "/get_class_name.py:1-11"
+    },
+    "369": {
+        "file_id": 46,
+        "content": "Class A initializes and asserts the property value, prints class name, updates its own dictionary with 'someProperty', assigns and prints the value of 'someProperty'.",
+        "type": "comment"
+    },
+    "370": {
+        "file_id": 47,
+        "content": "/get_requirements.cmd",
+        "type": "filepath"
+    },
+    "371": {
+        "file_id": 47,
+        "content": "The code is using cat to concatenate multiple Python files (integratedEnergySystemPrototypes.py, system_topology_utils.py, mini_data_log_utils.py, mini_ies_test.py, mini_heat_system.py, mini_refrigeration_system.py, result_processlib.py, demo_utils.py, data_visualize_utils.py, config.py, and cpExample.py) and piping the output to grep \"import\" (rg import) to list all imports, then using uniq to remove duplicates from the output.",
+        "type": "summary"
+    },
+    "372": {
+        "file_id": 47,
+        "content": "cat integratedEnergySystemPrototypes.py system_topology_utils.py mini_data_log_utils.py  mini_ies_test.py mini_heat_system.py mini_refrigeration_system.py result_processlib.py demo_utils.py data_visualize_utils.py config.py cpExample.py | rg import | uniq",
+        "type": "code",
+        "location": "/get_requirements.cmd:1-1"
+    },
+    "373": {
+        "file_id": 47,
+        "content": "The code is using cat to concatenate multiple Python files (integratedEnergySystemPrototypes.py, system_topology_utils.py, mini_data_log_utils.py, mini_ies_test.py, mini_heat_system.py, mini_refrigeration_system.py, result_processlib.py, demo_utils.py, data_visualize_utils.py, config.py, and cpExample.py) and piping the output to grep \"import\" (rg import) to list all imports, then using uniq to remove duplicates from the output.",
+        "type": "comment"
+    },
+    "374": {
+        "file_id": 48,
+        "content": "/host_document.cmd",
+        "type": "filepath"
+    },
+    "375": {
+        "file_id": 48,
+        "content": "This command is running a Python documentation generator, pdoc, to serve the generated HTML documentation on localhost at port 8021. It will generate docs for three Python files - integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py.",
+        "type": "summary"
+    },
+    "376": {
+        "file_id": 48,
+        "content": "pdoc --http 0.0.0.0:8021 integratedEnergySystemPrototypes.py demo_utils.py cpExample.py",
+        "type": "code",
+        "location": "/host_document.cmd:1-1"
+    },
+    "377": {
+        "file_id": 48,
+        "content": "This command is running a Python documentation generator, pdoc, to serve the generated HTML documentation on localhost at port 8021. It will generate docs for three Python files - integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py.",
+        "type": "comment"
+    },
+    "378": {
+        "file_id": 49,
+        "content": "/install_gsudo.ps1",
+        "type": "filepath"
+    },
+    "379": {
+        "file_id": 49,
+        "content": "The comment describes an API-based installation process for a gsudoSetup.msi file, ensuring TLS 1.2 security. Upon successful installation, it displays success message, prompts to restart consoles, provides PowerShell instructions, appends module import command to $PROFILE, checks console input before continuing.",
+        "type": "summary"
+    },
+    "380": {
+        "file_id": 49,
+        "content": "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12\n$release = Invoke-RestMethod -Method Get -Uri \"https://api.github.com/repos/gerardog/gsudo/releases/latest\"\n$asset = $release.assets | Where-Object name -like \"gsudoSetup.msi\"\n$fileName = \"$env:TEMP\\$($asset.name)\"\nWrite-Output \"Downloading $($asset.name)\"\nInvoke-RestMethod -Method Get -Uri $asset.browser_download_url -OutFile $fileName\nWrite-Output \"Installing $($asset.name)\"\n$DataStamp = get-date -Format yyyyMMddTHHmmss\n$logFile = '{0}-{1}.log' -f \"$env:TEMP\\gsudoSetup\",$DataStamp\n$MSIArguments = @(\n    \"/i\"\n    ('\"{0}\"' -f $fileName)\n    \"/qb\"\n    \"/norestart\"\n    \"/L*v\"\n    $logFile\n)\n$msiexec = (Get-Command \"msiexec.exe\").Path\n$process = Start-Process -ArgumentList $MSIArguments -Wait $msiexec -PassThru\nif ($process.ExitCode -ne 0)\n{\n\t#Get-Content $logFile\n\tWrite-Warning -Verbose \"Installation failed! (msiexec error code $($process.ExitCode))\"\n\tWrite-Warning -Verbose \"  Log File location: $logFile\"\n\tWrite-Warning -Verbose \"  MSI File location: $fileName\"",
+        "type": "code",
+        "location": "/install_gsudo.ps1:1-30"
+    },
+    "381": {
+        "file_id": 49,
+        "content": "Downloading and installing gsudoSetup.msi file using REST API, ensuring TLS 1.2 security protocol, saving the log in temp directory with timestamp.",
+        "type": "comment"
+    },
+    "382": {
+        "file_id": 49,
+        "content": "}\nelse\n{\n\tWrite-Output \"gsudo installed succesfully!\"\n\tWrite-Output \"Please restart your consoles to use gsudo!`n\"\n\t\"PowerShell users: To use enhanced gsudo and Invoke-Gsudo cmdlet, add the following line to your `$PROFILE\"\n\t\"  Import-Module '${Env:ProgramFiles(x86)}\\gsudo\\gsudoModule.psd1'\"\n\t\"Or run: \"\n\t\"  Write-Output `\"``nImport-Module '${Env:ProgramFiles(x86)}\\gsudo\\gsudoModule.psd1'`\" | Add-Content `$PROFILE\"\n\tRemove-Item $fileName \n}\nif ([Console]::IsInputRedirected -eq $false -and [Console]::IsOutputRedirected -eq $false) \n{\n\tWrite-Host -NoNewLine 'Press any key to continue...';\n\t$_ = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');\n}",
+        "type": "code",
+        "location": "/install_gsudo.ps1:31-49"
+    },
+    "383": {
+        "file_id": 49,
+        "content": "Code block executes when gsudo installation is successful. It displays success message, asks to restart consoles for usage, provides instructions for PowerShell users, appends module import command to $PROFILE, checks for non-redirected console input and waits for any key press to continue.",
+        "type": "comment"
+    },
+    "384": {
+        "file_id": 50,
+        "content": "/jinja_test.j2",
+        "type": "filepath"
+    },
+    "385": {
+        "file_id": 50,
+        "content": "This code snippet utilizes Jinja2 template language and includes a loop that iterates through \"mylist\", displaying the prefix of each item. It defines a macro named 'test' and calls it twice, both with and without indentation. It also sets variables v1 and v2 to 1 and 2 respectively. Finally, it defines another macro called 'mtest', assigns its output to variable v0, and displays it twice.",
+        "type": "summary"
+    },
+    "386": {
+        "file_id": 50,
+        "content": "{%- for n in mylist -%}\nprefix: {{n}}\n{% endfor %}\n{% macro test()%}\nhappy\nsong\n    sing along\n{% endmacro%}\n{{test() | indent(4)}}\n{{test()}}\n{# {% error(\"exception\",1)%} #}\n{% set v1, v2 = 1,2 %}\n{{v1}}\n{{v2}}\n{% macro mtest()-%}\nhappy song\n{%- endmacro%}\n{% set v0 = mtest()%}\nv0: {{v0}}\nv0: {{v0}}",
+        "type": "code",
+        "location": "/jinja_test.j2:1-27"
+    },
+    "387": {
+        "file_id": 50,
+        "content": "This code snippet utilizes Jinja2 template language and includes a loop that iterates through \"mylist\", displaying the prefix of each item. It defines a macro named 'test' and calls it twice, both with and without indentation. It also sets variables v1 and v2 to 1 and 2 respectively. Finally, it defines another macro called 'mtest', assigns its output to variable v0, and displays it twice.",
+        "type": "comment"
+    },
+    "388": {
+        "file_id": 51,
+        "content": "/linearization_config.py",
+        "type": "filepath"
+    },
+    "389": {
+        "file_id": 51,
+        "content": "This code imports NumPy and defines lower and upper bounds for x and y variables, sample sizes for both variables, and a function z(x,y) that takes inputs from both variables.",
+        "type": "summary"
+    },
+    "390": {
+        "file_id": 51,
+        "content": "import numpy as np\nx_lb, x_ub = 0,3\ny_lb, y_ub = 0, 2*np.pi\nx_sample_size = y_sample_size = 100\nz_func = lambda x,y:x*np.sin(y)",
+        "type": "code",
+        "location": "/linearization_config.py:1-8"
+    },
+    "391": {
+        "file_id": 51,
+        "content": "This code imports NumPy and defines lower and upper bounds for x and y variables, sample sizes for both variables, and a function z(x,y) that takes inputs from both variables.",
+        "type": "comment"
+    },
+    "392": {
+        "file_id": 52,
+        "content": "/matlab_code/matlab_to_python_howto.md",
+        "type": "filepath"
+    },
+    "393": {
+        "file_id": 52,
+        "content": "First, clone the matlab2python tool from GitHub or Gitee and install its dependencies. Then, use the tool to convert MATLAB files (.m) to Python files (.py). Pandas is useful for reading and writing data files like Excel files, accessing data by column and row names using DataFrame index functionality. Matlab and Python differ in their index operation symbols and loop traversal syntax.",
+        "type": "summary"
+    },
+    "394": {
+        "file_id": 52,
+        "content": "One.a tool called as \"matlab2python\"\n1、安装：\n>>git clone https://github.com/ebranlard/matlab2python\n>>cd matlab2python\n>>pip install -r requirements.txt\n如果有朋友不能翻墙clone不下来代码，把上面第一行命令换成：\n>>git clone https://gitee.com/zongfang/matlab2python.git\n2、使用：\n在matlab2python目录下输入\n>>python matlab2python.py file.m -o file.py\n注意：file.m如果不指定位置就是当前目录下的，如果要用别的目录下的文件，需要指定路径。\n-----------------------------------------------------------------------------------------------\nTwo.pandas 的作用\npandas 主要承担下列matlab任务：\n读写数据文件，一般是 excel 文件。例如：读取输入参数文件；将计算结果输出到 excel 文件。\n按列名访问列数据、行数据。即使用 DataFrame 的行索引、列索引功能。\n-------------------------------------------------------------------------------------------------\nThree.Matlab 和 Python 的差异\n1、索引操作符号：A(1)，A[0]\nmatlab 中访问矩阵中的元素，用圆括号做为索引操作符，像这样 A(1)，下标从1开始；而python中用方括号，像这样A[0],下表从0开始。\n2.遍历循环\nmatlab中for i=1:L-1 与 python中for i in range(0,L)一样",
+        "type": "code",
+        "location": "/matlab_code/matlab_to_python_howto.md:1-26"
+    },
+    "395": {
+        "file_id": 52,
+        "content": "First, clone the matlab2python tool from GitHub or Gitee and install its dependencies. Then, use the tool to convert MATLAB files (.m) to Python files (.py). Pandas is useful for reading and writing data files like Excel files, accessing data by column and row names using DataFrame index functionality. Matlab and Python differ in their index operation symbols and loop traversal syntax.",
+        "type": "comment"
+    },
+    "396": {
+        "file_id": 53,
+        "content": "/microgrid_base/Dockerfile_backup",
+        "type": "filepath"
+    },
+    "397": {
+        "file_id": 53,
+        "content": "The Dockerfile installs Ubuntu 22.04, necessary packages, copies setup files, updates package lists, and sets up the container environment for Miniconda3 and IBM ILOG CPLEX installation.",
+        "type": "summary"
+    },
+    "398": {
+        "file_id": 53,
+        "content": "FROM ubuntu:22.04\n# ENTRYPOINT [ \"/bin/bash\" ]\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# ARG MODIFY_BASHRC=modify_bashrc_for_mamba.py\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\nARG CONDA_INIT=conda_init.sh\n# ARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/ubuntu_environment /etc/environment\nCOPY ${MICROGRID_DIR}/${MODIFY_BASHRC} .\nCOPY ./cplex_install_packages/cplex_studio128.linux-x86-64.bin ${CPLEX_INSTALL_BIN}\n# RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak\n# COPY ${MICROGRID_DIR}/ubuntu_jammy_sources.list /etc/apt/sources.list\n# RUN cat /etc/apt/sources.list.bak >> /etc/apt/sources.list\n# RUN rm /etc/apt/sources.list.bak\nRUN apt update\nRUN apt install -y curl bzip2\n# RUN curl -o ${MAMBA_INSTALL} https://micro.mamba.pm/install.sh\n# RUN bash ${MAMBA_INSTALL}\n# RUN curl -o ${CONDA_INSTALL} https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_backup:1-25"
+    },
+    "399": {
+        "file_id": 53,
+        "content": "This Dockerfile sets up a Ubuntu 22.04 base image, installs necessary packages like curl and bzip2, copies required files for environment setup, updates the package list, and prepares for Conda installation through shell scripts without explicitly mentioning Mamba or Miniconda.",
+        "type": "comment"
+    }
+}

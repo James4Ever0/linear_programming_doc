@@ -1,0 +1,10 @@
+{
+    "summary": "The code is creating an archive named \"type_system.7z\" with the contents \"microgrid_v2*\" and an accompanying text file named \"type_system.md\".",
+    "details": [
+        {
+            "comment": "The code is creating an archive named \"type_system.7z\" with the contents \"microgrid_v2*\" and an accompanying text file named \"type_system.md\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/packup_type_system.sh\":0-0",
+            "content": "7z a type_system.7z microgrid_v2* type_system.md"
+        }
+    ]
+}

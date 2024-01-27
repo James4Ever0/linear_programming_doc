@@ -1,0 +1,10 @@
+{
+    "summary": "This code configures the global index URL for pip and installs packages from a specified URL, ensuring smooth installation of required packages for the microgrid base.",
+    "details": [
+        {
+            "comment": "This code configures the global index URL for pip and installs packages from a specified URL, ensuring smooth installation of required packages for the microgrid base.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_update_conda_cplex.sh\":0-1",
+            "content": "conda run -n cplex --live-stream --no-capture-output pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple\nconda run -n cplex --live-stream --no-capture-output pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code is sending a POST request to a FastAPI server with the given base URL and port. It includes data in JSON format with key-value pairs for name, price, offer status, and nested dictionaries. The response from the server is then printed along with the status code of the request.",
+    "details": [
+        {
+            "comment": "This code is sending a POST request to a FastAPI server with the given base URL and port. It includes data in JSON format with key-value pairs for name, price, offer status, and nested dictionaries. The response from the server is then printed along with the status code of the request.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_client_test.py\":0-12",
+            "content": "from fastapi_server_with_doc import port\nimport requests\nbaseurl = f\"http://127.0.0.1:{port}/\"\nurl = baseurl + \"items\"\njson_data = dict(\n    name=\"hello\", price=1, is_offer=False, myDict={\"mydict\": {\"more\": [1, 2, 3]}}\n)\nr = requests.post(url, json=json_data)\nresponse = r.json()\nprint(\"RESP:\", response)\nprint(\"STATUS_CODE\", r.status_code)"
+        }
+    ]
+}

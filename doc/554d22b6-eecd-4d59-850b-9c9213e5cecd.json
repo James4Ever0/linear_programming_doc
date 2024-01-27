@@ -1,0 +1,15 @@
+{
+    "summary": "The Dockerfile sets up a Ubuntu 22.04 image with environment variables for Conda and CPLEX, installs necessary packages, and updates the system. The code snippet installs Miniconda and initializes a microgrid environment within a Docker container, but the last step is taking an unusually long time.",
+    "details": [
+        {
+            "comment": "This Dockerfile initializes a Ubuntu 22.04 image, sets environment variables for Conda and CPLEX, installs necessary packages, and performs system updates.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_init\":0-26",
+            "content": "FROM ubuntu:22.04\n# ENTRYPOINT [ \"/bin/bash\" ]\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# ARG MODIFY_BASHRC=modify_bashrc_for_mamba.py\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\nARG INIT=init.sh\nARG CONDA_INIT=conda_init.sh\nARG REQUIREMENTS=requirements.txt\nARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nENV PATH=\"/root/miniconda3/bin:${CPLEX_PATH}:${PATH}\"\nWORKDIR /root\n# COPY ${MICROGRID_DIR}/ubuntu_environment /etc/environment\n# COPY ${MICROGRID_DIR}/${MODIFY_BASHRC} .\n# RUN rm -rf *\nCOPY ./cplex_install_packages/cplex_studio128.linux-x86-64.bin ${CPLEX_INSTALL_BIN}\n# RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak\n# COPY ${MICROGRID_DIR}/ubuntu_jammy_sources.list /etc/apt/sources.list\n# RUN cat /etc/apt/sources.list.bak >> /etc/apt/sources.list\n# RUN rm /etc/apt/sources.list.bak\nRUN apt update\nRUN apt install -y curl bzip2\n# RUN curl -o ${MAMBA_INSTALL} https://micro.mamba.pm/install.sh"
+        },
+        {
+            "comment": "This code snippet installs Miniconda and executes a set of scripts for initializing a microgrid environment within a Docker container. It copies necessary files to the appropriate locations, but the last step is taking an unusually long time.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_init\":27-34",
+            "content": "# RUN bash ${MAMBA_INSTALL}\n# RUN curl -o ${CONDA_INSTALL} https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh\nCOPY ./miniconda_installer/Miniconda3-py39_4.12.0-Linux-x86_64.sh ${CONDA_INSTALL}\nCOPY ${MICROGRID_DIR}/${INIT} .\nCOPY ${MICROGRID_DIR}/${CONDA_INIT} .\nCOPY ${MICROGRID_DIR}/${REQUIREMENTS} .\n# THIS STEP IS TAKING SUPER LONG. PLEASE MAKE THIS INTO AN IMAGE.\n# CMD ${BASH}"
+        }
+    ]
+}

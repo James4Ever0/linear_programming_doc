@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the yaml module, opens a file named \"test_config.yaml\", safely loads its content into the 'data' variable using yaml.safe_load(), and prints the data. The code also demonstrates how to load multiple documents split by \"---\" using yaml.safe_load_all() and iterate over the resulting generator to print each document.",
+    "details": [
+        {
+            "comment": "The code imports the yaml module, opens a file named \"test_config.yaml\", safely loads its content into the 'data' variable using yaml.safe_load(), and prints the data. The code also demonstrates how to load multiple documents split by \"---\" using yaml.safe_load_all() and iterate over the resulting generator to print each document.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/read_yaml.py\":0-22",
+            "content": "import yaml\nfpath = \"test_config.yaml\"\nimport rich\nwith open(fpath, \"r\") as file:\n    data = yaml.safe_load(file)\n    rich.print(data)\n    # {'db': {'abc': 'def', 'mykey': None, 'myotherkey': None}}\n    #################################\n    #     {\n    #     'db': {\n    #         'abc': 'def',\n    #         'mykey': None,\n    #         'myotherkey': [None, None]\n    #     }\n    # }\n    # dataList = yaml.safe_load_all(file) # generator.\n    # # load multiple documents splited by \"---\"\n    # for data in dataList:\n    #     rich.print(data)"
+        }
+    ]
+}

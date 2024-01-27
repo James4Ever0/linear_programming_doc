@@ -1,0 +1,20 @@
+{
+    "summary": "The code uses Pyomo and CPLEX to create a mathematical model with variables, constraints, and solves it, checking for abnormal exit conditions and printing x bounds.",
+    "details": [
+        {
+            "comment": "This code uses Pyomo to create a mathematical model with variables x, y, z, and h. It defines constraints based on different scenarios of feasibility and infeasibility for the variable y. The expressions define the relationships between these variables, and the code checks if the model is unbounded or infeasible.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/pyomo_reduce_inequalities.py\":0-29",
+            "content": "# from sympy import symbols\n# TODO: create more readable constraint names for easy debugging\n# TODO: extract infeasible constraints with relevant solver message\n# use pyomo\nfrom pyomo.environ import *\nx_bounds = []\nfor sense in [minimize, maximize]:\n    model = ConcreteModel()\n    x = model.\u53d8\u91cfx = Var()\n    y = model.\u53d8\u91cfy = Var()\n    z = model.\u53d8\u91cfz = Var()\n    h = model.\u53d8\u91cfh = Var()\n    # z = model.z = Var()\n    # x, y, z = symbols(\"x y z\")\n    # infeasible on y.\n    # unbounded\n    # expressions = [y >= z, y <= 20, y >= 10, z <= 0, z >= -10, x <= 100 - y]\n    # feasible\n    # expressions = [y >= z, y <= 20, y >= 10, z <= 0, z >= -10, x <= 100 - y, x >= y - z]\n    # infeasible\n    # expressions = [y >= z, y >= 20, y <= 10, z <= 0, z >= -10, x <= 100 - y, x >= y - z]\n    # double infeasible (will not show both)\n    expressions = [y >= z, y >= 20, y <= 10, h >= 20, h <= 10, z <= 0, z >= -10, x <= 100 - (h+y)/2, x >= (h+y)/2 - z]\n    # Bound infeasibility column '\u53d8\u91cfy'.\n    # check if is unbounded or infeasible.\n    # try to comment that out, see if it can solve"
+        },
+        {
+            "comment": "Code sets up a model, writes it to file, solves with CPLEX solver, and handles potential exceptions for infeasible or unbounded constraints.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/pyomo_reduce_inequalities.py\":30-56",
+            "content": "    # red = reduce_inequalities(expresssions, [x])\n    for i, _expr in enumerate(expressions):\n        model.__setattr__(f\"expr_{i}\", Constraint(expr=_expr))\n    # print(red)\n    obj = model.obj = Objective(expr=x, sense=sense)\n    io_options = dict(symbolic_solver_labels=True)\n    model.write(filename=\"your_model_name.lp\", io_options=io_options)\n    solver = SolverFactory(\"cplex\")\n    # \u6c42\u89e3\u5668\u53d8\u91cf\u4e71\u7801,\u5f71\u54cd\u6c42\u89e3\n    solver.options[\"read fileencoding\"] = 'utf-8'\n    # TODO: get solver log.\n    result = solver.solve(model, tee=True, io_options=io_options)\n    TC = result.solver.termination_condition\n    import rich\n    rich.print(result)\n    normalTCs = [\n        TerminationCondition.globallyOptimal,\n        TerminationCondition.locallyOptimal,\n        TerminationCondition.feasible,\n        TerminationCondition.optimal,\n    ]\n    if TC == TerminationCondition.infeasible:\n        raise Exception(\"infeasible constraint found. please check expression\")\n    elif TC == TerminationCondition.unbounded:\n        raise Exception(\"unbounded constraint found. please check expression\")"
+        },
+        {
+            "comment": "This code checks if the solver exit condition is abnormal and raises an exception with the details. It also prints the value of variable x, its sense (equal to or greater than), adds the value to a list of bounds, and finally prints the complete list of x bounds.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/pyomo_reduce_inequalities.py\":57-62",
+            "content": "    elif TC not in normalTCs:\n        raise Exception(f\"abnormal solver exit condition: {TC}\")\n    print(\"val? %s, sense? %s\" % (val_x := value(x), sense))\n    x_bounds.append(val_x)\nprint(\"x bounds:\", x_bounds)"
+        }
+    ]
+}

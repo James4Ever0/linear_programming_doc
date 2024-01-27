@@ -1,0 +1,10 @@
+{
+    "summary": "This code configures simulation parameters such as simulation rounds, time intervals, and default values. It initializes variables for the number of hours in a day (based on year setting), sunlight intensity per hour, and large numbers. The code also includes debug settings to adjust the number of hours based on run mode.",
+    "details": [
+        {
+            "comment": "This code configures simulation parameters such as simulation rounds, time intervals, and default values. It initializes variables for the number of hours in a day (based on year setting), sunlight intensity per hour, and large numbers. The code also includes debug settings to adjust the number of hours based on run mode.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/config.py\":1-46",
+            "content": "\"\"\"\n\u4eff\u771f\u5171\u4eab\u53c2\u6570\n\"\"\"\n# ma = 0  # not using? moving average?\nimport numpy as np\nimport time\nlocaltime1 = time.time()\ndebug = 1\nepsilon = 1e-10\n\"\"\"\n\u4f5c\u7528:\u5982\u679c\u8bbe\u7f6e\u4e3a1,\u5c06\u628anum_hour0\u4e58\u4ee5year(year\u7684\u9ed8\u8ba4\u503c\u662f1)\n\"\"\"\nrun = 0\nyear = 1\nday_node = 24\n\"\"\"\n\u4e00\u592924\u5c0f\u65f6\n\"\"\"\nnode = day_node * 1 * 1\nif debug == 0:\n    num_hour = node\nelse:\n    num_hour = node * year\n# total simulation rounds?\nsimulationTime = 3600\n# a big number\nbigNumber = 10e10\n\"\"\"\n\u8bbe\u7f6e\u4e00\u4e2a\u5927\u7684\u6570,\u9ed8\u8ba4\u503c\u4e3a10\u768410\u6b21\u65b9\n\"\"\"\n# every hour of one day?\nintensityOfIllumination = np.ones(shape=num_hour)\n\"\"\"\n24\u5c0f\u65f6\u5149\u7167\u5f3a\u5ea6\u6570\u7ec4,\u6570\u7ec4\u5f62\u72b6\u4e3a`(num_hour0,)`,\u6240\u6709\u5143\u7d20\u521d\u59cb\u5316\u4e3a1\n\"\"\"\n# what is this \"ha\"? just sunlight stats per hour in a day?"
+        }
+    ]
+}

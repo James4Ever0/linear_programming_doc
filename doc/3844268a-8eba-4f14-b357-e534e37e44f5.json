@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports all necessary functions and classes from the ies_optim_jinja module and defines a variable logger_print. It is used for any additional models not included in the microgrid, allowing them to be created outside of the template and imported into ies_optim.py for use.",
+    "details": [
+        {
+            "comment": "This code imports all necessary functions and classes from the ies_optim_jinja module and defines a variable logger_print. It is used for any additional models not included in the microgrid, allowing them to be created outside of the template and imported into ies_optim.py for use.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/extra_models.py\":0-9",
+            "content": "from log_utils import logger_print\n\"\"\"\nfor any other model not within the microgrid (or you don't want to write it in template), make it here.\nrename the template generated file: ies_optim.py -> ies_optim_jinja.py\ncreate a file named \"ies_optim.py\" which imports all things from ies_optim_jinja.py and extra_models.py\n\"\"\"\nfrom ies_optim_jinja import *"
+        }
+    ]
+}

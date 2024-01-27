@@ -1,0 +1,10 @@
+{
+    "summary": "Class A initializes and asserts the property value, prints class name, updates its own dictionary with 'someProperty', assigns and prints the value of 'someProperty'.",
+    "details": [
+        {
+            "comment": "Class A initializes and asserts the property value, prints class name, updates its own dictionary with 'someProperty', assigns and prints the value of 'someProperty'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/get_class_name.py\":0-10",
+            "content": "class A:\n    property = 1\n    def __init__(self):\n        A.property +=1\n        assert A.property == self.__class__.property\n        print(\"CLASS NAME?\", self.__class__.__name__)\n        self.__dict__.update({'someProperty':1})\n        val = self.someProperty # type: ignore \n        print(\"VALUE?\",val)\nA()"
+        }
+    ]
+}

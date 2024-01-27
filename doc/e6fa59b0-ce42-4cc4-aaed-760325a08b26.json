@@ -1,0 +1,10 @@
+{
+    "summary": "This code runs two Python scripts, checks for nonzero exit codes, and then generates code if no errors occurred.",
+    "details": [
+        {
+            "comment": "This code runs two Python scripts, checks for nonzero exit codes, and then generates code if no errors occurred.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/generate_basic_params.sh\":0-13",
+            "content": "python3 parse_params.py\n# echo \"exit code? $?\"\n# if [ $? -ne 0 ] ; then\n# echo \"nonzero exit code for: `python3 parse_params.py`\"\n# exit\n# fi\npython3 parse_units_and_names.py\n# echo \"exit code? $?\"\n# if [ $? -ne 0 ] ; then\n# echo \"nonzero exit code for: `python3 parse_units_and_names.py`\"\n# exit\n# fi\n# then execute the template to generate code"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Imports necessary libraries and defines two functions: checkDisjunctive() checks if a model is disjunctive, transformDisjunctiveModel() transforms a model to bigM if it's disjunctive.",
+    "details": [
+        {
+            "comment": "Imports necessary libraries and defines two functions: checkDisjunctive() checks if a model is disjunctive, transformDisjunctiveModel() transforms a model to bigM if it's disjunctive.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/pyomo_environ.py\":0-16",
+            "content": "import pyomo_patch\nfrom pyomo.environ import *\nfrom pyomo.gdp import *\nfrom config import ies_env\ndef checkDisjunctive(model: ConcreteModel):\n    for _ in model.component_data_objects(ctype=Disjunct):\n        return True\n    return False\ndef transformDisjunctiveModel(model, bigM=1e8):\n    is_disjunctive = checkDisjunctive(model)\n    if is_disjunctive:\n        TransformationFactory(\"gdp.bigm\").apply_to(model, bigM=bigM)\n    return is_disjunctive"
+        }
+    ]
+}

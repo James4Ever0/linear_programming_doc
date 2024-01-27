@@ -1,0 +1,10 @@
+{
+    "summary": "Creates a symbolic link named \"dwg_blueprint\" in the current directory, linking to the file/folder at C:\\Users\\ss\\input_dwg.",
+    "details": [
+        {
+            "comment": "Creates a symbolic link named \"dwg_blueprint\" in the current directory, linking to the file/folder at C:\\Users\\ss\\input_dwg.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/symlinks/create_symlink.cmd\":0-1",
+            "content": "@REM mklink /D <link_path> <target_path>\nmklink /D dwg_blueprint C:\\Users\\ss\\input_dwg"
+        }
+    ]
+}

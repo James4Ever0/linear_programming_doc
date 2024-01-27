@@ -1,0 +1,10 @@
+{
+    "summary": "This Dockerfile updates the base image by copying files from a specified directory, executes initialization scripts, and sets environment variables. It also installs necessary packages and libraries using Conda and Apt environments.",
+    "details": [
+        {
+            "comment": "This Dockerfile updates the base image by copying files from a specified directory, executes initialization scripts, and sets environment variables. It also installs necessary packages and libraries using Conda and Apt environments.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_update_self\":0-29",
+            "content": "# !!!DO NOT USE THIS FILE!!!\n# YOU HAVE BEEN WARNED\nFROM microgrid_update:latest as previous_stage\n# seriously?\nFROM scratch\nCOPY --from=previous_stage / /\nARG BASH=/bin/bash\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/init_solver.sh .\nRUN ${BASH} init_solver.sh\n# COPY ${MICROGRID_DIR}/init_apt_environ.sh .\n# RUN ${BASH} init_apt_environ.sh\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_docplex.sh .\nRUN ${BASH} init_update_conda_docplex.sh\nCOPY ${MICROGRID_DIR}/requirements_docker_launch.txt .\nCOPY ${MICROGRID_DIR}/requirements.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_cplex.sh .\nRUN ${BASH} init_update_conda_cplex.sh\n# finally we run this.\nCOPY ${MICROGRID_DIR}/init_apt_environ.sh .\nRUN ${BASH} init_apt_environ.sh"
+        }
+    ]
+}

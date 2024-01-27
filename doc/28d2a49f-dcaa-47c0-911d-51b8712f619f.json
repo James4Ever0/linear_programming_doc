@@ -1,0 +1,10 @@
+{
+    "summary": "This code reads the root's .bashrc file, uncomments lines containing \"mamba initialize\", and rewrites the file with these changes.",
+    "details": [
+        {
+            "comment": "This code reads the root's .bashrc file, uncomments lines containing \"mamba initialize\", and rewrites the file with these changes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/modify_bashrc_for_mamba.py\":0-20",
+            "content": "from log_utils import logger_print\nwith open(BASHRC := \"/root/.bashrc\", \"r\") as f:\n    lines = f.read().split(\"\\n\")\nuncomment = lambda l: l.split(\"#\")[-1]\nflag = False\nnew_lines = []\nfor line in lines:\n    if not flag:\n        if \"mamba initialize\" in line:\n            # if \"conda initialize\" in line:\n            flag = True\n    if flag:\n        line = uncomment(line)\n    new_lines.append(line)\nwith open(BASHRC, \"w+\") as f:\n    f.write(\"\\n\".join(new_lines))"
+        }
+    ]
+}

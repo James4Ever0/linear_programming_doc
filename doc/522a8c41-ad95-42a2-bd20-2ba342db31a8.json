@@ -1,0 +1,10 @@
+{
+    "summary": "The code uses pandoc to convert HTML files (example_docstring, processed, processed_article and processed_index) to DOCX format. The output file names are specified with their corresponding extensions (.docx), and the \"-o\" flag specifies the output filename.",
+    "details": [
+        {
+            "comment": "The code uses pandoc to convert HTML files (example_docstring, processed, processed_article and processed_index) to DOCX format. The output file names are specified with their corresponding extensions (.docx), and the \"-o\" flag specifies the output filename.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/original_html_to_docx.sh\":0-3",
+            "content": "pandoc -o original_example_docstring.docx html/example_docstring.html\npandoc -o processed.docx html/processed.html\npandoc -o processed_article.docx html/processed_article.html\npandoc -o processed_index.docx html/processed_index.html"
+        }
+    ]
+}

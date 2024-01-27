@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary modules and retrieves an instance of the IESEnv data class using getConfig function. It then exports the ies_env variable to be accessed by other parts of the program.",
+    "details": [
+        {
+            "comment": "This code imports necessary modules and retrieves an instance of the IESEnv data class using getConfig function. It then exports the ies_env variable to be accessed by other parts of the program.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/config.py\":0-13",
+            "content": "from log_utils import logger_print\nfrom config_utils import getConfig\nfrom config_dataclasses import IESEnv\nies_env = getConfig(IESEnv)\n__all__ = [\"ies_env\"]\n# if __name__ == \"__main__\":\n#     # let's test\n#     # import rich\n#     dat: IESEnv = IESEnvConfig.load()\n#     logger_print(dat)"
+        }
+    ]
+}

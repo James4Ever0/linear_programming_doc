@@ -1,0 +1,532 @@
+{
+    "3200": {
+        "file_id": 356,
+        "content": "Option Explicit\nDim i, strArguments, wshShell\nIf WScript.Arguments.Count = 0 Then Syntax\nIf WScript.Arguments(0) = \"/?\" Then Syntax\nstrArguments = \"\"\nFor i = 0 To WScript.Arguments.Count - 1\n\tstrArguments = strArguments & \" \" & WScript.Arguments(i)\nNext\nSet wshShell = CreateObject( \"WScript.Shell\" )\nwshShell.Run Trim( strArguments ), 0, False\nSet wshShell = Nothing\nSub Syntax\n\tDim strMsg\n\tstrMsg = \"RunNHide.vbs,  Version 2.00\" & vbCrLf _\n\t       & \"Run a batch file or (console) command in a hidden window\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Usage:  RUNNHIDE.VBS  some_command  [ some_arguments ]\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Where:  \"\"some_command\"\"    is the batch file or (console) command\" & vbCrLf _\n\t       & \"                          you want to run hidden\" & vbCrLf _\n\t       & \"        \"\"some_arguments\"\"  are optional arguments for \"\"some_command\"\"\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Based on a \"\"one-liner\"\" by Alistair Johnson\" & vbCrLf _\n\t       & \"www.microsoft.com/technet/scriptcenter/csc/scripts/scripts/running/cscte009.mspx\" _",
+        "type": "code",
+        "location": "/runhide.vbs:1-31"
+    },
+    "3201": {
+        "file_id": 356,
+        "content": "The code is a VBS script for running batch files or console commands in a hidden window. It checks syntax and usage, takes arguments as input, and executes the command in a hidden manner based on a one-liner by Alistair Johnson.",
+        "type": "comment"
+    },
+    "3202": {
+        "file_id": 356,
+        "content": "\t       & vbCrLf & vbCrLf _\n\t       & \"Written by Rob van der Woude\" & vbCrLf _\n\t       & \"http://www.robvanderwoude.com\"\n\tWScript.Echo strMsg\n\tWScript.Quit 1\nEnd Sub",
+        "type": "code",
+        "location": "/runhide.vbs:32-37"
+    },
+    "3203": {
+        "file_id": 356,
+        "content": "This code snippet displays a message with author credit and website link, then terminates the script with an exit code.",
+        "type": "comment"
+    },
+    "3204": {
+        "file_id": 357,
+        "content": "/schedule_update.cmd",
+        "type": "filepath"
+    },
+    "3205": {
+        "file_id": 357,
+        "content": "Creates a task in Task Scheduler to run the \"scheduled_commit.cmd\" file every 5 minutes with the name \"IES_Modeling\".",
+        "type": "summary"
+    },
+    "3206": {
+        "file_id": 357,
+        "content": "schtasks /CREATE /SC MINUTE /MO 5  /TN \"IES_Modeling\" /TR \"D:\\project\\xianxing\\scheduled_commit.cmd\"\nschtasks /RUN /I /TN \"IES_Modeling\"\nREM https://www.windowscentral.com/how-create-task-using-task-scheduler-command-prompt",
+        "type": "code",
+        "location": "/schedule_update.cmd:1-3"
+    },
+    "3207": {
+        "file_id": 357,
+        "content": "Creates a task in Task Scheduler to run the \"scheduled_commit.cmd\" file every 5 minutes with the name \"IES_Modeling\".",
+        "type": "comment"
+    },
+    "3208": {
+        "file_id": 358,
+        "content": "/scheduled_commit.cmd",
+        "type": "filepath"
+    },
+    "3209": {
+        "file_id": 358,
+        "content": "The code hides the console, navigates to a specific directory, executes a script, and redirects its output to a log file.",
+        "type": "summary"
+    },
+    "3210": {
+        "file_id": 358,
+        "content": "CONSOLESTATE /Hide\n@REM http://www.robvanderwoude.com\n@REM https://www.robvanderwoude.com/battech_hideconsole.php\nD:\ncd D:\\project\\xianxing\n@REM not to output too many things. just look at the most recent one.\ncommit.cmd > run.log",
+        "type": "code",
+        "location": "/scheduled_commit.cmd:1-7"
+    },
+    "3211": {
+        "file_id": 358,
+        "content": "The code hides the console, navigates to a specific directory, executes a script, and redirects its output to a log file.",
+        "type": "comment"
+    },
+    "3212": {
+        "file_id": 359,
+        "content": "/script.sh",
+        "type": "filepath"
+    },
+    "3213": {
+        "file_id": 359,
+        "content": "The code performs a GET request to fetch a heat component with id 257, and sets HTTP headers such as user-agent and x-requested-with before appending the result to cloudpss_simu.mjson file.",
+        "type": "summary"
+    },
+    "3214": {
+        "file_id": 359,
+        "content": "curl 'https://ies.cloudpss.net:8202/editor/getComponentForHeat/?id=257' \\\n  -H 'authority: ies.cloudpss.net:8202' \\\n  -H 'accept: application/json, text/javascript, */*; q=0.01' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'cookie: first=1; csrftoken=Digx2EfnYitLn08WpmRGcQU4Gz1Q3mh6hpgEF1juKFXldQq1U2OiOBb7oaWDbKeX; setlang=1; TK=4e128a76808f4e283cb57df7d3fd098e18c91354; username=Steven0128; email=; id=1197; setlang1=test213; first=1; setlang=test; SECKEY_ABVK=Ep8Zj2+Hk2VQz+GHI2Xh9HpjvRnr1CRieYk6oTiz8kA%3D; BMAP_SECKEY=O6M7JkIg5MejfsdnUNF_wPSZR_1vflwZJkB4gjMH0QD4_TYMzo9Z1Ibknz3YFBF9-U9elAk74_LvBRewX_deuW8W77BePTlTJhVijK3KvQBlRYcL58bscgrR16hNwL5c1epYFdu9l7gptzM8QbEsHfZeo7sPwP7XhwlSu1eQ0VmxLqazEtzZUmVNhIFxvGNB; csrf=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; csrftoken=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; sessionid=d1mx1eci22ddalw7f72os0uhb6b0bjld' \\\n  -H 'referer: https://ies.cloudpss.net:8202/editor/?id=21559' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"' \\",
+        "type": "code",
+        "location": "/script.sh:1-7"
+    },
+    "3215": {
+        "file_id": 359,
+        "content": "This code is making a GET request to 'https://ies.cloudpss.net:8202/editor/getComponentForHeat/?id=257' with various headers including authority, accept, accept-language, cookie, referer, and sec-ch-ua. It seems to be fetching a component for a heat with id 257 from the specified URL.",
+        "type": "comment"
+    },
+    "3216": {
+        "file_id": 359,
+        "content": "  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-origin' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36' \\\n  -H 'x-requested-with: XMLHttpRequest' >> cloudpss_simu.mjson",
+        "type": "code",
+        "location": "/script.sh:8-14"
+    },
+    "3217": {
+        "file_id": 359,
+        "content": "This code sets HTTP headers for a request, including user-agent and x-requested-with. It then appends the resulting request to cloudpss_simu.mjson file.",
+        "type": "comment"
+    },
+    "3218": {
+        "file_id": 360,
+        "content": "/serve_pydoc.ps1",
+        "type": "filepath"
+    },
+    "3219": {
+        "file_id": 360,
+        "content": "This code is using pdoc3 to generate API documentation for Python modules. It sets up a web server on 0.0.0.0:8001 to serve the generated HTML documentation, which can be accessed by opening the specified IP address and port in a web browser. The syntax \"--http\" or \"--port\" is used to specify the URL where the documentation will be served.",
+        "type": "summary"
+    },
+    "3220": {
+        "file_id": 360,
+        "content": "ipconfig | rg 192.168\n# python -m pydoc -n 0.0.0.0 -p 8001 .\\cpExample.py\n# pdoc and pdoc3 are different.\n# i use pdoc3.\n# pdoc3 syntax\n# pdoc --http 0.0.0.0:8001 .\\cpExample.py\npdoc --http 0.0.0.0:8001 .\\example_docstring.py\n# pdoc syntax\n# pdoc --port 8001 --search .\\example_docstring.py",
+        "type": "code",
+        "location": "/serve_pydoc.ps1:1-12"
+    },
+    "3221": {
+        "file_id": 360,
+        "content": "This code is using pdoc3 to generate API documentation for Python modules. It sets up a web server on 0.0.0.0:8001 to serve the generated HTML documentation, which can be accessed by opening the specified IP address and port in a web browser. The syntax \"--http\" or \"--port\" is used to specify the URL where the documentation will be served.",
+        "type": "comment"
+    },
+    "3222": {
+        "file_id": 361,
+        "content": "/setup_gptcommit.cmd",
+        "type": "filepath"
+    },
+    "3223": {
+        "file_id": 361,
+        "content": "Sets OpenAI API base, key, and model for GPTCommit, then installs configuration. Ensures periodic updates without overloading.",
+        "type": "summary"
+    },
+    "3224": {
+        "file_id": 361,
+        "content": "gptcommit config set --local openai.api_base \"https://api.chatanywhere.com.cn/v1\"\ngptcommit config set --local openai.api_key \"sk-CXMgNasrAvxNDYDTVE1LZtJvTWEF5scC6OvHhbTe1i016urg\"\ngptcommit config set --local openai.model \"gpt-3.5-turbo\"\ngptcommit install\n@REM ensure that we do this in regular interval. do not do this too fast.",
+        "type": "code",
+        "location": "/setup_gptcommit.cmd:1-5"
+    },
+    "3225": {
+        "file_id": 361,
+        "content": "Sets OpenAI API base, key, and model for GPTCommit, then installs configuration. Ensures periodic updates without overloading.",
+        "type": "comment"
+    },
+    "3226": {
+        "file_id": 362,
+        "content": "/setup_gptcommit.sh",
+        "type": "filepath"
+    },
+    "3227": {
+        "file_id": 362,
+        "content": "This code sets the GPTcommit configuration for OpenAI with a local API base and API key. It ensures this is done regularly without being too fast, likely for updating or syncing purposes.",
+        "type": "summary"
+    },
+    "3228": {
+        "file_id": 362,
+        "content": "gptcommit config set --local openai.apt_base \"https://api.chatanywhere.com.cn\"\ngptcommit config set --local openai.api_key \"sk-CXMgNasrAvxNDYDTVE1LZtJvTWEF5scC6OvHhbTe1i016urg\"\n@REM ensure that we do this in regular interval. do not do this too fast.",
+        "type": "code",
+        "location": "/setup_gptcommit.sh:1-3"
+    },
+    "3229": {
+        "file_id": 362,
+        "content": "This code sets the GPTcommit configuration for OpenAI with a local API base and API key. It ensures this is done regularly without being too fast, likely for updating or syncing purposes.",
+        "type": "comment"
+    },
+    "3230": {
+        "file_id": 363,
+        "content": "/subversion_sync.cmd",
+        "type": "filepath"
+    },
+    "3231": {
+        "file_id": 363,
+        "content": "The code performs a Subversion update, copies several Python files and data files to a specific directory, adds newly created or modified files to the repository, and commits the changes with a message \"update\".",
+        "type": "summary"
+    },
+    "3232": {
+        "file_id": 363,
+        "content": "svn update D:\\project\\XiDianProject\\YH\\04-编码\\NetworkVisualize \ncp connectivity_matrix.xlsx integratedEnergySystemPrototypes.py system_topology_utils.py mini_data_log_utils.py jinan_changqing-hour.dat mini_ies_test.py mini_heat_system.py mini_refrigeration_system.py result_processlib.py demo_utils.py data_visualize_utils.py config.py cpExample.py README.md requirements.txt -t D:\\project\\XiDianProject\\YH\\04-编码\\NetworkVisualize\\\nsvn add D:\\project\\XiDianProject\\YH\\04-编码\\NetworkVisualize\\*\nsvn commit D:\\project\\XiDianProject\\YH\\04-编码\\NetworkVisualize -m \"update\"",
+        "type": "code",
+        "location": "/subversion_sync.cmd:1-4"
+    },
+    "3233": {
+        "file_id": 363,
+        "content": "The code performs a Subversion update, copies several Python files and data files to a specific directory, adds newly created or modified files to the repository, and commits the changes with a message \"update\".",
+        "type": "comment"
+    },
+    "3234": {
+        "file_id": 364,
+        "content": "/symlinks/create_symlink.cmd",
+        "type": "filepath"
+    },
+    "3235": {
+        "file_id": 364,
+        "content": "Creates a symbolic link named \"dwg_blueprint\" in the current directory, linking to the file/folder at C:\\Users\\ss\\input_dwg.",
+        "type": "summary"
+    },
+    "3236": {
+        "file_id": 364,
+        "content": "@REM mklink /D <link_path> <target_path>\nmklink /D dwg_blueprint C:\\Users\\ss\\input_dwg",
+        "type": "code",
+        "location": "/symlinks/create_symlink.cmd:1-2"
+    },
+    "3237": {
+        "file_id": 364,
+        "content": "Creates a symbolic link named \"dwg_blueprint\" in the current directory, linking to the file/folder at C:\\Users\\ss\\input_dwg.",
+        "type": "comment"
+    },
+    "3238": {
+        "file_id": 365,
+        "content": "/system_topology_utils.py",
+        "type": "filepath"
+    },
+    "3239": {
+        "file_id": 365,
+        "content": "The code generates a directed graph representing the energy system, saves as JSON, and displays the figure with labels and bold fonts. It provides flexibility in file saving and avoids immediate display.",
+        "type": "summary"
+    },
+    "3240": {
+        "file_id": 365,
+        "content": "from integratedEnergySystemPrototypes import EnergyFlowNodeFactory\nimport networkx as nx\nimport matplotlib.pyplot as plt\ndef visualizeSystemTopology(\n    NodeFactory: EnergyFlowNodeFactory,\n    draw_options={\n        \"node_color\": \"yellow\",\n        \"node_size\": 1000,\n    },\n    system_name=\"ies_system\",\n):\n    G = nx.DiGraph(None, attrs={}) # global simulation params go here.\n    node_index = 0\n    for device_id in NodeFactory.device_ids:\n        device_name = NodeFactory.device_id_to_device_name[device_id]\n        device_node_name = f\"{device_name}_{device_id[:4]}_device\"\n        G.add_node(device_node_name,attrs={},node_type='device')\n    for node in NodeFactory.nodes:\n        node_name = f\"{node.energy_type}_io_{node_index}\"\n        G.add_node(node_name,attrs={},node_type='io') # energy i/o nodes\n        node_index += 1\n        # G.add_node(2,\"BESS\")\n        for input_id in node.input_ids:\n            device_id = input_id.split(\"_\")[0]\n            try:\n                # device_id = input_id\n                device_node_name = f\"{NodeFactory.device_id_to_device_name[device_id]}_{device_id[:4]}_device\"",
+        "type": "code",
+        "location": "/system_topology_utils.py:1-31"
+    },
+    "3241": {
+        "file_id": 365,
+        "content": "Creates a directed graph (G) representing the energy system topology, adding nodes for devices and I/O nodes. Device node names are formatted based on device IDs, while I/O node names follow an incremental index.",
+        "type": "comment"
+    },
+    "3242": {
+        "file_id": 365,
+        "content": "                G.add_edge(\n                    node_name,\n                    device_node_name,\n                )\n            except:\n                breakpoint()\n                pass\n        for output_id in node.output_ids:\n            device_id = output_id.split(\"_\")[0]\n            try:\n                # device_id = output_id\n                device_node_name = f\"{NodeFactory.device_id_to_device_name[device_id]}_{device_id[:4]}_device\"\n                G.add_edge(\n                    device_node_name,\n                    node_name,\n                )\n            except:\n                breakpoint()\n                pass\n    # breakpoint() # check how to save the graph as json.\n    from networkx.readwrite import json_graph\n    serialized = json_graph.adjacency_data(G)\n    # import rich\n    # rich.print(serialized)\n    # breakpoint()\n    import json\n    serialized_string = json.dumps(serialized)\n    with open('test_graph_data.json','w+') as f:\n        f.write(serialized_string)\n    nx.draw(G, with_labels=True, font_weight=\"bold\", **draw_options)",
+        "type": "code",
+        "location": "/system_topology_utils.py:32-63"
+    },
+    "3243": {
+        "file_id": 365,
+        "content": "Creates a directed graph (G) representing a system topology by adding edges between nodes and devices based on output_ids. Saves the graph as JSON for future use, and draws the graph with labels and bold fonts.",
+        "type": "comment"
+    },
+    "3244": {
+        "file_id": 365,
+        "content": "    # plt.show()\n    figure_path = f\"topology_{system_name}.png\"\n    print(\"Saving figure to:\", figure_path)\n    plt.savefig(figure_path)",
+        "type": "code",
+        "location": "/system_topology_utils.py:64-67"
+    },
+    "3245": {
+        "file_id": 365,
+        "content": "Code snippet saves a figure to a file with the specified system name, avoiding immediate display and providing flexibility.",
+        "type": "comment"
+    },
+    "3246": {
+        "file_id": 366,
+        "content": "/taylor_series_expansion_approximation_nonlinear_function_piecewise.py",
+        "type": "filepath"
+    },
+    "3247": {
+        "file_id": 366,
+        "content": "This code approximates sin(x) using Taylor series expansion and piecewise power calculations with numpy and scipy's interp1d. It compares the approximation to the actual value of sin(2).",
+        "type": "summary"
+    },
+    "3248": {
+        "file_id": 366,
+        "content": "# z = x*sin(y)\n# sin(y) ~= y-y^3/3!+y^5/5!\n# y_3 = y^3\n# y_5 = y^5\n# z = x*y - x*y_3/3! + x*y_5/5!\n# i_0 = (x+y)/2, i_1 = (x-y)/2\n# i_2 = (x+y_3)/2, i_3 = (x-y_3)/2\n# i_4 = (x+y_5)/2, i_5 = (x-y_5)/2\n# z = i_0^2-i_1^2 - (i_2^2-i_3^2)/3!+(i_4^2-i_5^2)/5!\nfrom linearization_config import *\npow_3_lb = y_3_lb = y_lb**3\npow_3_ub = y_3_ub = y_ub**3\npow_5_lb = y_5_lb = y_lb**5\npow_5_ub = y_5_ub = y_ub**5\ni_0_lb = (x_lb + y_lb) / 2\ni_0_ub = (x_ub + y_ub) / 2\ni_1_lb = (x_lb - y_ub) / 2\ni_1_ub = (x_ub - y_lb) / 2\ni_2_lb = (x_lb + y_3_lb) / 2\ni_2_ub = (x_ub + y_3_ub) / 2\ni_3_lb = (x_lb - y_3_ub) / 2\ni_3_ub = (x_ub - y_3_lb) / 2\ni_4_lb = (x_lb + y_5_lb) / 2\ni_4_ub = (x_ub + y_5_ub) / 2\ni_5_lb = (x_lb - y_5_ub) / 2\ni_5_ub = (x_ub - y_5_lb) / 2\npow_2_lb = min(i_0_lb, i_1_lb, i_2_lb, i_3_lb, i_4_lb, i_5_lb)\npow_2_ub = max(i_0_ub, i_1_ub, i_2_ub, i_3_ub, i_4_ub, i_5_ub)\nimport numpy as np\nfrom scipy.interpolate import interp1d\n# # 定义输入和输出数组\n# x = np.array([0, 1, 2, 3, 4, 5])\n# y = np.array([0, 1, 4, 9, 16, 25])\ndef interpolate_from_input_and_output_array(x, y):",
+        "type": "code",
+        "location": "/taylor_series_expansion_approximation_nonlinear_function_piecewise.py:1-44"
+    },
+    "3249": {
+        "file_id": 366,
+        "content": "The code calculates the Taylor series expansion and performs piecewise approximation of a nonlinear function. It defines lower and upper bounds for interpolated values, then uses numpy and scipy's interp1d to create an interpolation function based on input (x) and output (y) arrays.",
+        "type": "comment"
+    },
+    "3250": {
+        "file_id": 366,
+        "content": "    # 使用interp1d函数将输入和输出数组转化为分段函数\n    f = interp1d(x, y, kind=\"linear\")  # put np.ndarray here\n    return f\n# # 使用分段函数计算新的输出值\n# x_new = np.array([1.5, 3.5])\n# y_new = f(x_new)\n# # 打印新的输出值\n# print(y_new)\ndef get_piecewise_function(lb, ub, sample_size, func):\n    print(\"LB:\",lb, \"UB:\",ub)\n    input_array = np.linspace(lb, ub, sample_size)\n    output_array = func(input_array)\n    piecewise_func = interpolate_from_input_and_output_array(input_array, output_array)\n    return piecewise_func\npiecewise_sample_size = 100000\npiecewise_pow_2 = get_piecewise_function(\n    pow_2_lb, pow_2_ub, piecewise_sample_size, lambda x: x**2\n)\npiecewise_pow_3 = get_piecewise_function(\n    pow_3_lb, pow_3_ub, piecewise_sample_size, lambda x: x**3\n)\npiecewise_pow_5 = get_piecewise_function(\n    pow_5_lb, pow_5_ub, piecewise_sample_size, lambda x: x**5\n)\nimport math\ndef z_func_approx(x: float, y: float):\n    assert x > x_lb\n    assert x < x_ub\n    assert y > y_lb\n    assert y < y_ub\n    y = np.array([y])\n    x = np.array([x])\n    y_3 = piecewise_pow_3(y)",
+        "type": "code",
+        "location": "/taylor_series_expansion_approximation_nonlinear_function_piecewise.py:45-88"
+    },
+    "3251": {
+        "file_id": 366,
+        "content": "Code snippet defines a function `get_piecewise_function` that takes lower bound, upper bound, sample size, and function as input. It creates an array of evenly spaced points between the bounds using `np.linspace`, computes output values for the input function, and uses `interpolate_from_input_and_output_array` to create a piecewise function. The code then defines three piecewise functions (`piecewise_pow_2`, `piecewise_pow_3`, `piecewise_pow_5`) using this function. Finally, it defines `z_func_approx` which takes x and y as input, asserts certain conditions on them, converts to numpy arrays, and returns the result of applying the piecewise cubic power function (`piecewise_pow_3`) on y.",
+        "type": "comment"
+    },
+    "3252": {
+        "file_id": 366,
+        "content": "    y_5 = piecewise_pow_5(y)\n    # breakpoint()\n    i_0 = (x + y) / 2\n    i_1 = (x - y) / 2\n    i_2 = (x + y_3) / 2\n    i_3 = (x - y_3) / 2\n    i_4 = (x + y_5) / 2\n    i_5 = (x - y_5) / 2\n    pow_2_i_0 = piecewise_pow_2(i_0)\n    pow_2_i_1 = piecewise_pow_2(i_1)\n    pow_2_i_2 = piecewise_pow_2(i_2)\n    pow_2_i_3 = piecewise_pow_2(i_3)\n    # print(\"I_4:\",i_4)\n    pow_2_i_4 = piecewise_pow_2(i_4)\n    pow_2_i_5 = piecewise_pow_2(i_5)\n    z_approx = (\n        (pow_2_i_0 - pow_2_i_1)\n        - (pow_2_i_2 - pow_2_i_3) / math.factorial(3)\n        + (pow_2_i_4 - pow_2_i_5) / math.factorial(5)\n    )\n    return z_approx\nprint(z_func_approx(1, 2), np.sin(2))",
+        "type": "code",
+        "location": "/taylor_series_expansion_approximation_nonlinear_function_piecewise.py:89-116"
+    },
+    "3253": {
+        "file_id": 366,
+        "content": "This code approximates the nonlinear function sin(x) using a Taylor series expansion. It performs piecewise power calculations for i_0 to i_5, then applies mathematical operations on these values to obtain z_approx as an approximation of z = sin(2). Finally, it prints z_approx and the actual value of sin(2) for comparison.",
+        "type": "comment"
+    },
+    "3254": {
+        "file_id": 367,
+        "content": "/test_add_lower_and_upper_bounds.py",
+        "type": "filepath"
+    },
+    "3255": {
+        "file_id": 367,
+        "content": "In this code, a test model is created and a continuous variable named \"var\" is defined. The lower bound is set to 5 and the upper bound is set to 15. EnergySystemUtils is initialized with these bounds and the target value of 10 is assigned to the variable \"var\". Finally, the function check_conflict from mini_data_log_utils is imported and used to check for conflicts in the model.",
+        "type": "summary"
+    },
+    "3256": {
+        "file_id": 367,
+        "content": "from integratedEnergySystemPrototypes import EnergySystemUtils, Model\nmodel = Model(\"test_model\")\nvar = model.continuous_var(name=\"var\")\ntarget_value = 10  # 10>5, but we set 5 as lower bound, to check if this issue happens.\n# set 15 as upper bound.\nlower_bound, upper_bound = 4, 5\nutil = EnergySystemUtils(model, num_hour=1)\nutil.add_lower_and_upper_bounds([var], lower_bound, upper_bound)\nutil.equation(var, target_value)\n# check for conflicts?\nfrom mini_data_log_utils import check_conflict\ncheck_conflict(model)",
+        "type": "code",
+        "location": "/test_add_lower_and_upper_bounds.py:1-22"
+    },
+    "3257": {
+        "file_id": 367,
+        "content": "In this code, a test model is created and a continuous variable named \"var\" is defined. The lower bound is set to 5 and the upper bound is set to 15. EnergySystemUtils is initialized with these bounds and the target value of 10 is assigned to the variable \"var\". Finally, the function check_conflict from mini_data_log_utils is imported and used to check for conflicts in the model.",
+        "type": "comment"
+    },
+    "3258": {
+        "file_id": 368,
+        "content": "/test_class_create.py",
+        "type": "filepath"
+    },
+    "3259": {
+        "file_id": 368,
+        "content": "Class definition for a new class with data and value attributes, initializing val from execute_init method call. Prints the val attribute value \"VAL\" after object creation.",
+        "type": "summary"
+    },
+    "3260": {
+        "file_id": 368,
+        "content": "class new_class:\n    def __init__(self,data, value):\n        self.data = data\n        self.value = value\n        \"\"\"\n        hint of value\n        \"\"\"\n        self.execute_init(2)\n    def execute_init(self,val):\n        self.val = val\n        \"\"\"\n        some hint of val? will not be displayed\n        \"\"\"\na = new_class(4,5)\nprint('VAL', a.val)",
+        "type": "code",
+        "location": "/test_class_create.py:2-17"
+    },
+    "3261": {
+        "file_id": 368,
+        "content": "Class definition for a new class with data and value attributes, initializing val from execute_init method call. Prints the val attribute value \"VAL\" after object creation.",
+        "type": "comment"
+    },
+    "3262": {
+        "file_id": 369,
+        "content": "/test_client.py",
+        "type": "filepath"
+    },
+    "3263": {
+        "file_id": 369,
+        "content": "This code imports necessary modules, reads data from a file, sets a unique ID, makes a GET request to an API endpoint with the unique ID as parameters, gets the response status code and JSON data, and finally prints the JSON response.",
+        "type": "summary"
+    },
+    "3264": {
+        "file_id": 369,
+        "content": "# shall we change the default encoding? not \"iso-8859-1\"\nimport requests\n# import json\nfrom test_server_client_configs import *\nwith open(TEST_GRAPH_CONFIG_PATH, \"r\") as f:\n    data = f.read()\n    # data_dict = json.loads(data)\nunique_id = \"e3c49fae-85e2-4cf2-915d-ea2ebb9b798f\"\nr = requests.get(check_result_async, params=dict(unique_id=unique_id))\n# r = requests.post(upload_url, json={'data':data})\n# r = requests.post(async_url, json={'data':data}) # just upload the graph, nothing more.\nstatus_code = r.status_code\nr_json = r.json()\nimport rich\nrich.print(r_json)\nprint(\"___RESPONSE___\")",
+        "type": "code",
+        "location": "/test_client.py:1-21"
+    },
+    "3265": {
+        "file_id": 369,
+        "content": "This code imports necessary modules, reads data from a file, sets a unique ID, makes a GET request to an API endpoint with the unique ID as parameters, gets the response status code and JSON data, and finally prints the JSON response.",
+        "type": "comment"
+    },
+    "3266": {
+        "file_id": 370,
+        "content": "/test_cpexample.cmd",
+        "type": "filepath"
+    },
+    "3267": {
+        "file_id": 370,
+        "content": "Sets PATH for CPLEX, Git, Julia, Anaconda, etc., and executes PowerShell script with output logged.",
+        "type": "summary"
+    },
+    "3268": {
+        "file_id": 370,
+        "content": "@REM @REM chcp 65001\n@REM set PATH=\"C:\\Windows\\System32\\;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;D:\\ProgramFiles\\CPLEX\\opl\\bin\\x64_win64;D:\\ProgramFiles\\CPLEX\\opl\\oplide\\;D:\\ProgramFiles\\CPLEX\\cplex\\bin\\x64_win64;D:\\ProgramFiles\\CPLEX\\cpoptimizer\\bin\\x64_win64;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\; C:\\Windows\\System32\\OpenSSH\\;D:\\ProgramFiles\\Git\\cmd;C:\\Program Files\\Bandizip\\;C:\\Users\\ss\\AppData\\Local\\julias\\bin;C:\\Windows\\system32\\config\\systemprofile\\AppData\\Local\\Microsoft\\WindowsApps;D:\\ProgramFiles\\anaconda\\envs\\py37;D:\\ProgramFiles\\anaconda\\envs\\py37\\Library\\mingw-w64\\bin;D:\\ProgramFiles\\anaconda\\envs\\py37\\Library\\usr\\bin;D:\\ProgramFiles\\anaconda\\envs\\py37\\Library\\bin;D:\\ProgramFiles\\anaconda\\envs\\py37\\Scripts;D:\\ProgramFiles\\anaconda\\envs\\py37\\bin;D:\\ProgramFiles\\anaconda\\condabin;D:\\ProgramFiles\\CPLEX\\opl\\bin\\x64_win64;D:\\ProgramFiles\\CPLEX\\opl\\oplide;D:\\ProgramFiles\\CPLEX\\cplex\\bin\\x64_win64;D:\\ProgramFiles\\CPLE",
+        "type": "code",
+        "location": "/test_cpexample.cmd:1-3"
+    },
+    "3269": {
+        "file_id": 370,
+        "content": "Sets the PATH variable to include necessary directories for executing CPLEX, PowerShell, Git, Julia, Anaconda, and other software on Windows.",
+        "type": "comment"
+    },
+    "3270": {
+        "file_id": 370,
+        "content": "X\\cpoptimizer\\bin\\x64_win64;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;D:\\ProgramFiles\\Git\\cmd;C:\\Program Files\\Bandizip;D:\\ProgramFiles\\anaconda;D:\\ProgramFiles\\anaconda\\Library\\mingw-w64\\bin;D:\\ProgramFiles\\anaconda\\Library\\usr\\bin;D:\\ProgramFiles\\anaconda\\Library\\bin;D:\\ProgramFiles\\anaconda\\Scripts;C:\\Users\\ss\\AppData\\Local\\Microsoft\\WindowsApps;D:\\ProgramFiles\\VSCode\\bin;C:\\Users\\ss\\AppData\\Local\\julias\\bin;\"\n@REM D:\\ProgramFiles\\anaconda\\envs\\py37\\python.exe cpExample.py > test_log.log\n@REM type test_log.log\n@REM echo\n@REM echo check output at test_log.log\npowershell -Command \".\\test_cpexample.ps1\"",
+        "type": "code",
+        "location": "/test_cpexample.cmd:3-13"
+    },
+    "3271": {
+        "file_id": 370,
+        "content": "Sets system PATH variables and executes a PowerShell script, redirecting output to test_log.log file for later reference.",
+        "type": "comment"
+    },
+    "3272": {
+        "file_id": 371,
+        "content": "/test_cpexample.ps1",
+        "type": "filepath"
+    },
+    "3273": {
+        "file_id": 371,
+        "content": "This code executes a Python script named \"cpExample.py\" and redirects its output to both the console and a file called \"test_log.log\".",
+        "type": "summary"
+    },
+    "3274": {
+        "file_id": 371,
+        "content": "python .\\cpExample.py | tee test_log.log",
+        "type": "code",
+        "location": "/test_cpexample.ps1:1-1"
+    },
+    "3275": {
+        "file_id": 371,
+        "content": "This code executes a Python script named \"cpExample.py\" and redirects its output to both the console and a file called \"test_log.log\".",
+        "type": "comment"
+    },
+    "3276": {
+        "file_id": 372,
+        "content": "/test_decorate_class_method.py",
+        "type": "filepath"
+    },
+    "3277": {
+        "file_id": 372,
+        "content": "The code defines a class method decorator and a class with a decorated class method. The decorator takes a function as an argument, creating a new function that wraps the original one. Inside this wrapper function, it prints information about the class instance (self), any additional arguments, and keywords before and after invoking the wrapped function. The class has an initialized attribute and a class method decorated with the defined decorator. When an instance of the class is created and the class method is called, it prints the passed parameters and accesses attributes of the class instance.",
+        "type": "summary"
+    },
+    "3278": {
+        "file_id": 372,
+        "content": "# confusing.\ndef class_method_decorator(func):  # what will be passed to the function?\n    def decorated_func(self: object, *args, **kwargs):\n        # class_instance = args[0] # <- this is the 'self'\n        # really?\n        print(\"CLASS INSTANCE:\", self)\n        print(\"ALL REMAINING ARGS:\", args)\n        print(\"ALL KWARGS:\", kwargs)\n        print(\"___BEFORE INVOKE___\")\n        value = func(self, *args, **kwargs)\n        print(\"___AFTER INVOKE___\")\n        return value\n    return decorated_func\nclass A:\n    def __init__(self, param):\n        self.param = param\n    # cannot use self here. warning!\n    @class_method_decorator\n    def class_method(self, param_0):\n        print(\"PASSED PARAM_0:\", param_0)\n        print(\"CLASS ATTR PARAM:\", self.param)\na = A(\"[PARAM]\")\na.class_method(\"[PARAM_0]\")",
+        "type": "code",
+        "location": "/test_decorate_class_method.py:1-30"
+    },
+    "3279": {
+        "file_id": 372,
+        "content": "The code defines a class method decorator and a class with a decorated class method. The decorator takes a function as an argument, creating a new function that wraps the original one. Inside this wrapper function, it prints information about the class instance (self), any additional arguments, and keywords before and after invoking the wrapped function. The class has an initialized attribute and a class method decorated with the defined decorator. When an instance of the class is created and the class method is called, it prints the passed parameters and accesses attributes of the class instance.",
+        "type": "comment"
+    },
+    "3280": {
+        "file_id": 373,
+        "content": "/test_linearization_max_zeros.py",
+        "type": "filepath"
+    },
+    "3281": {
+        "file_id": 373,
+        "content": "The code defines a model with continuous variables x and y, adds constraints, and maximizes zeros in y without specifying an objective function. The second code minimizes the absolute value of a summation by iterating over a range of numbers, printing \"HAVE SOLUTION?\" or \"NO SOLUTION\" based on the presence of a solution.",
+        "type": "summary"
+    },
+    "3282": {
+        "file_id": 373,
+        "content": "from docplex.mp.model import Model\nfrom docplex.mp.vartype import VarType\nfrom typing import List\nbigNumber = 1e10\ndef max_zeros_2(num_hour: int, model: Model, x: List[VarType], y: List[VarType]):\n    helpers = model.binary_var_list([i for i in range(num_hour)], name=\"x_flags\")\n    for i in range(num_hour):\n        eps = 1e-10\n        model.add_if_then(helpers[i] == 0, x[i] >= 0)\n        model.add_if_then(helpers[i] == 1, x[i] <= 0 - eps)\n        model.add_if_then(helpers[i] == 0, y[i] == x[i])\n        model.add_if_then(helpers[i] == 1, y[i] == 0)\n    # x_positive = model.binary_var_list([i for i in range(num_hour)], name=\"x_positive\")\n    # model.add_constraints(\n    #     (1 - x_positive[i]) * bigNumber + x[i] >= 0 for i in range(num_hour)\n    # )\n    # model.add_constraints(\n    #     x_positive[i] * bigNumber - x[i] >= 0 for i in range(num_hour)\n    # )\n    # # flag == 1 -> positive x\n    # # flag == 0 -> negative x\n    # model.add_constraints(\n    #     y[h] <= x[h] + (1 - x_positive[h]) * bigNumber for h in range(0, num_hour)",
+        "type": "code",
+        "location": "/test_linearization_max_zeros.py:1-26"
+    },
+    "3283": {
+        "file_id": 373,
+        "content": "This code defines a function `max_zeros_2` that creates binary variables to represent whether `x[i]` is greater than or equal to 0, and then uses these variables to enforce constraints on `x` and `y`. It also provides an alternative method using `binary_var_list` and additional constraints.",
+        "type": "comment"
+    },
+    "3284": {
+        "file_id": 373,
+        "content": "    # )\n    # model.add_constraints(\n    #     y[h] >= x[h] - (1 - x_positive[h]) * bigNumber for h in range(0, num_hour)\n    # )\n    # model.add_constraints(\n    #     y[h]>=0 for h in range(0, num_hour)\n    # )\nmodel_name = \"max_zeros_test\"\nmodel = Model(model_name)\nnum_hours = 24\nb = model.continuous_var(lb=-100, ub=100, name=\"b\")\nx = model.continuous_var_list(\n    lb=-100, ub=100, keys=list(range(num_hours + 1)), name=\"x_n\"\n)\ny = model.continuous_var_list(\n    lb=-100, ub=100, keys=list(range(num_hours + 1)), name=\"y_n\"\n)\nimport math\nmodel.add_constraints(\n    x[i] == b + math.sin(i * math.pi / 12) for i in range(num_hours + 1)\n)\n# this works. but this will not show the value of zeroed elements in y.\n# from integratedEnergySystemPrototypes import Linearization\n# linearization = Linearization()\n# linearization.max_zeros(num_hour=num_hours + 1, model=model, x=x, y=y)\n# let's define the `max_zeros` ourselves.\nmax_zeros_2(num_hour=num_hours + 1, model=model, x=x, y=y)\n# objective =model.sum(x[i] + y[i] for i in range(num_hours + 1))",
+        "type": "code",
+        "location": "/test_linearization_max_zeros.py:27-64"
+    },
+    "3285": {
+        "file_id": 373,
+        "content": "This code defines a model with continuous variables x and y, representing hourly values. It adds constraints that x[h] is equal to b plus the sine of h's position divided by 12, and y[h] must be greater than or equal to x[h]. The code then calls max_zeros_2 function with these variables to maximize the number of zeros in y without specifying an objective function.",
+        "type": "comment"
+    },
+    "3286": {
+        "file_id": 373,
+        "content": "objective = model.abs(model.sum(x[i] + y[i] for i in range(num_hours + 1)))\nmodel.minimize(objective)\nsolution = model.solve()\nif solution:\n    print(\"HAVE SOLUTION?\")\n    # breakpoint()\n    print(solution)\nelse:\n    print(\"NO SOLUTION\")",
+        "type": "code",
+        "location": "/test_linearization_max_zeros.py:65-75"
+    },
+    "3287": {
+        "file_id": 373,
+        "content": "This code minimizes the absolute value of a summation by iterating over a range of numbers. If a solution is found, it prints \"HAVE SOLUTION?\" followed by the solution. Otherwise, it prints \"NO SOLUTION\".",
+        "type": "comment"
+    },
+    "3288": {
+        "file_id": 374,
+        "content": "/test_loading_light_intensity_data.py",
+        "type": "filepath"
+    },
+    "3289": {
+        "file_id": 374,
+        "content": "Code reads hourly radiation data from a file, prints its shape, and displays the first 100 values. It attempts to concatenate new radiation data for each day, but the loop is incorrect and does nothing.",
+        "type": "summary"
+    },
+    "3290": {
+        "file_id": 374,
+        "content": "import numpy as np\npath = \"./jinan_changqing-hour.dat\"\ndata = np.loadtxt(path, dtype=float)\nprint(\"SHAPE OF DATA:\", data.shape)  #  (8760, 4)\n# (row_count, column_count)\n# breakpoint()\nimport math\nnum_hour = 24\nradiation = data[:, 0]\nintensityOfIllumination1 = radiation\nprint(\"MATRIX_1_SHAPE\", intensityOfIllumination1.shape) # just an excerpt.\nprint(intensityOfIllumination1[:100])\n# not looping?\nfor loop in range(1, math.ceil(num_hour / 8760)): # 1/365, clearly not what we want.\n    intensityOfIllumination1 = np.concatenate( # what does this concatenate do?\n        (intensityOfIllumination1, radiation), axis=0\n    )\n    print(\"CHANGING?\",loop)\nprint(\"MATRIX_1_SHAPE\", intensityOfIllumination1.shape) # just an excerpt.\nprint(intensityOfIllumination1[:100])\n# seems it is doing nothing",
+        "type": "code",
+        "location": "/test_loading_light_intensity_data.py:1-29"
+    },
+    "3291": {
+        "file_id": 374,
+        "content": "Code reads hourly radiation data from a file, prints its shape, and displays the first 100 values. It attempts to concatenate new radiation data for each day, but the loop is incorrect and does nothing.",
+        "type": "comment"
+    },
+    "3292": {
+        "file_id": 375,
+        "content": "/test_plot.jl",
+        "type": "filepath"
+    },
+    "3293": {
+        "file_id": 375,
+        "content": "Code imports the Plots module, creates an array x from 0 to 10 and assigns sine values to y using . operator, but plot function is not called so no visualization happens. Finally, it prints out X_VALUES and Y_VALUES without any formatting.",
+        "type": "summary"
+    },
+    "3294": {
+        "file_id": 375,
+        "content": "# using Plots\nx=0:10;y=sin.(x);\n# plot(x,y)\nprintln(\"X_VALUES:\")\nprintln(x)\nprintln()\nprintln(\"Y_VALUES:\")\nprintln(y)",
+        "type": "code",
+        "location": "/test_plot.jl:1-8"
+    },
+    "3295": {
+        "file_id": 375,
+        "content": "Code imports the Plots module, creates an array x from 0 to 10 and assigns sine values to y using . operator, but plot function is not called so no visualization happens. Finally, it prints out X_VALUES and Y_VALUES without any formatting.",
+        "type": "comment"
+    },
+    "3296": {
+        "file_id": 376,
+        "content": "/test_server.py",
+        "type": "filepath"
+    },
+    "3297": {
+        "file_id": 376,
+        "content": "This code defines API endpoints for asynchronous tasks, manages pending tasks using a global lock and task list, and runs a uvicorn web application on specified port.",
+        "type": "summary"
+    },
+    "3298": {
+        "file_id": 376,
+        "content": "from fastapi import FastAPI\nimport time\nfrom test_server_client_configs import *\nGLOBAL_TASK_COUNT = 0\nimport datetime\n# of course we will set limit to max running time per task\nfrom pydantic import BaseModel\nclass DataModel(BaseModel): # use this to parse the dict passed in later.\n    data: str\ndef get_current_time_string():\n    time_string = \" \".join(datetime.datetime.now().isoformat().split(\".\")[0].split(\"T\"))\n    return time_string\ndef mock_calculation(data: DataModel, sleep_time: float = 20):\n    \"\"\"\n    Mocking the heavy calculation of system optimization.\n    Args:\n        sleep_time (float): the duration of our fake task, in seconds\n    \"\"\"\n    print(f\"TIME: {get_current_time_string()}\")\n    print(f\"DATA RECEIVED: {len(str(data))}\")\n    print(f\"CALCULATING! TOTAL TASK #{GLOBAL_TASK_COUNT}\")\n    time.sleep(sleep_time)\n    print(f\"TOTAL TASK #{GLOBAL_TASK_COUNT}. DONE!\")\n    return \"CALCULATED RESULT\"  # fake though.\napp = FastAPI()\n# where is the port?\n# create some context manager? sure?\n# could there be multiple requests? use lock please?",
+        "type": "code",
+        "location": "/test_server.py:1-41"
+    },
+    "3299": {
+        "file_id": 376,
+        "content": "```python\n# Import necessary libraries and modules (FastAPI, time, test_server_client_configs)\n# Define GLOBAL_TASK_COUNT variable\n# Set limit to max running time per task using datetime and pydantic's BaseModel for parsing data\n# Function get_current_time_string() returns the current time string without microseconds\n# Mock_calculation function mocks heavy system optimization calculation with optional sleep time\n# Create FastAPI instance and define routes/endpoints (not shown)\n```",
+        "type": "comment"
+    }
+}

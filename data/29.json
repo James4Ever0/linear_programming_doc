@@ -1,0 +1,546 @@
+{
+    "2900": {
+        "file_id": 312,
+        "content": "e verification failed for conjugate ports '{conjugate_ports}' at topo status frame #{topo_status_frame_index} (calculated)\"\n                                )\n                                em.append(\"conds: \"+repr(conds))\n                                em.append(\"energy types: \"+repr(energytypes))\n                                {# em.append(f\"topo status frame: {topo_status_frame}\") #}\n                            if not cached_quit:\n                                cached_quit = True\n                            if _conjugate_verified:\n                                _conjugate_verified = False\n                                break # to save processing power\n                if _conjugate_verified:\n                    topo_status_frame_flatten[port_name].add(port_status)\n                else:\n                    if not cached_quit:\n                        logger_print(\n                        f\"skipping topo status frame #{topo_status_frame_index} due to failed conjugate ports verification\"\n                    )",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:465-481"
+    },
+    "2901": {
+        "file_id": 312,
+        "content": "The code checks the verification of conjugate ports in a topo status frame and appends relevant information to 'em'. If verification fails, it skips the topo status frame. This helps save processing power by not processing frames with failed conjugate port verification. The code also logs why the frame is being skipped if necessary.",
+        "type": "comment"
+    },
+    "2902": {
+        "file_id": 312,
+        "content": "        for port_name, verifier in port_verifiers.items():\n            conds = topo_status_frame_flatten.get(port_name, [UNKNOWN])\n            {# conds = topo_status_frame_flatten[port_name] #}\n            cached = False\n            cache_key = (portNameTransformer(port_name), tuple(conds))\n            {# cache_key = (port_name, tuple(conds)) #}\n            if cache_key in cached_port_verifiers.keys():\n                verified = cached_port_verifiers[cache_key]\n                cached = True\n            else:\n                verified = verifier(conds)\n                cached_port_verifiers[cache_key] = verified\n            port_verified[port_name] = verified\n            if not verified:\n                logger_print(f\"verifier failed for port '{port_name}', conds: {repr(conds)} (calculated)\")\n        all_ports_verified = all(port_verified.values())\n        all_conjugate_ports_verified = all(conjugate_port_verified.values())\n        topo_verified = all_ports_verified and all_conjugate_ports_verified\n        if not all_ports_verified:",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:482-502"
+    },
+    "2903": {
+        "file_id": 312,
+        "content": "The code is iterating through port verifiers and their corresponding names. It checks if a cache key, formed by the port name and conditions, already exists in the cached_port_verifiers dictionary. If it does, the verified status is retrieved from the cache; otherwise, the verifier function is called with the conditions to determine the verified status. If any verifier fails, a log message is printed. Finally, it checks if all ports and their conjugates are verified and stores the topology verification status in the topo_verified variable.",
+        "type": "comment"
+    },
+    "2904": {
+        "file_id": 312,
+        "content": "            logger_print(\"not all port vaildations have passed\")\n        if not all_conjugate_ports_verified:\n            logger_print(\"not all conjugate port vaildations have passed\")\n        if not topo_verified:\n            logger_print(f\"topo verification failed for topo status #{topo_status_index}\")\n        else:\n            if len(topo_status) > 0:\n                verified_topology_status_dict[adder_status] = topo_status\n            else:\n                logger_print(\"skipping due to empty topo status\")\n        banner(f\"processed topo status #{topo_status_index}\")\n    banner(\"verified topo status\")\n    # if you want verbosity...\n    {# logger_print(verified_topology_status_dict) #}\n    return verified_topology_status_dict\ndef isomorphicTopologyStatusCombinator(topology_status_dict: dict):\n    topo_status_to_adder_status_dict: Dict[frozenset, set] = {}\n    for adder_index_to_energy_type, topo_status in topology_status_dict.items():\n        topo_status_frozen = frozenset(topo_status)\n        if topo_status_frozen not in topo_status_to_adder_status_dict.keys():",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:503-527"
+    },
+    "2905": {
+        "file_id": 312,
+        "content": "This code verifies the validity of port configurations and topology statuses. It checks if all ports are valid, if conjugate ports match, and performs topology verification for each status in the given dictionary. If any validation fails, it logs an error message. Otherwise, it updates a dictionary with the verified topology statuses and returns them.",
+        "type": "comment"
+    },
+    "2906": {
+        "file_id": 312,
+        "content": "            topo_status_to_adder_status_dict[topo_status_frozen] = set()\n        topo_status_to_adder_status_dict[topo_status_frozen].add(\n            adder_index_to_energy_type\n        )\n    return topo_status_to_adder_status_dict\ndef check_if_can_proceed(verified_topology_status_dict):\n    isomorphic_topo_status = None\n    possible_adder_energy_type_set_counts = len(verified_topology_status_dict)\n    logger_print(\n        \"possible adder energy type set counts:\", possible_adder_energy_type_set_counts\n    )\n    isomorphic_topo_status = isomorphicTopologyStatusCombinator(\n        verified_topology_status_dict\n    )\n    banner(\"isomorphic topo status (converted)\")\n    for k,v in isomorphic_topo_status.items():\n        logger_print('key:',*[f'\\t{str(e_k)}' for e_k in k], 'value:', f'\\t{v}')\n    isomorphic_topo_status_counts = len(isomorphic_topo_status.keys())\n    logger_print(\"isomorphic topo status counts:\", isomorphic_topo_status_counts)\n    can_proceed = False\n    if isomorphic_topo_status_counts == 0:\n        logger_print(\"no adder energy type set\")",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:528-554"
+    },
+    "2907": {
+        "file_id": 312,
+        "content": "This function creates a dictionary mapping topology status \"frozen\" to the energy type adder indexes. It then checks if there is an isomorphic topology for a given verified topology status dictionary, returning True or False accordingly. The function also prints information about the possible adder energy type set counts and isomorphic topology status counts using logger_print statements.",
+        "type": "comment"
+    },
+    "2908": {
+        "file_id": 312,
+        "content": "    elif isomorphic_topo_status_counts > 1:\n        logger_print(\"multiple adder energy type sets found\")\n    else:\n        can_proceed = True\n    if not can_proceed:\n        logger_print(\"cannot proceed\")\n    else:\n        logger_print(\"clear to proceed\")\n    return can_proceed, isomorphic_topo_status\ndef check_if_can_proceed_common(topology_status_dict, port_verifiers, conjugate_port_verifiers, adder_index_to_port_name):\n    verified_topology_status_dict = verify_topology_status_dict(\n        topology_status_dict, port_verifiers, conjugate_port_verifiers, adder_index_to_port_name\n    )\n    can_proceed, isomorphic_topo_status = check_if_can_proceed(verified_topology_status_dict)\n    return can_proceed, isomorphic_topo_status\ndef execute_python_code_and_check_if_can_proceed(render_params, adder_index_to_port_name, port_verifiers, conjugate_port_verifiers, adderNameToAdderPortNames):\n    topology_status_dict = query_result_from_python(render_params, adder_index_to_port_name, adderNameToAdderPortNames)\n ",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:555-575"
+    },
+    "2909": {
+        "file_id": 312,
+        "content": "Code is a part of a microgrid base program. The \"check_if_can_proceed\" function checks if the topology status has multiple adder energy type sets, and returns whether it can proceed or not along with the isomorphic topology status. The \"check_if_can_proceed_common\" function verifies the topology status dictionary and calls check_if_can_proceed function. The \"execute_python_code_and_check_if_can_proceed\" function queries the result from a Python script, then calls \"check_if_can_proceed_common\" to perform the main functionality.",
+        "type": "comment"
+    },
+    "2910": {
+        "file_id": 312,
+        "content": "   return check_if_can_proceed_common(topology_status_dict, port_verifiers, conjugate_port_verifiers, adder_index_to_port_name)\ndef execute_prolog_script_and_check_if_can_proceed(\n    prolog_script_content,\n    adder_index_to_port_name,\n    port_verifiers,\n    conjugate_port_verifiers,\n    adderNameToAdderPortNames\n):\n    topology_status_dict = query_result_from_prolog(\n        prolog_script_content, adder_index_to_port_name, adderNameToAdderPortNames\n    )\n    return check_if_can_proceed_common(topology_status_dict, port_verifiers, conjugate_port_verifiers, adder_index_to_port_name)\ndef weak_type_check():...\n    {# this time we might not need prolog #}\n    {# or could you rewrite the prolog with something else? #}\n    {# or just do everything within prolog #}",
+        "type": "code",
+        "location": "/microgrid_base/type_utils.py.j2:575-592"
+    },
+    "2911": {
+        "file_id": 312,
+        "content": "This code includes two functions, `execute_prolog_script_and_check_if_can_proceed` and `weak_type_check`, with the latter potentially being unnecessary due to changes in approach. The execute function queries the Prolog script using provided parameters and returns the result of a common check function.",
+        "type": "comment"
+    },
+    "2912": {
+        "file_id": 313,
+        "content": "/microgrid_base/typical_day_calc.py",
+        "type": "filepath"
+    },
+    "2913": {
+        "file_id": 313,
+        "content": "This code defines load format for workdays and holidays, calculates seasonal days, generates day lists and checks for overlap between weekday and holiday sets. It also stores day-wise data in a dictionary with day indices as keys and their main categories as values.",
+        "type": "summary"
+    },
+    "2914": {
+        "file_id": 313,
+        "content": "from log_utils import logger_print\nimport numpy\nimport scipy  # for KNN\nfrom pydantic import BaseModel, validator, Field\nload_format = {\"workday\": [0, 1, 2, 3, 4], \"hoilday\": [5, 6]}\nload_format1 = {\"workday\": [1, 2, 3, 4, 5], \"hoilday\": [0, 6]}\nlfs = [load_format, load_format1]\n# assert day in range(7)\n# 温度聚类 -> 9 sets -> avg wind/solar\n# shape: 1x365\n# 春季是3月到5月，夏季是6月到8月，秋季是9月到11月，冬季是12月到2月\n# 平年的2月是28天，闰年2月是29天。\n# 4月、6月、9月、11月各是30天。\n# 1月、3月、5月、7月、8月、10月、12月各是31天。\nmonth_days = [31] * 12\nmonth_days[1] = 28\nmonth_days[4 - 1] = month_days[6 - 1] = month_days[9 - 1] = month_days[11 - 1] = 30\nmdr = numpy.cumsum(month_days)\nlogger_print(mdr)\nspring_days = [d for d in range(mdr[1], mdr[4])]\nsummer_days = [d for d in range(mdr[4], mdr[7])]\nautumn_days = [d for d in range(mdr[7], mdr[10])]\nwinter_days = [\n    d for d in range(365) if d not in spring_days + summer_days + autumn_days\n]\n# {day_index: {\"main\": main_category, \"\"}}\n# append by keys.\n# {data_key: [index, ...]}\nfor lf in lfs:\n    wd, hd = set(lf[\"workday\"]), set(lf[\"hoilday\"])",
+        "type": "code",
+        "location": "/microgrid_base/typical_day_calc.py:1-41"
+    },
+    "2915": {
+        "file_id": 313,
+        "content": "Code defines load format for workdays and holidays, initializes a list of these formats, and calculates the number of days in each season. It then generates lists of days for each season using cumulative sum of month lengths and checks if the day is in any of the defined holiday sets. The code also defines a dictionary for storing day-wise data with keys as day indices and values as their main categories.",
+        "type": "comment"
+    },
+    "2916": {
+        "file_id": 313,
+        "content": "    assert wd.intersection(hd) == set()\n    assert wd.union(hd) == set(range(7))",
+        "type": "code",
+        "location": "/microgrid_base/typical_day_calc.py:42-43"
+    },
+    "2917": {
+        "file_id": 313,
+        "content": "The code checks if the intersection of weekday (wd) and holiday (hd) sets is empty, indicating no overlap between them. It also confirms that the union of both sets covers all days from 0 to 6 (representing a typical day in a week).",
+        "type": "comment"
+    },
+    "2918": {
+        "file_id": 314,
+        "content": "/microgrid_base/unit_utils.py",
+        "type": "filepath"
+    },
+    "2919": {
+        "file_id": 314,
+        "content": "The code imports modules, defines a function for unit conversion using pint's UnitRegistry, includes error checking and logging of units and powers. It also defines standard units, creates translation tables, checks compatibility, and logs information. The unitParserWrapper function is defined to clean and parse values with units, converting inputs into Pint Quantities, performing multiplication, and returning results as VAL_WITH_UNIT. The code finally converts the unit of result to a string and returns both magnitude and unit representation as a tuple.",
+        "type": "summary"
+    },
+    "2920": {
+        "file_id": 314,
+        "content": "from log_utils import logger_print\nimport pint\nfrom os.path import abspath, dirname, join\nunit_def_path = f\"{join(dirname(abspath(__file__)), '../merged_units.txt')}\"\n# unit_def_path = \"../merged_units.txt\"\nureg = pint.UnitRegistry(unit_def_path)\nimport parse\ndef unitParser(val):\n    return parse.parse(\"{val_name}({val_unit})\", val)\ndef unitFactorCalculator(\n    ureg: pint.UnitRegistry, standard_units: frozenset, old_unit_name: str\n):  # like \"元/kWh\"\n    assert old_unit_name != \"\"\n    assert type(old_unit_name) == str\n    ## now, the classic test?\n    standard_units_mapping = {\n        ureg.get_compatible_units(unit): unit for unit in standard_units\n    }\n    try:\n        quantity = ureg.Quantity(1, old_unit_name)  # one, undoubtable.\n    except:\n        raise Exception(\"Unknown unit name:\", old_unit_name)\n    # quantity = ureg.Quantity(1, ureg.元/ureg.kWh)\n    magnitude, units = quantity.to_tuple()\n    new_units_list = []\n    for unit, power in units:\n        # if type(unit)!=str:\n        logger_print(\"UNIT?\", unit, \"POWER?\", power)",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:1-38"
+    },
+    "2921": {
+        "file_id": 314,
+        "content": "This code imports necessary modules and defines a function to parse and convert values between different units. It uses a UnitRegistry object from the pint package, specifying a path for unit definitions, and defines a function to calculate conversion factors for given units. The code also performs some error checking and logging of the units and powers encountered in the calculations.",
+        "type": "comment"
+    },
+    "2922": {
+        "file_id": 314,
+        "content": "        compat_units = ureg.get_compatible_units(\n            unit\n        )  # the frozen set, as the token for exchange.\n        target_unit = standard_units_mapping.get(compat_units, None)\n        if target_unit:\n            # ready to convert?\n            unit = str(target_unit)\n        else:\n            raise Exception(\"No common units for:\", unit)\n        new_units_list.append((unit, power))\n    logger_print(\"NEW UNITS LIST:\", new_units_list)\n    new_unit = ureg.UnitsContainer(tuple(new_units_list))\n    new_quantity = quantity.to(new_unit)\n    logger_print(\"OLD QUANTITY:\", quantity)\n    logger_print(\"NEW QUANTITY:\", new_quantity)\n    # get the magnitude?\n    new_magnitude = new_quantity.magnitude  # you multiply that.\n    logger_print(\"MAGNITUDE TO STANDARD:\", new_magnitude)\n    new_unit_name = str(new_unit)\n    logger_print(\"STANDARD:\", new_unit_name)\n    return new_magnitude, new_unit_name\nstandard_units_name_list = [\n    \"万元\",\n    \"kWh\",\n    \"km\",\n    \"kW\",\n    \"年\",\n    \"MPa\",\n    \"V\",\n    \"Hz\",\n    \"ohm\",\n    \"one\",",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:39-77"
+    },
+    "2923": {
+        "file_id": 314,
+        "content": "Code snippet converts a given quantity to a standard unit. It first checks for compatible units, then converts the unit if necessary using ureg library, and finally returns the magnitude of the new quantity in standard units. The code also includes logging print statements for visibility.",
+        "type": "comment"
+    },
+    "2924": {
+        "file_id": 314,
+        "content": "    # \"percent\"\n    \"台\",\n    \"m2\",\n    \"m3\",\n    # \"stere\",\n    # TODO: make \"kelvin\" into standard unit, not celsius.\n    \"celsius\",\n    \"metric_ton\",  # this is weight.\n    # \"p_u_\",\n    \"dimensionless\",\n]\nstandard_units = frozenset(\n    [ureg.Unit(unit_name) for unit_name in standard_units_name_list]\n)\nBASE_UNIT_TRANSLATION_TABLE = {\n    \"percent\": [\"%\"],\n    \"m2\": [\"m²\"],\n    \"mm2\": [\"mm²\"],\n    \"/hour\": [\n        \"/h\",\n    ],\n    \"m3\": [\"m³\", \"Nm3\", \"Nm³\"],\n    \"mm3\": [\"mm³\"],\n    \"p_u_\": [\n        \"p.u.\",\n    ],\n    # \"次\": [\"one\"],\n}\ndef revert_dict(mdict: dict):\n    result = {e: k for k, v in mdict.items() for e in v}\n    return result\nUNIT_TRANSLATION_TABLE = revert_dict(BASE_UNIT_TRANSLATION_TABLE)\ndef getSingleUnitConverted(default_unit, val_unit):\n    logger_print(\"DEFAULT UNIT:\", default_unit)\n    default_unit_real = ureg.Unit(default_unit)\n    default_unit_compatible = ureg.get_compatible_units(default_unit_real)\n    # logger_print(\"TRANS {} -> {}\".format(val_name, base_class)) # [PS]\n    if val_unit is None:\n        val_unit = default_unit",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:78-125"
+    },
+    "2925": {
+        "file_id": 314,
+        "content": "This code defines standard units and creates unit translation tables. It also includes a function to convert values based on the default unit provided. The BASE_UNIT_TRANSLATION_TABLE contains various unit abbreviations for different units, and UNIT_TRANSLATION_TABLE is its reverse version. The getSingleUnitConverted function takes in a default unit and a value unit, if none is given it defaults to the default unit, then uses compatible units for conversion.",
+        "type": "comment"
+    },
+    "2926": {
+        "file_id": 314,
+        "content": "        logger_print(\"USING DEFAULT UNIT\")\n    logger_print(\"UNIT\", val_unit)\n    unit = ureg.Unit(val_unit)\n    compatible_units = ureg.get_compatible_units(unit)\n    # logger_print(\"COMPATIBLE UNITS\", compatible_units)\n    if default_unit_compatible == frozenset():\n        raise Exception(\"Compatible units are zero for default unit:\", default_unit)\n    if compatible_units == frozenset():\n        raise Exception(\"Compatible units are zero for value unit:\", val_unit)\n    if not default_unit_compatible == compatible_units:\n        has_exception = True\n        logger_print(\n            \"Unit {} not compatible with default unit {}\".format(val_unit, default_unit)\n        )\n    else:\n        has_exception = False\n    return has_exception, val_unit\ndef translateUnit(_val_unit):\n    for (\n        trans_source_unit,\n        trans_target_unit,\n    ) in UNIT_TRANSLATION_TABLE.items():\n        _val_unit = _val_unit.replace(trans_source_unit, trans_target_unit)\n    return _val_unit\ndef unitCleaner(val):\n    val = (\n        val.replace(\"（\", \"(\")",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:126-156"
+    },
+    "2927": {
+        "file_id": 314,
+        "content": "The code defines a function that takes in a unit and checks if it's compatible with the default unit. It logs information about the units, raises exceptions if no compatible units are found, and returns whether any exception occurred or not along with the cleaned-up unit string. The translateUnit() function replaces source units in a given unit string with target units according to a predefined translation table, while the unitCleaner() function cleans up certain special characters in the unit string.",
+        "type": "comment"
+    },
+    "2928": {
+        "file_id": 314,
+        "content": "        .replace(\"）\", \")\")\n        .replace(\" \", \"\")\n        .replace(\";\", \"\")\n        .replace(\"；\", \"\")\n    )\n    val = val.strip(\"*\").strip(\":\").strip(\"：\").strip()\n    return val\nfrom typing import Tuple, Union\ndef unitParserWrapper(val: str) -> Tuple[str, Union[str, None]]:\n    val = unitCleaner(val)\n    if parsed_val := unitParser(val):\n        return (parsed_val[\"val_name\"], parsed_val[\"val_unit\"])\n    return (val, None)\ntry:\n    from typing import TypeAlias\nexcept:\n    from typing_extensions import TypeAlias\nVAL_WITH_UNIT: TypeAlias = Tuple[Union[float, int], str]\nimport beartype\n@beartype.beartype\ndef valueWithUnitToQuantity(val_with_unit: VAL_WITH_UNIT) -> pint.Quantity:\n    quantity = val_with_unit[0] * ureg.Unit(val_with_unit[1])\n    return quantity\n@beartype.beartype\ndef multiplyWithUnit(\n    val_with_unit_0: VAL_WITH_UNIT, val_with_unit_1: VAL_WITH_UNIT\n) -> VAL_WITH_UNIT:\n    q0 = valueWithUnitToQuantity(val_with_unit_0)\n    q1 = valueWithUnitToQuantity(val_with_unit_1)\n    q_result = q0 * q1\n    magnitude = q_result.magnitude",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:157-199"
+    },
+    "2929": {
+        "file_id": 314,
+        "content": "The function unitParserWrapper takes a string input and cleans it by removing specific characters before parsing the value and unit using another function unitParser. If successful, the parsed value and unit are returned as a tuple. The code also defines VAL_WITH_UNIT as a type alias for a tuple containing a number (float or int) and a string representing a unit. The functions valueWithUnitToQuantity and multiplyWithUnit utilize these types to convert the input values into Pint Quantities, perform multiplication, and return the result as VAL_WITH_UNIT.",
+        "type": "comment"
+    },
+    "2930": {
+        "file_id": 314,
+        "content": "    unit_str = str(q_result.u)\n    return (magnitude, unit_str)",
+        "type": "code",
+        "location": "/microgrid_base/unit_utils.py:200-201"
+    },
+    "2931": {
+        "file_id": 314,
+        "content": "This code converts the unit of a result (q_result.u) to a string and returns both the magnitude and the string representation of the unit as a tuple.",
+        "type": "comment"
+    },
+    "2932": {
+        "file_id": 315,
+        "content": "/microgrid_base/violation_utils.py",
+        "type": "filepath"
+    },
+    "2933": {
+        "file_id": 315,
+        "content": "This code utilizes Pyomo, LogUtils, and Pydantic to check variable and constraint bounds in a microgrid system. It identifies violations and aims to handle piecewise constraints in future work. It introduces classes like PiecewiseBaseInfo, PiecewiseInfo, MagicList, and ViolationInfo for analysis using ModelScanner on ConcreteModel constraints.",
+        "type": "summary"
+    },
+    "2934": {
+        "file_id": 315,
+        "content": "from log_utils import logger_print\n# assign invalid values to var and constraints.\n# see if the system can detect bounds/constraint violations\nfrom pyomo_environ import *\n# you might need to sort it out. check how much further it goes.\n# from pyomo.util.infeasible import log_infeasible_constraints,\nfrom pydantic import BaseModel\nfrom typing import Union, Literal, List\ndef get_var_or_constraint_bounds(var: Var):\n    lb, ub = None, None\n    if var.has_lb():\n        lb = value(var.lower, exception=False)\n    if var.has_ub():\n        ub = value(var.upper, exception=False)\n    return lb, ub\nclass VarViolation(BaseModel):\n    bound_violation: float\n    vartype_violation: float\n    @property\n    def has_violation(self):\n        return any([v > 0 for v in [self.bound_violation, self.vartype_violation]])\ndef moderate_violation(violation, tol):\n    assert tol >= 0, f\"violation tolerance must be non-negative\\npassed: {tol}\"\n    violation = abs(violation)\n    if violation <= tol:\n        violation = 0\n    return violation\ndef get_lower_bound_violation(val: float, lower_bound: Union[float, None], tol: float):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:1-41"
+    },
+    "2935": {
+        "file_id": 315,
+        "content": "The code defines a function to check for variable or constraint bounds violations and creates a class for Violation detection. It also includes functions to moderate violation tolerances and calculate lower bound violations. The code uses the Pyomo, LogUtils, and Pydantic libraries, and might involve sorting out further implementation details.",
+        "type": "comment"
+    },
+    "2936": {
+        "file_id": 315,
+        "content": "    violation = 0\n    if any([v is None for v in [val, lower_bound]]):\n        return violation\n    if val < lower_bound:\n        violation = moderate_violation(lower_bound - val, tol)\n    return violation\ndef get_bounds_violation(\n    val: float,\n    lower_bound: Union[float, None],\n    upper_bound: Union[float, None],\n    tol: float,\n):\n    if all([bound is not None for bound in [lower_bound, upper_bound]]):\n        assert (\n            lower_bound <= upper_bound\n        ), \"invalid bound ({lower_bound}, {upper_bound})\\nlower bound shall not be greater than upper bound.\"\n    violation = get_lower_bound_violation(val, lower_bound, tol)\n    if violation == 0:\n        violation = get_lower_bound_violation(upper_bound, val, tol)\n    return violation\ndef get_boolean_or_integer_violation(val: float, tol: float):\n    violation = val % 1\n    if violation != 0:\n        violation = min([violation, 1 - violation])\n    return moderate_violation(violation, tol)\ndef constructVarChecker(domainName: str, domainBounds):\n    def checker(var: Var, tol: float):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:42-75"
+    },
+    "2937": {
+        "file_id": 315,
+        "content": "The code consists of several utility functions for checking the validity and bounds of values. The \"get_bounds_violation\" function calculates a violation if both lower and upper bounds are provided, and checks that the lower bound is not greater than the upper bound. It then calls \"get_lower_bound_violation\" for both lower and upper bounds, and returns the first non-zero result. The \"get_boolean_or_integer_violation\" function calculates a violation based on the difference between an integer or boolean value and 0.5. The \"checker\" function constructs a checker function using a domain name and its bounds, and checks the validity of a variable against those bounds within a specified tolerance.",
+        "type": "comment"
+    },
+    "2938": {
+        "file_id": 315,
+        "content": "        val = value(var)\n        var_bounds = get_var_or_constraint_bounds(var)\n        bounds_violation = get_bounds_violation(val, *var_bounds, tol)\n        vartype_violation = get_bounds_violation(val, *domainBounds, tol)\n        if vartype_violation == 0:\n            if \"Integers\" in domainName or domainName in [\"Boolean\", \"Binary\"]:\n                vartype_violation = get_boolean_or_integer_violation(val, tol)\n        varViolation = VarViolation(\n            bound_violation=bounds_violation, vartype_violation=vartype_violation\n        )\n        return (varViolation, *var_bounds)\n    return checker\nfrom functools import lru_cache\n@lru_cache(maxsize=1)\ndef getVarCheckers():\n    varDomainObjs = [\n        Reals,\n        PositiveReals,\n        NonPositiveReals,\n        NegativeReals,\n        NonNegativeReals,\n        Integers,\n        PositiveIntegers,\n        NonPositiveIntegers,\n        NegativeIntegers,\n        NonNegativeIntegers,\n        Boolean,\n        Binary,\n    ]\n    checkers = {}\n    for varDomainObj in varDomainObjs:",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:76-112"
+    },
+    "2939": {
+        "file_id": 315,
+        "content": "This function checks if a variable's value violates its bounds or the allowed data type. It first calculates bound and datatype violations, and if a specific domain (Integers, Booleans, Binary) is detected, it further calculates the violation for that particular type. The function then returns the calculated violations along with the variable's bounds. The code also includes a function getVarCheckers() that defines checkers for different types of variables using lru_cache decorator to improve performance by caching results.",
+        "type": "comment"
+    },
+    "2940": {
+        "file_id": 315,
+        "content": "        domainName = varDomainObj.name\n        domainBounds = varDomainObj.bounds()\n        checker = constructVarChecker(domainName, domainBounds)\n        checkers[domainName] = checker\n    return checkers\nclass VarInfo(BaseModel):\n    varName: str\n    val: float\n    domainName: Literal[  # usually, just need to check if it is boolean/binary/integer.\n        \"Reals\",\n        \"PositiveReals\",\n        \"NonPositiveReals\",\n        \"NegativeReals\",\n        \"NonNegativeReals\",\n        \"Integers\",\n        \"PositiveIntegers\",\n        \"NonPositiveIntegers\",\n        \"NegativeIntegers\",\n        \"NonNegativeIntegers\",\n        \"Boolean\",\n        \"Binary\",\n    ]\n    lower_bound: Union[float, None]\n    upper_bound: Union[float, None]\n    violation: VarViolation\n    @property\n    def has_violation(self):\n        return self.violation.has_violation()\nclass ConstraintInfo(BaseModel):\n    constraintName: str\n    variables: List[VarInfo]\n    violation: float\n    representation: str\n    is_linear: bool\n    @property\n    def has_violation(self):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:113-154"
+    },
+    "2941": {
+        "file_id": 315,
+        "content": "This code defines classes for representing variable and constraint information in a microgrid system. It includes details such as variable name, domain type, lower and upper bounds, and violation status. The classes also store constraint details like name, list of variables involved, violation value, and representation of the constraint.",
+        "type": "comment"
+    },
+    "2942": {
+        "file_id": 315,
+        "content": "        # TODO: consider overall violation among variables inside constraint\n        return self.violation > 0\nfrom pyomo.core.expr import current as EXPR\ndef get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n    var: Var, tol=1e-6, violation_only: bool = True\n):\n    checkers = getVarCheckers()\n    domainName = var.domain._name\n    varName = var.name\n    val = value(var)\n    if domainName in checkers.keys():\n        checker = checkers[domainName]\n        varViolation, lower_bound, upper_bound = checker(\n            var, tol\n        )  # violation shall be positive when actual violation is greater than tolerance, otherwise zero.\n        if violation_only and not varViolation.has_violation:\n            return\n        varInfo = VarInfo(\n            varName=varName,\n            val=val,\n            domainName=domainName,\n            lower_bound=lower_bound,\n            upper_bound=upper_bound,\n            violation=varViolation,\n        )\n        return varInfo\n    else:\n        raise Exception(\"unknown domain name: %s\" % domainName)",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:155-186"
+    },
+    "2943": {
+        "file_id": 315,
+        "content": "This function checks a variable's bounds and type for violations. If the tolerance level is exceeded, it returns a VarInfo object containing information about the variable's name, value, domain name, lower and upper bounds, and violation status.",
+        "type": "comment"
+    },
+    "2944": {
+        "file_id": 315,
+        "content": "from typing import Dict\ndef getVarInfoListFromVarInfoDict(varInfoDict: Dict[str, VarInfo]):\n    varInfoList = list(varInfoDict.values())\n    return varInfoList\nfrom contextlib import contextmanager\nfrom copy import deepcopy\nclass SkipSettingNoneDict(dict):\n    def __setitem__(self, name, value):\n        if value is not None:\n            super().__setitem__(name, value)\n@contextmanager\ndef varInfoDictContext():\n    class VarInfoDictUpdator:\n        def __init__(self, violation_only: bool = False):\n            self._varInfoDict = SkipSettingNoneDict()\n            self.violation_only = violation_only\n        def update(self, var):\n            if var is not None:\n                varName = str(var)\n                if varName not in self._varInfoDict.keys():\n                    self._varInfoDict[\n                        varName\n                    ] = get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                        var, violation_only=self.violation_only\n                    )\n        @property\n        def varInfoDict(self):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:189-225"
+    },
+    "2945": {
+        "file_id": 315,
+        "content": "This code defines a function `getVarInfoListFromVarInfoDict` that takes a dictionary of variable information and returns a list of the values in the dictionary. It also includes a class `SkipSettingNoneDict`, which is a subclass of `dict` that doesn't allow setting none as a value, and a context manager `varInfoDictContext` to facilitate updating a variable information dictionary with violation information for variables if they are not None.",
+        "type": "comment"
+    },
+    "2946": {
+        "file_id": 315,
+        "content": "            return deepcopy(self._varInfoDict)\n        def __del__(self):\n            del self._varInfoDict\n    varInfoDictUpdator = VarInfoDictUpdator()\n    try:\n        yield varInfoDictUpdator\n    finally:\n        del varInfoDictUpdator\ndef decompose_linear_constraint_from_terms_and_get_variable_info(terms):\n    with varInfoDictContext() as varInfoDictUpdator:\n        for coef, var in terms:\n            varInfoDictUpdator.update(var)\n            return varInfoDictUpdator.varInfoDict\nfrom pyomo.core.base.var import *\nVarType = Union[Var, _VarData, _GeneralVarData, VarList, SimpleVar, ScalarVar]\nfrom typing import Iterable\ndef walk_expression(expr: Expression):\n    if (args := getattr(expr, \"args\", None)) is not None:\n        if isinstance(args, Iterable):\n            for arg in args:\n                if isinstance(arg, VarType):\n                    yield arg\n                else:\n                    yield from walk_expression(arg)\ndef decompose_nonlinear_constraint_and_get_variable_info_dict(constr: Constraint):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:226-262"
+    },
+    "2947": {
+        "file_id": 315,
+        "content": "The code defines a class for updating variable information and provides functions to decompose linear and nonlinear constraints, retrieving variable information along the way. The `VarType` is used as a union of various types of variables. The `walk_expression` function iterates over the expression's arguments, yielding vars if they exist or recursively calling itself for other arguments. The `decompose_linear_constraint_from_terms_and_get_variable_info` function uses the `varInfoDictUpdator` to update variable info and returns the updated dictionary of variables. Similarly, the `decompose_nonlinear_constraint_and_get_variable_info_dict` function decomposes a nonlinear constraint and retrieves the variable information as a dictionary.",
+        "type": "comment"
+    },
+    "2948": {
+        "file_id": 315,
+        "content": "    with varInfoDictContext() as varInfoDictUpdator:\n        for var in walk_expression(constr.body):\n            varInfoDictUpdator.update(var)\n        return varInfoDictUpdator.varInfoDict\ndef decompose_constraint_and_get_variable_info(constr: Constraint):\n    is_linear, terms = EXPR.decompose_term(constr.body)\n    # decompose non-linear constraints.\n    if is_linear:\n        varInfoDict = decompose_linear_constraint_from_terms_and_get_variable_info(\n            terms\n        )\n    else:\n        varInfoDict = decompose_nonlinear_constraint_and_get_variable_info_dict(constr)\n    varInfoList = getVarInfoListFromVarInfoDict(varInfoDict)\n    return is_linear, varInfoList\n# TODO: iterate over piecewise constraints.\nimport numpy as np\nfrom pyomo.core.base.piecewise import SimplePiecewise, IndexedPiecewise\nPiecewiseType = Union[Piecewise, SimplePiecewise, IndexedPiecewise]\nfrom typing import Tuple\n# do not use this. we need the data.\n# from pydantic import PrivateAttr\n# from functools import cached_property\n# not avaliable on pydantic v1",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:263-297"
+    },
+    "2949": {
+        "file_id": 315,
+        "content": "This code snippet appears to be a part of a larger program for handling constraints in a microgrid optimization problem. It includes functions to decompose linear and nonlinear constraints, as well as piecewise constraints. The code uses the Pyomo library for constraint manipulation and potentially Pydantic for data management. However, the use of Pydantic is commented out, suggesting it may not be necessary in this context. Additionally, there seems to be a TODO note indicating future work on handling piecewise constraints.",
+        "type": "comment"
+    },
+    "2950": {
+        "file_id": 315,
+        "content": "# ref: https://docs.pydantic.dev/latest/usage/computed_fields\n# from pydantic import computed_field\nclass PiecewiseBaseInfo(BaseModel):\n    piecewiseName: str\n    piecewiseTypeName: Literal[\"Piecewise\", \"SimplePiecewise\", \"IndexedPiecewise\"]\n    inputVarInfo: VarInfo\n    outputVarInfo: VarInfo\n    input_points: List[float]\n    output_points: List[float]\nclass PiecewiseInfo(PiecewiseBaseInfo):\n    # computed.\n    output_violation: float\n    input_domain_violation: float\n    input_domain: Tuple[float, float]\n    @classmethod\n    def compute(cls, piecewiseBaseInfo: PiecewiseBaseInfo, tol=1e-6):\n        input_domain = (\n            min(piecewiseBaseInfo.input_points),\n            max(piecewiseBaseInfo.input_points),\n        )\n        input_point = piecewiseBaseInfo.inputVarInfo.val\n        output_point = piecewiseBaseInfo.outputVarInfo.val\n        input_domain_violation = get_bounds_violation(input_point, *input_domain, tol=0)\n        if input_domain_violation == 0:  # within bound.\n            expected_output = np.interp(",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:298-329"
+    },
+    "2951": {
+        "file_id": 315,
+        "content": "Class PiecewiseBaseInfo represents base information for piecewise functions, including name, type, input and output variable info, and input and output points. Class PiecewiseInfo extends PiecewiseBaseInfo with computed fields: output_violation, input_domain_violation, and input_domain. The compute method takes a PiecewiseBaseInfo object and computes the input_domain_violation and expected_output using the input and output variable values, as well as the input points and domain.",
+        "type": "comment"
+    },
+    "2952": {
+        "file_id": 315,
+        "content": "                input_point,\n                piecewiseBaseInfo.input_points,\n                piecewiseBaseInfo.output_points,\n            )\n            output_violation = abs(output_point - expected_output)\n            output_violation = moderate_violation(output_violation, tol)\n        else:\n            output_violation = 0\n        return cls(\n            **piecewiseBaseInfo.dict(),\n            output_violation=output_violation,\n            input_domain_violation=input_domain_violation,\n            input_domain=input_domain,\n        )\n    @property\n    def has_violation(self):\n        return any(\n            [v != 0 for v in [self.output_violation, self.input_domain_violation]]\n        )\nclass MagicList(list):\n    def append(self, value):\n        if value is not None:\n            super().append(value)\n    def sort_by_attr(self, attr: str, reverse=False):\n        super().sort(key=lambda e: getattr(e, attr), reverse=reverse)\n        return self\n    def filter_by_attr(self, attr: str, negate=False):\n        if negate:",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:330-362"
+    },
+    "2953": {
+        "file_id": 315,
+        "content": "The code defines a class for storing violation information related to input domain and output, and a MagicList class with append, sort_by_attr, and filter_by_attr methods. The ViolationInfo class takes input_point, input_points, output_points, output_violation, input_domain_violation, and input_domain as parameters. It calculates the output violation if the else condition is met, otherwise sets it to 0. The has_violation property returns True if either output_violation or input_domain_violation is not equal to 0. MagicList class extends list with additional append, sort_by_attr, and filter_by_attr methods that handle None values, sort by a specified attribute, and filter based on a specified attribute with negation option respectively.",
+        "type": "comment"
+    },
+    "2954": {
+        "file_id": 315,
+        "content": "            ret = filter(lambda e: not getattr(e, attr), self)\n        else:\n            ret = filter(lambda e: getattr(e, attr), self)\n        return MagicList(ret)\nclass ModelInfo:\n    def __init__(self):\n        self.constraints: List[ConstraintInfo] = MagicList()\n        self.variables: List[VarInfo] = MagicList()\n        self.piecewises: List[PiecewiseInfo] = MagicList()\n    def clear(self):\n        for obj in self.__dict__.values():\n            obj.clear()\nfrom rich.pretty import pretty_repr\nclass ModelScanner:\n    def __init__(self, model: ConcreteModel, tol=1e-6, violation_only=True):\n        self.tol = tol\n        self.model = model\n        self.modelInfo = ModelInfo()\n        self.violation_only = violation_only\n    def constraint(self):\n        self.modelInfo.constraints.clear()\n        # you can deactivate some constraints.\n        # model.constraint.activate()\n        # model.constraint.deactivate()\n        for constr in self.model.component_data_objects(\n            ctype=Constraint, active=True, descend_into=True",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:363-397"
+    },
+    "2955": {
+        "file_id": 315,
+        "content": "This code defines a `ModelScanner` class which scans a ConcreteModel object and its components, specifically focusing on constraints. It utilizes a `ModelInfo` class to store information about the model's constraints, variables, and piecewise functions. The `clear()` method removes all objects from the instance's dictionaries. The `tol` parameter sets a tolerance level for constraint evaluation, while `violation_only` determines if only constraints with violations are considered. The code includes methods to activate or deactivate constraints within the model.",
+        "type": "comment"
+    },
+    "2956": {
+        "file_id": 315,
+        "content": "        ):\n            body_value = value(constr.body, exception=False)\n            constraint_bounds = get_var_or_constraint_bounds(constr)\n            constraintName = constr.name\n            if body_value is not None:\n                violation = get_bounds_violation(\n                    body_value, *constraint_bounds, self.tol\n                )\n                if self.violation_only and violation == 0:\n                    continue\n                representation = str(constr.expr)\n                is_linear, varInfoList = decompose_constraint_and_get_variable_info(\n                    constr\n                )\n                constraintInfo = ConstraintInfo(\n                    constraintName=constraintName,\n                    is_linear=is_linear,\n                    variables=varInfoList,\n                    violation=violation,\n                    representation=representation,\n                )\n                self.modelInfo.constraints.append(constraintInfo)\n        return self.modelInfo.constraints\n    def variable(self):",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:398-422"
+    },
+    "2957": {
+        "file_id": 315,
+        "content": "This code calculates constraint violations and adds the information to a model. It checks each constraint's body value, extracts its name and expression, decomposes it into linear components and variable info, and stores the relevant details in ConstraintInfo objects for later use. The method returns all stored constraints.",
+        "type": "comment"
+    },
+    "2958": {
+        "file_id": 315,
+        "content": "        self.modelInfo.variables.clear()\n        for var in self.model.component_data_objects(ctype=Var, descend_into=True):\n            self.modelInfo.variables.append(\n                get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                    var, self.tol, violation_only=self.violation_only\n                )\n            )\n        return self.modelInfo.variables\n    def piecewise(self):\n        self.modelInfo.piecewises.clear()\n        for pw in self.model.block_data_objects(active=True, descend_into=True):\n            if isinstance(pw, PiecewiseType):\n                piecewiseName = pw.name\n                piecewiseTypeName = type(pw).__name__\n                io_params = {}\n                for key, value in {\"input\": \"domain\", \"output\": \"range\"}.items():\n                    var = getattr(pw, f\"_{value}_var\")\n                    io_params[\n                        f\"{key}VarInfo\"\n                    ] = get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                        var, self.tol, violation_only=False",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:423-446"
+    },
+    "2959": {
+        "file_id": 315,
+        "content": "The function clears the model's variable list, iterates through all variables in the model, and appends information about each variable's violation of bounds and variable type to the modelInfo list. The piecewise function clears the model's piecewise list, iterates through active, descend-into PiecewiseType objects, and adds their information (name, type, input/output parameter details) to the modelInfo list.",
+        "type": "comment"
+    },
+    "2960": {
+        "file_id": 315,
+        "content": "                    )\n                    io_params[f\"{key}_points\"] = getattr(pw, f\"_{value}_pts\")\n                piecewiseBaseInfo = PiecewiseBaseInfo(\n                    piecewiseName=piecewiseName,\n                    piecewiseTypeName=piecewiseTypeName,\n                    **io_params,\n                )\n                piecewiseInfo = PiecewiseInfo.compute(piecewiseBaseInfo, tol=self.tol)\n                if self.violation_only and not piecewiseInfo.has_violation:\n                    continue\n                self.modelInfo.piecewises.append(piecewiseInfo)\n        return self.modelInfo.piecewises\n    def all(self):\n        self.constraint()\n        self.variable()\n        self.piecewise()\n        return self.modelInfo\n    def report(self):\n        self.all()\n        report_lines = []\n        for key, obj in self.modelInfo.__dict__:\n            report.append(key.center(70, \"=\"))\n            report.append(pretty_repr(obj))\n        report = \"\\n\".join(report_lines)\n        return report\n@contextmanager\ndef modelScannerContext(",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:447-481"
+    },
+    "2961": {
+        "file_id": 315,
+        "content": "This code is a part of a microgrid model. It defines functions for constraint, variable, piecewise, and report operations. The modelScannerContext function acts as a context manager. The piecewise function computes and appends piecewise information to the model if there are no violations, then returns the list of piecewises. The all function performs all model operations and returns the modelInfo object. Finally, the report function generates a formatted report from the modelInfo object for presentation.",
+        "type": "comment"
+    },
+    "2962": {
+        "file_id": 315,
+        "content": "    model: ConcreteModel, tol: float = 1e-6, violation_only: bool = True\n):\n    modelScanner = ModelScanner(model, tol=tol, violation_only=violation_only)\n    try:\n        yield modelScanner\n    finally:\n        del modelScanner\nif __name__ == \"__main__\":\n    # advanced logical expression linearization using pyomo.GDP\n    # ref: https://pyomo.readthedocs.io/en/latest/modeling_extensions/gdp/modeling.html\n    model = ConcreteModel()\n    model.a = Var(within=Binary)\n    model.b = Var(within=NonNegativeReals)\n    model.c = Var(within=NonNegativeIntegers)\n    model.d = Var(bounds=(-10, 10))\n    model.e = Var()\n    model.a.set_value(1.5)\n    model.b.set_value(-0.5)\n    model.c.set_value(100.5)\n    model.d.set_value(-11)\n    model.e.set_value(-50.5)\n    model.con1 = Constraint(expr=model.d >= model.c)\n    model.con2 = Constraint(expr=model.b >= model.c)\n    model.con3 = Constraint(expr=model.a + model.b <= -model.c)\n    model.con4 = Constraint(expr=model.b * model.b >= model.c)\n    # piecewise is not constraint, though.",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:482-513"
+    },
+    "2963": {
+        "file_id": 315,
+        "content": "The code initializes a Pyomo model with five variables and four constraints, representing an advanced logical expression. The ConcreteModel is scanned using ModelScanner with given tolerance and violation settings. The model variables are set to specific values and constraints are defined to represent the logical expressions.",
+        "type": "comment"
+    },
+    "2964": {
+        "file_id": 315,
+        "content": "    model.pw = Piecewise(\n        model.c,  # y_var\n        model.e,  # x_var\n        pw_pts=[-100, 0, 100],\n        pw_repn=\"MC\",\n        # pw_repn=\"SOS2\",\n        f_rule=[100, 0, -100],\n        pw_constr_type=\"EQ\",\n        unbounded_domain_var=True,\n        warn_domain_coverage=False,\n    )\n    model.pw.MC_poly_x[1] = 1\n    model.pw.MC_poly_x[2] = 1\n    model.pw.MC_bin_y[1] = 1\n    model.pw.MC_bin_y[2] = 1\n    modelScanner = ModelScanner(model)\n    for constrInfo in modelScanner.constraint():\n        logger_print(constrInfo)\n    logger_print(\"=\" * 70)\n    for varInfo in modelScanner.variable():\n        logger_print(varInfo)\n    logger_print(\"=\" * 70)\n    for piecewiseInfo in modelScanner.piecewise():\n        logger_print(piecewiseInfo)",
+        "type": "code",
+        "location": "/microgrid_base/violation_utils.py:515-544"
+    },
+    "2965": {
+        "file_id": 315,
+        "content": "The code creates a piecewise function using the Piecewise class, specifying constraints and representation type. It then sets values for certain elements of the piecewise function object and initializes a ModelScanner to extract information from the model. It logs constraint, variable, and piecewise information for analysis.",
+        "type": "comment"
+    },
+    "2966": {
+        "file_id": 316,
+        "content": "/mini_data_log_utils.py",
+        "type": "filepath"
+    },
+    "2967": {
+        "file_id": 316,
+        "content": "The function solves a list of IntegratedEnergySystem models, handles model conflicts and non-convex quadratic constraints. It returns the solution or \"UNABLE TO SOLVE\", creates save directory, plots results, logs information about detected constraints.",
+        "type": "summary"
+    },
+    "2968": {
+        "file_id": 316,
+        "content": "from typing import List\nfrom docplex.mp.model import Model\nfrom integratedEnergySystemPrototypes import IntegratedEnergySystem, check_conflict\ndef solve_and_log(\n    systems: List[IntegratedEnergySystem], model: Model, simulation_name: str\n):\n    systems_annualized = [system.annualized for system in systems]\n    import functools\n    objective = functools.reduce(lambda a, b: a + b, systems_annualized)\n    model.minimize(objective)\n    # 1000秒以内解出 否则放弃\n    model.set_time_limit(time_limit=1000)\n    from typing import Union\n    from docplex.mp.solution import SolveSolution\n    # 模型求解返回值 可为空\n    solution_run1: Union[None, SolveSolution] = model.solve(\n        log_output=True\n    )  # output some solution.\n    from data_visualize_utils import (\n        printDecisionVariablesFromSolution,\n        printIntegratedEnergySystemDeviceCounts,\n        plotSingle,\n    )\n    if solution_run1 == None:\n        print(\"UNABLE TO SOLVE\")\n    else:\n        printDecisionVariablesFromSolution(model)\n        printIntegratedEnergySystemDeviceCounts(systems)",
+        "type": "code",
+        "location": "/mini_data_log_utils.py:1-40"
+    },
+    "2969": {
+        "file_id": 316,
+        "content": "This function solves a list of IntegratedEnergySystem models and returns the solution. It sets a time limit of 1000 seconds for the model to solve, and if it's unable to solve within this time frame, it prints \"UNABLE TO SOLVE\". If a solution is found, it prints decision variables from the model and integrated energy system device counts.",
+        "type": "comment"
+    },
+    "2970": {
+        "file_id": 316,
+        "content": "        # collect all types of lists.\n        import os, shutil\n        save_directory = f\"{simulation_name}_figures\"\n        if os.path.isdir(save_directory):\n            shutil.rmtree(save_directory)\n        for system in systems:\n            system_name = system.device_name\n            system_data_name_list = dir(system)\n            for system_data_name in system_data_name_list:\n                system_data = system.__dict__.get(system_data_name, None)\n                for port_direction in ['input','output']:\n                    if system_data_name == f\"power_of_{port_direction}s\" and type(system_data) == dict:\n                        for key,value in system_data.items():\n                            if type(value) == list:\n                                plotSingle(value,title_content=f\"{system_name}_{system_data_name}_{key}\",save_directory=save_directory)\n                if type(system_data) == list:\n                    # then we plot this!\n                    plotSingle(\n                        system_data,",
+        "type": "code",
+        "location": "/mini_data_log_utils.py:42-61"
+    },
+    "2971": {
+        "file_id": 316,
+        "content": "The code collects all types of lists from different systems, creates a save directory if it doesn't exist, and then plots the data using the plotSingle function. It checks for specific system data names and port directions to determine what to plot.",
+        "type": "comment"
+    },
+    "2972": {
+        "file_id": 316,
+        "content": "                        title_content=f\"{system_name}_{system_data_name}\",\n                        save_directory=save_directory,\n                    )\n        print(\"TOTAL ANNUAL:\", objective.solution_value)\n        # breakpoint()\n        # 1007399999.999996 if charge[0] == discharge[0] == 0\n        # 992227727.2532595 if no init constrains on charge/discharge\ndef check_solve_and_log(systems: List[IntegratedEnergySystem], model: Model, simulation_name: str):\n    # before all the fuzz...\n    has_conflict = check_conflict(model)  # no conflict?\n    if has_conflict:\n        print(\"MODEL HAS CONFLICT.\")\n        breakpoint()\n    # non-convex quadratic constraint?\n    # please show me!\n    has_quad_cons = False\n    print()\n    print(\"#\"*30)\n    for quadratic_constraint in model.iter_quadratic_constraints():\n        print(\"QUAD CONS?\",quadratic_constraint)\n        if not has_quad_cons:\n            has_quad_cons=True\n    print(\"#\"*30)\n    print()\n    if has_quad_cons:\n        raise Exception(\"You have quadratic constraints in model.\")",
+        "type": "code",
+        "location": "/mini_data_log_utils.py:62-91"
+    },
+    "2973": {
+        "file_id": 316,
+        "content": "This code checks if the model has conflicts or non-convex quadratic constraints. If a conflict is found, it breaks execution and prints a message. If non-convex quadratic constraints are detected, an exception is raised. It logs information about quadratic constraints present in the model for further examination.",
+        "type": "comment"
+    },
+    "2974": {
+        "file_id": 316,
+        "content": "    solve_and_log(systems,model,simulation_name)",
+        "type": "code",
+        "location": "/mini_data_log_utils.py:93-93"
+    },
+    "2975": {
+        "file_id": 316,
+        "content": "This function appears to take in a list of systems, a model, and a simulation name as parameters. It then calls the solve() method on the model with the given systems, followed by logging the results using the provided simulation_name.",
+        "type": "comment"
+    },
+    "2976": {
+        "file_id": 317,
+        "content": "/mini_heat_system.py",
+        "type": "filepath"
+    },
+    "2977": {
+        "file_id": 317,
+        "content": "The code initializes a mini-heat system, creates devices with specific parameters, registers them for simulation, and validates and visualizes the system using NodeFactory while logging performance.",
+        "type": "summary"
+    },
+    "2978": {
+        "file_id": 317,
+        "content": "from integratedEnergySystemPrototypes import (\n    PhotoVoltaic,\n    # CombinedHeatAndPower,\n    # GroundSourceSteamGenerator,\n    WaterHeatPump,\n    CitySupply,\n    Linearization,\n    WaterEnergyStorage,\n    # GasBoiler,\n    Exchanger,\n    Load,\n    GridNet,\n)\nfrom demo_utils import LoadGet, ResourceGet\nfrom config import num_hour, day_node\n# num_hour *=3\nfrom docplex.mp.model import Model\nsimulation_name = \"micro_heat_system\"\nload = LoadGet()\n# let's augment the load.\nimport math\nimport numpy as np\nheat_load = load.get_heat_load(num_hour)\ndelta = 0.3\nheat_load = (\n    np.array([(1 - delta) + math.cos(i * 0.2) * delta for i in range(len(heat_load))])\n    * heat_load\n) * 0.4\nwarmWaterLoad = Load(\"warm_water\", data=heat_load)\nmodel = Model(name=simulation_name)\ndebug = False\nresource = ResourceGet()\n# gas_price0 = resource.get_gas_price(num_hour)\nmunicipalHotWater_price0 = resource.get_municipalHotWater_price(num_hour)\nelectricity_price0 = resource.get_electricity_price(num_hour)\nintensityOfIllumination0 = (\n    resource.get_radiation(path=\"jinan_changqing-hour.dat\", num_hour=num_hour) * 100",
+        "type": "code",
+        "location": "/mini_heat_system.py:1-44"
+    },
+    "2979": {
+        "file_id": 317,
+        "content": "The code imports various modules and classes, initializes load data, creates a warm water load, sets up a model for the simulation, retrieves resource prices, and defines a radiation value.",
+        "type": "comment"
+    },
+    "2980": {
+        "file_id": 317,
+        "content": ")\n# 光伏\nphotoVoltaic = PhotoVoltaic(\n    num_hour,\n    model,\n    device_count_max=5000 * 1000000,  # how about let's alter this?\n    device_price=4500 * 0.0001,\n    intensityOfIllumination=intensityOfIllumination0,\n    efficiency=0.8,\n    device_name=\"PhotoVoltaic\",\n    debug=debug,\n)\nphotoVoltaic.constraints_register()\n# 电网\ngridNet = GridNet(\n    num_hour,\n    model,\n    device_count_max=200000,\n    device_price=0,\n    electricity_price=electricity_price0 * 1000,\n    electricity_price_upload=0.35 * 10000000000,\n    debug=debug,\n)\ngridNet.constraints_register(powerPeak_predicted=2000)\n# 水源热泵\nwaterSourceHeatPumps = (\n    WaterHeatPump(  # you are not using the electricity of photothermal power?\n        num_hour,\n        model,\n        device_count_max=2000,\n        device_price=3000,\n        electricity_price=electricity_price0\n        * 0,  # with gridnet, optional electricity input?\n        case_ratio=np.ones(4),\n        device_name=\"waterSourceHeatPumps\",\n        debug=debug,\n    )\n)\nwaterSourceHeatPumps.constraints_register()",
+        "type": "code",
+        "location": "/mini_heat_system.py:45-88"
+    },
+    "2981": {
+        "file_id": 317,
+        "content": "Code snippet includes the creation and initialization of three device objects: PhotoVoltaic, GridNet, and WaterHeatPump. Each device has its unique parameters such as device_count_max, device_price, and electricity_price, with corresponding constraints registered after initialization. The WaterHeatPump object has optional electricity input from the grid network.",
+        "type": "comment"
+    },
+    "2982": {
+        "file_id": 317,
+        "content": "# power constrains:\n# model.add_constraints(waterSourceHeatPumps.electricity_waterSourceHeatPumps[h] == photoVoltaic.power_photoVoltaic[h] + gridNet.total_power[h] for h in range(num_hour))\n# 水储能罐\nwaterStorageTank = WaterEnergyStorage(\n    num_hour,\n    model,\n    volume_max=10000,\n    volume_price=300,  # make it cheap\n    device_price_powerConversionSystem=1,\n    conversion_rate_max=0.5,\n    efficiency=0.9,\n    energy_init=1,\n    stateOfCharge_min=0,\n    stateOfCharge_max=1,\n    ratio_cold_water=10,\n    ratio_warm_water=10,\n    ratio_hot_water=20,\n    device_name=\"waterStorageTank\",\n    debug=debug,\n)\nwaterStorageTank.constraints_register(register_period_constraints=1, day_node=day_node)\nhotWaterExchanger = Exchanger(\n    num_hour,\n    model,\n    device_count_max=20000,\n    device_price=400,\n    k=50,\n    device_name=\"hotWaterExchanger\",\n    input_type=\"hot_water\",\n    output_type=\"warm_water\",\n)\nhotWaterExchanger.constraints_register()\n# 市政热水\nmunicipalHotWater = CitySupply(\n    num_hour,\n    model,\n    device_count_max=5000 * 10000,",
+        "type": "code",
+        "location": "/mini_heat_system.py:91-132"
+    },
+    "2983": {
+        "file_id": 317,
+        "content": "Code snippet contains definitions and registrations for three energy system components: waterSourceHeatPumps, waterStorageTank, and hotWaterExchanger. The waterSourceHeatPumps are constrained by available electricity from photoVoltaic and gridNet. WaterEnergyStorage tank is created with volume_max of 10k, conversion rate max of 0.5, and efficiency of 0.9. Exchanger with device count max of 20k and k value of 50 is defined as hotWaterExchanger for hot water to warm water exchange. CitySupply component with device count max of 50m is created as municipalHotWater.",
+        "type": "comment"
+    },
+    "2984": {
+        "file_id": 317,
+        "content": "    device_price=3000 * 1000,\n    running_price=0.3 * np.ones(num_hour) * 1000,  # run_price -> running_price\n    efficiency=0.9 * 0.1,\n    output_type=\"hot_water\",  # add output_type\n    debug=debug,\n)\nmunicipalHotWater.constraints_register()  # remove \"model\"\n# power_heat_sum = model.continuous_var_list(\n#     [i for i in range(0, num_hour)], name=\"power_heat_sum\"\n# )\n# power_heatStorage = model.continuous_var_list(\n#     [i for i in range(0, num_hour)], name=\"power_heatStorage\"\n# )\n# model.add_constraints(\n#     power_heat_sum[h]\n#     == municipalHotWater.heat_citySupplied[h]\n#     + waterSourceHeatPumps.power_waterSourceHeatPumps_heat[h]\n#     + power_heatStorage[h]\n#     for h in range(0, num_hour)\n# )\n# # 高温热水去处\n# model.add_constraints(\n#     power_heat_sum[h] >= heat_load[h] for h in range(0, num_hour)\n# )  # 每小时热水消耗 >= 每小时热水负荷消耗量\n# model.add_constraints(\n#     waterSourceHeatPumps.power_waterSourceHeatPumps_heatStorage[h]\n#     + waterStorageTank.power_waterStorageTank_heat[h]\n#     == power_heatStorage[h]",
+        "type": "code",
+        "location": "/mini_heat_system.py:133-165"
+    },
+    "2985": {
+        "file_id": 317,
+        "content": "Creating a municipal hot water object with specified attributes, registering constraints for heat supply and storage.",
+        "type": "comment"
+    },
+    "2986": {
+        "file_id": 317,
+        "content": "#     for h in range(0, num_hour)\n# )\n# linearization = Linearization()\n# linearization.max_zeros(\n#     # TODO: invert x/y position\n#     num_hour,\n#     model,\n#     y=power_heatStorage,\n#     x=waterStorageTank.power_waterStorageTank_heat,\n# )\nsystems = [\n    photoVoltaic,\n    gridNet,\n    waterSourceHeatPumps,\n    waterStorageTank,\n    municipalHotWater,\n    hotWaterExchanger,\n    warmWaterLoad,\n]  # you are going to check this under the nodeFactory.\n# systems = [platePhotothermal,hotWaterLiBr,municipalHotWater]\n###### SYSTEM OVERVIEW ######\n#\n# |e\\dv | PV | GN | HP | WT | MH | WL | EX |\n# |-----|----|----|----|----|----|----|----|\n# | ele | s  |r\\s | r  |    |    |    |    |\n# | ww  |    |    | s  | r  |    | r  | s  |\n# | ww_s|    |    | s  | s  |    |    |    |\n# | hw  |    |    |    |    | s  |    | r  |\n#\n###### SYSTEM TOPOLOGY ######\n#                                           [NODE3] - WT\n#                                          /          |\n#                     PV ->  [NODE2] ->  HP           |\n#                           \\_ GRID _/      \\         |",
+        "type": "code",
+        "location": "/mini_heat_system.py:166-204"
+    },
+    "2987": {
+        "file_id": 317,
+        "content": "The code creates a list of systems for the mini-heat system. It initializes various heat system components, including photoVoltaic, gridNet, waterSourceHeatPumps, waterStorageTank, municipalHotWater, hotWaterExchanger, and warmWaterLoad. These systems will be used to simulate the mini-heat system's behavior.",
+        "type": "comment"
+    },
+    "2988": {
+        "file_id": 317,
+        "content": "#                                            |        |\n#                                            |       /\n#                 MH - [NODE5] ->  EX -> [NODE4] ----\n#                                           |\n#                                           WL\nfrom integratedEnergySystemPrototypes import EnergyFlowNodeFactory, NodeUtils\nelectricity_type = \"electricity\"\nwarm_water_type = \"warm_water\"\nhot_water_type = \"hot_water\"\nwarm_water_storage_type = \"warm_water_storage\"\nNodeFactory = EnergyFlowNodeFactory(model, num_hour, debug=debug)\n# Node1 = NodeFactory.create_node(energy_type=electricity_type)\nNode2 = NodeFactory.create_node(energy_type=electricity_type)\nNode3 = NodeFactory.create_node(energy_type=warm_water_storage_type)\nNode4 = NodeFactory.create_node(energy_type=warm_water_type)\nNode5 = NodeFactory.create_node(energy_type=hot_water_type)\n# in the end, we make some class called the \"load class\", to ensure the integrity.\n# Node1.add_input(photoVoltaic)\n# Node1.add_output(gridNet)\n# Node2.add_input(gridNet)",
+        "type": "code",
+        "location": "/mini_heat_system.py:205-236"
+    },
+    "2989": {
+        "file_id": 317,
+        "content": "This code creates EnergyFlowNode instances for various energy types and adds inputs and outputs to them. The nodes represent different parts of the integrated energy system, including electricity and warm/hot water storage. These nodes are then used to ensure the integrity of the overall system.",
+        "type": "comment"
+    },
+    "2990": {
+        "file_id": 317,
+        "content": "Node2.add_input(photoVoltaic)\nNode2.add_input_and_output(gridNet)\nNode2.add_output(waterSourceHeatPumps)\n# nodeUtil = NodeUtils(model, num_hour)\n# nodeUtil.fully_connected(Node1, Node2)  # ensure the energy types will match.\n# connected: 403607148.29181826\n# not connected: 403607193.2534507\n# pretty much the same?\nNode3.add_input(waterSourceHeatPumps)\nNode3.add_output(waterStorageTank)\nNode4.add_inputs(waterSourceHeatPumps, waterStorageTank, hotWaterExchanger)\nNode4.add_output(warmWaterLoad)\nNode5.add_input(municipalHotWater)\nNode5.add_output(hotWaterExchanger)\n# NodeFactory.check_system_validity(systems)\nNodeFactory.build_relations(systems)  # <- before you build, you check validity.\n# Node1.build_relations()\n# Node2.build_relations()\n# Node3.build_relations()\n# Node4.build_relations()\nassert NodeFactory.built\nfrom system_topology_utils import visualizeSystemTopology\nvisualizeSystemTopology(NodeFactory, system_name = 'heat')\nfrom mini_data_log_utils import check_solve_and_log\ncheck_solve_and_log(systems, model, simulation_name)",
+        "type": "code",
+        "location": "/mini_heat_system.py:237-271"
+    },
+    "2991": {
+        "file_id": 317,
+        "content": "Code sets up a system of nodes for heat distribution, ensuring energy types match before connecting them. Nodes are created and their inputs/outputs defined. NodeFactory is used to build relations between nodes, validity is checked, and visualization is performed. The system's performance is then logged using mini_data_log_utils.",
+        "type": "comment"
+    },
+    "2992": {
+        "file_id": 318,
+        "content": "/mini_ies_test.py",
+        "type": "filepath"
+    },
+    "2993": {
+        "file_id": 318,
+        "content": "The code sets up a CPLEX environment for microgrid simulation, registers an EnergyStorageSystem with a battery, connects it to other sources and loads, creates variables, adds inputs/outputs, builds relations, visualizes system topology, and compares power generation from solar panels and gridNet.",
+        "type": "summary"
+    },
+    "2994": {
+        "file_id": 318,
+        "content": "# all 12.8 versions of cplex installers:\n# http://www.mysmu.edu/faculty/hclau/is421.html\n# we need different architecture, via miniconda -> rosetta, x86-64, python==3.7\n# https://www.jianshu.com/p/0b95b3d48b99\n# using enviorment: `conda activate rosetta`\nimport os\n# add this or not?\nimport sys\ndef get_platform():\n    platforms = {\n        \"linux1\": \"Linux\",\n        \"linux2\": \"Linux\",\n        \"darwin\": \"OS X\",\n        \"win32\": \"Windows\",\n    }\n    if sys.platform not in platforms:\n        return sys.platform\n    return platforms[sys.platform]\nplatform = get_platform()\nif platform == \"darwin\":  # not my computer!\n    os.environ[\"PATH\"] = (\n        \"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:\" + os.environ[\"PATH\"]\n    )  # not working?\n# print(os.environ['PATH'])\nfrom integratedEnergySystemPrototypes import (\n    GridNet,\n    EnergyStorageSystem,\n    PhotoVoltaic,\n    symbols,\n    Load,\n)\nfrom demo_utils import LoadGet, ResourceGet\nfrom config import num_hour, day_node, epsilon\n# num_hour *=3\nfrom docplex.mp.model import Model",
+        "type": "code",
+        "location": "/mini_ies_test.py:1-46"
+    },
+    "2995": {
+        "file_id": 318,
+        "content": "This code sets up an environment for working with CPLEX, a linear programming solver. It activates the \"rosetta\" environment under conda, checks the operating system platform and adjusts the PATH variable accordingly to locate CPLEX executables, and imports various modules needed for modeling an integrated energy system prototype. The code also adjusts the simulation parameters before initializing a docplex model.",
+        "type": "comment"
+    },
+    "2996": {
+        "file_id": 318,
+        "content": "simulation_name = \"microgrid\"\nload = LoadGet()\npower_load = load.get_power_load(num_hour)\nelectricityLoad = Load('electricity',power_load)\nmodel = Model(name=simulation_name)\n# debug = True # we step through conflicts.\n# debug = \"EXCEPTION\" # we step through conflicts.\n# debug = \"STEP_EXCEPTION\"\ndebug = False\nresource = ResourceGet()\nelectricity_price = resource.get_electricity_price(num_hour)\nintensityOfIllumination = resource.get_radiation(\n    path=\"jinan_changqing-hour.dat\", num_hour=num_hour\n)\n# 光伏\nphotoVoltaic = PhotoVoltaic(\n    num_hour,\n    model,\n    device_count_max=50000,  # how about let's alter this?\n    device_price=4500,\n    intensityOfIllumination=intensityOfIllumination,\n    efficiency=0.8,\n    device_name=\"PhotoVoltaic\",\n    # device_count_min=5000,\n    debug=debug,\n)\nphotoVoltaic.constraints_register()\n# 电网\ngridNet = GridNet(\n    num_hour,\n    model,\n    device_count_max=10000,\n    device_price=0,\n    electricity_price=electricity_price,\n    electricity_price_upload=0.35,\n    debug=debug\n    # device_count_min=5000,",
+        "type": "code",
+        "location": "/mini_ies_test.py:48-91"
+    },
+    "2997": {
+        "file_id": 318,
+        "content": "The code initializes variables and objects for a microgrid simulation. It creates an electricity load, sets a price for electricity, determines the intensity of illumination, registers constraints for PhotoVoltaic devices, and initializes GridNet objects with specific parameters. The debug variable allows stepping through conflicts.",
+        "type": "comment"
+    },
+    "2998": {
+        "file_id": 318,
+        "content": ")\ngridNet.constraints_register(powerPeak_predicted=2000)\n# 电池储能\nbatteryEnergyStorageSystem = EnergyStorageSystem(\n    num_hour,\n    model,\n    device_count_max=200000,\n    device_price=1800,  # this won't save anything.\n    device_price_powerConversionSystem=250,\n    conversion_rate_max=2,\n    efficiency=0.9,\n    energy_init=1,  # this value will somehow affect system for sure. epsilon? fully charged? what is the size of the battery? let's set it to zero? (no do not do this or the system will not run. let's set it slightly greater than zero.) this parameter is not used when `register_period_constraints=1` (original) because the battery status will always stay at the same level both at the end and the start.\n    stateOfCharge_min=0,  # state of charge\n    stateOfCharge_max=1,\n    input_type=\"electricity\",\n    output_type=\"electricity\",\n    device_count_min=1,  # just buy it? what is the problem?\n    debug=debug,\n)\n# original: battery\nbatteryEnergyStorageSystem.constraints_register(  # using mode 1?\n    register_period_constraints=0, day_node=day_node",
+        "type": "code",
+        "location": "/mini_ies_test.py:92-115"
+    },
+    "2999": {
+        "file_id": 318,
+        "content": "The code defines an EnergyStorageSystem with a battery for energy storage. The system has maximum device count set to 200, maximum conversion rate of 2, and efficiency of 0.9. It also initializes the energy with a value that affects the system and sets state of charge limits between 0 and 1. The battery is registered with constraints mode 1. The code snippet refers to previous lines where day_node is defined for constraints registration.",
+        "type": "comment"
+    }
+}

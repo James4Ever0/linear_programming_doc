@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines a Pyomo model and uses SolverFactory to solve it, logging infeasible constraints for microgrid log file infeasibility detection. It prints solver status, termination condition, and logging data for debugging purposes.",
+    "details": [
+        {
+            "comment": "The code defines a Pyomo model with variables and constraints. It then uses the SolverFactory to solve the model and logs infeasible constraints after solving. The model aims to minimize a sum of x values for different elements in set LE, subjected to certain constraints. The solution is logged into a StringIO object named mstream with INFO level logging.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/log_infeasible.py\":0-48",
+            "content": "from log_utils import logger_print\nfrom pyomo_environ import *\n# from pyomo.environ import (\n#     Param,\n#     ConcreteModel,\n#     Var,\n#     Objective,\n#     ConstraintList,\n#     value,\n#     minimize,\n# )\nfrom pyomo.opt import SolverFactory\nfrom pyomo.util.infeasible import log_infeasible_constraints\nm = ConcreteModel()\nm.LE = set([1, 2, 3])\nm.x = Var(m.LE, initialize=0)\nm.M = Param(initialize=1000000)\ndef obj_rule(m):\n    return sum(m.x[i] * 1 for i in m.LE)\nm.z = Objective(rule=obj_rule, sense=minimize)\nm.cons1 = ConstraintList()\nfor i in m.LE:\n    m.cons1.add(10**2 * m.x[i] >= m.M)\n    m.cons1.add(10**2 * m.x[i] <= -3)\nimport io\nmstream = io.StringIO()\n# import sys\nimport logging\n# logging.basicConfig(stream=sys.stderr, level=logging.INFO)\nlogging.basicConfig(stream=mstream, level=logging.INFO)\nfrom constants import Solver\nsolver = SolverFactory(Solver.cplex)\n# solver = SolverFactory(Solver.glpk)\nsolution = solver.solve(m, tee=True)\n# after solving.\nlog_infeasible_constraints(m, log_expression=True, log_variables=True)"
+        },
+        {
+            "comment": "This code snippet is part of a microgrid log file infeasibility detection. It prints the solver's status, termination condition, and logging data for debugging purposes, ensuring all necessary information is captured before truncating the stream.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/log_infeasible.py\":49-64",
+            "content": "logger_print()\nlogger_print(\"SOLVER STATUS?\", solution.solver.status)\nlogger_print(\n    \"TERMINATION CONDITION?\", solution.solver.termination_condition\n)  # infeasible.\n# logging.basicConfig(filename=\"example.log\", encoding=\"utf-8\", level=logging.INFO)\nlogger_print(value(m.z))\nmstream.seek(0)\nlogging_data = mstream.read()\n# alternative:\n# logging_data = mstream.getvalue()\nmstream.truncate(0)\nlogger_print(\"LOGGING DATA:\")\nlogger_print(logging_data)"
+        }
+    ]
+}

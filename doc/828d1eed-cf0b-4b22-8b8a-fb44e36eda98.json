@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports the pint library for unit conversion and defines a UnitRegistry called ureg. It loads definitions from \"currency_units.txt\" file, enables contexts, and tries to get compatible units for \"\u5143\". Compatible units are printed and the code ends with a breakpoint.",
+    "details": [
+        {
+            "comment": "Code imports the pint library for unit conversion and defines a UnitRegistry called ureg. It loads definitions from \"currency_units.txt\" file, enables contexts, and tries to get compatible units for \"\u5143\". Compatible units are printed and the code ends with a breakpoint.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_unit_create_convert_compatible.py\":0-26",
+            "content": "import pint\n# similar projects: https://pint.readthedocs.io/en/stable/getting/faq.html\n# ureg = pint.UnitRegistry(filename = \"currency_units.txt\") # not compatible? can we merge UnitRegistries?\nureg = pint.UnitRegistry()\n# myGroup = ureg.Group(\"new_group\")\n# ureg.define(\"\u5143 = [currency]\")\n# ureg.define(\"dollar = 7 \u5143\")\nureg.load_definitions(\"currency_units.txt\")\n# ureg.define(\"dollar = [currency]\")\n# ureg.define(\"million_dollar = 10000000 dollar\")\nureg.enable_contexts()\n# error! \n# File \"D:\\ProgramFiles\\anaconda\\envs\\py37\\lib\\site-packages\\pint\\registry.py\", line 939, in _get_compatible_units\n#     return self._cache.dimensional_equivalents[src_dim]\nprint(\"EQUIVS:\")\nprint(ureg._cache.dimensional_equivalents)\ncompatible_units = ureg.get_compatible_units(\"\u5143\") # maybe in different unit system?\n# compatible_units = ureg.get_compatible_units(\"dollar\")\nprint(\"COMPAT:\", compatible_units)\nbreakpoint()\n# still working for standard units?"
+        }
+    ]
+}

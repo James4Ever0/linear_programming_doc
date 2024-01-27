@@ -1,0 +1,15 @@
+{
+    "summary": "Dockerfile sets up conda environment, installs CPLEX, configures bash files, ensures self-updates, and mounts paths for container launch with entry script.",
+    "details": [
+        {
+            "comment": "Dockerfile creating a conda environment, installing CPLEX, and configuring bash files.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_main\":0-29",
+            "content": "FROM microgrid_init\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\n# ARG INIT=init.sh\nARG CONDA_INIT=conda_init.sh\nARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nWORKDIR /root\nRUN chmod u+x ${CONDA_INSTALL}\nRUN ./${CONDA_INSTALL} -b\n# ENV PATH=\"/root/miniconda3/bin:${PATH}\"\n# RUN python3 ${MODIFY_BASHRC}\n# RUN source ${BASHRC}\nARG BASH_INIT=.bashrc\n# RUN ${BASH} ln -s $(which micromamba) /bin/conda\nRUN echo 'export PATH=\"/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux:$PATH\"' >> ${BASH_INIT}\nRUN conda init\nRUN mkdir miniconda3/envs/cplex\nCOPY ${MICROGRID_DIR}/condarc .condarc\nRUN ${BASH} ${CONDA_INIT}\nRUN ${BASH} init.sh\nRUN chmod +x ${CPLEX_INSTALL_BIN}\n# RUN echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./${CPLEX_INSTALL_BIN}\nCOPY ${MICROGRID_DIR}/install_cplex.sh .\nRUN ${BASH} install_cplex.sh\n# RUN echo \"export PATH=\\$PATH:${CPLEX_PATH}\" >> ${BASHRC}"
+        },
+        {
+            "comment": "Ensures self-updates and mounts paths from local directory, launching container with entry script using BASH.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_main\":30-34",
+            "content": "# shall we ensure self-updates.\n# shall we mount some paths from local directory and put entry script there when launch container from python script.\n# CMD ${BASH} ${MAIN_SCRIPT_PATH}\n# think we can do more with less constraints.\n# CMD ${BASH}"
+        }
+    ]
+}

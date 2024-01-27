@@ -1,0 +1,10 @@
+{
+    "summary": "This code demonstrates the usage of Pydantic for data validation and modeling in Python. It defines a TestDataClass that includes properties with various types, such as string, optional string, and list. The code also shows how to parse and construct objects using the defined class, while highlighting the flexibility and tolerance for minor data source discrepancies.",
+    "details": [
+        {
+            "comment": "This code demonstrates the usage of Pydantic for data validation and modeling in Python. It defines a TestDataClass that includes properties with various types, such as string, optional string, and list. The code also shows how to parse and construct objects using the defined class, while highlighting the flexibility and tolerance for minor data source discrepancies.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pydantic_validator_test.py\":0-29",
+            "content": "from pydantic import BaseModel, validator\nfrom typing import Optional, List\nimport json\nclass TestDataClass(BaseModel):\n    key_1: str\n    key_2: Optional[str]\n    key_3: str\n    key_4: List\n    @validator(\"key_1\")\n    def validate_key_1(cls, value) -> dict:  # validator can also process things?\n        cmp = json.loads(value)  # will raise error if it is not parseable.\n        return cmp  # now it is dict.\n# try parsing?\nobj = dict(key_1=json.dumps({\"k\": \"abc\"}), key_3=\"def\", key_4=[])  # now we are talking.\nTestDataClass.parse_raw(json.dumps(obj))  # this is string.\n# how to construct one though?\n# data = TestDataClass(key_1=2, key_3=\"10\")  # invalid input! no error?\ndata_1 = TestDataClass(key_1=json.dumps({\"k\": \"abc\"}), key_2=\"11\", key_3=1, key_4=[])\n# not allowed None as list, but allow number as string.\n# minor tolerance for data sources.\n# breakpoint()\ndata_2 = TestDataClass(\n    key_1=\"{}\", key_2=\"2\", key_3=\"3\", key_4=[]\n)  # all must be filled?"
+        }
+    ]
+}

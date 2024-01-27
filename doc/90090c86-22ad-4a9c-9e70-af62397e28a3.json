@@ -1,0 +1,10 @@
+{
+    "summary": "The code evaluates the expression x * y - 2 * (x + y) for varying inputs of x and y within specified ranges, finds the minimum and maximum values along with their corresponding input pairs, and prints them.",
+    "details": [
+        {
+            "comment": "The code evaluates the expression x * y - 2 * (x + y) for varying inputs of x and y within specified ranges, finds the minimum and maximum values along with their corresponding input pairs, and prints them.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/conic_problem.py\":0-25",
+            "content": "from sympy.abc import x, y\nimport numpy as np\nexpr = x * y - 2 * (x + y)\n# help(expr.evalf)\nx_min, x_max = -1, 3\ny_min, y_max = -2, 4\nmin_val = 1000\nmax_val = -1000\nmin_inputs = []\nmax_inputs = []\nfor _x in np.linspace(x_min, x_max, 100):\n    for _y in np.linspace(y_min, y_max, 100):\n        val = expr.evalf(subs={x: _x, y: _y})\n        if val < min_val:\n            min_val = val\n            min_inputs = [_x, _y]\n        if val > max_val:\n            max_val = val\n            max_inputs = [_x, _y]\nprint(f\"MIN: {min_val}, MAX: {max_val}\")\nprint(f\"MIN_INPUT: {min_inputs}, MAX_INPUT: {max_inputs}\")"
+        }
+    ]
+}

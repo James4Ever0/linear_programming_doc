@@ -1,0 +1,15 @@
+{
+    "summary": "The comment describes an API-based installation process for a gsudoSetup.msi file, ensuring TLS 1.2 security. Upon successful installation, it displays success message, prompts to restart consoles, provides PowerShell instructions, appends module import command to $PROFILE, checks console input before continuing.",
+    "details": [
+        {
+            "comment": "Downloading and installing gsudoSetup.msi file using REST API, ensuring TLS 1.2 security protocol, saving the log in temp directory with timestamp.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/install_gsudo.ps1\":0-29",
+            "content": "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12\n$release = Invoke-RestMethod -Method Get -Uri \"https://api.github.com/repos/gerardog/gsudo/releases/latest\"\n$asset = $release.assets | Where-Object name -like \"gsudoSetup.msi\"\n$fileName = \"$env:TEMP\\$($asset.name)\"\nWrite-Output \"Downloading $($asset.name)\"\nInvoke-RestMethod -Method Get -Uri $asset.browser_download_url -OutFile $fileName\nWrite-Output \"Installing $($asset.name)\"\n$DataStamp = get-date -Format yyyyMMddTHHmmss\n$logFile = '{0}-{1}.log' -f \"$env:TEMP\\gsudoSetup\",$DataStamp\n$MSIArguments = @(\n    \"/i\"\n    ('\"{0}\"' -f $fileName)\n    \"/qb\"\n    \"/norestart\"\n    \"/L*v\"\n    $logFile\n)\n$msiexec = (Get-Command \"msiexec.exe\").Path\n$process = Start-Process -ArgumentList $MSIArguments -Wait $msiexec -PassThru\nif ($process.ExitCode -ne 0)\n{\n\t#Get-Content $logFile\n\tWrite-Warning -Verbose \"Installation failed! (msiexec error code $($process.ExitCode))\"\n\tWrite-Warning -Verbose \"  Log File location: $logFile\"\n\tWrite-Warning -Verbose \"  MSI File location: $fileName\""
+        },
+        {
+            "comment": "Code block executes when gsudo installation is successful. It displays success message, asks to restart consoles for usage, provides instructions for PowerShell users, appends module import command to $PROFILE, checks for non-redirected console input and waits for any key press to continue.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/install_gsudo.ps1\":30-48",
+            "content": "}\nelse\n{\n\tWrite-Output \"gsudo installed succesfully!\"\n\tWrite-Output \"Please restart your consoles to use gsudo!`n\"\n\t\"PowerShell users: To use enhanced gsudo and Invoke-Gsudo cmdlet, add the following line to your `$PROFILE\"\n\t\"  Import-Module '${Env:ProgramFiles(x86)}\\gsudo\\gsudoModule.psd1'\"\n\t\"Or run: \"\n\t\"  Write-Output `\"``nImport-Module '${Env:ProgramFiles(x86)}\\gsudo\\gsudoModule.psd1'`\" | Add-Content `$PROFILE\"\n\tRemove-Item $fileName \n}\nif ([Console]::IsInputRedirected -eq $false -and [Console]::IsOutputRedirected -eq $false) \n{\n\tWrite-Host -NoNewLine 'Press any key to continue...';\n\t$_ = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');\n}"
+        }
+    ]
+}

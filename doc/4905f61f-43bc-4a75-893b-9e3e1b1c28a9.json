@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the PATH environment variable to include CPLEX Studio and runs pytest for running tests with various flags and parameters. It uses different combinations of live-stream, capture output, and file/directory options. The intention is to execute test cases related to the 'model' and other files in the directory using CPLEX Studio for optimization.",
+    "details": [
+        {
+            "comment": "This code sets the PATH environment variable to include CPLEX Studio and runs pytest for running tests with various flags and parameters. It uses different combinations of live-stream, capture output, and file/directory options. The intention is to execute test cases related to the 'model' and other files in the directory using CPLEX Studio for optimization.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/run_test.sh\":0-11",
+            "content": "# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" conda run -n rosetta --live-stream --no-capture-output python -m pytest --lf --lfnf=all --capture=tee-sys .\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" conda run -n base --no-capture-output --live-stream pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-no $*\nenv PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys $*\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys .\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all .\n# pytest --lf --lfnf=all --capture=tee-sys .\n# pytest --lf --lfnf=all --rootdir=../ ."
+        }
+    ]
+}

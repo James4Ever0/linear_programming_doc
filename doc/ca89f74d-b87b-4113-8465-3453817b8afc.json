@@ -1,0 +1,10 @@
+{
+    "summary": "This code is using pdoc3 to generate API documentation for Python modules. It sets up a web server on 0.0.0.0:8001 to serve the generated HTML documentation, which can be accessed by opening the specified IP address and port in a web browser. The syntax \"--http\" or \"--port\" is used to specify the URL where the documentation will be served.",
+    "details": [
+        {
+            "comment": "This code is using pdoc3 to generate API documentation for Python modules. It sets up a web server on 0.0.0.0:8001 to serve the generated HTML documentation, which can be accessed by opening the specified IP address and port in a web browser. The syntax \"--http\" or \"--port\" is used to specify the URL where the documentation will be served.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/serve_pydoc.ps1\":0-11",
+            "content": "ipconfig | rg 192.168\n# python -m pydoc -n 0.0.0.0 -p 8001 .\\cpExample.py\n# pdoc and pdoc3 are different.\n# i use pdoc3.\n# pdoc3 syntax\n# pdoc --http 0.0.0.0:8001 .\\cpExample.py\npdoc --http 0.0.0.0:8001 .\\example_docstring.py\n# pdoc syntax\n# pdoc --port 8001 --search .\\example_docstring.py"
+        }
+    ]
+}

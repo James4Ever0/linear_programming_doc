@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports a custom model from the Or-Tools library and solves it using different solvers. It checks the solve status, prints the objective value, and variable values if the solution is optimal or feasible. If the model is invalid, it stops with a breakpoint.",
+    "details": [
+        {
+            "comment": "The code imports a custom model from the Or-Tools library and solves it using different solvers. It checks the solve status, prints the objective value, and variable values if the solution is optimal or feasible. If the model is invalid, it stops with a breakpoint.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_load_custom_model.py\":1-29",
+            "content": "from ortools.linear_solver.python import model_builder, model_builder_helper\n# from ortools.sat.python.cp_model.\n# breakpoint()\n# not working for docplex exported format.\nmps_path ='converted.mps' \n# working? but how do we get result?\n# mps_path ='exported.mps'\nmodel = model_builder.ModelBuilder()\n# model.import_from_lp_file(\"no_bound.lp\")\n# error reading file.\nmodel.import_from_mps_file(mps_path)\nsolver = model_builder.ModelSolver('SAT')\n# solver = model_builder.ModelSolver('SCIP')\nstatus = solver.solve(model)\nfrom ortools.linear_solver import pywraplp\nif status == model_builder_helper.SolveStatus.OPTIMAL or status == model_builder_helper.SolveStatus.FEASIBLE:\n    print(f\"Total objective = {solver.objective_value}\\n\")\n    for var in model.get_variables():\n        val = solver.value(var)\n        print(f\"{var} = {val}\")\nelif status == model_builder_helper.SolveStatus.MODEL_INVALID:\n    breakpoint()\nelse:\n    print(\"STATUS?\", status)\n    print(\"No solution found.\")"
+        }
+    ]
+}

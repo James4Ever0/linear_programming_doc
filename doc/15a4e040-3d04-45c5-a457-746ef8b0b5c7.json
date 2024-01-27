@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines `check_and_append` macro and functions to iterate through a list of statements, execute necessary ones, and append non-executable statements to IES/LES lists while removing elements from LES based on conditions.",
+    "details": [
+        {
+            "comment": "This code defines a macro `check_and_append` and functions `check_if_executable`, `execute_statement`, and `functional_executor`. The main function iterates over a list of statements, executes them if necessary, and appends non-executable statements to the `IES` and `LES` lists. It also includes an inner loop that removes elements from the `LES` list based on certain conditions.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/functional_base.py.j2\":0-35",
+            "content": "from typing import List\n{% macro check_and_append(stmt, ies = \"IES\", env = \"environment\") %}\nif check_if_executable({{stmt}}, {{env}}):\n    environment = execute_statement({{stmt}}, {{env}})\n    {{ies}}.append({{stmt}})\n{% endmacro %}\ndef check_if_executable(statement, environment) -> bool:\n    return is_executable\ndef execute_statement(statement, environment):\n    return environment\ndef functional_executor(statement_array:List, \n    environment = ...):\n    IES = []\n    LES = []\n    for statement in statement_array:\n        TLES = [] # create it along the way.\n        # stage 1\n{{check_and_append(\"statement\") | indent(4*2, true)}}\n        else:\n            TLES.append(statement)\n        # stage 2\n        while True:\n            late_removal_indexes = []\n            for index, elem in enumerate(LES.copy()):\n{{check_and_append(\"elem\") | indent(4*4, true)}}\n                    late_removal_indexes.append(index)\n            if len(late_removal_indexes) == 0:\n                break\n            LES = [e for i, e in enumerate(LES) if i not in late_removal_indexes]"
+        },
+        {
+            "comment": "This code is iterating through TLES, checking each element, and appending it to LES if it meets certain conditions. If the resulting LES is usually empty, the function returns IES and LES.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/functional_base.py.j2\":37-43",
+            "content": "        # stage 3\n        for elem in TLES:\n{{check_and_append(\"elem\") | indent(4*3, true)}}\n            else:\n                LES.append(elem)\n    # usually, LES == []\n    return IES, LES"
+        }
+    ]
+}

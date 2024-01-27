@@ -1,0 +1,539 @@
+{
+    "400": {
+        "file_id": 53,
+        "content": "COPY ./miniconda_installer/Miniconda3-py39_4.12.0-Linux-x86_64.sh ${CONDA_INSTALL}\nRUN chmod u+x ${CONDA_INSTALL}\nRUN ./${CONDA_INSTALL} -b\n# ENV PATH=\"/root/miniconda/bin:${PATH}\"\n# RUN python3 ${MODIFY_BASHRC}\n# RUN source ${BASHRC}\n# RUN ${BASH} ln -s $(which micromamba) /bin/conda\nCOPY ${MICROGRID_DIR}/${INIT} .\nCOPY ${MICROGRID_DIR}/${CONDA_INIT} .\nRUN ${BASH} ${CONDA_INIT}\nRUN ${BASH} ${INIT}\nRUN chmod +x ${CPLEX_INSTALL_BIN}\nRUN echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./${CPLEX_INSTALL_BIN}\n# RUN echo \"export PATH=\\$PATH:${CPLEX_PATH}\" >> ${BASHRC}\n# shall we ensure self-updates.\n# shall we mount some paths from local directory and put entry script there when launch container from python script.\n# CMD ${BASH} ${MAIN_SCRIPT_PATH}\n# think we can do more with less constraints.\nCMD ${BASH}",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_backup:26-44"
+    },
+    "401": {
+        "file_id": 53,
+        "content": "This code sets up the container environment by copying necessary files, installing Miniconda3, configuring PATH variables, and executing initialization scripts. It also installs IBM ILOG CPLEX and prepares for potential command execution on CMD.",
+        "type": "comment"
+    },
+    "402": {
+        "file_id": 54,
+        "content": "/microgrid_base/Dockerfile_init",
+        "type": "filepath"
+    },
+    "403": {
+        "file_id": 54,
+        "content": "The Dockerfile sets up a Ubuntu 22.04 image with environment variables for Conda and CPLEX, installs necessary packages, and updates the system. The code snippet installs Miniconda and initializes a microgrid environment within a Docker container, but the last step is taking an unusually long time.",
+        "type": "summary"
+    },
+    "404": {
+        "file_id": 54,
+        "content": "FROM ubuntu:22.04\n# ENTRYPOINT [ \"/bin/bash\" ]\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# ARG MODIFY_BASHRC=modify_bashrc_for_mamba.py\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\nARG INIT=init.sh\nARG CONDA_INIT=conda_init.sh\nARG REQUIREMENTS=requirements.txt\nARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nENV PATH=\"/root/miniconda3/bin:${CPLEX_PATH}:${PATH}\"\nWORKDIR /root\n# COPY ${MICROGRID_DIR}/ubuntu_environment /etc/environment\n# COPY ${MICROGRID_DIR}/${MODIFY_BASHRC} .\n# RUN rm -rf *\nCOPY ./cplex_install_packages/cplex_studio128.linux-x86-64.bin ${CPLEX_INSTALL_BIN}\n# RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak\n# COPY ${MICROGRID_DIR}/ubuntu_jammy_sources.list /etc/apt/sources.list\n# RUN cat /etc/apt/sources.list.bak >> /etc/apt/sources.list\n# RUN rm /etc/apt/sources.list.bak\nRUN apt update\nRUN apt install -y curl bzip2\n# RUN curl -o ${MAMBA_INSTALL} https://micro.mamba.pm/install.sh",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_init:1-27"
+    },
+    "405": {
+        "file_id": 54,
+        "content": "This Dockerfile initializes a Ubuntu 22.04 image, sets environment variables for Conda and CPLEX, installs necessary packages, and performs system updates.",
+        "type": "comment"
+    },
+    "406": {
+        "file_id": 54,
+        "content": "# RUN bash ${MAMBA_INSTALL}\n# RUN curl -o ${CONDA_INSTALL} https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh\nCOPY ./miniconda_installer/Miniconda3-py39_4.12.0-Linux-x86_64.sh ${CONDA_INSTALL}\nCOPY ${MICROGRID_DIR}/${INIT} .\nCOPY ${MICROGRID_DIR}/${CONDA_INIT} .\nCOPY ${MICROGRID_DIR}/${REQUIREMENTS} .\n# THIS STEP IS TAKING SUPER LONG. PLEASE MAKE THIS INTO AN IMAGE.\n# CMD ${BASH}",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_init:28-35"
+    },
+    "407": {
+        "file_id": 54,
+        "content": "This code snippet installs Miniconda and executes a set of scripts for initializing a microgrid environment within a Docker container. It copies necessary files to the appropriate locations, but the last step is taking an unusually long time.",
+        "type": "comment"
+    },
+    "408": {
+        "file_id": 55,
+        "content": "/microgrid_base/Dockerfile_main",
+        "type": "filepath"
+    },
+    "409": {
+        "file_id": 55,
+        "content": "Dockerfile sets up conda environment, installs CPLEX, configures bash files, ensures self-updates, and mounts paths for container launch with entry script.",
+        "type": "summary"
+    },
+    "410": {
+        "file_id": 55,
+        "content": "FROM microgrid_init\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\n# ARG INIT=init.sh\nARG CONDA_INIT=conda_init.sh\nARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nWORKDIR /root\nRUN chmod u+x ${CONDA_INSTALL}\nRUN ./${CONDA_INSTALL} -b\n# ENV PATH=\"/root/miniconda3/bin:${PATH}\"\n# RUN python3 ${MODIFY_BASHRC}\n# RUN source ${BASHRC}\nARG BASH_INIT=.bashrc\n# RUN ${BASH} ln -s $(which micromamba) /bin/conda\nRUN echo 'export PATH=\"/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux:$PATH\"' >> ${BASH_INIT}\nRUN conda init\nRUN mkdir miniconda3/envs/cplex\nCOPY ${MICROGRID_DIR}/condarc .condarc\nRUN ${BASH} ${CONDA_INIT}\nRUN ${BASH} init.sh\nRUN chmod +x ${CPLEX_INSTALL_BIN}\n# RUN echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./${CPLEX_INSTALL_BIN}\nCOPY ${MICROGRID_DIR}/install_cplex.sh .\nRUN ${BASH} install_cplex.sh\n# RUN echo \"export PATH=\\$PATH:${CPLEX_PATH}\" >> ${BASHRC}",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_main:1-30"
+    },
+    "411": {
+        "file_id": 55,
+        "content": "Dockerfile creating a conda environment, installing CPLEX, and configuring bash files.",
+        "type": "comment"
+    },
+    "412": {
+        "file_id": 55,
+        "content": "# shall we ensure self-updates.\n# shall we mount some paths from local directory and put entry script there when launch container from python script.\n# CMD ${BASH} ${MAIN_SCRIPT_PATH}\n# think we can do more with less constraints.\n# CMD ${BASH}",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_main:31-35"
+    },
+    "413": {
+        "file_id": 55,
+        "content": "Ensures self-updates and mounts paths from local directory, launching container with entry script using BASH.",
+        "type": "comment"
+    },
+    "414": {
+        "file_id": 56,
+        "content": "/microgrid_base/Dockerfile_patch",
+        "type": "filepath"
+    },
+    "415": {
+        "file_id": 56,
+        "content": "This Dockerfile patch installs Python 3.6.2 in a conda environment and installs the required CPLEX and docplex libraries for the microgrid_docplex target, using provided ARG variables to define paths and directories.",
+        "type": "summary"
+    },
+    "416": {
+        "file_id": 56,
+        "content": "FROM microgrid_server:latest\n# target: microgrid_docplex\n# install: python3.6 conda env & cplex python libraries\n# TODO: does container itself or its \"layers\" contain any \"ARG\" or \"ENV\" which defines ${VAR} that can be used in \"Dockerfile\"?\n# TODO: use hadolint\nARG CPLEX_PYPATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/python/3.6/x86-64_linux\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nRUN conda create -y -n docplex python==3.6.2\nRUN cd ${CPLEX_PYPATH} && conda run -n docplex python setup.py install\nRUN conda run -n docplex pip install -r requirements_docplex.txt",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_patch:1-13"
+    },
+    "417": {
+        "file_id": 56,
+        "content": "This Dockerfile patch installs Python 3.6.2 in a conda environment and installs the required CPLEX and docplex libraries for the microgrid_docplex target, using provided ARG variables to define paths and directories.",
+        "type": "comment"
+    },
+    "418": {
+        "file_id": 57,
+        "content": "/microgrid_base/Dockerfile_update",
+        "type": "filepath"
+    },
+    "419": {
+        "file_id": 57,
+        "content": "This Dockerfile updates the microgrid base, installs required packages and libraries using init scripts, sets up environment variables, and copies necessary files to the workspace. The ADDITIONAL_SUFFIX_ARGS argument is used to export additional files and folders. Logs are stored in /root/microgrid/server/logs.",
+        "type": "summary"
+    },
+    "420": {
+        "file_id": 57,
+        "content": "FROM microgrid_docplex:latest\nARG BASH=/bin/bash\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/init_solver.sh .\nRUN ${BASH} init_solver.sh\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_docplex.sh .\nRUN ${BASH} init_update_conda_docplex.sh\nCOPY ${MICROGRID_DIR}/requirements_docker_launch.txt .\nCOPY ${MICROGRID_DIR}/requirements.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_cplex.sh .\nRUN ${BASH} init_update_conda_cplex.sh\n# finally we run this.\nCOPY ${MICROGRID_DIR}/init_apt_environ.sh .\nRUN ${BASH} init_apt_environ.sh\n# we copy files to our workspace\n# COPY ${MICROGRID_DIR}${ADDITIONAL_SUFFIX} /root/microgrid_server\n# to export it, use it as --build-arg, you must write the below line:\nARG ADDITIONAL_SUFFIX_ARGS\nRUN mkdir -p /root/microgrid/server/logs\n# ENV ADDITIONAL_SUFFIX $ADDITIONAL_SUFFIX_ARGS\nCOPY ${MICROGRID_DIR}${ADDITIONAL_SUFFIX_ARGS} /root/microgrid\n# RUN echo ${ADDITIONAL_SUFFIX_ARGS}",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_update:1-32"
+    },
+    "421": {
+        "file_id": 57,
+        "content": "This Dockerfile updates the microgrid base, installs required packages and libraries using init scripts, sets up environment variables, and copies necessary files to the workspace. The ADDITIONAL_SUFFIX_ARGS argument is used to export additional files and folders. Logs are stored in /root/microgrid/server/logs.",
+        "type": "comment"
+    },
+    "422": {
+        "file_id": 58,
+        "content": "/microgrid_base/Dockerfile_update_self",
+        "type": "filepath"
+    },
+    "423": {
+        "file_id": 58,
+        "content": "This Dockerfile updates the base image by copying files from a specified directory, executes initialization scripts, and sets environment variables. It also installs necessary packages and libraries using Conda and Apt environments.",
+        "type": "summary"
+    },
+    "424": {
+        "file_id": 58,
+        "content": "# !!!DO NOT USE THIS FILE!!!\n# YOU HAVE BEEN WARNED\nFROM microgrid_update:latest as previous_stage\n# seriously?\nFROM scratch\nCOPY --from=previous_stage / /\nARG BASH=/bin/bash\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/init_solver.sh .\nRUN ${BASH} init_solver.sh\n# COPY ${MICROGRID_DIR}/init_apt_environ.sh .\n# RUN ${BASH} init_apt_environ.sh\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_docplex.sh .\nRUN ${BASH} init_update_conda_docplex.sh\nCOPY ${MICROGRID_DIR}/requirements_docker_launch.txt .\nCOPY ${MICROGRID_DIR}/requirements.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_cplex.sh .\nRUN ${BASH} init_update_conda_cplex.sh\n# finally we run this.\nCOPY ${MICROGRID_DIR}/init_apt_environ.sh .\nRUN ${BASH} init_apt_environ.sh",
+        "type": "code",
+        "location": "/microgrid_base/Dockerfile_update_self:1-30"
+    },
+    "425": {
+        "file_id": 58,
+        "content": "This Dockerfile updates the base image by copying files from a specified directory, executes initialization scripts, and sets environment variables. It also installs necessary packages and libraries using Conda and Apt environments.",
+        "type": "comment"
+    },
+    "426": {
+        "file_id": 59,
+        "content": "/microgrid_base/HOW_TO_DEBUG.md",
+        "type": "filepath"
+    },
+    "427": {
+        "file_id": 59,
+        "content": "The code provides guidance on debugging MILP models, focusing on error tracking and resolving issues in microgrid models through categorization and objective function adjustments. It relaxes adder constraints, accumulates errors, isolates error models, and locates conflicting code within device models.",
+        "type": "summary"
+    },
+    "428": {
+        "file_id": 59,
+        "content": "# Debugging MILP Models\n## Configuration\nYou can configure the program in the following ways:\n1. Setting environmental variables with corresponding name\n2. Pass configuration as commandline options (the syntax is different, so use `--help` to learn it first)\n3. Write configuration in an dotenv formatted file and pass the path of that file into either as environment variable or commandline option\n## Debugging Preference\nSmall models are always preferred since they are fast and concise. If one big model is troublesome and hard to analyze, you can either reduce the iteration size or submodel count.\n## Modeling Preference\nWhen you want to model some logical non-linearities (like disjunctions), the GDP method (`pyomo.gdp`) is always preferred over manual Big-M definitions. This can minimize error, ensure clarity and reduce cognitive loads.\n## Error Tracking\nTo learn more about error logs, we need to create a mapping between the line number, the file name and the variables being defined. Once the varia",
+        "type": "code",
+        "location": "/microgrid_base/HOW_TO_DEBUG.md:1-21"
+    },
+    "429": {
+        "file_id": 59,
+        "content": "This code provides guidance on debugging MILP models, with different configuration options and preferences for modeling logical non-linearities. Error tracking is discussed as well, suggesting a mapping between line number, file name, and variables being defined to aid in learning about error logs.",
+        "type": "comment"
+    },
+    "430": {
+        "file_id": 59,
+        "content": "ble/constraint name is found in the error log, we can reference the source and learn more abount the cause of the error.\nWe can categorize and sort errors by importance (like violation degree) and relevance.\n### Infeasibility or Unbounded variables\nTo know more of the cause of the error, we need to set the objective function to a constant, so if in this way the model is still not valid, it must be infeasible, or having contradictive constraints.\nTo use this feature, set `INFEASIBILITY_DIAGNOSTIC=True` in configuration.\n### Feasopt\nWhen the model is hard to reduce, and must be analyzed in detail, we can use the `feasopt` option to find the violated constraints.\nFeasopt is part of the failsafe protocols. Set `FAILSAFE=True` in configuration to enable it.\nMore options like `FEASOPT_TIMELIMIT` can be found as constants in file `failsafe_utils.py`.\nIn case you may want more specific relaxation targets than all constraints, you can tweak the adders, device count bounds and more.\nOne common routine is ",
+        "type": "code",
+        "location": "/microgrid_base/HOW_TO_DEBUG.md:21-41"
+    },
+    "431": {
+        "file_id": 59,
+        "content": "This code explains how to debug issues in a microgrid model by categorizing and sorting errors based on importance, setting objective function to a constant for infeasibility or unbounded variables detection, using feasopt for detailed analysis of hard-to-reduce models, and adjusting relaxation targets as needed.",
+        "type": "comment"
+    },
+    "432": {
+        "file_id": 59,
+        "content": "that first relax all adder constraints and add the sum of all adder errors into target, then locate the error, create isolated models which enforce error must be fulfilled and relax constraints like device count bounds, also we can locate the conflicting code location within the device model.",
+        "type": "code",
+        "location": "/microgrid_base/HOW_TO_DEBUG.md:41-41"
+    },
+    "433": {
+        "file_id": 59,
+        "content": "Relaxes adder constraints, accumulates errors in target, isolates error models while relaxing device count bounds, and locates conflicting code within device model.",
+        "type": "comment"
+    },
+    "434": {
+        "file_id": 60,
+        "content": "/microgrid_base/Makefile",
+        "type": "filepath"
+    },
+    "435": {
+        "file_id": 60,
+        "content": "The Makefile configures the microgrid server environment, installs dependencies, and includes targets for checks, tests, and release creation. It also provides functions for running commands in specific environments, lists JSON files for simulations, and instructions for building a server and generating documentation. The code handles project tasks, generates and manipulates files, runs alternative solvers with warm start option, writes logs for debugging, and defines test and execution steps for a microgrid solver.",
+        "type": "summary"
+    },
+    "436": {
+        "file_id": 60,
+        "content": "# https://www.gnu.org/software/make/manual/html_node/Parallel-Output.html\n# gmake -Oline\n# running this under bash. will be a lot better.\n# courtesy from ChatGPT\n.SHELLFLAGS := -ec \n# cygwin heap error: https://blog.csdn.net/lemontree1945/article/details/86975644\n# PS C:\\Users\\z98hu\\scoop\\apps\\git\\2.40.0.windows.1\\usr\\bin> C:\\Users\\z98hu\\scoop\\apps\\git\\2.40.0.windows.1\\usr\\bin\\rebase.exe -b 0x200000000 .\\msys-2.0.dll\n# makefile launches subshell every individual line.\n.PHONY: test\n################ ENVIRONMENT VARIABLES ################\nPLATFORM := $(shell python -c \"import os; print(os.name)\")\nifeq (${PLATFORM}, )\nPLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\nendif\nifeq (${PLATFORM}, nt)\nOS_TYPE = windows\nCONDA_EXEC = conda.bat\n# get our solvers in path\nWINDOWS_SOLVERS_DIRS=$(shell python -c \"import os;curdir=os.path.abspath(os.curdir);workfolder=os.path.dirname(os.path.dirname(curdir));solverdir=os.path.join(workfolder,'windows_solvers');pathaddons=';'.join([os.path.join(solverdir,os.path.join(e,'bin')) for e in ['scip','cbc','ipopt']]);print(pathaddons)\")",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:1-26"
+    },
+    "437": {
+        "file_id": 60,
+        "content": "This Makefile configures the shell flags and environment variables for the microgrid_base project. It checks the operating system type (Windows or Unix-like) and sets specific directories accordingly, ensuring correct execution of the solvers.",
+        "type": "comment"
+    },
+    "438": {
+        "file_id": 60,
+        "content": "export PATH := ${WINDOWS_SOLVERS_DIRS};$(PATH)\nelse\nCONDA_EXEC = conda\nOS_TYPE = macos\nendif\nPYTHON_ENV = -X utf8=1\nifeq (${OS_TYPE}, macos)\nCONDA_ENV = rosetta\nPYTHON = /usr/bin/python3\nGSUDO = \nNO_GSUDO = \nelse\nCONDA_ENV = cplex\nPYTHON = python ${PYTHON_ENV}\nGSUDO = gsudo\nNO_GSUDO = gsudo -k\n$(shell gsudo cache on)\nendif\nPLATFORM_NAME:=$(shell python -c \"import platform;print(platform.system())\")\nifeq (${PLATFORM_NAME}, Linux)\nCONDA_ENV=cplex\nendif\nCONDA = ${CONDA_EXEC} run -n ${CONDA_ENV} --live-stream --no-capture-output\nrun_in_conda_env = ${CONDA_EXEC} run -n $(1) --live-stream --no-capture-output python\n# run_in_conda_env = conda run -n $(1) --live-stream --no-capture-output python\n# CONDA = conda run -n rosetta --live-stream --no-capture-output\nexport OS_TYPE PLATFORM PYTHON PYTHON_ENV CONDA_ENV\n################ VARIABLES ################\nMICROGRID_TYPESYS_JSONS = microgrid_v2_all_types_structured.json microgrid_v2_connectivity_matrix.json microgrid_v2_device_port_type_mapping.json\nTYPESYS_PLOTS = type_system.png device_connectivity_matrix.png",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:27-70"
+    },
+    "439": {
+        "file_id": 60,
+        "content": "This Makefile sets environment variables, defines paths for different OS types, and specifies the Conda environment to use. It also provides functions to run commands in specific Conda environments with live-stream output. Additionally, it lists certain JSON files and potential plot names associated with microgrid simulation.",
+        "type": "comment"
+    },
+    "440": {
+        "file_id": 60,
+        "content": "TYPE_UTILS_RESDIR = type_utils_resources\nTYPE_UTILS_RESOURCE_JSON = ${TYPE_UTILS_RESDIR}/extra_ports.json ${TYPE_UTILS_RESDIR}/microgrid_ports.json\nTYPE_UTILS_EXCEL_INPUT = ${TYPE_UTILS_RESDIR}/设备接口_10_11.xlsx\nRELEASE_DIR = microgrid_server_release\nSERVER_RELEASE_DIR = ${RELEASE_DIR}/server\nRELEASE_INIT_DIR = ${RELEASE_DIR}/init\n# RELEASE_TEST_DIR = ${RELEASE_DIR}/test\nSERVER_CODE = fastapi_celery_server.py fastapi_datamodel_template.py fastapi_server_template.py fastapi_celery_functions.py\nSERVER_SCRIPT = fastapi_terminate_service.sh fastapi_tmuxp.sh fastapi_tmuxp.yml\nRELEASE_ARCHIVE = release.7z\nEXPORT_FORMAT_CODE = export_format_validate.py export_format_units.py\nMODEL_CODE = topo_check.py type_def.py topo_check_v2.py ies_optim.py ies_optim_legacy.py prolog_gen.pro.j2 ${EXPORT_FORMAT_CODE}\n# use $(wildcard <pattern>) to precompute the pattern.\n# FILTERED_UTILS = $(wildcard csv*)\nFILTERED_UTILS = $(wildcard csv* pyright*)\n# FILTERED_UTILS = $(wildcard csv* pyright* jinja*)\n# FILTERED_UTILS = $(wildcard csv* pyright* jinja* json*)",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:72-99"
+    },
+    "441": {
+        "file_id": 60,
+        "content": "This Makefile defines paths and files for a microgrid server release, including the server code, scripts, resource directories, and filtered utilities. It also mentions optional test directory, archive format, model code, and uses wildcard pattern to precompute patterns for filtered utilities.",
+        "type": "comment"
+    },
+    "442": {
+        "file_id": 60,
+        "content": "# UTILS = $(filter-out ${FILTERED_UTILS}, *_utils.py)\nUTILS = $(filter-out ${FILTERED_UTILS}, $(wildcard *_utils.py))\nDOCKERFILES = Dockerfile_patch Dockerfile_update .dockerignore\n# DOCKERFILES = Dockerfile_patch Dockerfile_update Dockerfile_update_self\n# DOCKERFILES = Dockerfile_*\nDOCKER_DEPS = docker_launch.py ${DOCKERFILES}\nEXTRA_CODE_DEPS = passwords.py solve_model.py constants.py pyomo_*.py config.py config_dataclasses.py shared_datamodels.py ${DOCKER_DEPS} ${UTILS}\n# EXTRA_CODE_DEPS = passwords.py solve_model.py constants.py pyomo_patch.py config.py ${DOCKER_DEPS} ${UTILS}\n# EXTRA_CODE_DEPS = unit_utils.py passwords.py solve_model.py expr_utils.py constants.py log_utils.py pyomo_patch.py debug_utils.py conflict_utils.py json_utils.py error_utils.py\nEXPORT_FORMAT_SCHEMA = export_format.json planning_export_format.json\nEXTRA_DATA_DEPS = frontend_sim_param_translation.json test_output_full_mock_reduced.json ${EXPORT_FORMAT_SCHEMA}\nUNIT_DEFINITIONS = ../merged_units.txt ../constants_en.txt\nPYTHON_REQUIREMENTS = requirements*.txt",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:101-120"
+    },
+    "443": {
+        "file_id": 60,
+        "content": "This Makefile defines UTILS, DOCKERFILES, and EXTRA_CODE_DEPS for building a project. It also lists EXPORT_FORMAT_SCHEMA and EXTRA_DATA_DEPS for exporting data and UNIT_DEFINITIONS for unit definitions. PYTHON_REQUIREMENTS are specified for the Python environment.",
+        "type": "comment"
+    },
+    "444": {
+        "file_id": 60,
+        "content": "INIT_SCRIPTS = init*.sh conda_init.sh\nINIT_FILES = ${PYTHON_REQUIREMENTS} ${INIT_SCRIPTS}\nTEST_INPUT_FORMAT_FILES = template_input.json test_json_input_format.py\nTEST_CODE = test_topo_check.py ${TEST_INPUT_FORMAT_FILES}\nLOG_DIRS = logs\n# LOG_DIRS = logs ${SERVER_RELEASE_DIR}/logs\nPARAM_BASE_REQUIREMENTS = frontend_sim_param_translation.json microgrid_jinja_param_base.json ${MICROGRID_TYPESYS_JSONS} lib_parse_params.py\nifeq (${OS_TYPE}, macos)\nMAIN_EXEC=bash cplex_test.sh\n# MAIN_EXEC=${CONDA} bash cplex_test.sh\nelse\nMAIN_EXEC=env BETTER_EXCEPTIONS=1 ${PYTHON} test_topo_check.py -f\nendif\n################ META TARGETS ################\nmain: release\n\t${MAIN_EXEC}\n.requirements: ${PYTHON_REQUIREMENTS}\n\t${PYTHON} -m pip install -r requirements.txt\n\t$(call run_in_conda_env,docplex) -m pip install -r requirements_docplex.txt\n\ttouch .requirements\n${LOG_DIRS}:\n\tmkdir -p $@\n\ttouch $@/.log\nserve: release\n\tcd ${SERVER_RELEASE_DIR}\n\tbash fastapi_tmuxp.sh ${OS_TYPE}\n# ref: https://www.gnu.org/software/make/manual/html_node/Variables_002fRecursion.html",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:122-160"
+    },
+    "445": {
+        "file_id": 60,
+        "content": "This Makefile sets up environment for running microgrid simulations. It initializes scripts, defines test code and input files, and creates log directories. The main target runs the simulation with OS-dependent commands. It also installs Python requirements in a Conda environment, starts a server, and creates a .requirements file for tracking installed packages.",
+        "type": "comment"
+    },
+    "446": {
+        "file_id": 60,
+        "content": "code_check: code_checker.py\n\t${PYTHON} code_checker.py -- ${MAKE} ${MAKECMDGOALS}\ntest: release\n\t${MAKE} -e -C test\nt_export: release\n\t${MAKE} -e -C test t_export\nt_failsafe: release\n\t${MAKE} -e -C test t_failsafe\nt_model: release\n\t${MAKE} -e -C test t_model\ndsl:\n\t${MAKE} -e -C dsl_parser\n# packup all necessary files for the test.\nrelease: code test_code ${LOG_DIRS} server code_check .requirements release_prepare\n\techo \"Release file ready at ${RELEASE_ARCHIVE}\"\n\techo \"You may run 'upload_to_server' scripts\"\nrelease_prepare: ${INIT_FILES} ${UNIT_DEFINITIONS} ${MODEL_CODE} ${EXTRA_CODE_DEPS} ${EXTRA_DATA_DEPS} ${SERVER_CODE} ${SERVER_SCRIPT} ${TEST_CODE}\n\trm -rf ${RELEASE_DIR}\n\trm -rf ${RELEASE_ARCHIVE}\n\tmkdir -p ${SERVER_RELEASE_DIR}\n\tmkdir -p ${RELEASE_INIT_DIR}\n\tcp ${INIT_FILES} ${RELEASE_INIT_DIR}\n\tcp ${UNIT_DEFINITIONS} ${RELEASE_DIR}\n\tcp ${MODEL_CODE} ${EXTRA_CODE_DEPS} ${EXTRA_DATA_DEPS} ${SERVER_CODE} ${SERVER_SCRIPT} ${TEST_CODE} ${SERVER_RELEASE_DIR}\n\t7z a ${RELEASE_ARCHIVE} ${RELEASE_DIR}\ncode: ${EXTRA_CODE_DEPS} ${EXTRA_DATA_DEPS} ${MODEL_CODE} ${TEST_CODE}",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:162-197"
+    },
+    "447": {
+        "file_id": 60,
+        "content": "This Makefile contains targets for running code checks, tests, and creating a release. The \"release\" target packs necessary files and generates a release archive. The \"code\" target compiles the model code, test code, and other dependencies. The Makefile uses various other files and directories to perform these tasks.",
+        "type": "comment"
+    },
+    "448": {
+        "file_id": 60,
+        "content": "server: server_code server_script\nserver_code: ${SERVER_CODE}\nserver_script: ${SERVER_SCRIPT}\ntest_code: ${TEST_CODE}\ndocs: constraints.log\nserver_docs: openapi.json\ntemplates: output_template.json template_input.json\n################ IMPLEMENTATION ################\n# topo_check.py ies_optim.py: topo_check.py.j2 ies_optim.py.j2 jinja_template_model_generator.py jinja_utils.py param_base.py unit_utils.py ${UNIT_DEFINITIONS} ${PARAM_BASE_REQUIREMENTS}\ntopo_check_v2.py ies_optim_legacy.py: topo_check_v2.py.j2 ies_optim_legacy.py.j2 jinja_template_model_generator.py jinja_utils.py param_base.py unit_utils.py ${UNIT_DEFINITIONS} ${PARAM_BASE_REQUIREMENTS}\n\t${PYTHON} jinja_template_model_generator.py\n# pyright_regex_check:\n# \t${PYTHON} pyright_utils.py\n${EXPORT_FORMAT_CODE} ${EXPORT_FORMAT_SCHEMA} sim_param_export.xlsx: export_format_validate.py.j2 export_format_units.py.j2 parse_export_format.py jinja_utils.py 设备信息库各参数.xlsx param_base.py unit_utils.py ${UNIT_DEFINITIONS}\n\t${PYTHON} parse_export_format.py\nparam_base.py: device_whitelist.py",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:199-225"
+    },
+    "449": {
+        "file_id": 60,
+        "content": "This Makefile includes instructions for building a server, executing tests, and generating documentation. It uses Python scripts to process templates and validate data formats. The file also mentions specific Python files and dependencies required for these tasks.",
+        "type": "comment"
+    },
+    "450": {
+        "file_id": 60,
+        "content": "parse_units_and_names.py: device_whitelist.py\n# microgrid_jinja_param_base.json: device_params_intermediate.json microgrid_device_port_type_mapping.json parse_units_and_names.py unit_utils.py ${UNIT_DEFINITIONS}\n# microgrid_jinja_param_base.json: device_params_intermediate.json microgrid_v2_device_port_type_mapping.json parse_units_and_names.py unit_utils.py ${UNIT_DEFINITIONS}\nmicrogrid_jinja_param_base.json: device_params_intermediate.json ${TYPE_UTILS_RESOURCE_JSON} parse_units_and_names.py unit_utils.py ${UNIT_DEFINITIONS}\n\t${PYTHON} parse_units_and_names.py\n${MICROGRID_TYPESYS_JSONS} ${TYPESYS_PLOTS}: type_system_v2.py csv_utils.py\n\t${PYTHON} type_system_v2.py -p\nfrontend_sim_param_translation.json: frontend_sim_param_translation.js parse_frontend_sim_param_translation.py\n\t${PYTHON} parse_frontend_sim_param_translation.py\n# device_params_intermediate.json microgrid_device_params_intermediate.json: parse_params.py 设备接口-微电网参数.csv 设备信息库各参数.xlsx\ndevice_params_intermediate.json microgrid_device_",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:227-242"
+    },
+    "451": {
+        "file_id": 60,
+        "content": "This code is responsible for creating various JSON files and executing Python scripts to preprocess data. The files are generated by running specific commands with different parameters, such as parsing units, generating microgrid Jinja parameter base, creating type system JSONs, and translating frontend simulation parameters. Various intermediate files like CSVs, XLSXs, and other JSONs are used throughout the process.",
+        "type": "comment"
+    },
+    "452": {
+        "file_id": 60,
+        "content": "params_intermediate.json ${TYPE_UTILS_RESOURCE_JSON}: parse_params.py 设备接口-微电网参数.csv 设备信息库各参数_23_10_11_from_7_24.xlsx ${TYPE_UTILS_EXCEL_INPUT}\n\t${PYTHON} parse_params.py\nconstraints.log: parse_optim_constraints.py ies_optim.py\n\t${PYTHON} parse_optim_constraints.py > constraints.log\npasswords.py: passwords_template.py\n\tcp passwords_template.py passwords.py\ntest_output_full_mock.json: test_output_full.json\n\tcp test_output_full.json test_output_full_mock.json\ntype_utils.py: type_utils.py.j2 render_type_utils.py ${TYPE_UTILS_RESOURCE_JSON}\n\t${PYTHON} render_type_utils.py\ntest_output_full_mock_reduced.json: test_output_full_mock.json reduce_demo_data_size.py json_utils.py\n\t${PYTHON} reduce_demo_data_size.py\n# great.\ntest_make_args:\n\t# echo ${MAKEFLAGS}\n\techo ${MAKECMDGOALS}\ntest_utils_wildcard:\n\techo ${UTILS}\n\techo ${FILTERED_UTILS}\n# working!\n# cplex & cbc support warmstart\n# scip: randseed\n# ipopt: warm_start_init_point\ndefine run_alternative_solver\n\tif [ '${2}' = '1' ] ; then \\\n\t\twarm_start=WARM_START=1; \\\n\t\tlogfile_name=$${solver}_warm_start; \\",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:242-276"
+    },
+    "453": {
+        "file_id": 60,
+        "content": "This code contains various tasks to generate and manipulate files for a microgrid project. It includes tasks like parsing parameters, generating constraints, creating passwords, reducing data size, and running alternative solvers with warm start option.",
+        "type": "comment"
+    },
+    "454": {
+        "file_id": 60,
+        "content": "\telse \\\n\t\twarm_start=; \\\n\t\tlogfile_name=$${solver}; \\\n\tfi; \\\n\tif [ '${3}' = '1' ] ; then \\\n\t\tinfeasible=INFEASIBLE=1; \\\n\t\tlogfile_name=$${logfile}_infeaible; \\\n\telse \\\n\t\tinfeasible=; \\\n\t\tlogfile_name=$${logfile}; \\\n\tfi; \\\n\tenv SOLVER_NAME=$1 $${warm_start} $${infeasible} $${PYTHON} alternative_solver.py 2>&1 | tee $${logfile_name}.txt \nendef\noss_solvers=scip cbc ipopt\nwarmstart_solvers=cbc cplex\n# ipopt supports warmstart by default. just pass values to variable 'initialize' parameter\n# it will cause trouble if previous problematic solution is still there.\n# maybe it is also true for scip.\nCD_TEST_DEBUG_DIR=cd cplex_abnormal_exit_condition_debug &&\ndefine run_test_alternative_solver\n\t${CD_TEST_DEBUG_DIR} for solver in $(oss_solvers); do \\\n\t\t$(call run_alternative_solver,$${solver},0,0); \\\n\tdone\n\t${CD_TEST_DEBUG_DIR} for solver in $(oss_solvers); do \\\n\t\t$(call run_alternative_solver,$${solver},0,1); \\\n\tdone\n\t${CD_TEST_DEBUG_DIR} for solver in $(warmstart_solvers); do \\\n\t\t$(call run_alternative_solver,$${solver},1,0); \\",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:277-311"
+    },
+    "455": {
+        "file_id": 60,
+        "content": "This code defines a rule to run alternative solvers and tests their behavior. It uses variables for the solver type, warm-starting, and infeasibility detection. The code runs the chosen solver with different conditions to check its performance. The warm-start and infeasible conditions are set accordingly using if statements. Finally, it writes logs to a text file for debugging purposes.",
+        "type": "comment"
+    },
+    "456": {
+        "file_id": 60,
+        "content": "\tdone\n\t${CD_TEST_DEBUG_DIR} for solver in $(warmstart_solvers); do \\\n\t\t$(call run_alternative_solver,$${solver},1,1); \\\n\tdone\nendef\ntest_alternative_solver:\n\t$(call run_test_alternative_solver)\ntest_persistent_solver:\n\t# ${NO_GSUDO}\n\t# may get solution by input .nl model file.\n\t${CD_TEST_DEBUG_DIR} ${CONDA} python scip_persistent.py\nsolver_repl:\n\tcmd /K\ntest_topo_check:\n\t${PYTHON} test_topo_check.py\nmicrogrid_topo_check:\n\t${PYTHON} microgrid_topo_check.py\ndiesel_topo_check:\n\t${PYTHON} diesel_topo_check.py",
+        "type": "code",
+        "location": "/microgrid_base/Makefile:312-337"
+    },
+    "457": {
+        "file_id": 60,
+        "content": "This code defines various test and execution steps for a microgrid solver. It utilizes different solvers, scripts, and commands to check topology, execute tests, and run alternative solvers for the microgrid problem.",
+        "type": "comment"
+    },
+    "458": {
+        "file_id": 61,
+        "content": "/microgrid_base/Makefile.j2",
+        "type": "filepath"
+    },
+    "459": {
+        "file_id": 61,
+        "content": "Macro definition and loop through Python files, creating rules for each file. For each file, it generates an output rule with the joined outputs, input file name, and joined inputs. It then executes a Python command using the macro to build the file.",
+        "type": "summary"
+    },
+    "460": {
+        "file_id": 61,
+        "content": "{%macro J(mlist)%}{{\" \".join(mlist)}}{% endmacro%}\n{% for e in python_files%}\n{{J(e.outputs)}}: {{e.fname}} {{J(e.inputs)}}\n    python3 $< {{J(e.args)}}\n{% endfor %}",
+        "type": "code",
+        "location": "/microgrid_base/Makefile.j2:1-6"
+    },
+    "461": {
+        "file_id": 61,
+        "content": "Macro definition and loop through Python files, creating rules for each file. For each file, it generates an output rule with the joined outputs, input file name, and joined inputs. It then executes a Python command using the macro to build the file.",
+        "type": "comment"
+    },
+    "462": {
+        "file_id": 62,
+        "content": "/microgrid_base/README.md",
+        "type": "filepath"
+    },
+    "463": {
+        "file_id": 62,
+        "content": "The Python-based microgrid system utilizes IESLang, provides dependencies and configurations for tasks, generates model code, prepares tests and API definitions, and includes utility scripts and language specifications.",
+        "type": "summary"
+    },
+    "464": {
+        "file_id": 62,
+        "content": "# Microgrid Algorithm Service\nThe main objective of this directory is to model an IES system and optimize its operation.\nUser defines topology, in which devices such as loads, grids, energy sources and generators are.\nInputs and outputs follow a standard format. Modeling language \"IESLang\" is used to describe the system.\n## \"passwords.py\"\nThis file is ignored by default. Should you create this under `./passwords.py` and `./microgrid_server_release/server/passwords.py`.\nExample content:\n```python\nfrom log_utils import logger_print\nredis_password = ''\n```\n## \"docker_launch.py\"\nJust run this file by `python3 docker_launch.py` and service will be created under `http://localhost:9870`.\nAttach container by `docker container attach <container_id>`.\n## \"openapi.json\"\nThis file describe public APIs of the algorithm server. You can load this file using Postman/Apifox.\nTo acquire this file, run `curl -O <server_end_point>/openapi.json`.\n## Usage\nThe easiest way for setting this up is by installing all dependencies and then invoke `make` under base directory.",
+        "type": "code",
+        "location": "/microgrid_base/README.md:1-35"
+    },
+    "465": {
+        "file_id": 62,
+        "content": "This code directory contains a microgrid algorithm service, with the main objective of modeling an IES (Integrated Energy System) and optimizing its operation. The user can define the topology by adding loads, grids, energy sources, and generators. The modeling language used is \"IESLang\". The code also includes a file for passwords (passwords.py), a script to launch Docker (docker_launch.py), and describes public APIs in openapi.json. To set up the service, install dependencies and run 'make' under the base directory.",
+        "type": "comment"
+    },
+    "466": {
+        "file_id": 62,
+        "content": "On different system you may need to modify code in `Makefile` to ensure correct dependency resolution.\nInstall CPLEX and Anaconda (for environment management) on your system. Do not use non-Linux OSes for deployment since they do not support `tmux`.\nMinimum Python version is `3.9`.\nInstall Python dependencies by `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt`.\nTo run `celery`, you need to install and run `redis-server` and `rabbitmq-server`.\n## Developing\nIf some files are generated by templates, do not modify them. Instead, find related \".j2\" files and modify it, then invoke `make test` under base directory, to ensure your modification is not making more troubles.\nFor more info on Pyomo, please check [this tutorial](https://www.shangyexinzhi.com/article/5385476.html), [github repo](https://github.com/WenYuZhi/PyomoTutorial) or [official docs](https://pyomo.readthedocs.io/en/stable/index.html).\n## Roadmap\n* [x] create algorithm service\n* [x] parse input parameters from excel",
+        "type": "code",
+        "location": "/microgrid_base/README.md:37-56"
+    },
+    "467": {
+        "file_id": 62,
+        "content": "This code provides instructions for setting up a Python-based microgrid system, specifying the necessary software installations and configurations. It includes details on dependencies, system requirements, and guidance on making modifications to avoid issues with generated files. Additional resources are provided for learning about Pyomo, which seems to be an essential component of the system.",
+        "type": "comment"
+    },
+    "468": {
+        "file_id": 62,
+        "content": "* [x] create name mapping table\n* [x] define port types and connectivity matrix\n* [x] generate model code using jinja2 and macros\n* [x] prepare generative tests\n* [x] type check undefined variables\n* [ ] define and parse `*.ies` DSL files\n## File Structure\n- Makefile: main makefile for code generation, define build dependencies, handles and share environment variables across submake sessions.\n- ies_optim.py.j2: template for generating main model code\n- jinja_utils.py: utils for reading and rendering template, testing and formatting generated code\n- type_system_v2.py: topology type system generation\n- parse_params.py: shared params for code generation\n- parse_frontend_sim_param_translation.py: parse `.js` file and generate export table header translation map\n- parse_export_format.py: generate `export_format_validate.py`\n- parse_optim_constraints.py: generate `constraints.log` (which contains all constraints used in model) by parsing `ies_optim.py`\n- parse_units_and_names.py: generate `microgrid_jinja_param_base.py` used for input datastructure and unit definitions in `ies_optim.py`",
+        "type": "code",
+        "location": "/microgrid_base/README.md:57-74"
+    },
+    "469": {
+        "file_id": 62,
+        "content": "The code snippet provided is a list of tasks that need to be completed for the microgrid_base project. Tasks include creating a name mapping table, defining port types and connectivity matrix, generating model code using Jinja2 templating language and macros, preparing generative tests, and type checking undefined variables. The remaining task is to define and parse *.ies DSL files. Additionally, there are various Python files listed for their specific functions in the project, such as ies_optim.py.j2 which generates the main model code, and Jinja_utils.py for reading and rendering templates.",
+        "type": "comment"
+    },
+    "470": {
+        "file_id": 62,
+        "content": "- microgrid_server_release: for service distribution\n    - constants_en.txt: constants definitions imported by merged_units.txt\n    - merged_units.txt: modified unit definitions used by package \"pint\"\n    - init: setup scripts for server (incomplete)\n        - init.sh: bash setup script\n        - requirements.txt: python requirements file\n    - server: main server code\n        - export_format_validate.py: validate and export data to output\n        - export_format.json: used by `solve_model.py` for data validation\n        - expr_utils.py: for analyzing expressions in exceptions\n        - fastapi_celery_server.py: celery worker for model solving\n        - fastapi_datamodel_template.py: data exchange schema for api\n        - fastapi_server_template.py: fastapi server code, which defines apis\n        - fastapi_terminate_service.sh: for finding and killing previous algorithm service (for restart)\n        - fastapi_tmuxp.sh: launching service by creating four panes in one tmux session\n        - fastapi_tmuxp.yml: config file read by tmuxp, used to create tmux session",
+        "type": "code",
+        "location": "/microgrid_base/README.md:75-90"
+    },
+    "471": {
+        "file_id": 62,
+        "content": "This codebase contains a microgrid server release for service distribution. It includes constant definitions in `constants_en.txt`, modified unit definitions in `merged_units.txt` used by the \"pint\" package, setup scripts for the server in `init`, Python requirements file `requirements.txt`, and various files for server code implementation. The code includes validation and data export functions, schema for data exchange, and a FastAPI server that defines APIs. Additional scripts are present for finding and killing previous algorithm services, launching the service, and creating tmux sessions.",
+        "type": "comment"
+    },
+    "472": {
+        "file_id": 62,
+        "content": "        - frontend_sim_param_translation.json: translate Chinese table headers into predefined terms for output\n        - ies_optim.py: model definition and implementation\n        - passwords.py: stores password for redis, used by `fastapi_celery_server.py`\n        - solve_model.py: receive input as model specification, invoke optimization session and create results.\n        - template_input.json: example api input data format\n        - test_json_input_format.py: test reading file for input data, checking topology consistency, model solving and data exporting\n        - test_topo_check.py: test using code to construct model topology as input data and check topology consistency, model solving and data exporting\n        - topo_check.py: utils for constructing model topology and checking\n        - unit_utils.py: utils for unit conversion\n- test: code for testing\n    - sample_data: stores data which might causes problem to system\n    - common_fixtures.py: shared fixtures used by `test_model.py`\n    - c",
+        "type": "code",
+        "location": "/microgrid_base/README.md:91-103"
+    },
+    "473": {
+        "file_id": 62,
+        "content": "This codebase contains various files for a microgrid optimization project, including model definition and implementation (ies_optim.py), unit conversion utilities (unit_utils.py), and test cases (test_json_input_format.py, test_topo_check.py) to validate the input data format, topology consistency, and model solving capabilities. The code also includes example API input data format (template_input.json) and utilities for constructing model topology (topo_check.py). Additionally, there is a file for password storage (passwords.py) used by `fastapi_celery_server.py` and a file for frontend parameter translation (frontend_sim_param_translation.json). The codebase also contains test cases for problematic data (test/sample_data), shared fixtures used by the model testing (common_fixtures.py), and an unfinished C file.",
+        "type": "comment"
+    },
+    "474": {
+        "file_id": 62,
+        "content": "ommon_fixtures.py.j2: code template which uses `ies_optim.py` for generating input data fixtures to `common_fixtures.py.tmp`\n    - common_fixtures.py.tmp: template generation target, used as reference while writing `common_fixtures.py`\n    - conic_problem.py: experiment on solving fictional optimization nonlinear objectives using numpy\n    - dev_info_tmp_gen.py: reading `common_fixtures.py.j2` and generate `.tmp` target\n    - generate_test_model.py: reading `test_model.py.j2` and generate `test_model.py`\n    - test_model.py: test code for main model code\n    - Makefile: test makefile for easy construction by specifying build dependencies\n- dsl_parser: IESLang parser and code generator\n    - functional_base.py: experimental functional exeucution mechanism\n    - functional_base.py.j2: for generating functional_base.py.j2\n    - generate_code.py: for reading functional_base.py.j2 and generate python code\n    - lex_yacc.py: for tokenizing and parsing IESLang code (experiment)\n    - Makefile: define IESLang related build tasks",
+        "type": "code",
+        "location": "/microgrid_base/README.md:103-115"
+    },
+    "475": {
+        "file_id": 62,
+        "content": "The code mentions different Python files and their purposes within the project. `common_fixtures.py.j2` is a code template for generating input data fixtures, while `conic_problem.py` experimentally solves nonlinear objectives using numpy. `dev_info_tmp_gen.py` reads the template and generates a temporary file. `generate_test_model.py` generates test models by reading a template file. `Makefile` is a test makefile for easy construction. `dsl_parser` includes experimental parsing and code generation tools, such as functional execution mechanisms and IESLang related build tasks.",
+        "type": "comment"
+    },
+    "476": {
+        "file_id": 62,
+        "content": "    - mylang.ies: IESLang language specification\n    - mylang.txt: legacy language specification\n    - pyomo_reduce_ineqalities.py: for calculating variable bounds from a system of ineqality expressions, used by iesl\n    - yacc_init.py: experimencal parser\n    - your_model_name.lp: experimental model export as lp files which contains Chinese charactors\n    - 柴油.ies: diesel power generator model written in IESLang language\n- cplex_convex_debug: test files for debugging cplex solver\n    - init.sh: for moving `*.lp` files to this directory.\n- frontend_convert_format: convert non-standard frontend data into standard model specification format, used by frontend\n    - customToolbar.vue: code used by frontend, which includes logics for input data construction\n    - cvt.js: non-standard input format conversion\n    - error_cvt.js: error message handling (translation)\n    - input_template_processed.json: example input template\n    - sample_parse.json: partial cleaned non-standard input data\n    - sample.json: raw non-standard input data",
+        "type": "code",
+        "location": "/microgrid_base/README.md:116-130"
+    },
+    "477": {
+        "file_id": 62,
+        "content": "This code chunk represents various files and folders involved in the microgrid base project. It includes the IESLang language specification, a legacy language specification file, Python scripts for calculating variable bounds and parsing, LP files with Chinese characters, and files for debugging CPLEX solver. Additionally, there are frontend conversion format files, including input template processing, sample data, and error handling scripts.",
+        "type": "comment"
+    },
+    "478": {
+        "file_id": 62,
+        "content": "- logs: directory reserved for logging\n    - .log: need to be touched in order to preserve this directory in release archive `release.7z`\n- makefile_ninja_pytest_incremental_test\n    - platform_detect_makefile: for detecting different os using makefile\n        - Makefile: os detect implementation\n    - construct_ninja_file.py: using package \"ninja_syntax\" to generate ninja.build file\n    - dodo.py: experiment of package \"pydo\"\n    - generic.py: python type system experiment\n    - lfnf.py: pytest file used for testing pytest \"-lfnf\" commandline flag\n    - Makefile.j2: test jinja template for generating Makefile\n    - mytest.py: pytest file using type hints and request fixture\n    - test_buffer.py: infinite loop for conda stdout buffer mechanism\n    - type_check.py: multiple experiments of python type system\n    - typecheck.py: static condition exhausitiveness check",
+        "type": "code",
+        "location": "/microgrid_base/README.md:131-144"
+    },
+    "479": {
+        "file_id": 62,
+        "content": "This code chunk lists various files and their purposes within the project. It includes a logging directory, makefile for OS detection, Ninja file generation, package experiments, template files, pytest files with different features, and buffer mechanism for conda stdout.",
+        "type": "comment"
+    },
+    "480": {
+        "file_id": 63,
+        "content": "/microgrid_base/__init__.py",
+        "type": "filepath"
+    },
+    "481": {
+        "file_id": 63,
+        "content": "This code imports necessary packages and functions for the microgrid base module. It brings in functionality from Pyomo Environ and utilizes logger_print from log_utils.",
+        "type": "summary"
+    },
+    "482": {
+        "file_id": 63,
+        "content": "# from pyomo_environ import *\nfrom log_utils import logger_print",
+        "type": "code",
+        "location": "/microgrid_base/__init__.py:1-2"
+    },
+    "483": {
+        "file_id": 63,
+        "content": "This code imports necessary packages and functions for the microgrid base module. It brings in functionality from Pyomo Environ and utilizes logger_print from log_utils.",
+        "type": "comment"
+    },
+    "484": {
+        "file_id": 64,
+        "content": "/microgrid_base/adaptive_sampling/test.py",
+        "type": "filepath"
+    },
+    "485": {
+        "file_id": 64,
+        "content": "Code generates a set of x and y points using hyperopt library. It defines an objective function and search space, then minimizes the objective over the search space with 100 evaluations. The best result is printed.",
+        "type": "summary"
+    },
+    "486": {
+        "file_id": 64,
+        "content": "from hyperopt import hp\nx_range = (10,1e5)\nsupersample_size = 10000\nfunc = lambda x: x**2\nimport numpy as np\nx_points = np.linspace(*x_range, supersample_size)\ny_points = func(x_points)\nx_points = x_points.tolist()\ny_points = y_points.tolist()\ny_range = (y_points[0], y_points[-1])\n# define an objective function\ndef objective(args):\n    case, val = args\n    if case == 'case 1':\n        return val\n    else:\n        return val ** 2\n# define a search space\nspace = hp.choice('a',\n    [\n        ('case 1', 1 + hp.lognormal('c1', 0, 1)),\n        ('case 2', hp.uniform('c2', -10, 10))\n    ])\n# minimize the objective over the space\nfrom hyperopt import fmin, tpe, space_eval\nbest = fmin(objective, space, algo=tpe.suggest, max_evals=100)\nprint(best)\n# -> {'a': 1, 'c2': 0.01420615366247227}\nprint(space_eval(space, best))\n# -> ('case 2', 0.01420615366247227}",
+        "type": "code",
+        "location": "/microgrid_base/adaptive_sampling/test.py:1-42"
+    },
+    "487": {
+        "file_id": 64,
+        "content": "Code generates a set of x and y points using hyperopt library. It defines an objective function and search space, then minimizes the objective over the search space with 100 evaluations. The best result is printed.",
+        "type": "comment"
+    },
+    "488": {
+        "file_id": 65,
+        "content": "/microgrid_base/adaptive_sampling/test_adaptive_piecewise_approximation.py",
+        "type": "filepath"
+    },
+    "489": {
+        "file_id": 65,
+        "content": "The code uses piecewise linear fit to create a function with four line segments, fits the function, predicts values for determined points, and displays the plot.",
+        "type": "summary"
+    },
+    "490": {
+        "file_id": 65,
+        "content": "# recursive binsect method\n# descent by: error area threshold or max section count\nimport pwlf\nimport numpy as np\nx_start, x_end, sample_size = -500, 500, 100\n# x_start, x_end, sample_size = 0, 5000, 100\nx = np.linspace(x_start, x_end, sample_size)\n# y = np.sin(x)\n# y = np.sin(x) + np.random.normal(0, 0.2, 100)\ny = x**2\n# initialize piecewise linear fit with your x and y data\nmyPWLF = pwlf.PiecewiseLinFit(x, y)\n# fit the function with four line segments\n# force the function to go through the data points\n# (0.0, 0.0) and (0.19, 0.16)\n# where the data points are of the form (x, y)\n# x_c = [0.0, 0.19]\n# y_c = [0.0, 0.2]\n# res = myPWLF.fitfast(20, pop=3)\nres = myPWLF.fitfast(12, pop=3)\n# res = myPWLF.fitfast(4, pop=3)\n# this is slow. do not use\n# res = myPWLF.fit(4, x_c, y_c)\n# x_c = [x[0], x[-1]]\n# y_c = [y[0], y[-1]]\n# res = myPWLF.fit(12,x_c, y_c, atol=0.1)\n# predict for the determined points\n# xHat = np.linspace(min(x), 0.19, num=10000)\nyHat = myPWLF.predict(x)\nimport matplotlib.pyplot as plt\n# plot the results\nplt.figure()",
+        "type": "code",
+        "location": "/microgrid_base/adaptive_sampling/test_adaptive_piecewise_approximation.py:1-39"
+    },
+    "491": {
+        "file_id": 65,
+        "content": "Code imports pwlf and numpy libraries, initializes x and y data points, creates a piecewise linear fit object, fits the function with four line segments, predicts values for determined points, plots the results using matplotlib.pyplot.",
+        "type": "comment"
+    },
+    "492": {
+        "file_id": 65,
+        "content": "plt.plot(x, y, 'o')\nplt.plot(x, yHat, '-', color='red')\nplt.show()",
+        "type": "code",
+        "location": "/microgrid_base/adaptive_sampling/test_adaptive_piecewise_approximation.py:40-42"
+    },
+    "493": {
+        "file_id": 65,
+        "content": "Code plots x and y data as points, and the estimated yHat as a red line, then displays the plot.",
+        "type": "comment"
+    },
+    "494": {
+        "file_id": 66,
+        "content": "/microgrid_base/adaptive_sampling/test_bisect.py",
+        "type": "filepath"
+    },
+    "495": {
+        "file_id": 66,
+        "content": "The function `adaptive_piecewise_approximation` performs iterative linear regression on data subsections and terminates upon exceeding error threshold, updating and returning new subsection list. The code snippet adjusts max subsection count and prints results with lengths.",
+        "type": "summary"
+    },
+    "496": {
+        "file_id": 66,
+        "content": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n# TODO: shift the breakpoints iteratively\n# Adaptive Piecewise Approximation algorithm\ndef adaptive_piecewise_approximation(x, y, max_subsection_count, error_threshold = 0):\n    # Initialize with the entire range as the first subsection\n    subsections = [(0, len(x)-1)]\n    # Iterate until the maximum subsection count is reached\n    while len(subsections) < max_subsection_count:\n        new_subsections = []\n        errors = []\n        # Iterate over each subsection\n        for start, end in subsections:\n            # TODO: change the error calculation method, fix the start & end points, fuse the connecting points\n            # Perform linear regression on the subsection\n            model = LinearRegression()\n            model.fit(x[start:end+1].reshape(-1, 1), y[start:end+1])\n            # Calculate the predicted values\n            y_pred = model.predict(x[start:end+1].reshape(-1, 1))\n            # Calculate the error (element-wise)\n            error = np.abs(y[start:end+1] - y_pred)",
+        "type": "code",
+        "location": "/microgrid_base/adaptive_sampling/test_bisect.py:1-27"
+    },
+    "497": {
+        "file_id": 66,
+        "content": "Function `adaptive_piecewise_approximation` performs iterative linear regression on subsections of input data, creating new subsections based on errors calculated from predicted values. Maximum number of subsections is defined by `max_subsection_count`. Error threshold and start/end point fusion are TODOs to be implemented.",
+        "type": "comment"
+    },
+    "498": {
+        "file_id": 66,
+        "content": "            # Store the error and subsection\n            errors.append(np.sum(error))\n            new_subsections.append((start, end))\n        # Find the subsection with the highest error\n        max_error_index = np.argmax(errors)\n        max_error = errors[max_error_index]\n        max_error_subsection = new_subsections[max_error_index]\n        # Check if the maximum error is greater than a threshold\n        if max_error > error_threshold:\n            # Bisect the subsection with the highest error\n            start, end = max_error_subsection\n            if end-start <= 1:\n                break\n            mid = (end+start) // 2\n            new_subsections[max_error_index] = (max_error_subsection[0], mid)\n            new_subsections.append((mid+1, max_error_subsection[1]))\n            new_subsections.sort(key = lambda x: x[0])\n        else:\n            break\n        # Update the subsections\n        subsections = new_subsections\n    return subsections\n# Example usage\nx = np.linspace(0, 10, 100)\ny = x **2\n# y = np.sin(x)",
+        "type": "code",
+        "location": "/microgrid_base/adaptive_sampling/test_bisect.py:29-59"
+    },
+    "499": {
+        "file_id": 66,
+        "content": "The code iteratively bisects a time series to identify the highest error within defined subsections and terminates if it exceeds a specified threshold. The code then updates and returns the new list of subsections.",
+        "type": "comment"
+    }
+}

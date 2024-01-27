@@ -1,0 +1,10 @@
+{
+    "summary": "This code generates a FastAPI client using the openapi-python-client tool. It takes a JSON file (fastapi_openapi.json) as input, and generates a Python client code (fastapi_client_generated.py). It also automatically generates an __init__.py file for organizing multiple API callers in the same namespace.",
+    "details": [
+        {
+            "comment": "This code generates a FastAPI client using the openapi-python-client tool. It takes a JSON file (fastapi_openapi.json) as input, and generates a Python client code (fastapi_client_generated.py). It also automatically generates an __init__.py file for organizing multiple API callers in the same namespace.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_client_generator.py\":0-15",
+            "content": "target_file = \"fastapi_client_generated.py\"\n# let's generate the client from this json.\nimport os\n# suggest you to clean this openapi json (the function name) first:\n# https://fastapi.tiangolo.com/advanced/generate-clients/\n#\njson_file_path = 'fastapi_openapi.json'\n# also try to automatically generate appropriate `__init__.py` file so we can have multiple api callers in the same namespace.\ncmd = f'openapi-python-client generate --path {json_file_path}' # generate to: chimichang-app-client, with chimichang_app_client wrapped inside.\nos.system(cmd)"
+        }
+    ]
+}

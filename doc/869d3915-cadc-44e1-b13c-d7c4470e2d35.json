@@ -1,0 +1,10 @@
+{
+    "summary": "The code defines a function build_and_solve_model_with_strict_inequality, which creates a Pyomo model with constraints and an objective, solves it using CPLEX solver, and prints the result. It also includes a patch to suppress strict inequality in Pyomo expressions.",
+    "details": [
+        {
+            "comment": "The code defines a function build_and_solve_model_with_strict_inequality, which creates a Pyomo model with constraints and an objective, solves it using CPLEX solver, and prints the result. It also includes a patch to suppress strict inequality in Pyomo expressions.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/suppress_strict_inequalities.py\":0-34",
+            "content": "from pyomo.environ import *\nimport rich\ndef build_and_solve_model_with_strict_inequality():\n    model = ConcreteModel()\n    model.x = Var(bounds=(-1,1))\n    model.y = Var(bounds=(-1,1))\n    model.rel = Constraint(expr=model.x < model.y) # error, if not patched.\n    model.obj = Objective(expr=model.x, sense=minimize)\n    solver = SolverFactory('cplex')\n    ret = solver.solve(model, tee=True)\n    rich.print(ret)\n# build_and_solve_model_with_strict_inequality()\n# print(\"#\"*60)\n######## SUPPRESS STRICT INEQUALITY PATCH #########\ndef strict_setter(self, val):\n    ...\ndef strict_getter(self):\n    return False\nInEq = pyomo.core.expr.relational_expr.InequalityExpression\nsetattr(InEq,\"_strict_setter\", strict_setter)\nsetattr(InEq,\"_strict_getter\", strict_getter)\nInEq._strict = property(fget=InEq._strict_getter, fset=InEq._strict_setter)\nInEq.strict = InEq._strict\n######## SUPPRESS STRICT INEQUALITY PATCH #########\nbuild_and_solve_model_with_strict_inequality()"
+        }
+    ]
+}

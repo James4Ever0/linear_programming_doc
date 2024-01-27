@@ -1,0 +1,15 @@
+{
+    "summary": "The code includes various mathematical notations and formulas, such as summation, integration, functions, and ranges for variables. It defines Variable 1 as a real number between 1 and 10, and Variable 2 as an integer within the range [1, Z].",
+    "details": [
+        {
+            "comment": "This code snippet contains various mathematical notations and formulas, likely used in a programming context. It includes summation, integration, functions, and more. It seems to cover different types of mathematical expressions and ranges for variables. The code appears to be documentation or a reference list of different mathematical operations and formulations.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md\":0-103",
+            "content": "[link to line one](./test_code.html#line-50)\n[link to line two](./test_code.py)\nformula:\n$$\n\\sum_{b=1}^{10} {a}_{b}\n$$\n$$\n\\frac{d}{d b} b\n$$\n$$\n\\int b\\, \\mathrm{d}b ,{\\rm where} \\  10 \\ge b \\ge 1\n$$\n$$\n\\operatorname{Q}_{\\text{negative}}(a)\n$$\n$$\n\\mathbb{R}\n$$\n$$\n0 \\leq c \\leq 1\n$$\nfor reals:\n$$\nc \\in \\mathbb{R}\n$$\n$$\n\\left\\lceil{c}\\right\\rceil\n$$\n$$\nc \\in \\left[0, 1\\right] \\cap \\mathbb{Z}\n$$\n$$\n{\\rm dt}\n$$\n$$\n{c}' = \\cfrac{a}{1+\\cfrac{c}{d}} \n$$\n$$\n\\sqrt[3]{n} \n\\lim_{x \\to \\infty} \\frac{x}{x+1} $$\n$$\na \\bmod 24 \n$$\n$$\n\\Gamma(x) = x^2 \n\\sigma \\delta \\psi \\epsilon \\varepsilon \n$$\n$$\n{x+1 \\over x-1} + {c \\over d} \n$$\n$$\na \\times b \n$$\n$$\n\u53d8\u91cf_{1}\\times\u53d8\u91cf_{2}\n$$\n$$\n\\frac{\\mathrm{d}}{\\mathrm{d} b} b\n$$\n$$\n\u53d8\u91cf_{1} \\in \\mathbb{Q}, \u53d8\u91cf_{1} > 0\n$$\nnatural does not contain zero, but natural_0 does\nintersection\n$$\n\\left\\{1, 2, \\ldots, 10\\right\\} \n$$\n$$\n\\left[0, \u53d8\u91cf_{1}\\right] \\cap \\mathbb{N}\n$$\n$$\n\\left[-1, 1\\right] \\times \\left[10, 100\\right]\n$$\n$$\n\\left\\{\u53d8\u91cf_{1}\\; \\middle|\\; \u53d8\u91cf_{1} \\in \\mathbb{R} \\wedge \u53d8\u91cf_{1} > 1 \\right\\} \n$$\n$$\n\\left\\{2 \u53d8\u91cf_{1}\\; \\middle|\\; \u53d8\u91cf_{1} \\in \\mathbb{Z}\\right\\} "
+        },
+        {
+            "comment": "This code defines a set of variables. Variable 1 is a real number greater than 1 and less than 10, while Variable 2 is an integer within the range [1, Z].",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md\":104-112",
+            "content": "$$\n$$\n\\left\\{\u53d8\u91cf_{1}\\; \\middle|\\; \u53d8\u91cf_{1} \\in \\mathbb{R} \\wedge \u53d8\u91cf_{1} > 1 \\wedge \u53d8\u91cf_{1} < 10 \\right\\} \n$$\n$$\n\\mathbb{Z} \\cap \\left[1, \u53d8\u91cf_{2}\\right]\n$$"
+        }
+    ]
+}

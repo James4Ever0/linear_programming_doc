@@ -1,0 +1,542 @@
+{
+    "2200": {
+        "file_id": 249,
+        "content": "/microgrid_base/mock_utils.py",
+        "type": "filepath"
+    },
+    "2201": {
+        "file_id": 249,
+        "content": "This code imports libraries, defines functions and classes for model factories, generates fake output data, creates planning objects, ensures deterministic behavior with a deterministic random number generator, handles unknown targets, and tests deterministic behavior.",
+        "type": "summary"
+    },
+    "2202": {
+        "file_id": 249,
+        "content": "\"\"\"\nThis library mocks algorithm response.\nHash input parameters for random seeds, if configured.\n\"\"\"\nimport json\nfrom pydantic_factories import ModelFactory\nfrom log_utils import logger_print\nfrom fastapi_datamodel_template import (\n    单次计算结果,\n    CalculationResult,\n    ObjectiveResult,\n    规划结果详情_翻译,\n    规划方案概览_翻译,\n    设备出力曲线,\n    仿真结果,\n    出力曲线,\n    曲线,\n    mDict,\n)\nwith open(\"test_output_full_mock_reduced.json\", \"r\") as f:\n    mock_output_data = json.loads(f.read())\n    mock_calculation_result = CalculationResult.parse_obj(mock_output_data)\nfrom config import ies_env\nTHRESHOLD = ies_env.MOCK_DATA_THRESHOLD\ndef decreaseByOneThousand(number, threshold=10):\n    assert number >= 0, f\"invalid number: {repr(number)}\"\n    if number <= threshold:\n        return number\n    ret = number / 10\n    # logger_print(number, ret)\n    return decreaseByOneThousand(ret, threshold=threshold)\nimport pandas\ndef modifyIfIsDeviceCount(location, val):\n    if \"deviceCount\" in location:\n        return random.randint(1, 10)\n    return val\ndef modifyValueIfNumber(location, val):",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:1-50"
+    },
+    "2203": {
+        "file_id": 249,
+        "content": "The code mocks algorithm response and provides a library for generating random seeded responses. It imports necessary classes from various libraries and modules, reads data from a JSON file, and defines functions to modify values if they are numbers or device counts.",
+        "type": "comment"
+    },
+    "2204": {
+        "file_id": 249,
+        "content": "    # bool is subclass of int\n    # if isinstance(val, Union[float, int]):\n    if type(val) in [float, int]:\n        if not pandas.isnull(val):\n            if val != 0:\n                positive = val > 0\n                val_abs = abs(val)\n                val_abs_modified = decreaseByOneThousand(val_abs, threshold=THRESHOLD)\n                val_modified = (1 if positive else -1) * val_abs_modified\n                val_modified = reduceNumberPrecisionAfterDecimalPoint(val_modified)\n                return val_modified\n    return val\ndef reduceNumberPrecisionAfterDecimalPoint(num, precision=3):\n    factor = 10**precision\n    reduced_num = int(num * factor) / factor\n    return reduced_num\nfrom ies_optim import EnergyFlowGraph\nimport random\nfrom pydantic import BaseModel\nfrom solve_model import targetTypeAsTargetName\nfrom json_utils import jsonApply\nimport hashlib\nclass 规划方案概览_翻译_工厂(ModelFactory):\n    __model__ = 规划方案概览_翻译\nclass 规划结果详情_翻译_工厂(ModelFactory):\n    __model__ = 规划结果详情_翻译\nclass 仿真结果工厂(ModelFactory):\n    __model__ = 仿真结果",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:51-88"
+    },
+    "2205": {
+        "file_id": 249,
+        "content": "This function checks if the input value is either an int or float, ensures it's not null and not zero. It then calculates the absolute value of the input, applies a precision reduction function to it, and returns the modified value. The code also includes several class definitions for model factories and one function that reduces number precision after the decimal point.",
+        "type": "comment"
+    },
+    "2206": {
+        "file_id": 249,
+        "content": "def generate_fake_output_data(input_data: EnergyFlowGraph):\n    (\n        firstMDict,\n        curve_elemsize,\n        curve_x_unit,\n        mDictCount,\n        planType,\n    ) = get_fake_output_data_params(input_data)\n    with deterministic_rng_context(input_data):\n        resultList = []\n        for _ in range(mDictCount):\n            obj_r = ObjectiveResult(\n                financialObjective=random.uniform(10, 1000),\n                environmentalObjective=random.uniform(10, 1000),\n            )\n            prt = []\n            ps = 规划方案概览_翻译_工厂.build()\n            ps.planType = planType\n            pdl = []\n            srt = []\n            for elem in firstMDict.nodes:\n                if getattr(elem, \"type\") == \"设备\":\n                    prepare_fake_calc_result_per_device(\n                        curve_elemsize, curve_x_unit, prt, pdl, srt, elem\n                    )\n                    result = 单次计算结果(\n                        objectiveResult=obj_r,\n                        planningResultTable=prt,\n                        planningSummary=ps,",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:91-123"
+    },
+    "2207": {
+        "file_id": 249,
+        "content": "The code generates a fake output data by creating an objective result, building planning related objects, and preparing a fake calculation result per device for given input data.",
+        "type": "comment"
+    },
+    "2208": {
+        "file_id": 249,
+        "content": "                        performanceDataList=pdl,\n                        simulationResultTable=srt,\n                    )\n                    resultList.append(result)\n        cr = CalculationResult(\n            resultList=resultList,\n            residualEquipmentAnnualFactor=random.uniform(0, 5),\n            success=True,\n            error_log=\"\",\n        )\n        # finally, pass to the number manipulation routines.\n        processed_cr = jsonApply(cr.dict(), modifyValueIfNumber, modifyIfIsDeviceCount)\n        pcr_obj = CalculationResult.parse_obj(processed_cr)\n        return pcr_obj\ndef prepare_fake_calc_result_per_device(\n    curve_elemsize, curve_x_unit, prt, pdl, srt, elem\n):\n    subtype = getattr(elem, \"subtype\")\n    # subtype = getattr(elem, \"subtype_hidden\", getattr(elem, 'subtype'))\n    param = getattr(elem, \"param\")\n    设备名称, 生产厂商, 设备型号 = (\n        getattr(param, \"设备名称\", \"未知\"),\n        getattr(param, \"生产厂商\", \"未知\"),\n        getattr(param, \"设备型号\", \"未知\"),\n    )\n    px = [f\"{i}{curve_x_unit}\" for i in range(curve_elemsize)]",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:124-153"
+    },
+    "2209": {
+        "file_id": 249,
+        "content": "This code defines a function to prepare fake calculation results per device. It retrieves information from the element and its parameters, such as subtype, device name, manufacturer, model, and power curve data points. The code then generates a power curve x-axis based on the curve_elemsize and curve_x_unit variables. This function is used to create fake calculation results for testing or simulation purposes.",
+        "type": "comment"
+    },
+    "2210": {
+        "file_id": 249,
+        "content": "    py = [random.uniform(-10, 10) for _ in range(curve_elemsize)]\n    pcurve = 曲线(x=px, y=py)\n    abbr = \"功率\"\n    pl = [出力曲线(name=f\"{subtype}{abbr}曲线\", abbr=abbr, data=pcurve)]\n    pr = 规划结果详情_翻译_工厂.build()\n    pr.deviceName = 设备名称\n    pr.deviceModel = 设备型号\n    pd = 设备出力曲线(name=设备名称, plot_list=pl)\n    sr = 仿真结果工厂.build()\n    sr.name = 设备名称\n    sr.type = 设备型号\n    prt.append(pr)\n    pdl.append(pd)\n    srt.append(sr)\nfrom contextlib import contextmanager\nimport os\ndef restore_randomness():\n    trng_seed = lambda: os.urandom(ies_env.ANSWER_TO_THE_UNIVERSE)\n    random.seed(trng_seed())\n    规划方案概览_翻译_工厂.seed_random(trng_seed())\n    规划结果详情_翻译_工厂.seed_random(trng_seed())\n    仿真结果工厂.seed_random(trng_seed())\n@contextmanager\ndef deterministic_rng_context(input_data: BaseModel):\n    if ies_env.DETERMINISTIC_MOCK:\n        input_hash = get_datamodel_hash(input_data)\n        random.seed(input_hash)\n        规划方案概览_翻译_工厂.seed_random(input_hash)\n        规划结果详情_翻译_工厂.seed_random(input_hash)\n        仿真结果工厂.seed_random(input_hash)\n    try:",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:154-190"
+    },
+    "2211": {
+        "file_id": 249,
+        "content": "This code is responsible for generating power curve data and creating objects representing planning results, device output curves, and simulation results. It also handles setting up the random number generator to ensure deterministic behavior if necessary. The code uses a deterministic random number generator context manager and seeds several factories with the same seed value to ensure consistent results.",
+        "type": "comment"
+    },
+    "2212": {
+        "file_id": 249,
+        "content": "        yield\n    finally:\n        if ies_env.DETERMINISTIC_MOCK:\n            restore_randomness()\ndef get_datamodel_hash(input_data: BaseModel):\n    input_bytes = input_data.json().encode(\"utf-8\")\n    input_hash = hashlib.sha1(input_bytes).digest()\n    return input_hash\ndef get_fake_output_data_params(input_data: EnergyFlowGraph):\n    firstMDict: mDict = input_data.mDictList[0]\n    calcTarget = firstMDict.graph.计算目标\n    calcStepSize = firstMDict.graph.计算步长\n    curve_elemsize, curve_x_unit = get_fake_data_curve_params(calcStepSize)\n    mDictCount = get_fake_data_mdict_count(calcTarget)\n    planType = targetTypeAsTargetName(calcTarget)\n    return firstMDict, curve_elemsize, curve_x_unit, mDictCount, planType\ndef get_fake_data_mdict_count(calcTarget):\n    if calcTarget == \"经济_环保\":\n        mDictCount = 9\n    elif calcTarget in [\"经济\", \"环保\"]:\n        mDictCount = 1\n    else:\n        raise Exception(\"Unknown calculation target: %s\" % calcTarget)\n    return mDictCount\ndef get_fake_data_curve_params(calcStepSize):\n    if calcStepSize == \"小时\":",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:191-227"
+    },
+    "2213": {
+        "file_id": 249,
+        "content": "The code contains functions for generating fake output data, calculating a hash from input data, and determining the number of mDicts based on calculation targets. The get_fake_output_data_params function retrieves specific parameters for generating fake data, while get_fake_data_mdict_count determines the number of mDicts depending on the calculation target. The code also includes exception handling for unknown calculation targets.",
+        "type": "comment"
+    },
+    "2214": {
+        "file_id": 249,
+        "content": "        curve_elemsize = 8760\n        curve_x_unit = \"时\"\n    elif calcStepSize == \"秒\":\n        curve_elemsize = 7200\n        curve_x_unit = \"秒\"\n    else:\n        raise Exception(\"Unknown calculation step size: %s\" % calcStepSize)\n    return curve_elemsize, curve_x_unit\ndef determinism_assertation(deterministic, hash1, hash2):\n    expr = lambda a, b: a == b if deterministic else a != b\n    error_msg = (\n        f\"Non-deterministic when configured as deterministic: {hash1} != {hash2}\"\n        if deterministic\n        else f\"Deterministic when configured as non-deterministic: {hash1} == {hash2}\"\n    )\n    assert expr(hash1, hash2), error_msg\n    logger_print(f\"Passed {'' if deterministic else 'non-'}determinism check.\")\nif __name__ == \"__main__\":\n    # test the util.\n    def test_determinism(input_data: EnergyFlowGraph, deterministic: bool):\n        ies_env.DETERMINISTIC_MOCK = deterministic\n        fake_output_data1 = generate_fake_output_data(input_data)\n        fake_output_data2 = generate_fake_output_data(input_data)",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:228-255"
+    },
+    "2215": {
+        "file_id": 249,
+        "content": "The code defines a function that calculates the element size and unit based on the calculation step size. It also includes a determinism assertion function that asserts whether the results are deterministic or non-deterministic, logging accordingly. The code ends with a main function for testing the utility of the defined functions.",
+        "type": "comment"
+    },
+    "2216": {
+        "file_id": 249,
+        "content": "        hash1 = get_datamodel_hash(fake_output_data1)\n        hash2 = get_datamodel_hash(fake_output_data2)\n        determinism_assertation(deterministic, hash1, hash2)\n    mock_input = \"mock_data_energy_flow_graph.json\"\n    input_data = EnergyFlowGraph.parse_file(mock_input)\n    for det in [True, False]:\n        test_determinism(input_data, det)",
+        "type": "code",
+        "location": "/microgrid_base/mock_utils.py:257-266"
+    },
+    "2217": {
+        "file_id": 249,
+        "content": "This code generates hashes for two output data sets, performs a determinism assertion check, and then tests the deterministic behavior of an EnergyFlowGraph using two input configurations.",
+        "type": "comment"
+    },
+    "2218": {
+        "file_id": 250,
+        "content": "/microgrid_base/modify_bashrc_for_mamba.py",
+        "type": "filepath"
+    },
+    "2219": {
+        "file_id": 250,
+        "content": "This code reads the root's .bashrc file, uncomments lines containing \"mamba initialize\", and rewrites the file with these changes.",
+        "type": "summary"
+    },
+    "2220": {
+        "file_id": 250,
+        "content": "from log_utils import logger_print\nwith open(BASHRC := \"/root/.bashrc\", \"r\") as f:\n    lines = f.read().split(\"\\n\")\nuncomment = lambda l: l.split(\"#\")[-1]\nflag = False\nnew_lines = []\nfor line in lines:\n    if not flag:\n        if \"mamba initialize\" in line:\n            # if \"conda initialize\" in line:\n            flag = True\n    if flag:\n        line = uncomment(line)\n    new_lines.append(line)\nwith open(BASHRC, \"w+\") as f:\n    f.write(\"\\n\".join(new_lines))",
+        "type": "code",
+        "location": "/microgrid_base/modify_bashrc_for_mamba.py:1-21"
+    },
+    "2221": {
+        "file_id": 250,
+        "content": "This code reads the root's .bashrc file, uncomments lines containing \"mamba initialize\", and rewrites the file with these changes.",
+        "type": "comment"
+    },
+    "2222": {
+        "file_id": 251,
+        "content": "/microgrid_base/natural_gas_generator_template.py",
+        "type": "filepath"
+    },
+    "2223": {
+        "file_id": 251,
+        "content": "The code snippet is a demo sketch for natural gas generator template, not intended to run. It imports logger_print from log_utils and aims to extract load-consumption rate tablet processing from diesel generators.",
+        "type": "summary"
+    },
+    "2224": {
+        "file_id": 251,
+        "content": "from log_utils import logger_print\n# just for demo purposes (sketch)\n# not for running\n# extract the load-consumption rate tablet processing from diesel generator",
+        "type": "code",
+        "location": "/microgrid_base/natural_gas_generator_template.py:1-6"
+    },
+    "2225": {
+        "file_id": 251,
+        "content": "The code snippet is a demo sketch for natural gas generator template, not intended to run. It imports logger_print from log_utils and aims to extract load-consumption rate tablet processing from diesel generators.",
+        "type": "comment"
+    },
+    "2226": {
+        "file_id": 252,
+        "content": "/microgrid_base/packup_type_system.sh",
+        "type": "filepath"
+    },
+    "2227": {
+        "file_id": 252,
+        "content": "The code is creating an archive named \"type_system.7z\" with the contents \"microgrid_v2*\" and an accompanying text file named \"type_system.md\".",
+        "type": "summary"
+    },
+    "2228": {
+        "file_id": 252,
+        "content": "7z a type_system.7z microgrid_v2* type_system.md",
+        "type": "code",
+        "location": "/microgrid_base/packup_type_system.sh:1-1"
+    },
+    "2229": {
+        "file_id": 252,
+        "content": "The code is creating an archive named \"type_system.7z\" with the contents \"microgrid_v2*\" and an accompanying text file named \"type_system.md\".",
+        "type": "comment"
+    },
+    "2230": {
+        "file_id": 253,
+        "content": "/microgrid_base/param_base.py",
+        "type": "filepath"
+    },
+    "2231": {
+        "file_id": 253,
+        "content": "The code reads configuration files for microgrid simulation, preprocesses data to create an interface set and connection type mapping table. It filters unwhitelisted devices and creates a device library by iterating over a dictionary, identifying specific keys and their types.",
+        "type": "summary"
+    },
+    "2232": {
+        "file_id": 253,
+        "content": "from log_utils import logger_print\nfrom render_type_utils import (\n    TYPE_UTILS_MICROGRID_PORTS_DATA,\n    TYPE_UTILS_EXTRA_PORTS_DATA,\n)\nimport json\ndef read_json(path):\n    with open(path, \"r\") as f:\n        return json.load(f)\nfrontend_translation_table = read_json(\"frontend_sim_param_translation.json\")\ntype_sys = {\n    \"类型分类表\": read_json(\"microgrid_v2_all_types_structured.json\"),  # （不包含设备名称）分类->能源->类型\n    \"连接类型映射表\": read_json(\"microgrid_v2_connectivity_matrix.json\"),  # \"端点1_端点2\"->生成连接类型\n    \"设备锚点类型表\": read_json(\n        \"microgrid_v2_device_port_type_mapping.json\"\n    ),  # 设备分类->设备名称->锚点名称->锚点类型\n}\ndparam_path = \"microgrid_jinja_param_base.json\"\ndparam = read_json(dparam_path)\n类型集合分类 = [\n    (mkey.replace(\"设备\", \"锚点\"), [e for (k, v) in mdata.items() for e in v])\n    for mkey, mdata in type_sys[\"类型分类表\"].items()\n]\n类型集合分类.append(\n    (\"设备\", [dev for cat, devs in type_sys[\"设备锚点类型表\"].items() for dev in devs.keys()])\n)\n# 设备接口集合 = {\n#     dev_name: set([(port_name, port_type) for port_name, port_type in ports.items()])",
+        "type": "code",
+        "location": "/microgrid_base/param_base.py:1-39"
+    },
+    "2233": {
+        "file_id": 253,
+        "content": "The code reads configuration files and populates necessary data structures for the microgrid simulation. It imports necessary functions and modules, reads JSON files containing translation tables, connection type mapping, device port type mapping, and Jinja parameter base file. The code then processes this information to create a classified set of types based on anchor points or devices and their associated ports.",
+        "type": "comment"
+    },
+    "2234": {
+        "file_id": 253,
+        "content": "#     for cat0, devs in type_sys[\"设备锚点类型表\"].items()\n#     for dev_name, ports in devs.items()\n# }\n设备接口集合 = {}\nfrom device_whitelist import device_whitelist\nfor data_dict in TYPE_UTILS_MICROGRID_PORTS_DATA, TYPE_UTILS_EXTRA_PORTS_DATA:\n    for category, device_dict in data_dict.items():\n        for dev_name, device_data in device_dict.items():\n            if dev_name not in device_whitelist:\n                continue\n            port_set = set()\n            for port_name, port_data in device_data[\"ports\"].items():\n                能流方向 = port_data[\"能流方向\"]\n                port_type = 能流方向.replace(\"进\", \"输入\").replace(\"出\", \"输出\")\n                port_set.add((port_name, port_type))\n            设备接口集合[dev_name] = port_set\n#########################\n# logger_print(设备接口集合)\n# breakpoint()\n#########################\n连接类型映射表 = {\n    frozenset((c1, c2)): c\n    for (c1, c2), c in [(k.split(\"_\"), v) for k, v in type_sys[\"连接类型映射表\"].items()]\n}\n设备库 = []\nfor super_class, v0 in dparam.items():\n    for class_name, v1 in v0.items():\n        mstrs = []",
+        "type": "code",
+        "location": "/microgrid_base/param_base.py:40-73"
+    },
+    "2235": {
+        "file_id": 253,
+        "content": "This code creates a device interface set and a connection type mapping table for microgrid devices. It iterates through the data, filters out unwhitelisted devices, and adds their interfaces to the interface set. The connection type mapping table is built based on a provided dictionary.",
+        "type": "comment"
+    },
+    "2236": {
+        "file_id": 253,
+        "content": "        mdigits = []\n        mtables = []\n        for param_super_class, v2 in v1.items():\n            # if param_super_class == \"仿真模拟\":\n            #     continue\n            for item in v2:\n                if item == \"设备选型\":\n                    continue\n                else:\n                    if type(item) == str:\n                        mstrs.append((param_super_class, item))\n                    elif type(item) == list:\n                        mdigits.append((param_super_class, item))\n                    elif type(item) == dict:\n                        main = item[\"MAIN\"]\n                        sub = item[\"SUB\"]\n                        mtables.append((param_super_class, main, sub))\n        设备库.append((super_class, class_name, mstrs, mdigits, mtables))",
+        "type": "code",
+        "location": "/microgrid_base/param_base.py:74-91"
+    },
+    "2237": {
+        "file_id": 253,
+        "content": "The code iterates over `v1` dictionary, checks for specific keys and their types (str, list or dict) within the inner loop. It creates separate lists for each type of item: `mstrs`, `mdigits`, and `mtables`. Finally, it appends these lists along with superclass and class_name to the `设备库` list.",
+        "type": "comment"
+    },
+    "2238": {
+        "file_id": 254,
+        "content": "/microgrid_base/parse_export_format.py",
+        "type": "filepath"
+    },
+    "2239": {
+        "file_id": 254,
+        "content": "The code reads Excel data, generates JSON format, handles planning results and filters irrelevant terms for microgrid simulation. It processes results, ensures unique device definitions, writes to a JSON file, and renders templates for formatting in the microgrid base.",
+        "type": "summary"
+    },
+    "2240": {
+        "file_id": 254,
+        "content": "from log_utils import logger_print\nexcel_path = \"设备信息库各参数_10_24.xlsx\"\n# excel_path = \"设备信息库各参数_10_12.xlsx\"\n# excel_path = \"设备信息库各参数.xlsx\"\nfrom lib_parse_params import repair_excel\nrepair_excel(excel_path)\nfrom jinja_utils import code_and_template_path, load_render_and_format\nimport rich\nimport re\nfrom constants import *\ncode_path, template_path = code_and_template_path(\"export_format_validate\")\ncode_unit_path, template_unit_path = code_and_template_path(\n    \"export_format_units\"\n)  # TODO: mark this as dependency as \"ies_optim.py\"\n# you may also need to render some other code to avoid circular importing issues.\n设计规划结果输出CSV = \"设备信息库各参数-规划方案及详情.csv\"  # parse this thing first.\noutput_path = \"export_format.json\"\nplanning_output_path = f\"planning_{output_path}\"\nMAKEFILE = dict(\n    inputs=[template_path, template_unit_path, excel_path, 设计规划结果输出CSV],\n    outputs=[output_path, code_path, code_unit_path, planning_output_path],\n    args=[],\n)\nimport json\n# from os import name\nimport pandas\n# --------------------------- #",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:1-41"
+    },
+    "2241": {
+        "file_id": 254,
+        "content": "This code imports necessary modules, defines variables for file paths, and initializes a dictionary of inputs and outputs for a Makefile. The code aims to parse an Excel file, generate code from templates, and output the result in JSON format. Additionally, it handles planning results by creating a separate file with a specific naming convention.",
+        "type": "comment"
+    },
+    "2242": {
+        "file_id": 254,
+        "content": "#   设计规划导出数据格式准备    #\n# --------------------------- #\n设计规划结果输出格式表格 = pandas.read_csv(\n    设计规划结果输出CSV, on_bad_lines=\"warn\", header=None\n)  # you can ignore bad lines.\n# logger_print(设计规划结果输出格式表格)\n# breakpoint()\nsubSchemas = []\n# breakpoint()\nfor colIndex in (设计规划T := 设计规划结果输出格式表格.T):\n    firstElem = (col := 设计规划T[colIndex].to_list())[0]\n    if (\n        isinstance(firstElem, str)\n        and not isinstance(col[1], str)\n        and len(firstElem) == 4\n        and firstElem.startswith(\"方案\")\n    ):\n        # logger_print(firstElem)\n        # breakpoint()\n        subSchemas.append((firstElem, colIndex))\nplanningResultSchema = {schemaName: {} for schemaName, _ in subSchemas}\nfrom unit_utils import unitParserWrapper\n# need to remove few terms before saving to disk.\nremoveTermRegexes = {\n    \"方案列表\": [r\"年平均.+\", \"方案名称\"],  # use non-greedy modifier (backtracking)\n    \"方案详情\": [\"能源消耗费用\", r\"年.+?收入\", \"出力曲线\"],\n}\nhitRecords = {k: {e: False} for k, v in removeTermRegexes.items() for e in v}\nfrom typing import List\ndef checkIfMatchAListOfRegexes(term: str, regexList: List[str], key: str):",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:42-79"
+    },
+    "2243": {
+        "file_id": 254,
+        "content": "This code reads the design planning export data format and prepares to store it. It checks for specific patterns in the data, such as \"方案\" followed by a four-character string, and extracts relevant sub-schemas. It also defines a set of terms to remove before saving to disk. The code uses regular expressions (regex) to identify and filter these terms.",
+        "type": "comment"
+    },
+    "2244": {
+        "file_id": 254,
+        "content": "    for regex in regexList:\n        if re.match(regex, term):\n            hitRecords[key][term] = True\n            return True\n    return False\ndef getSchemaType(schemaHeader, schemaHeaderUnit):\n    if schemaHeaderUnit:\n        return \"float\"\n    else:\n        if schemaHeader in [\"数量\"]:\n            return \"int\"\n        elif schemaHeader in [\"平均效率_平均COP\"]:\n            return \"float\"\n        else:\n            return \"str\"\nfor schemaName, index in subSchemas:  # why we have nan here?\n    regexList = removeTermRegexes[schemaName]\n    # Assignment expressions within a subscript are supported only in Python 3.10 and newer\n    schemaHeaderIndex = index + 1\n    schemaHeaders = 设计规划T[schemaHeaderIndex].to_list()\n    # schemaHeaders = 设计规划T[schemaHeaderIndex := index + 1].to_list()\n    # logger_print(schemaHeaders)\n    # breakpoint()\n    englishSchemaHeaderIndex = schemaHeaderIndex + 2\n    englishSchemaHeaders = 设计规划T[\n        englishSchemaHeaderIndex\n        # englishSchemaHeaderIndex := schemaHeaderIndex + 2\n    ].to_list()",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:80-112"
+    },
+    "2245": {
+        "file_id": 254,
+        "content": "The code defines a function to get the schema type based on the header and unit, iterates over subSchemas, and checks for any NaN values. The code uses regex matching to determine if a term matches specific patterns, and returns True or False accordingly. It also demonstrates assignment expressions in Python 3.10 for simplifying subscript assignments.",
+        "type": "comment"
+    },
+    "2246": {
+        "file_id": 254,
+        "content": "    # breakpoint()\n    # 去除了自来水消耗\n    remove_isna = lambda it: filter(lambda e: not pandas.isna(e), it)\n    for schemaHeader, englishSchemaHeader in zip(\n        remove_isna(schemaHeaders), remove_isna(englishSchemaHeaders)\n    ):\n        schemaHeader = schemaHeader.replace(\"/\", \"_\")  # for code generation\n        strippedSchemaHeader, schemaHeaderUnit = unitParserWrapper(schemaHeader)\n        if checkIfMatchAListOfRegexes(strippedSchemaHeader, regexList, schemaName):\n            logger_print(\"SKIPPING:\", strippedSchemaHeader)\n            continue\n        planningResultSchema[schemaName].update(\n            {\n                strippedSchemaHeader: {\n                    \"unit\": schemaHeaderUnit,  # could be \"None\"\n                    \"englishName\": englishSchemaHeader,\n                    \"type\": getSchemaType(schemaHeader, schemaHeaderUnit),\n                }\n            }\n        )\n# check if all regexes have hits.\nerrors = []\nfor k, v in hitRecords.items():\n    for e in v:\n        if e is False:\n            errors.append(f\"Error: regex {e.__repr__()} with no match!\")",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:113-139"
+    },
+    "2247": {
+        "file_id": 254,
+        "content": "This code segment appears to be filtering and processing data headers based on regex matches. It removes NaN values, replaces forward slashes with underscores, and trims the data for generating code. The code also checks if all regexes have hits without any misses, logging errors if necessary.",
+        "type": "comment"
+    },
+    "2248": {
+        "file_id": 254,
+        "content": "if errors:\n    raise Exception(\"\\n\".join(errors))\nlogger_print(planningResultSchema)\n# breakpoint()\n# store this to file. remember to mention this file in Makefile. automation tools like \"dyndep\" in ninja, or \"submake\" can be used.\nwith open(planning_output_path, \"w+\") as f:\n    f.write(json.dumps(planningResultSchema, indent=4, ensure_ascii=False))\n# -------------------------- #\ntable_name = \"仿真结果\"\ntable = pandas.read_excel(excel_path, sheet_name=table_name, header=None)\n# logger_print(table)\ndef is_empty(elem):\n    if type(elem) is str:\n        return elem.strip() == \"\"\n    else:\n        return True\ntrough = 0\ndata = {}\nfor i, r in table.iterrows():\n    rlist = [(e.strip() if type(e) == str else \"\") for e in r.tolist()]\n    first_elem, second_elem = rlist[0], rlist[1]\n    if is_empty(first_elem):\n        trough = 0\n    elif not is_empty(first_elem) and is_empty(second_elem):\n        if trough == 0:\n            trough = 1\n            key = first_elem\n        elif trough == 2:\n            device = rlist[0]\n            data[key][-1][\"devices\"].append(device)",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:141-181"
+    },
+    "2249": {
+        "file_id": 254,
+        "content": "Code reads an excel sheet, checks for empty cells, and stores data in a dictionary with keys from non-empty first cell values and appends device names to the dictionary's last key's \"devices\" list. Saves the planningResultSchema to a file using json.dumps().",
+        "type": "comment"
+    },
+    "2250": {
+        "file_id": 254,
+        "content": "    elif not is_empty(first_elem) and not is_empty(second_elem):\n        # breakpoint()\n        last_empty_index = len(rlist)\n        try:\n            last_empty_index = rlist.index(\"\")\n        except:\n            pass\n        headings = rlist[:last_empty_index]\n        trough = 2\n        data[key] = data.get(key, []) + [{\"headings\": headings, \"devices\": []}]\n# need processing.\nlogger_print(data)\nlogger_print(\"writing to:\", output_path)\nnew_data = {k: {} for k in data.keys()}\nrevmap = {\n    \"one\": [\"平均效率/平均COP\", \"设备台数\", \"时间\"],\n    # \"万元\": [\"设备维护费用\", \"柴油消耗费用\"],\n    # \"kWh\": [\"电负荷\", \"产电量\"],\n}\ndefault_unit_maps = {k: v for v, klist in revmap.items() for k in klist}\n# None -> str\nfrom unit_utils import (\n    unitCleaner,\n    unitParser,\n    standard_units,\n    unitFactorCalculator,\n    ureg,\n    translateUnit,\n)\ndef convert_format(h_array):\n    result_mapping = {}\n    for elem in h_array:\n        # elem = elem.strip()\n        elem = unitCleaner(elem)\n        result = unitParser(elem)\n        if result:\n            elem_name, unit = result[\"val_name\"], result[\"val_unit\"]",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:182-226"
+    },
+    "2251": {
+        "file_id": 254,
+        "content": "This code is parsing and processing a list of elements, breaking it into headings and devices, and storing the data in a dictionary. It also performs unit conversion using functions from the unit_utils module. The revmap dictionary contains mappings for converting units between different categories.",
+        "type": "comment"
+    },
+    "2252": {
+        "file_id": 254,
+        "content": "        else:\n            elem_name = elem\n            unit = default_unit_maps.get(elem, None)\n        if unit:\n            old_unit_name = translateUnit(unit)\n            logger_print(\"processing:\", elem_name)\n            mag, new_unit_name = unitFactorCalculator(\n                ureg, standard_units, old_unit_name\n            )\n            unit = (mag, new_unit_name, old_unit_name)\n        result_mapping[elem_name] = unit\n    return result_mapping\nnew_data[\"仿真结果\"][\"ALL\"] = convert_format(data[\"仿真结果\"][0][\"headings\"])\nfrom param_base import 设备接口集合\nall_device_names = list(设备接口集合.keys())\nlogger_print()\nlogger_print(all_device_names)\n# 外部能源 & 负荷类型\nnonDevNames = [\"柴油\", \"电负荷\", \"氢负荷\", \"冷负荷\", \"热负荷\", \"蒸汽负荷\", \"市政自来水\", \"天然气\", \"电网\", \"氢气\"]\ncommonDevParams = [\"设备型号\", \"设备台数\", \"设备维护费用\"]\ncommonParams = [\"元件名称\", \"元件类型\"]\nfor paramName in commonParams:\n    if paramName not in (dictALL := new_data[\"仿真结果\"][\"ALL\"]).keys():\n        dictALL.update({paramName: None})\nsimDevParam = {name: [] for name in all_device_names}\nnonCountableDevNames = [\"传输线\"]",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:227-259"
+    },
+    "2253": {
+        "file_id": 254,
+        "content": "This code is parsing and converting data format for microgrid simulation results. It retrieves headings from the first simulation result, creates a dictionary of common device parameters, updates missing keys in \"仿真结果\" with None values, and initializes an empty list for non-countable devices. The code also includes a logger to print information during processing.",
+        "type": "comment"
+    },
+    "2254": {
+        "file_id": 254,
+        "content": "for k in simDevParam.keys():\n    simDevParam[k].extend(commonParams)\n    if k not in nonDevNames:\n        simDevParam[k].extend(\n            [\n                e\n                for e in commonDevParams\n                if (e != \"设备台数\" if k in nonCountableDevNames else True)\n            ]\n        )\nsimParamLUT = {\n    \"产冷量\": [],\n    \"冷负荷\": [],\n    \"产热量\": [\"电解槽\", \"燃气发电机\"],\n    \"热负荷\": [],\n    \"产电量\": [\"光伏发电\", \"风力发电\", \"柴油发电\", \"燃气发电机\"],\n    \"电负荷\": [\"电负荷\", \"电解槽\"],\n    \"蒸汽产量\": [],\n    \"蒸汽负荷\": [],\n    \"氢气产量\": [\"电解槽\"],\n    \"氢气消耗量\": [\"氢负荷\"],\n    \"柴油消耗量\": [\"柴油发电\", \"柴油\"],\n    \"柴油消耗费用\": [\"柴油\"],\n    \"天然气消耗量\": [\"燃气发电机\"],\n    \"天然气消耗费用\": [],\n    \"平均效率/平均COP\": [\"柴油发电\", \"传输线\", \"变压器\", \"锂电池\", \"变流器\", \"双向变流器\"],\n    \"冷收入\": [],\n    \"热收入\": [],\n    \"电收入\": [\"电负荷\"],\n    \"蒸汽收入\": [],\n    \"氢气收入\": [\"氢负荷\"],\n    \"自来水消耗量\": [],\n    \"自来水消耗费用\": [],\n}\nall_devs_with_uniq_sim_param = [i for k in simParamLUT.values() for i in k]\nall_sim_params = list(simParamLUT.keys()) + commonDevParams + commonParams\nexcel_sim_params = set(new_data[\"仿真结果\"][\"ALL\"].keys())\nassert (setEXC := set(excel_sim_params)) == (",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:260-302"
+    },
+    "2255": {
+        "file_id": 254,
+        "content": "The code iterates over simulation device parameters, extends them with common parameters and optional additional parameters based on the device type. It then creates a dictionary (simParamLUT) mapping parameter names to lists of devices that use each parameter. All unique simulator parameters are stored in all_sim_params. The setEXC is created by comparing the excel simulation parameters to the simParamLUT keys, and an assertion checks if both sets are equal.",
+        "type": "comment"
+    },
+    "2256": {
+        "file_id": 254,
+        "content": "    setALL := set(all_sim_params)\n), f\"参数不符合:\\nEXCEL UNIQ: {setEXC.difference(setALL)}\\nCODE UNIQ: {setALL.difference(setEXC)}\"\n# ), f\"参数不符合:\\nEXCEL UNIQ: {setEXC.difference(setALL)}\\nCODE UNIQ: {setALL.difference(setEXC)}\"\nfor dev in all_device_names:\n    assert dev in all_devs_with_uniq_sim_param, f\"'{dev}'没有仿真独有参数\"\n# simParamLUT.update({\"设备维护费用\": [d for d in all_device_names if d not in nonDevNames]})\n# simDevParam =\nfor k, vlist in simParamLUT.items():\n    for v in vlist:\n        simDevParam[v].append(k)\ntableRepr = {\n    k: [\n        (\"x\" if k in simDevParam[k1] else \"\") if k != commonParams[0] else k1\n        for k1 in simDevParam.keys()\n    ]\n    for k in sorted(excel_sim_params, key=lambda x: 1 if x != commonParams[0] else 0)\n}\nimport pandas as pd\ndf = pd.DataFrame(tableRepr, index=None)\nlogger_print(df.head())\nfilepath = \"sim_param_export.xlsx\"\nlogger_print(f\"writing to: {filepath}\")\ndf.to_excel(filepath, index=False)\nfor d in all_device_names:\n    # new_data[\"仿真结果\"][d] = convert_format(simDevParam[d])",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:303-336"
+    },
+    "2257": {
+        "file_id": 254,
+        "content": "Iterates through all devices and creates a DataFrame, then writes the table to an Excel file.",
+        "type": "comment"
+    },
+    "2258": {
+        "file_id": 254,
+        "content": "    new_data[\"仿真结果\"][d] = {e: new_data[\"仿真结果\"][\"ALL\"][e] for e in simDevParam[d]}\n# type? sum or array.\n# unit conversion? divide by conversion rate.\n# in unit conversion exception list? check.\n# matched to which port?\nk = \"设备出力曲线\"\nfor elem in data[k]:\n    h, dlist = elem[\"headings\"], elem[\"devices\"]\n    for d in dlist:\n        assert d not in new_data[k].keys(), f\"错误：'{d}'在{k}中重复定义\"\n        new_data[k][d] = convert_format(h)\nlogger_print()\nlogger_print(new_data)\nwith open(output_path, \"w+\") as f:\n    f.write(json.dumps(new_data, indent=4, ensure_ascii=False))\nlogger_print(\"write to:\", output_path)\nmodel_names = [f\"{n}模型\" for n in all_device_names]\nrender_params = dict(\n    main_data=new_data,\n    nonDevNames=nonDevNames,\n    nonCountableDevNames=nonCountableDevNames,\n    每年小时数=每年小时数,\n)\n# render_params = dict(model_names=model_names, main_data=new_data)\nfrom copy import deepcopy\nload_render_and_format(\n    template_path, code_path, deepcopy(render_params), banner=\"FORMAT_VALIDATE_CODE\"\n)\nload_render_and_format(\n    template_unit_path,",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:337-375"
+    },
+    "2259": {
+        "file_id": 254,
+        "content": "This code segment is responsible for handling simulation results, parsing data, converting units, and ensuring no duplicate device definitions. It then writes the processed data to a JSON file and passes it along with other parameters to render and format templates.",
+        "type": "comment"
+    },
+    "2260": {
+        "file_id": 254,
+        "content": "    code_unit_path,\n    deepcopy(render_params),\n    banner=\"FORMAT_UNIT_CODE\",\n)",
+        "type": "code",
+        "location": "/microgrid_base/parse_export_format.py:376-379"
+    },
+    "2261": {
+        "file_id": 254,
+        "content": "This code is initializing a function call with three parameters: \"code_unit_path\" (path of the code unit), \"render_params\" (deep copied rendering parameters), and \"banner\" set to \"FORMAT_UNIT_CODE\". The purpose seems to be for parsing and formatting code units in the microgrid base.",
+        "type": "comment"
+    },
+    "2262": {
+        "file_id": 255,
+        "content": "/microgrid_base/parse_frontend_sim_param_translation.py",
+        "type": "filepath"
+    },
+    "2263": {
+        "file_id": 255,
+        "content": "The code reads a JavaScript file, parses its lines to extract English and Chinese names, creates a dictionary mapping Chinese names to English names, and writes the dictionary as a JSON file.",
+        "type": "summary"
+    },
+    "2264": {
+        "file_id": 255,
+        "content": "from log_utils import logger_print\nfilepath = \"frontend_sim_param_translation.js\"\noutput_path = \"frontend_sim_param_translation.json\"\nMAKEFILE = dict(inputs=[filepath], outputs=[output_path], args=[])\nimport parse\nwith open(filepath, \"r\") as f:\n    data = f.read()\n    lines = data.split(\"\\n\")\n    # logger_print(lines)\nresultMap = {}\nfor line in lines:\n    line = line.replace(\":\", \": \").replace(\",\", \" , \").strip()\n    while True:\n        if \" :\" in line:\n            line = line.replace(\" :\", \":\")\n        else:\n            break\n    result = parse.parse(\n        \"{englishName}:{space_1}'{sampleData}'{space_2},{space_3}//{chineseName}\", line\n    )\n    if result:\n        logger_print(result)\n        resultMap[result[\"chineseName\"].upper()] = result[\"englishName\"]\nimport json\nlogger_print(\"writing to:\", output_path)\nwith open(output_path, \"w+\") as f:\n    f.write(json.dumps(resultMap, ensure_ascii=False, indent=4))",
+        "type": "code",
+        "location": "/microgrid_base/parse_frontend_sim_param_translation.py:1-35"
+    },
+    "2265": {
+        "file_id": 255,
+        "content": "The code reads a JavaScript file, parses its lines to extract English and Chinese names, creates a dictionary mapping Chinese names to English names, and writes the dictionary as a JSON file.",
+        "type": "comment"
+    },
+    "2266": {
+        "file_id": 256,
+        "content": "/microgrid_base/parse_optim_constraints.py",
+        "type": "filepath"
+    },
+    "2267": {
+        "file_id": 256,
+        "content": "This code reads and parses a file for optimizer constraints in a microgrid's codebase, identifies related class and function definitions, and logs their types and names as hints. It also checks \"compute\" functions to print their defined constraints.",
+        "type": "summary"
+    },
+    "2268": {
+        "file_id": 256,
+        "content": "from log_utils import logger_print\nfilepath = \"ies_optim.py\"\noutput_path = \"constraints.log\"\nMAKEFILE = dict(inputs=[filepath], outputs=[output_path], args=[\">\", output_path])\nwith open(filepath, \"r\") as f:\n    content = f.read()\nimport ast\nmfile = ast.parse(content)\n# logger_print(mfile, dir(mfile))\n# breakpoint()\nimport astor\nTS = lambda ast_tree: astor.code_gen.to_source(ast_tree)\ndef printTypeAndNameHint(TYPE: str, NAME: str, indent: int = 0):\n    logger_print()\n    logger_print(f\"{' '*indent}[{TYPE}]========================[{NAME}]\")\ndef walkElemAndPrintConstraint(\n    elem: ast.AST, TYPE: str, NAME: str, trial=True, indent=0\n):\n    if not trial:\n        printTypeAndNameHint(TYPE, NAME, indent=indent)\n    hasCode = False\n    for w in ast.walk(elem):\n        if type(w) == ast.Call:\n            callName = astor.to_source(w.func).strip()\n            if \"constraint\" in callName.lower() and \"register\" not in callName:\n                callCode = (\n                    astor.to_source(w)\n                    .strip()",
+        "type": "code",
+        "location": "/microgrid_base/parse_optim_constraints.py:1-39"
+    },
+    "2269": {
+        "file_id": 256,
+        "content": "This code reads the content of a file (ies_optim.py), parses it using ast, and then walks through each element to check for constraint functions. If found, the function name is logged along with its type. The logger_print function is used for logging, and there's an option to break at any point during execution.",
+        "type": "comment"
+    },
+    "2270": {
+        "file_id": 256,
+        "content": "                    .replace(callName, callName.split(\".\")[-1])\n                )\n                hasCode = True\n                if not trial:\n                    logger_print(\" \" * (indent + 4) + callCode)\n    if trial:\n        if hasCode:\n            walkElemAndPrintConstraint(elem, TYPE, NAME, trial=False, indent=indent)\n    return hasCode\nfor elem in mfile.body:\n    if type(elem) == ast.ClassDef:\n        cname = elem.name\n        # logger_print(cname)\n        if cname.endswith(\"模型\"):\n            if cname == \"设备模型\":\n                printTypeAndNameHint(\"CLASS\", cname)\n                for e in elem.body:\n                    if type(e) == ast.FunctionDef:\n                        walkElemAndPrintConstraint(e, \"FUNC\", e.name, indent=4)\n            else:\n                walkElemAndPrintConstraint(elem, \"CLASS\", cname)\n    elif type(elem) == ast.FunctionDef:\n        funcName = elem.name\n        if funcName == \"compute\":\n            walkElemAndPrintConstraint(elem, \"FUNC\", funcName)",
+        "type": "code",
+        "location": "/microgrid_base/parse_optim_constraints.py:40-66"
+    },
+    "2271": {
+        "file_id": 256,
+        "content": "This code is parsing optimizer constraints from a microgrid's codebase. It identifies specific class and function definitions related to optimization and prints their types and names as hints. It also checks for \"compute\" functions within these classes and walks through their elements to print the constraints they define.",
+        "type": "comment"
+    },
+    "2272": {
+        "file_id": 257,
+        "content": "/microgrid_base/parse_params.py",
+        "type": "filepath"
+    },
+    "2273": {
+        "file_id": 257,
+        "content": "This code imports functions, sets FLAGS, parses XLSX files to JSON and CSVs to JSON. It checks CSV flag, iterates over filepaths, calls parser function for CSV conversion, prints separator line after each conversion.",
+        "type": "summary"
+    },
+    "2274": {
+        "file_id": 257,
+        "content": "from log_utils import logger_print\n# FLAGS = {\"XLSX\": False, \"CSV\": True}\nimport os\ntype_utils_resdir = \"type_utils_resources\"\nfpath_under_type_utils_resdir = lambda fpath: os.path.join(type_utils_resdir, fpath)\nTYPE_UTILS_MICROGRID_PORTS = fpath_under_type_utils_resdir(\"microgrid_ports\")\nTYPE_UTILS_EXTRA_PORTS = fpath_under_type_utils_resdir(\"extra_ports\")\nport_type_def_excel_name = \"设备接口_11_3\"\nif __name__ == \"__main__\":\n    FLAGS = {\"XLSX\": True, \"CSV\": True}\n    from lib_parse_params import main_parser, csv_parser\n    xlsx_worklist = [\n        (\"设备信息库各参数_23_10_11_from_7_24\", \"基础参数\", \"device_params_intermediate\"),\n        # (\"设备信息库各参数_23_7_24\", \"基础参数\", \"device_params_intermediate\"),\n        (\n            fpath_under_type_utils_resdir(port_type_def_excel_name),\n            # fpath_under_type_utils_resdir(\"设备接口_10_11\"),\n            \"微电网接口\",\n            TYPE_UTILS_MICROGRID_PORTS,\n        ),\n        (\n            fpath_under_type_utils_resdir(port_type_def_excel_name),\n            # fpath_under_type_utils_resdir(\"设备接口_10_11\"),",
+        "type": "code",
+        "location": "/microgrid_base/parse_params.py:1-30"
+    },
+    "2275": {
+        "file_id": 257,
+        "content": "The code imports necessary functions and defines paths for different file types. It then sets the FLAGS for both XLSX and CSV parsing to True, and calls the main parser function from lib_parse_params module. The code also includes a list of workbook names, descriptions, and output directories for XLSX files, including one for microgrid interfaces.",
+        "type": "comment"
+    },
+    "2276": {
+        "file_id": 257,
+        "content": "            \"新增设备接口\",\n            TYPE_UTILS_EXTRA_PORTS,\n        ),\n        # (\"设备信息库各参数\", \"基础参数\", \"device_params_intermediate\"),\n        # (\"设备信息库各参数\", \"设备参数\", \"device_params_intermediate\"),\n        # cannot work with all excels. damn it.\n        # (\"设备接口\", \"微电网参数\", \"microgrid_device_params_intermediate\"),\n    ]\n    csv_worklist = [\n        (\"设备接口-微电网参数\", \"microgrid_device_params_intermediate\"),  # this is not enough.\n    ]\n    MAKEFILE = dict(\n        inputs=[e[0] + \".csv\" for e in csv_worklist]\n        + [e[0] + \".xlsx\" for e in xlsx_worklist],\n        outputs=[e[-1] + \".json\" for e in csv_worklist + xlsx_worklist],\n        args=[],\n    )\n    if FLAGS[\"XLSX\"]:\n        for filepath, sheet_name, output_path in xlsx_worklist:\n            type_utils_parser = False\n            if filepath.startswith(type_utils_resdir):\n                type_utils_parser = True\n            main_parser(\n                f\"{filepath}.xlsx\", sheet_name, f\"{output_path}.json\", type_utils_parser\n            )\n            logger_print(\"____\")",
+        "type": "code",
+        "location": "/microgrid_base/parse_params.py:31-59"
+    },
+    "2277": {
+        "file_id": 257,
+        "content": "This code defines input and output files for two data formats (.csv and .xlsx) and creates a dictionary \"MAKEFILE\" with the details. It then checks if XLSX flag is set, and if so, it parses each specified XLSX file using appropriate parser functions, storing results in corresponding JSON files.",
+        "type": "comment"
+    },
+    "2278": {
+        "file_id": 257,
+        "content": "    if FLAGS[\"CSV\"]:\n        for filepath, output_path in csv_worklist:\n            csv_parser(f\"{filepath}.csv\", f\"{output_path}.json\")\n            logger_print(\"____\")",
+        "type": "code",
+        "location": "/microgrid_base/parse_params.py:61-64"
+    },
+    "2279": {
+        "file_id": 257,
+        "content": "The code block checks if the CSV flag is set, then iterates over filepaths and output paths from the csv_worklist. It calls the csv_parser function to convert CSV files to JSON at the specified output path and prints a separator line after each conversion.",
+        "type": "comment"
+    },
+    "2280": {
+        "file_id": 258,
+        "content": "/microgrid_base/parse_units_and_names.py",
+        "type": "filepath"
+    },
+    "2281": {
+        "file_id": 258,
+        "content": "The code imports modules, defines paths and formats, retrieves table data, checks microgrid devices, processes nested tables, handles exceptions, updates dictionaries, converts units, categorizes units, populates output data, ensures unit compatibility, and writes JSON data.",
+        "type": "summary"
+    },
+    "2282": {
+        "file_id": 258,
+        "content": "from log_utils import logger_print\n# main_path = \"device_params_intermediate.json\" # data parse here. since we are changing the main table.\n# device_name_path = \"microgrid_device_params_intermediate.json\" # just for reference.\ndevice_data_path_base = \"device_params_intermediate.json\"\nfrom render_type_utils import (\n    TYPE_UTILS_MICROGRID_PORTS_DATA,\n    TYPE_UTILS_EXTRA_PORTS_DATA,\n)\nmicrogrid_device_port_path = \"microgrid_v2_device_port_type_mapping.json\"\n# microgrid_device_port_path = \"microgrid_device_port_type_mapping.json\" # shall you update this to v2.\noutput_path = \"microgrid_jinja_param_base.json\"\nMAKEFILE = dict(\n    inputs=[\n        device_data_path_base,\n        #  microgrid_device_port_path\n    ],\n    outputs=[output_path],\n    args=[],\n)\nimport pint\nimport json\nimport rich\nfrom unit_utils import (\n    unitFactorCalculator,\n    ureg,\n    standard_units,\n    getSingleUnitConverted,\n    translateUnit,\n)\nEXCEL = \"嵌套\"\nMEASURE = \"调度\"\nTABLE_FORMATS = {\n    \"燃油消耗率\": {str(ureg.Unit(\"m3 / kWh\")): (\"负载率\", \"%\")},\n    \"燃气消耗率\": {str(ureg.Unit(\"m3 / kWh\")): (\"负载率\", \"%\")},",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:1-46"
+    },
+    "2283": {
+        "file_id": 258,
+        "content": "The code imports necessary modules, defines paths and constants for device parameter parsing and processing. It uses dictionaries to specify formats and units, and a makefile to define inputs and outputs for the process. The code also utilizes unit conversion and translation functions from external libraries.",
+        "type": "comment"
+    },
+    "2284": {
+        "file_id": 258,
+        "content": "}\ndef get_table_format(k, u):\n    try:\n        t = TABLE_FORMATS\n        return t[k][str(u)]  # name, unit\n    except:\n        raise Exception(\"No table format for\", k, u)\nwith open(device_data_path_base, \"r\") as f:\n    device_data = json.load(f)\nwith open(microgrid_device_port_path, \"r\") as f:\n    port_dict = json.load(f)\ndata = {}\nfrom device_whitelist import device_whitelist\n# device_whitelist = ['柴油', '电负荷', '光伏发电', '风力发电', '柴油发电', '锂电池', '变压器', '变流器', '双向变流器', '传输线']\nall_microgrid_device_keys = []  # replace this with something else.\nfor port_dict in [TYPE_UTILS_MICROGRID_PORTS_DATA, TYPE_UTILS_EXTRA_PORTS_DATA]:\n    for k, v in port_dict.items():\n        for k1, v1 in v.items():\n            # if True:\n            if k1 in device_whitelist:\n                k0 = f\"{k}-{k1}\"\n                device_whitelist.append(k1)\n                all_microgrid_device_keys.append(k0)\n# logger_print(device_whitelist)\n# exit()\ndata = {}\ndata_is_excel = {}\ndef none_fallback(e):\n    if type(e) != str:\n        return \"\"\n    return e",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:47-89"
+    },
+    "2285": {
+        "file_id": 258,
+        "content": "Code defines a function to retrieve table formats based on key and unit, reads device data and port dictionary from JSON files, checks for microgrid devices in the device_whitelist, and returns the data.",
+        "type": "comment"
+    },
+    "2286": {
+        "file_id": 258,
+        "content": "# breakpoint()\nfor k, v in device_data.items():\n    for k1, v1 in v.items():\n        k1 = k1.replace(\"（\", \"(\").split(\"(\")[0].strip()\n        k0 = f\"{k}-{k1}\"\n        # if k1 == '传输线': breakpoint()\n        if (\n            k0 in all_microgrid_device_keys\n        ):  # all_microgrid_device_keys does not have 传输线\n            vlist = []\n            v_is_excel_list = []\n            for v2 in v1:\n                v2 = [none_fallback(e) for e in v2]\n                val = v2[0].strip()\n                if val == \"-\":\n                    continue\n                v_is_excel = (EXCEL in v2[1]) or (EXCEL in v2[2])\n                v_is_measured = MEASURE in v2[2]\n                if not v_is_measured:\n                    vlist.append(val)\n                    v_is_excel_list.append(v_is_excel)\n            data[k] = data.get(k, {})\n            data[k][k1] = vlist\n            data_is_excel[k] = data_is_excel.get(k, {})\n            data_is_excel[k][k1] = v_is_excel_list\n        else:\n            continue\n# 没有其他类元件：母线和母线接口\n# logger_print(data_is_excel)",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:92-126"
+    },
+    "2287": {
+        "file_id": 258,
+        "content": "This code is iterating through device data, extracting and parsing specific key-value pairs. If a certain key is found in all_microgrid_device_keys, it creates lists to store the values and their corresponding excel flags, otherwise it continues without doing anything. This process does not include other elements such as busbars and busbar taps. The code then prints the data regarding excel usage.",
+        "type": "comment"
+    },
+    "2288": {
+        "file_id": 258,
+        "content": "# breakpoint()\n# cat -> name -> [bool]\n# 锂电池\n# 年放电量需求(kWh) * 换芯周期(年) <= 电池机组容量(kWh) * 循环寿命(年) * 0.85\n# 作为电池数量限制的一部分\nimport parse\n# import pint\n# with open(path, \"r\") as f:\n#     data = json.load(f)\nkeys = list(data.keys())\nlogger_print(keys)\nlogger_print(data)\nCHAR_TYPE = [\"生产厂商\", \"设备型号\"]\nCOMMENT_TYPE = [\"从文件导入、保存数据、从典型库导入\"]\nMETA_TYPE = [\n    \"设备额定运行参数\",\n    \"设备经济性参数\",\n    \"设备运行约束\",\n]  # parse this?\nSKIP_TYPE = [\"设计规划拓扑图右侧菜单\", \"设计规划系统-拓扑图右侧菜单\"]\nBASE_TRANSLATION_TABLE_WITH_BASE_UNIT = {\n    \"Area\": (\n        \"m2\",\n        {\"\": [\"光伏板面积\"], \"MaxInstall-\": [\"最大安装面积\"], \"MinInstall-\": [\"最小安装面积\"]},\n    ),\n    \"Load\": (\"percent\", {\"\": [\"负载率\"]}),\n    \"Efficiency\": (\n        \"one\",\n        {\n            \"HydrogenGeneration-\": [\"制氢效率\"],\n            \"PowerConversion-\": [\"电电转换效率\"],\n            \"HeatRecycle-\": [\"热量回收效率\"],\n            \"Charge-\": [\"充能效率\"],\n            \"Discharge-\": [\"放能效率\"],\n            \"\": [\"效率\"],\n        },\n    ),\n    \"Parameter\": (\"one\", {\"Power-\": [\"功率因数\"], \"LoadRedundancy-\": [\"变压器冗余系数\"]}),\n    \"Count\": (\n        \"台\",\n        {\"Device-\": [\"安装台数\"], \"MaxDevice-\": [\"最大安装台数\"], \"MinDevice-\": [\"最小安装台数\"]},",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:127-179"
+    },
+    "2289": {
+        "file_id": 258,
+        "content": "This code appears to be parsing various unit types and their corresponding names from a JSON file. The units include Area, Load, Efficiency, Parameter, and Count. These units likely represent different attributes or specifications of various devices in a microgrid system. The code is also categorizing these units into different categories such as CHAR_TYPE, COMMENT_TYPE, META_TYPE, and SKIP_TYPE.",
+        "type": "comment"
+    },
+    "2290": {
+        "file_id": 258,
+        "content": "    ),\n    \"Length\": (\"km\", {\"\": [\"长度\"]}),\n    \"Power\": (\n        \"kW\",\n        {\n            \"RatedInput-\": [\"额定输入功率\"],\n            \"Rated-\": [\"额定功率\", \"额定发电功率\", \"变压器容量\"],\n            \"UnitRated-\": [\"组件额定功率\"],\n            \"Max-\": [\"最大发电功率\"],\n            \"Cutout-\": [\"切出功率\"],\n        },\n    ),\n    \"Rate\": (\n        \"one\",\n        {\"HotWaterToElectricity-\": [\"缸套水热电比\"], \"HotGasToElectricity-\": [\"烟气热电比\"]},\n    ),\n    \"HydrogenGenerationStartupRate\": (\"percent\", {\"\": [\"制氢启动功率比值\"]}),\n    \"WindSpeed\": (\"m/s\", {\"Rated-\": [\"额定风速\"], \"Min-\": [\"切入风速\"], \"Max-\": [\"切出风速\"]}),\n    \"DieselToPower\": (\"L/kWh\", {\"\": [\"燃油消耗率\"]}),\n    \"NaturalGasToPower\": (\"m3/kWh\", {\"\": [\"燃气消耗率\"]}),\n    \"StartupLimit\": (\"percent\", {\"Power-\": [\"启动功率百分比\"]}),\n    \"PowerConsumptionVariationRate\": (\"percent\", {\"\": [\"用电波动率\"]}),\n    \"DeltaLimit\": (\n        \"one/second\",\n        {\n            \"\": [\"爬坡率\"],\n            \"Power-\": [\n                \"发电爬坡率\",\n            ],\n            \"Battery-\": [\"电池充放电倍率\"],\n        },\n    ),  # two unit system.\n    \"SOC\": (\"percent\", {\"Min-\": [\"最小SOC\"], \"Max-\": [\"最大SOC\"], \"Init-\": [\"初始SOC\"]}),",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:180-212"
+    },
+    "2291": {
+        "file_id": 258,
+        "content": "This code defines various units and names used in the microgrid system. It includes units like \"kW\" for power, \"km\" for length, and \"percent\" for rate, startup limit, and power consumption variation rate. The code also contains translations for different languages and specific terms related to power generation, gas consumption, wind speed, diesel usage, and battery charging/discharging rates.",
+        "type": "comment"
+    },
+    "2292": {
+        "file_id": 258,
+        "content": "    \"StorageDecay\": (\"percent/hour\", {\"Battery-\": [\"存储衰减\"]}),\n    \"TransferDecay\": (\"kW/km\", {\"Power-\": [\"能量衰减系数\"]}),\n    \"BuildBaseCost\": (\"万元\", {\"\": [\"建设费用基数\"]}),\n    \"CostPerKilowatt\": (\"万元/kW\", {\"\": [\"采购成本\"], \"Build-\": [\"建设费用系数\"]}),\n    \"CostPerCapacity\": (\"万元/kWh\", {\"\": [\"采购成本\"], \"Build-\": [\"建设费用系数\"]}),\n    \"CostPerKilometer\": (\"万元/km\", {\"\": [\"采购成本\"], \"Build-\": [\"建设费用系数\"]}),\n    \"CostPerMachine\": (\"万元/台\", {\"\": [\"采购成本\"], \"Build-\": [\"建设费用系数\"]}),\n    \"CostPerYearPerMachine\": (\n        \"万元/(台*年)\",\n        {\n            \"\": [\"固定维护成本\"],\n        },\n    ),\n    \"CostPerYearPerKilowatt\": (\"万元/(kW*年)\", {\"\": [\"固定维护成本\"]}),\n    \"CostPerYearPerCapacity\": (\"万元/(kWh*年)\", {\"\": [\"固定维护成本\"]}),\n    \"VariationalCostPerWork\": (\"元/kWh\", {\"\": [\"可变维护成本\"]}),\n    # \"VariationalCostPerVolume\": (\"元/m3\", {\"\": [\"可变维护成本\"]}),\n    \"CostPerYearPerKilometer\": (\"万元/(km*年)\", {\"\": [\"维护成本\"]}),\n    \"Life\": (\"年\", {\"\": [\"设计寿命\"], \"Battery-\": [\"电池换芯周期\"]}),\n    \"LifetimeCycleCount\": (\"one\", {\"\": [\"等效完全循环次数\"]}),\n    \"Capacity\": (\n        \"kWh\",\n        {",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:213-235"
+    },
+    "2293": {
+        "file_id": 258,
+        "content": "This code defines various cost and decay parameters for microgrid components, such as storage decay, transfer decay, build base cost, and cost per capacity. It also includes details like lifecycle counts and design life for different components. The code is in Chinese.",
+        "type": "comment"
+    },
+    "2294": {
+        "file_id": 258,
+        "content": "            \"Rated-\": [\"额定容量\"],\n            \"MaxTotal-\": [\"最大设备容量\"],\n            \"MinTotal-\": [\"最小设备容量\"],\n            \"Total-\": [\"设备容量\"],\n            \"TotalDischarge-\": [\"生命周期总放电量\"],\n        },\n    ),\n}  # EnglishName: (ReferenceBaseUnit, {convert_string:[ChineseName, ...], ...})\n# checking these units.\n# they shall never be going too far.\n# for k, v in BASE_TRANSLATION_TABLE_WITH_BASE_UNIT.items():\n#     v_unit = v[0]\n#     mag, munit = unitFactorCalculator(ureg, standard_units, v_unit)\n#     if mag != 1:\n#         logger_print(\"-\"*20)\n#         logger_print(\"ERROR! MAGNITUDE:\", mag)\n#         logger_print(\"KEY:\", k)\n#         logger_print(\"ORIGINAL UNIT:\", v_unit)\n#         logger_print(\"CONVERTED UNIT:\", munit)\n#         logger_print(\"-\"*20)\n#         raise Exception(\"Standard Unit Error\")\n# TODO: check if units are compatible. set standard units.\n##################\n# convert_string: \"[prefix][-][suffix]\"\n# contain either 1 or no hyphen.\n# if contain no hyphen, it must be empty string.\ndef parse_convert_string(convert_string: str):",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:236-268"
+    },
+    "2295": {
+        "file_id": 258,
+        "content": "This code checks the units in the BASE_TRANSLATION_TABLE_WITH_BASE_UNIT and ensures they are within acceptable limits. It uses unitFactorCalculator to convert and compare the original unit with a standard unit, raising an exception if the magnitude is not 1. The function parse_convert_string takes a convert_string argument, which contains either one or no hyphen and is expected to be empty if it contains no hyphen.",
+        "type": "comment"
+    },
+    "2296": {
+        "file_id": 258,
+        "content": "    convert_string = convert_string.strip()\n    hyphen_count = convert_string.count(\"-\")\n    prefix = \"\"\n    suffix = \"\"\n    if hyphen_count == 1:\n        if convert_string.startswith(\"-\"):\n            suffix = convert_string.strip(\"-\")\n        elif convert_string.endswith(\"-\"):\n            prefix = convert_string.strip(\"-\")\n        else:  # in the middle!\n            prefix, suffix = convert_string.split(\"-\")\n        prefix = prefix.strip()\n        suffix = suffix.strip()\n    elif hyphen_count == 0:\n        if len(convert_string) != 0:\n            raise Exception(\"You should pass an empty string this time\")\n    else:\n        raise Exception(\"Invalid convert string:\", convert_string)\n    return prefix, suffix\nTRANSLATION_TABLE = {}\n# BASE_TRANSLATION_TABLE = {}\nBASE_CLASS_TO_UNIT_TABLE = {}\nfor k, v in BASE_TRANSLATION_TABLE_WITH_BASE_UNIT.items():\n    for k1, v1 in v[1].items():\n        prefix, suffix = parse_convert_string(k1)\n        k0 = prefix + k.strip() + suffix\n        # BASE_TRANSLATION_TABLE.update({k0: v1})",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:269-299"
+    },
+    "2297": {
+        "file_id": 258,
+        "content": "The code segment is responsible for parsing the convert string, which contains a prefix and suffix separated by hyphens. It checks if there's only one hyphen in the convert string, and then determines whether the prefix or suffix is at the start or end of the string. If there are more than one hyphens or an empty string is passed, it raises exceptions. The code also populates a translation table using the prefix, suffix, base, and unit information from the input dictionary.",
+        "type": "comment"
+    },
+    "2298": {
+        "file_id": 258,
+        "content": "        # BASE_CLASS_TO_UNIT_TABLE.update({k0: v[0]})\n        BASE_CLASS_TO_UNIT_TABLE[k0] = v[0]\n        for v2 in v1:\n            TRANSLATION_TABLE[v2] = TRANSLATION_TABLE.get(v2, []) + [k0]\n        # BASE_CLASS_TO_UNIT_TABLE[k] = BASE_CLASS_TO_UNIT_TABLE.get(k0, []) + [v[0]]\n# logger_print()\n# logger_print(BASE_CLASS_TO_UNIT_TABLE)\n# breakpoint()\n# logger_print()\n# logger_print(TRANSLATION_TABLE)\n# breakpoint()\n# BASE_CLASS_TO_UNIT_TABLE = {\n#     k: v[0] for k, v in BASE_TRANSLATION_TABLE_WITH_BASE_UNIT.items()\n# }\n# logger_print(BASE_TRANSLATION_TABLE)\n# logger_print(TRANSLATION_TABLE)\n# breakpoint()\n# TRANSLATION_TABLE = revert_dict(BASE_TRANSLATION_TABLE)\n# TRANSLATION_TABLE = revert_dict({k: v for k, v in BASE_TRANSLATION_TABLE.items()})\n# LIST_TYPE = [\n#     \"嵌套表格\"\n# ]  # check this in the 2nd index  # notice, list contains multiple headings, each heading may have its own unit.\ndef add_range_translation(mdict, source, target):\n    mdict.update(\n        {\n            f\"最大{source}\": f\"Max{target}\",\n            f\"最小{source}\": f\"Min{target}\",",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:300-334"
+    },
+    "2299": {
+        "file_id": 258,
+        "content": "This code updates dictionaries, defining unit translations and base class to unit mappings. It processes nested table headings and creates a function for adding range translations.",
+        "type": "comment"
+    }
+}

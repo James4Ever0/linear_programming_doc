@@ -1,0 +1,546 @@
+{
+    "1500": {
+        "file_id": 190,
+        "content": "/microgrid_base/failsafe_utils.py",
+        "type": "filepath"
+    },
+    "1501": {
+        "file_id": 190,
+        "content": "The code provides a `FileLogger` class and `solver_exec_script` function for executing solver scripts, handling file redirection, parsing output, navigating directories, and loading solution files in a microgrid system. It also generates optimization scripts, performs feasibility checks, defines a failsafe method for SCIP, and presents a utility function using IPOPT solver.",
+        "type": "summary"
+    },
+    "1502": {
+        "file_id": 190,
+        "content": "from log_utils import logger_print\nfrom config import ies_env\nfrom contextlib import contextmanager\nfrom log_utils import logger_traceback\n# from ies_optim import *\nfrom enum import auto, IntEnum\nfrom debug_utils import ExportedModel, modelSolvedTestContext\nimport random\nimport sys\nfrom pyomo_environ import *\nimport tempfile\nfrom constants import *\nimport os\nfrom typing import List\n# we need a configurable context manager which suppress exception.\n@contextmanager\ndef failsafe_suppress_exception(hint=\"failsafe suppressed exception:\"):\n    try:\n        yield\n    except Exception as e:\n        if not ies_env.FAILSAFE:\n            raise e\n        else:\n            logger_traceback(hint, stacklevel=5)\nimport inspect\nclass MethodRegistry(list):\n    \"\"\"\n    A registry of methods, used to register methods with given signature.\n    \"\"\"\n    def __init__(self, signature: List[str]):\n        self.signature = signature\n        self.names = set()\n        super().__init__()\n    def check_signature(self, obj):\n        obj_sig = inspect.signature(obj)",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:1-45"
+    },
+    "1503": {
+        "file_id": 190,
+        "content": "The code defines a context manager to suppress exceptions, a MethodRegistry class for registering methods with given signatures, and imports necessary modules. The context manager is used to prevent exceptions from propagating in failsafe mode, while the MethodRegistry class helps register methods based on their signature.",
+        "type": "comment"
+    },
+    "1504": {
+        "file_id": 190,
+        "content": "        obj_keys = list(obj_sig.parameters.keys())\n        assert (\n            obj_keys == self.signature\n        ), \"Signature mismatch: (registered signature: {}, given signature: {})\".format(\n            self.signature, obj_keys\n        )\n        return True\n    def add(self, obj):\n        name = obj.__name__\n        if name not in self.names:\n            if self.check_signature(obj):\n                self.names.add(name)\n                self.append(obj)\n    def register(self, obj):\n        self.add(obj)\n        return obj\nfailsafe_methods = MethodRegistry(signature=[\"mw\", \"logdir\"])\ndef quote(s: str, q='\"'):\n    return q + s + q\nfrom pyomo.common.tee import TeeStream\nfrom pyomo.common.log import LogStream\nimport datetime\nclass FileLogger:\n    def __init__(self, fname: str):\n        self.fname = fname\n        self.handle = open(fname, \"a+\")\n        self.handle.write(datetime.datetime.now().isoformat().center(70, \"=\") + \"\\n\")\n        # self.handle = open(fname, \"w+\")\n    def log(self, level, message):\n        logger_print(message)",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:46-86"
+    },
+    "1505": {
+        "file_id": 190,
+        "content": "The code defines a class `FileLogger` that writes log messages to a file, along with the current timestamp. It also includes a `MethodRegistry` for registering and checking the signatures of functions. The `quote` function adds quotation marks around its argument, while `TeeStream` and `LogStream` are imported from `pyomo.common`.",
+        "type": "comment"
+    },
+    "1506": {
+        "file_id": 190,
+        "content": "        self.handle.write(message + \"\\n\")\n    def __del__(self):\n        self.handle.close()\n        del self.fname\n        del self.handle\nimport subprocess\ndef solver_exec_script(solver: Solver, script: List[str], logfile: str, timeout: float):\n    check_script_is_not_empty(script)\n    cmd = [solver, *script]\n    flogger = FileLogger(logfile)\n    logger_print(\"running solver:\", cmd)\n    return_code = -1\n    try:\n        with failsafe_suppress_exception():\n            ostreams = [LogStream(level=None, logger=flogger), sys.stdout]\n            # cmd = \" \".join([e if \" \" not in e else quote(e) for e in cmd ])\n            # return_code = os.system(cmd)\n            with TeeStream(*ostreams) as t:\n                cp = subprocess.run(\n                    cmd,\n                    timeout=timeout,\n                    stdout=t.STDOUT,\n                    stderr=t.STDERR,\n                    universal_newlines=True,\n                )\n                return_code = cp.returncode\n            # cmd = f\"{Solver.cplex} -c {' '.join([quote(e) for e in script])}\"",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:87-120"
+    },
+    "1507": {
+        "file_id": 190,
+        "content": "The code defines a class `FileLogger` for logging output to a file and a function `solver_exec_script` that executes a script using a solver, with the option to log the execution to a specified logfile. The `FileLogger` writes messages to a handle and closes it in its destructor. The `solver_exec_script` function checks that the script is not empty, constructs the command from the solver and script elements, initializes a `FileLogger` for logging output, tries running the command using `subprocess.run`, suppressing exceptions with `failsafe_suppress_exception`, and returns the exit code of the subprocess. The function also handles stdout and stderr redirection through `TeeStream` to log both normal and error output to the specified logfile or stdout/stderr if no logfile is provided.",
+        "type": "comment"
+    },
+    "1508": {
+        "file_id": 190,
+        "content": "            # return_code = os.system(cmd)\n        return return_code\n    finally:\n        del flogger\ndef cplex_exec_script(script: List[str], logfile: str, timeout: float):\n    check_script_is_not_empty(script)\n    return solver_exec_script(Solver.cplex, [\"-c\", *script], logfile, timeout)\ndef check_script_is_not_empty(script):\n    assert len(script) > 0, \"no script to execute\"\ndef scip_exec_script(script: List[str], logfile: str, timeout: float):\n    check_script_is_not_empty(script)\n    args = []\n    for s in script:\n        args.append(\"-c\")\n        args.append(s)\n    return solver_exec_script(Solver.scip, args, logfile, timeout)\nSCIP_NOT_SOLVED_KW = \"no solution available\"\nSCIP_SOLVED_KW = \"objective value\"\ndef check_scip_if_solved(first_two_lines: list[str]):\n    _c = \"\\n\".join(first_two_lines)\n    if SCIP_SOLVED_KW in _c:\n        return True\n    elif SCIP_NOT_SOLVED_KW in _c:\n        return False\n    else:\n        raise Exception(\n            f\"Unknown scip solution conditon. Is it a scip solution file?\\nFirst two lines:\\n{_c}\"",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:121-157"
+    },
+    "1509": {
+        "file_id": 190,
+        "content": "The code is a part of a microgrid system that involves executing scripts with different solvers, such as CPLEX and SCIP. It includes functions for running the scripts, checking if the script is empty or not, and verifying if a SCIP solution file contains a solved or unsolved condition.",
+        "type": "comment"
+    },
+    "1510": {
+        "file_id": 190,
+        "content": "        )\nimport re\nREGEX_FIND_NON_BLANK_SEGMENTS = re.compile(r\"[^ \\t]+\")\nTWO = 2\ndef parse_scip_solution_content(content: str):\n    lines = content.strip().split(\"\\n\")\n    first_two_lines = lines[:TWO]\n    solution_lines = lines[TWO:]\n    solved = check_scip_if_solved(first_two_lines)\n    solution = {}\n    if solved:\n        for line in solution_lines:\n            line = line.strip()\n            if len(line) > 0:\n                candidates = REGEX_FIND_NON_BLANK_SEGMENTS.findall(line)\n                if len(candidates) >= TWO:\n                    try:\n                        varname, value_str = candidates[:TWO]\n                        varname = varname.strip()\n                        if len(varname) > 0:\n                            value = float(value_str)\n                            solution[varname] = value\n                    except TypeError:\n                        pass\n                    except Exception as e:\n                        raise e\n    return solution\n@contextmanager\ndef chdir_context(dirpath: str):",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:158-193"
+    },
+    "1511": {
+        "file_id": 190,
+        "content": "This function parses SCIP solver output and extracts variable values. It first checks if the solution is solved by examining the first two lines of the content, then iterates over solution lines, extracting non-blank segments using a regex pattern. If there are at least two such segments, it tries to parse them as variable name and value, storing the result in a dictionary and returning it. The code also includes a context manager for changing the current working directory.",
+        "type": "comment"
+    },
+    "1512": {
+        "file_id": 190,
+        "content": "    cwd = os.getcwd()\n    os.chdir(dirpath)\n    try:\n        yield\n    finally:\n        os.chdir(cwd)\nclass FeasoptMode(IntEnum):\n    \"\"\"\n    CPLEX> set feasopt mode <mode>\n        0 = find minimum-sum relaxation\n        1 = find optimal minimum-sum relaxation\n        2 = find minimum number of relaxations\n        3 = find optimal relaxation with minimum number of relaxations\n        4 = find minimum quadratic-sum relaxation\n        5 = find optimal minimum quadratic-sum relaxation\n    \"\"\"\n    minimum_sum_relaxation = (\n        0  # do not use 'auto' here because that will make it into 1\n    )\n    optimal_minimum_sum_relaxation = auto()\n    minimum_number_of_relaxations = auto()\n    optimal_relaxation_with_minimum_number_of_relaxations = auto()\n    minimum_quadratic_sum_relaxation = auto()\n    optimal_minimum_quadratic_sum_relaxation = auto()\nFEASOPT_TIMELIMIT = 240\n# FEASOPT_TIMELIMIT = 30\nCPLEX_SEC_TO_TICK = 290\nfrom bs4 import BeautifulSoup\ndef load_scip_sol_file(sol_file: str):\n    return solution_loader(sol_file, parse_scip_solution_content)",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:194-230"
+    },
+    "1513": {
+        "file_id": 190,
+        "content": "Code navigates through different directories, switches the current working directory using `os.chdir`, and yields after performing some operation. It also defines constants related to the CPLEX solver settings, and includes a function that loads SCIP solution files using `solution_loader` with a specific parsing function.",
+        "type": "comment"
+    },
+    "1514": {
+        "file_id": 190,
+        "content": "def parse_cplex_solution_content(content):\n    # 'xml' is the parser used. For html files, which BeautifulSoup is typically used for, it would be 'html.parser'.\n    soup = BeautifulSoup(content, \"xml\")\n    data = {}\n    for var in soup.find_all(\"variable\"):\n        name = var[\"name\"]\n        value = float(var[\"value\"])\n        data[name] = value\n    return data\ndef solution_loader(sol_file: str, parser):\n    with open(sol_file, \"r\") as f:\n        content = f.read()\n        data = parser(content)\n        return data\ndef load_cplex_sol_file(sol_file: str):\n    return solution_loader(sol_file, parse_cplex_solution_content)\ndef invoke_solver_with_custom_config_and_solution_parser(\n    mw, logfile: str, timelimit: int, script_generator, script_executor, solution_parser\n):\n    solved = False\n    # TODO: logging\n    with tempfile.TemporaryDirectory() as tmpdir:\n        with chdir_context(tmpdir):\n            with modelSolvedTestContext(mw.model) as check_solved:\n                # lp_path_abs = os.path.join(tmpdir, lp_path := \"model.mps\")",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:233-263"
+    },
+    "1515": {
+        "file_id": 190,
+        "content": "This code defines functions for parsing CPLEX solution content, loading CPLEX solution files, and invoking a solver with custom configuration and solution parser. The CPLEX solution is parsed using BeautifulSoup with the \"xml\" parser, and the solution is loaded by reading file content and passing it to the parser function. The solver is invoked within a temporary directory using a model-solving context manager.",
+        "type": "comment"
+    },
+    "1516": {
+        "file_id": 190,
+        "content": "                lp_path_abs = os.path.join(tmpdir, lp_path := \"model.lp\")\n                sol_path = \"solution.sol\"\n                exp_model = ExportedModel(mw.model, lp_path_abs)\n                script = script_generator(lp_path, sol_path)\n                script_executor(script, logfile, timelimit)\n                if os.path.exists(sol_path):\n                    # TODO: parse and assign value from solution\n                    solution = solution_parser(sol_path)\n                    for v in mw.model.component_data_objects(ctype=Var):\n                        varname = v.name\n                        trans_varname = exp_model.reverse_translation_table.get(\n                            varname, None\n                        )\n                        val = solution.get(trans_varname, None)\n                        if val is not None:\n                            v.set_value(val)\n                    solved = check_solved()\n                # breakpoint()\n    return solved\nSOLUTION_COUNT = 0\ndef feasopt_script_generator(",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:264-290"
+    },
+    "1517": {
+        "file_id": 190,
+        "content": "This code generates a script for a linear programming problem, executes it, and assigns the solution to the corresponding model variables if the solution exists. The solution count is also tracked.",
+        "type": "comment"
+    },
+    "1518": {
+        "file_id": 190,
+        "content": "    lp_path: str, sol_path: str, mode: FeasoptMode, solutionCount: int\n):\n    cplex_config = [\n        f\"timelimit {FEASOPT_TIMELIMIT}\"\n        if not ies_env.DETERMINISTIC_FAILSAFE\n        else f\"dettimelimit {FEASOPT_TIMELIMIT*CPLEX_SEC_TO_TICK}\",\n        f\"feasopt mode {mode}\",\n    ]\n    if solutionCount > 0:\n        cplex_config.append(f\"mip limits solutions {solutionCount}\")\n    if ies_env.DETERMINISTIC_FAILSAFE:\n        cplex_config.append(f\"randomseed {ies_env.ANSWER_TO_THE_UNIVERSE}\")\n    script = [\n        f\"read {lp_path}\",\n        *[f\"set {c}\" for c in cplex_config],\n        \"feasopt all\",  # dettime: 8816 ticks for 30s timelimit\n        f\"write {sol_path}\",\n        \"quit\",\n    ]\n    return script\nfrom functools import partial\ndef feasopt(mw, mode: FeasoptMode, logfile: str, solutionCount: int = SOLUTION_COUNT):\n    solved = invoke_solver_with_custom_config_and_solution_parser(\n        mw,\n        logfile,\n        FEASOPT_TIMELIMIT + 10,\n        partial(feasopt_script_generator, mode=mode, solutionCount=solutionCount),",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:291-321"
+    },
+    "1519": {
+        "file_id": 190,
+        "content": "This code generates a script for the CPLEX optimization solver to solve an LP problem and returns it. The script takes parameters such as the LP file path, solver mode, solution count, and deterministic fail-safe setting. The function uses partial to pass the mode and solutionCount parameters to the feasopt_script_generator function.",
+        "type": "comment"
+    },
+    "1520": {
+        "file_id": 190,
+        "content": "        cplex_exec_script,\n        load_cplex_sol_file,\n    )\n    return solved\n@failsafe_methods.register\ndef feasopt_with_optimization(mw, logdir: str):\n    logfile = os.path.join(logdir, \"cplex_feasopt_with_optimization_failsafe.log\")\n    return feasopt(mw, FeasoptMode.optimal_minimum_sum_relaxation, logfile), logfile\n@failsafe_methods.register\ndef feasopt_only(mw, logdir: str):\n    logfile = os.path.join(logdir, \"cplex_feasopt_only_failsafe.log\")\n    return feasopt(mw, FeasoptMode.minimum_sum_relaxation, logfile), logfile\ndef scip_minuc_script_generator(\n    lp_path: str, sol_path: str, solutionCount: int = SOLUTION_COUNT\n):\n    scip_config = [\n        f\"limits time {FEASOPT_TIMELIMIT}\",\n    ]\n    if solutionCount > 0:\n        scip_config.extend(\n            [\n                f\"limits solutions {solutionCount}\",\n                f\"limits maxsol {solutionCount}\",\n            ]\n        )\n    if ies_env.DETERMINISTIC_FAILSAFE:\n        scip_config.append(f\"random lpseed {ies_env.ANSWER_TO_THE_UNIVERSE}\")\n        scip_config.append(f\"random permutationseed {ies_env.ANSWER_TO_THE_UNIVERSE}\")",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:322-355"
+    },
+    "1521": {
+        "file_id": 190,
+        "content": "The code defines a function `feasopt_with_optimization` and `feasopt_only`, which utilize the `feasopt` method to perform feasibility checks on an input `mw` (presumably a model) with different modes. The first mode aims for optimal minimum sum relaxation, while the second aims only for minimum sum relaxation. Additionally, the code includes a `scip_minuc_script_generator` function that generates a set of instructions for the SCIP optimization software. This function can handle multiple solutions and implements some deterministic failsafe measures if necessary.",
+        "type": "comment"
+    },
+    "1522": {
+        "file_id": 190,
+        "content": "        scip_config.append(f\"random randomseedshift {ies_env.ANSWER_TO_THE_UNIVERSE}\")\n    script = [\n        f\"read {lp_path}\",\n        *[f\"set {c}\" for c in scip_config],\n        \"change minuc\",\n        \"optimize\",\n        f\"write solution {sol_path}\",\n        \"quit\",\n    ]\n    return script\n@failsafe_methods.register\ndef scip_minuc(mw, logdir: str):\n    logfile = os.path.join(logdir, \"scip_minuc.log\")\n    solved = invoke_solver_with_custom_config_and_solution_parser(\n        mw,\n        logfile,\n        FEASOPT_TIMELIMIT * 3,\n        scip_minuc_script_generator,\n        scip_exec_script,\n        load_scip_sol_file,\n    )\n    return solved, logfile\nIPOPT_MAX_ITERATION = 1000\nIPOPT_TIMELIMIT = 30\nIPOPT_ITERATION_KW = \"Number of Iterations\"\nIPOPT_MAX_ITER_CONFIG_KW = \"max_iter\"\nIPOPT_MAX_CPUTIME_CONFIG_KW = \"max_cpu_time\"\nIPOPT_MAX_CPUTIME = 10\n# you cannot use ipopt with constant objective.\n# @failsafe_methods.register\n# don't register it. deprecated.\ndef ipopt_no_presolve(mw, logdir: str):\n    solved = False\n    logfile = os.path.join(logdir, \"ipopt_failsafe.log\")",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:356-395"
+    },
+    "1523": {
+        "file_id": 190,
+        "content": "This code snippet defines a failsafe method for SCIP solver and registers it. The `scip_minuc` function invokes the SCIP solver with a custom configuration and solution parser, then returns the solved status and log file path. It also defines constants for IPOPT settings, but mentions that the `ipopt_no_presolve` method is deprecated.",
+        "type": "comment"
+    },
+    "1524": {
+        "file_id": 190,
+        "content": "    with SolverFactory(Solver.ipopt) as solver:\n        with modelSolvedTestContext(mw.model) as check_solved:\n            solver.options[IPOPT_MAX_ITER_CONFIG_KW] = IPOPT_MAX_ITERATION\n            solver.options[IPOPT_MAX_CPUTIME_CONFIG_KW] = IPOPT_MAX_CPUTIME\n            if ies_env.DETERMINISTIC_FAILSAFE:\n                # we pass initial values of variables as random seeds. don't have cli configuration.\n                ...\n            solved = ipopt_solve(mw, logfile, solver, check_solved)\n            if not solved:\n                # parse the logfile and rerun the task.\n                adjusted_max_iter = 0\n                if os.path.exists(logfile):\n                    with open(logfile, \"r\") as f:\n                        content = f.read()\n                        content_lines = content.split(\"\\n\")\n                        for line in content_lines:\n                            if IPOPT_ITERATION_KW in line:\n                                iteration = re.search(r\"\\d+\", line).group()\n                                logger_print(\"IPOPT FAILED AT ITERATION: \", iteration)",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:396-414"
+    },
+    "1525": {
+        "file_id": 190,
+        "content": "This code sets up a solver to solve an optimization model. If the failsafe is deterministic, it uses random seeds for initial variable values. If the solver does not find a solution, it parses the logfile and reruns the task with adjustments.",
+        "type": "comment"
+    },
+    "1526": {
+        "file_id": 190,
+        "content": "                                adjusted_max_iter = int(iteration) - 1\n                                break\n                if adjusted_max_iter > 0:\n                    solver.options[IPOPT_MAX_ITER_CONFIG_KW] = adjusted_max_iter\n                    os.remove(logfile)\n                    solved = ipopt_solve(mw, logfile, solver, check_solved)\n                else:\n                    logger_print(\n                        \"FAILED TO GET ITERATION COUNT FROM FAILED IPOPT SESSION\"\n                    )\n            # breakpoint()\n    return solved, logfile\ndef ipopt_solve(mw, logfile, solver, check_solved):\n    solved = False\n    with failsafe_suppress_exception():\n        solver.solve(mw.model, tee=True, logfile=logfile, timelimit=IPOPT_TIMELIMIT)\n        solved = check_solved()\n    return solved\n@failsafe_methods.register\ndef random_value_assignment(mw, logdir: str):\n    rng = lambda: random.uniform(-100, 100)\n    for v in mw.model.component_data_objects(ctype=Var):\n        v.set_value(rng(), skip_validation=True)  # suppress W1001",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:415-441"
+    },
+    "1527": {
+        "file_id": 190,
+        "content": "The code snippet is for a failsafe utility function that attempts to solve a problem using the IPOPT solver. If the iteration count cannot be obtained from a failed IPOPT session, it logs a failure message. The `ipopt_solve` function takes a model, logfile, and check_solved function as inputs and uses failsafe suppression to attempt solving the model with IPOPT, returning whether or not the problem was solved. The `random_value_assignment` method sets random values for variables in the model using a lambda function and skips validation to suppress W1001 warnings.",
+        "type": "comment"
+    },
+    "1528": {
+        "file_id": 190,
+        "content": "        # ref: https://pyomo.readthedocs.io/en/stable/errors.html#W1001\n    return (\n        True,\n        \"\",\n    )  # instead of None, to prevent unwanted behavior when checking existance\n# for m in [\n#     feasopt_with_optimization,\n#     feasopt_only,\n#     ipopt_no_presolve,\n#     random_value_assignment,\n# ]:\n#     failsafe_methods.add(m)\ndef solve_failsafe(mw, logdir: str):\n    \"\"\"\n    Steps (fail and continue):\n        1. feasopt & objective optimization\n        2. feasopt only\n        3. scip minuc\n        4. random value assignment\n    \"\"\"\n    solved = False\n    report = []\n    for method in failsafe_methods:\n        name = method.__name__\n        try:\n            logger_print(f\"trying failsafe method: {name}\")\n            solved, logfile = method(mw, logdir)\n            if solved:\n                logger_print(f\"solved with {name}\")\n                if os.path.exists(logfile):\n                    logger_print(f\"logfile write to: {logfile}\")\n                else:\n                    logger_print(f\"logfile not found at: {logfile}\")",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:442-479"
+    },
+    "1529": {
+        "file_id": 190,
+        "content": "The code defines a function 'solve_failsafe' that applies four different methods in a specific order to solve a problem. The methods are 'feasopt_with_optimization', 'feasopt_only', 'ipopt_no_presolve', and 'random_value_assignment'. If any of the methods successfully solve the problem, it stops and returns True along with the logfile path. The code also includes a try-except block to handle possible failures during execution.",
+        "type": "comment"
+    },
+    "1530": {
+        "file_id": 190,
+        "content": "                break  # you may not break just because of the 'solved' flag but also the existance of the logfile.\n            else:\n                logger_print(f\"failed to solve with {name}\")\n            report.append((name, solved, os.path.exists(logfile)))\n        except:\n            report.append((name, False, False))\n            logger_traceback()\n    for n, r, l_exists in report:\n        logger_print(f\"{n}:\\t{r}\\t(logfile exists? {l_exists})\")\n    return solved\nif __name__ == \"__main__\":\n    ies_env.FAILSAFE = True\n    with failsafe_suppress_exception():\n        raise Exception(\"Exc\")\n    # it will reach and raise Exc2\n    ies_env.FAILSAFE = False\n    with failsafe_suppress_exception():\n        raise Exception(\"Exc2\")",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_utils.py:480-500"
+    },
+    "1531": {
+        "file_id": 190,
+        "content": "This code defines a failsafe utility function that suppresses exceptions, checks if solutions are found for certain operations, and logs information about the operations. It is used within an 'if __name__ == \"__main__\"' block to demonstrate how it handles different types of exceptions.",
+        "type": "comment"
+    },
+    "1532": {
+        "file_id": 191,
+        "content": "/microgrid_base/fastapi_celery_functions.py",
+        "type": "filepath"
+    },
+    "1533": {
+        "file_id": 191,
+        "content": "This function calculates energy flow graph for a microgrid and returns a result object. It handles exceptions, checks results, and sets error_log and auxiliary equipment annual factor if needed.",
+        "type": "summary"
+    },
+    "1534": {
+        "file_id": 191,
+        "content": "from typing import Union\nfrom ies_optim import 计算年化率\nfrom solve_model import (\n    solveModelFromCalcParamList,\n    mDictListToCalcParamList,\n)\nfrom log_utils import logger_print\nfrom fastapi_datamodel_template import CalculationResult\ndef calculate_energyflow_graph_base(energyflow_graph: dict) -> Union[None, dict]:\n    # def calculate_energyflow_graph(self, energyflow_graph: dict) -> Union[None, dict]:\n    # raise Exception(\"ERROR MSG\")\n    # error_name = \"ERROR_NAME\"; error_log = 'ERROR_LOG'\n    # self.update_state(\n    #     state=\"FAILURE\", meta={\"exc_type\": error_name, \"exc_message\": error_log, 'custom':'...'}\n    # )  # https://distributedpython.com/posts/custom-celery-task-states/\n    # raise Ignore()\n    \"\"\"\n    能源系统仿真优化计算方法\n    Args:\n        energyflow_graph (dict): 能流拓扑图和计算所需信息\n    Returns:\n        calculation_result (dict): 计算结果\n    \"\"\"\n    mDictList = energyflow_graph[\"mDictList\"]\n    辅助设备寿命 = energyflow_graph[\"residualEquipmentLife\"]\n    贴现率 = mDictList[0][\"graph\"][\"贴现率\"]\n    辅助设备年化系数 = 计算年化率(贴现率, 辅助设备寿命)",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_functions.py:1-33"
+    },
+    "1535": {
+        "file_id": 191,
+        "content": "This function calculates the energy flow graph for a microgrid by taking in the energy flow graph and its necessary information. It then returns a calculation result containing the computed outcomes, including auxiliary equipment annual factor. This function uses the calculate_yearly_factor method from 计算年化率 module and mDictListToCalcParamList method from solve_model module.",
+        "type": "comment"
+    },
+    "1536": {
+        "file_id": 191,
+        "content": "    calcParamList = mDictListToCalcParamList(mDictList)\n    resultList = []\n    # error_log = \"\"\n    # success = False\n    # error_name = None\n    # try:\n    resultList = solveModelFromCalcParamList(calcParamList)\n    # except Exception as ex:\n    # import traceback\n    # error_log = traceback.format_exc()\n    # error_name = type(ex).__name__\n    # logger_print(\"************CELERY ERROR************\")\n    # logger_print(error_log)\n    if resultList != []:\n        # success = True\n        calculation_result = CalculationResult(\n            resultList=resultList,\n            success=True,\n            error_log=\"\",\n            residualEquipmentAnnualFactor=辅助设备年化系数,  # TODO: 计算辅助设备年化参数\n        ).dict()\n        return calculation_result\n    else:\n        raise Exception(\"Empty result list.\")\n        # calculation_result = CalculationResult(\n        #     error_log = \"Empty result list.\", resultList=resultList, success=False,\n        # )\n        # self.update_state(\n        #     state=\"FAILURE\", meta={\"exc_type\": error_name, \"exc_message\": error_log, 'custom':'...'}",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_functions.py:35-66"
+    },
+    "1537": {
+        "file_id": 191,
+        "content": "This code block calculates results using given parameters, handles exceptions and returns a CalculationResult object. It checks if the resultList is not empty, creates a CalculationResult object with the resultList and success as True, sets error_log to an empty string, and 辅助设备年化系数 as a TODO. If the resultList is empty, it raises an Exception.",
+        "type": "comment"
+    },
+    "1538": {
+        "file_id": 191,
+        "content": "        # )  # https://distributedpython.com/posts/custom-celery-task-states/\n        # raise Ignore()",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_functions.py:67-68"
+    },
+    "1539": {
+        "file_id": 191,
+        "content": "Custom Celery task states, raising Ignore exception.",
+        "type": "comment"
+    },
+    "1540": {
+        "file_id": 192,
+        "content": "/microgrid_base/fastapi_celery_server.py",
+        "type": "filepath"
+    },
+    "1541": {
+        "file_id": 192,
+        "content": "The code sets up a Celery application for a microgrid system, includes exception handling and timezone configuration, defines task functions, and sets worker configurations. However, the log file \"celery.log\" is not working properly.",
+        "type": "summary"
+    },
+    "1542": {
+        "file_id": 192,
+        "content": "from log_utils import logger_print\nfrom log_utils import (\n    makeRotatingFileHandler,\n    celery_log_filename,\n    timezone_str,\n    logger_traceback,\n)\nfrom celery import Celery\nfrom passwords import redis_password\nfrom typing import Union\n# BUG: no log written into \"celery.log\"\nMAIN_NAME = \"fastapi_celery\"\napp = Celery(\n    MAIN_NAME,\n    broker=\"amqp://guest@localhost:5672//\",\n    backend=f\"redis://:{redis_password}@localhost:6380\",\n    # backend=f\"redis://:{redis_password}@localhost:6379\",\n)\n# override format exception logic. (seems not working at all!)\n# ref: https://poe.com/s/PV9zAO91vGQjHJuZ4toR (GPT4)\nimport better_exceptions\nimport sys\nfrom celery.utils.log import ColorFormatter  # type: ignore\napp.conf.update(CELERY_TIMEZONE=timezone_str, CELERY_ENABLE_UTC=False)\n# class CustomFormatter(logging.Formatter):\nclass CustomFormatter(ColorFormatter):\n    def formatException(self, exc_info):\n        \"\"\"\n        Format the exception information and return the formatted string.\n        Parameters:\n            exc_info (tuple): The exception information tuple.",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_server.py:1-42"
+    },
+    "1543": {
+        "file_id": 192,
+        "content": "This code sets up a Celery application for a microgrid system, using AMQP broker and Redis backend. It also includes custom exception handling and timezone configuration. However, the log file \"celery.log\" does not seem to be working properly.",
+        "type": "comment"
+    },
+    "1544": {
+        "file_id": 192,
+        "content": "        Returns:\n            str: The formatted exception string.\n        \"\"\"\n        if exc_info and not isinstance(exc_info, tuple):\n            exc_info = sys.exc_info()  # copied from `ColorFormatter.formatException`\n        lines = better_exceptions.format_exception(*exc_info)\n        return \"\".join(lines)\ncustom_formatter = CustomFormatter()\nimport logging\ncelery_logger = app.log.get_default_logger()\ncelery_logger.addHandler(\n    makeRotatingFileHandler(celery_log_filename, level=logging.NOTSET)\n)\nfor handler in celery_logger.handlers:\n    handler.setFormatter(custom_formatter)\n# you'd better import models from other datamodel only file\n# you had not to pass anything like pydantic data model as parameter.\n# from microgrid_base.ies_optim import EnergyFlowGraph\n# from celery.exceptions import Ignore\nfrom fastapi_celery_functions import calculate_energyflow_graph_base\nfrom config import ies_env\nfrom mock_utils import generate_fake_output_data, EnergyFlowGraph\nfrom mock_utils import mock_output_data\n@app.task()",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_server.py:44-78"
+    },
+    "1545": {
+        "file_id": 192,
+        "content": "Function to format exception messages, sets up custom logger for Celery with rotating file handler and formatter, imports necessary modules and defines a task function using FastAPI's celery functions.",
+        "type": "comment"
+    },
+    "1546": {
+        "file_id": 192,
+        "content": "# @app.task(bind=True)  # parse it elsewhere.\ndef calculate_energyflow_graph(energyflow_graph: dict) -> Union[None, dict]:\n    if ies_env.GENERATED_MOCK:\n        ret = generate_fake_data_based_on_input(energyflow_graph)\n    else:\n        try:\n            ret = calculate_energyflow_graph_base(energyflow_graph)\n        except Exception as exc:\n            if ies_env.FAILSAFE:\n                logger_traceback()\n                try:\n                    ret = generate_fake_data_based_on_input(energyflow_graph)\n                except:\n                    logger_traceback()\n                    ret = mock_output_data.copy()\n            else:\n                raise exc\n    return ret\ndef generate_fake_data_based_on_input(energyflow_graph):\n    input_data = EnergyFlowGraph.parse_obj(energyflow_graph)\n    fake_output_data = generate_fake_output_data(input_data)\n    ret = fake_output_data.dict()\n    return ret\napp.conf.update(task_track_started=True)\napp.conf.update(worker_send_task_events=True)\nconcurrent_tasks = 3\napp.conf.update(worker_concurrency=concurrent_tasks)",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_server.py:79-109"
+    },
+    "1547": {
+        "file_id": 192,
+        "content": "This code defines a task function `calculate_energyflow_graph` that takes a dictionary as input and returns either the calculated result or a mock data depending on the environment. It also includes a helper function `generate_fake_data_based_on_input` for generating mock data based on the input dictionary. The code sets up Celery worker configuration to track task start, send task events, and limits the number of concurrent tasks to 3.",
+        "type": "comment"
+    },
+    "1548": {
+        "file_id": 192,
+        "content": "memory_limit = 20_000_000  # kB -> 20GB\napp.conf.update(worker_max_memory_per_child=memory_limit)\ntime_limit = 60 * 25  # sec, 25 minutes.\napp.conf.update(worker_time_limit=time_limit)\n# limits on ram usage, concurrency, execution time\nif __name__ == \"__main__\":\n    worker = app.Worker()\n    worker.start()  # type:ignore",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_celery_server.py:111-120"
+    },
+    "1549": {
+        "file_id": 192,
+        "content": "This code sets the maximum memory and execution time limits for Celery workers. The `memory_limit` variable is set to 20GB, while the `time_limit` variable is set to 25 minutes. If the code is run directly (not imported), it starts a Celery worker process with these limitations.",
+        "type": "comment"
+    },
+    "1550": {
+        "file_id": 193,
+        "content": "/microgrid_base/fastapi_datamodel_template.py",
+        "type": "filepath"
+    },
+    "1551": {
+        "file_id": 193,
+        "content": "This code defines classes for microgrid objects, stores calculation details, and ensures error avoidance in the `ParetoCurve` class. It includes a `CalculationResult` class for single-calculation results, an incomplete `EnergyFlowGraph` class, and subclasses `CalculationAsyncResult` and `RevokeResult`.",
+        "type": "summary"
+    },
+    "1552": {
+        "file_id": 193,
+        "content": "from log_utils import logger_print\nfrom pydantic import BaseModel, Field, validator, confloat\nfrom networkx.readwrite import json_graph\nfrom typing import Mapping, List, Tuple, Union, Dict, Any\nimport networkx\nfrom constants import *\ntry:\n    from typing import Literal\nexcept:\n    from typing_extensions import Literal\ntry:\n    from typing import assert_never\nexcept:\n    from typing_extensions import assert_never\n# from celery.states import PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED\n# question: how to convert pydantic models to json?\n# to json: json.dumps(model.dict())\n# from ies_optim import EnergyFlowGraph, 仿真结果, 规划结果详情, 规划方案概览\nfrom ies_optim import *\nclass 曲线(BaseModel):\n    x: List[str] = Field(title=\"x轴数据\")\n    y: List[float] = Field(title=\"y轴数据\")\n    @validator(\"x\")\n    def validate_x(cls, x: List[str]):\n        \"\"\"\n        Validate the input list of strings `x` and return the validated list.\n        Args:\n            cls: The class of the validator.\n            x (List[str]): The input list of strings to be validated.",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:1-40"
+    },
+    "1553": {
+        "file_id": 193,
+        "content": "This code is importing necessary modules and defining a class called \"Curve\" using Pydantic's BaseModel. The Curve class has an x attribute (List[str]) for x-axis data, y attribute (List[float]) for y-axis data, and a validator function to validate the input list of strings for the x attribute. The code also includes imports from other modules such as networkx, constants, and ies_optim.",
+        "type": "comment"
+    },
+    "1554": {
+        "file_id": 193,
+        "content": "        Returns:\n            List[str]: The validated list of strings.\n        Raises:\n            Exception: If the input list `x` is not valid.\n        \"\"\"\n        suffixMapping = {两小时秒数: \"秒\", 每年小时数: \"时\"}\n        for suffix in suffixMapping.values():\n            if x[0].endswith(suffix):\n                return x\n        len_x = len(x)\n        if len_x in suffixMapping.keys():\n            suffix = suffixMapping[len_x]\n            x = [e + suffix for e in x]\n            return x\n        else:\n            raise Exception(\"Non-standard x array length:\", len_x)\nclass 出力曲线(BaseModel):\n    name: str = Field(title=\"出力曲线标题\")\n    # device_name: str = Field(title = \"设备名称\")\n    abbr: str = Field(title=\"出力曲线缩写\")\n    data: 曲线 = Field(title=\"曲线数据\")\nclass 设备出力曲线(BaseModel):\n    name: str = Field(title=\"设备名称\")\n    plot_list: List[出力曲线] = Field(title=\"出力曲线列表\")\nclass ObjectiveResult(BaseModel):\n    financialObjective: float = Field(title=\"经济目标值\")\n    environmentalObjective: float = Field(title=\"环保目标值\")\n    adderError: float = Field(title=\"加法器误差\")",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:42-76"
+    },
+    "1555": {
+        "file_id": 193,
+        "content": "The code defines several classes representing objects related to a microgrid. It includes classes for output curves, devices with output curves, and objective results. The output curve class contains properties like title, abbreviation, and curve data. The device output curve class has properties for name and a list of output curves. Finally, the ObjectiveResult class stores financial, environmental objectives along with an adder error.",
+        "type": "comment"
+    },
+    "1556": {
+        "file_id": 193,
+        "content": "class 单次计算结果(BaseModel):\n    objectiveResult: ObjectiveResult = Field(\n        title=\"计算目标值结果\",\n        description=\"存放例如经济目标值、环保目标值的计算结果\",\n        example={\"financialObjective\": 2000, \"environmentalObjective\": 3000},\n    )\n    planningResultTable: List[规划结果详情_翻译] = Field(\n        title=\"规划结果详情列表\", description=\"方案内各机组信息\"\n    )\n    planningSummary: 规划方案概览_翻译 = Field(title=\"规划方案概览\", description=\"包括方案类型，方案总参数等等\")\n    performanceDataList: List[设备出力曲线] = Field(\n        title=\"设备出力曲线列表\",\n        description=\"每个设备逐步长出力情况\",\n        example=[\n            {\n                \"name\": \"Any\",\n                \"plot_list\": [\n                    {\n                        \"name\": \"plotName\",\n                        \"abbr\": \"plotAbbr\",\n                        \"data\": {\"x\": [], \"y\": []},\n                    }\n                ],\n            }\n        ],\n    )\n    simulationResultTable: List[仿真结果] = Field(\n        title=\"仿真结果列表\",\n        example=[\n            {\n                \"name\": \"Any\",\n                \"modelNumber\": \"Any\",\n                \"equiCounts\": 1,",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:79-111"
+    },
+    "1557": {
+        "file_id": 193,
+        "content": "This code defines a class named \"单次计算结果\" that represents the results of a single computation. It includes fields for objective result, planning result table, planning summary, performance data list, and simulation result table. The fields contain various types of information related to calculations such as financial and environmental objectives, planning details, device output curves, and simulation results.",
+        "type": "comment"
+    },
+    "1558": {
+        "file_id": 193,
+        "content": "                \"coolingCapacity\": 1,\n                \"coolingLoad\": 1,\n                \"electricSupply\": 1,\n                \"electricLoad\": 1,\n                \"heatingLoad\": 1,\n                \"heatLoad\": 1,\n                \"steamProduction\": 1,\n                \"steamLoad\": 1,\n                \"hydrogenProduction\": 1,\n                \"hydrogenConsumption\": 1,\n                \"dieselConsumption\": 1,\n                \"dieselConsumptionCosts\": 1,\n                \"naturalGasConsumption\": 1,\n                \"naturalGasConsumptionCosts\": 1,\n                \"averageEfficiency\": 1,\n                \"equipmentMaintenanceCosts\": 1,\n                \"coldIncome\": 1,\n                \"hotIncome\": 1,\n                \"eletricncome\": 1,\n                \"steamIncome\": 1,\n                \"hydrogenIncome\": 1,\n            }\n        ],\n    )\n# class ParetoCurve(BaseModel):\n#     x: List[float]\n#     x_label: str\n#     y: List[float]\n#     y_label: str\n# you need to check if any \"Field\" is using \"default\" positional argument, which might leads to error.",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:112-145"
+    },
+    "1559": {
+        "file_id": 193,
+        "content": "This code defines a ParetoCurve class with x and y as lists of float values, and x_label and y_label as strings. The default values are provided for each attribute. Check if any \"Field\" is using the \"default\" positional argument to avoid potential errors.",
+        "type": "comment"
+    },
+    "1560": {
+        "file_id": 193,
+        "content": "class CalculationResult(BaseModel):\n    resultList: List[单次计算结果]\n    # paretoCurve: Union[None, ParetoCurve] = None\n    residualEquipmentAnnualFactor: confloat(ge=0) = Field(\n        default=0, title=\"辅助设备年化系数\", description=\"仿真模拟是0，设计规划为非0\"\n    )\n    success: bool\n    error_log: str\n# class EnergyFlowGraph(BaseModel):\n#     \"\"\"\n#     用于仿真和优化计算的能流拓扑图，仿真和优化所需要的参数模型和变量定义会有所不同。\n#     \"\"\"\n#     graph: Mapping = Field(\n#         title=\"能流拓扑图的附加属性\",\n#         description=\"仿真和优化所需的模型参数字典\",\n#         examples=dict(\n#             建模仿真=dict(\n#                 summary=\"建模仿真所需参数\",\n#                 description=\"建模仿真需要知道仿真步长和起始时间\",\n#                 value={\n#                     \"模型类型\": \"建模仿真\",\n#                     \"仿真步长\": 60,\n#                     \"开始时间\": \"2023-3-1\",  # shall you parse this into `datetime.datetime`\n#                     \"结束时间\": \"2024-3-1\",\n#                 },\n#             ),\n#             规划设计=dict(\n#                 summary=\"规划设计所需参数\",\n#                 description=\"规划设计不需要知道仿真步长和起始时间,会根据不同优化指标事先全部计算，不需要在此指出\",",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:146-177"
+    },
+    "1561": {
+        "file_id": 193,
+        "content": "The code defines a class `CalculationResult` for storing the result of a calculation, including a list of single-calculation results, residual equipment annual factor, success status, and error log. It also includes a comment about an `EnergyFlowGraph` class that is not fully defined in this code snippet. The graph represents energy flow topology for both simulation and optimization, requiring different parameter models and variable definitions. The examples provided demonstrate the differences in required parameters between modeling simulation and planning design.",
+        "type": "comment"
+    },
+    "1562": {
+        "file_id": 193,
+        "content": "#                 value={\"模型类型\": \"规划设计\"},\n#             ),\n#         ),\n#     )\n#     nodes: List[Mapping] = Field(\n#         title=\"节点\",\n#         description=\"由所有节点ID和属性字典组成的列表\",\n#         example=[\n#             {\"id\": \"a\", \"node_type\": \"load\"},\n#             {\"id\": \"b\", \"node_type\": \"device\"},\n#             {\"id\": \"c\", \"node_type\": \"load\"},\n#             {\"id\": \"d\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#             {\"id\": \"e\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#             {\"id\": \"f\", \"node_type\": \"port\", \"port_type\": \"AC\"},\n#         ],\n#     )\n#     adjacency: List[List[Mapping]] = Field(\n#         title=\"边\",\n#         description=\"由能流图中节点互相连接的边组成的列表\",\n#         example=[\n#             [{\"id\": \"b\"}, {\"id\": \"d\"}],\n#             [{\"id\": \"a\"}, {\"id\": \"e\"}],\n#             [{\"id\": \"c\"}, {\"id\": \"f\"}],\n#             [{\"id\": \"d\"}, {\"id\": \"e\"}],\n#             [{\"id\", \"d\"}, {\"id\": \"f\"}],\n#         ],\n#     )\n#     def to_graph(self, directed=False) -> networkx.Graph:\n#         \"\"\"\n#         输出`networkx`计算图",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:178-208"
+    },
+    "1563": {
+        "file_id": 193,
+        "content": "This code defines a class with properties \"nodes\" and \"adjacency\", representing nodes and edges in a graph respectively. It also includes a method, \"to_graph\", which converts the object to a NetworkX graph and optionally handles directed graphs.",
+        "type": "comment"
+    },
+    "1564": {
+        "file_id": 193,
+        "content": "#         Arguments:\n#             directed (bool): 是否返回有向图\n#         Returns:\n#             G (Graph): `networkx`计算图\n#         \"\"\"\n#         graph: List[Tuple] = [(k, v) for k, v in self.graph.items()]\n#         graph_dict = dict(\n#             directed=directed,\n#             multigraph=False,\n#             graph=graph,\n#             nodes=self.nodes,\n#             adjacency=self.adjacency,\n#         )\n#         G = json_graph.adjacency_graph(graph_dict, directed=directed)\n#         return G\nclass CalculationAsyncSubmitResult(BaseModel):\n    \"\"\"\n    异步计算提交结果返回类\n    \"\"\"\n    calculation_id: Union[None, str] = Field(\n        description=\"如果成功注册计算任务，返回ID，否则为空\", title=\"计算ID\"\n    )\n    submit_result: Literal[\"success\", \"failed\"] = Field(\n        description='如果成功提交，返回\"success\"，否则返回\"failed\"', title=\"提交结果\"\n    )\nclass CalculationStateResult(BaseModel):\n    \"\"\"\n    包含计算任务状态的数据类\n    \"\"\"\n    calculation_state: Literal[\n        None,\n        \"PENDING\",\n        \"RECEIVED\",\n        \"STARTED\",\n        \"SUCCESS\",\n        \"FAILURE\",\n        \"RETRY\",",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:210-255"
+    },
+    "1565": {
+        "file_id": 193,
+        "content": "Function defines a method to return a NetworkX graph object from the data stored in self.graph.\nCalculationAsyncSubmitResult is a model for asynchronous calculation submission results with calculation_id and submit_result fields.",
+        "type": "comment"
+    },
+    "1566": {
+        "file_id": 193,
+        "content": "        \"REVOKED\",\n        \"NOT_CREATED\",\n    ] = Field(description=\"Celery内置任务状态，如果是null则表示不存在该任务\", title=\"计算任务状态\")\n# would you transfer this thing over celery, or you need to build it?\n# i'd rather build it.\nclass CalculationAsyncResult(CalculationStateResult):\n    \"\"\"\n    异步计算任务查询返回结果\n    \"\"\"\n    calculation_result: Union[None, CalculationResult] = Field(\n        description=\"如果没有计算完或者不存在返回空，否则返回计算结果字典\", title=\"计算结果\"\n    )\nclass RevokeResult(CalculationStateResult):\n    \"\"\"\n    撤销返回结果\n    \"\"\"\n    revoke_result: Literal[\"success\", \"failed\"] = Field(\n        description='如果成功撤销任务，返回\"success\"，否则返回\"failed\"', title=\"撤销结果\"\n    )",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_datamodel_template.py:256-280"
+    },
+    "1567": {
+        "file_id": 193,
+        "content": "This code defines two classes, `CalculationAsyncResult` and `RevokeResult`, which inherit from a base class called `CalculationStateResult`. Both classes have specific fields that represent the status and results of a calculation task. The `CalculationAsyncResult` has a field for the calculation result, which can be either null if the calculation is not yet complete or does not exist, or an instance of `CalculationResult` if it exists. The `RevokeResult` class has a field that stores the result of a task revocation attempt, either \"success\" or \"failed\".",
+        "type": "comment"
+    },
+    "1568": {
+        "file_id": 194,
+        "content": "/microgrid_base/fastapi_server_template.py",
+        "type": "filepath"
+    },
+    "1569": {
+        "file_id": 194,
+        "content": "This code creates a FastAPI server for microgrid optimization with Celery tasks, task management, logger setup, custom route handler class, and asynchronous routing, supporting Pareto curve generation, mock testing, and API endpoint revocation.",
+        "type": "summary"
+    },
+    "1570": {
+        "file_id": 194,
+        "content": "from log_utils import logger_print\n# suggestion: use fastapi for self-documented server, use celery for task management.\n# celery reference: https://github.com/GregaVrbancic/fastapi-celery/blob/master/app/main.py\nimport traceback\nfrom fastapi import BackgroundTasks, FastAPI\nfrom fastapi_datamodel_template import (\n    CalculationAsyncResult,\n    CalculationAsyncSubmitResult,\n    CalculationResult,\n    EnergyFlowGraph,\n    RevokeResult,\n    CalculationStateResult,\n)\nport = 9870\nhost = \"0.0.0.0\"\nimport logging\nfrom log_utils import (\n    fastapi_log_filename,\n    stdout_handler,\n    makeRotatingFileHandler,\n    # Formatter\n)\nfrom log_utils import logger_print as lp\nfastapi_log_handler = makeRotatingFileHandler(fastapi_log_filename)\nlogger = logging.getLogger(\"fastapi\")\nlogger.setLevel(\"DEBUG\")\nlogger.addHandler(fastapi_log_handler)\nlogger.addHandler(stdout_handler)\n# import celery\ndef logger_print(*args):  # override this.\n    lp(*args, logger=logger)\nfrom config import *\n# import os\n# MOCK = ies_env.STATIC_MOCK\n# changed to MOCK_TEST in config.py",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:1-45"
+    },
+    "1571": {
+        "file_id": 194,
+        "content": "This code sets up a FastAPI server for a microgrid system. It imports necessary modules, defines logger_print function to log messages using the defined logger, and configures logging handlers. The server runs on host \"0.0.0.0\" and port 9870. Celery is suggested for task management but not imported yet.",
+        "type": "comment"
+    },
+    "1572": {
+        "file_id": 194,
+        "content": "# MOCK = os.environ.get(\"MOCK\", None)  # if this is mock test.\nimport json\nfrom mock_utils import mock_calculation_result\nappName = \"IES Optim Server Template\"\nversion = \"0.0.1\"\ntags_metadata = [\n    {\"name\": \"async\", \"description\": \"异步接口，调用后立即返回\"},\n    {\"name\": \"sync\", \"description\": \"同步接口，调用后需等待一段时间才返回\"},\n]\ndescription = f\"\"\"\nIES系统仿真和优化算法服务器\nOpenAPI描述文件(可导入Apifox): https://{host}:{port}/openapi.json\nAPI文档: https://{host}:{port}/docs\n\"\"\"\n# from fastapi.utils import is_body_allowed_for_status_code\n# from starlette.exceptions import HTTPException\nfrom starlette.requests import Request\n# from starlette.responses import JSONResponse  # , Response\n# from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY\n# define the input structure here.\n# from pydantic import BaseModel\nfrom typing import List  # , Union , Literal, Dict\n# solved or not?\nimport datetime\nfrom celery.result import AsyncResult\nfrom typing import Dict, Any\nif ies_env.STATIC_MOCK is None:\n    from fastapi_celery_server import app as celery_app\n# remember these things won't persist.",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:46-85"
+    },
+    "1573": {
+        "file_id": 194,
+        "content": "This code sets up a FastAPI server template for an IES (Intelligent Electrical System) optimization and simulation service. It includes the necessary imports, defines app name, version, and tags metadata. The description explains that it provides an API with async and sync interfaces. Additionally, it references a mock utility function and mentions using Celery for task execution.",
+        "type": "comment"
+    },
+    "1574": {
+        "file_id": 194,
+        "content": "# remove any task without any update for 24 hours.\n# celery has the default of 24 hours. you handle it again here.\n# also has default task time of 1200 seconds. you may experiment.\ntaskDict: Dict[str, AsyncResult] = {}\n\"\"\"\n任务ID和任务对象的字典\n\"\"\"\ntaskInfo: Dict[str, datetime.datetime] = {}\n\"\"\"\n任务ID和任务最近更新时间的字典\n\"\"\"\ntaskResult: Dict[str, Any] = {}\n\"\"\"\n任务ID和任务结果的字典\n\"\"\"\ndef remove_stale_tasks():\n    \"\"\"\n    遍历并清除24小时未更新的任务\n    \"\"\"\n    now = datetime.datetime.now()\n    remove_keys = []\n    for key, value in taskInfo.items():\n        if (now - value).total_seconds() > 3600 * 24:\n            remove_keys.append(key)\n    for key in remove_keys:\n        if key in taskDict.keys():\n            del taskDict[key]\n        if key in taskInfo.keys():\n            del taskInfo[key]\n        if key in taskResult.keys():\n            del taskResult[key]\ndef remove_stale_tasks_decorator(function):\n    \"\"\"\n    清除过期任务装饰器\n    \"\"\"\n    def inner_function(*args, **kwargs):\n        remove_stale_tasks()\n        return function(*args, **kwargs)\n    return inner_function",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:86-130"
+    },
+    "1575": {
+        "file_id": 194,
+        "content": "This code defines functions to remove stale tasks from a dictionary. It includes two functions: `remove_stale_tasks()`, which removes tasks older than 24 hours, and a decorator `remove_stale_tasks_decorator()` for applying the removal function to other functions. The code also has three dictionaries to store task IDs, objects, and result information.",
+        "type": "comment"
+    },
+    "1576": {
+        "file_id": 194,
+        "content": "error_log_dict = {}\ndef celery_on_message(body: dict):\n    \"\"\"\n    Celery任务信息更新回调函数\n    Args:\n        body (dict): 更新的任务信息\n    \"\"\"\n    logger_print(\"BODY TYPE?\", type(body))\n    logger_print(\"ON MESSAGE?\", body)\n    task_id = body[\"task_id\"]\n    status = body[\"status\"]\n    logger_print(\"TASK STATUS?\", status)\n    if status == \"FAILURE\":\n        error_log_dict[task_id] = body.get(\"traceback\", \"\")\n    taskInfo[task_id] = datetime.datetime.now()\n    ###\n    # BODY TYPE? <class 'dict'>\n    # ON MESSAGE? {'status': 'STARTED', 'result': {'pid': 74297, 'hostname': 'celery@MacBook-Air-M1.local'}, 'traceback': None, 'children': [], 'date_done': None, 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\n    ###\n    # BODY TYPE? <class 'dict'>\n    # ON MESSAGE? {'status': 'SUCCESS', 'result': '14', 'traceback': None, 'children': [], 'date_done': '2023-03-28T09:26:50.382791', 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\ndef background_on_message(task: AsyncResult):\n    \"\"\"\n    后台获取任务计算结果的方法\n    Args:\n        task (AsyncResult): 任务对象",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:133-169"
+    },
+    "1577": {
+        "file_id": 194,
+        "content": "This code defines two functions: `celery_on_message` and `background_on_message`. The `celery_on_message` function is a callback for Celery task updates, which updates the task status and handles failure by storing traceback information in a dictionary. The `background_on_message` function retrieves the result of completed background tasks. Both functions use logging to print the type and content of received messages.",
+        "type": "comment"
+    },
+    "1578": {
+        "file_id": 194,
+        "content": "    \"\"\"\n    value = task.get(on_message=celery_on_message, propagate=False)\n    # shall you not check here.\n    # and not the message callback.\n    status = task.status\n    logger_print(\"TASK STATUS?\", status)\n    logger_print()\n    logger_print(\"VALUE TYPE?\", type(value))  # str, '14'\n    logger_print(\"TASK VALUE?\", value)\n    if status == \"SUCCESS\":\n        logger_print(\"TASK RESULT SET\")\n        taskResult[task.id] = value  # this will be exception.\n    else:\n        logger_print(\"NOT SETTING TASK RESULT\")\n# Reference: https://github.com/tiangolo/fastapi/issues/459\n# from typing import Any\n# import orjson\n# from starlette.responses import JSONResponse\n# class ORJSONResponse(JSONResponse):\n#     media_type = \"application/json\"\n#     def render(self, content: Any) -> bytes:\n#         return orjson.dumps(content)\nimport fastapi\napp = FastAPI(\n    debug=True,\n    description=description,\n    version=version,\n    tags_metadata=tags_metadata,\n    # default_response_class=ORJSONResponse,\n    default_response_class=fastapi.responses.ORJSONResponse,",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:170-207"
+    },
+    "1579": {
+        "file_id": 194,
+        "content": "This code snippet is from a FastAPI server template, and it sets up the default response class as ORJSONResponse. It includes a logger for printing task status, value type, and value itself. If the task status is \"SUCCESS\", it stores the result in the taskResult dictionary. The comment refers to an issue on GitHub related to using ORJSONResponse.",
+        "type": "comment"
+    },
+    "1580": {
+        "file_id": 194,
+        "content": ")\n# let us use this instead.\n# ref; https://fastapi.tiangolo.com/advanced/custom-request-and-route/\nfrom fastapi import FastAPI, Request, Response\nfrom fastapi.routing import APIRoute\nfrom typing import Callable\nfrom log_utils import terminal_column_size\nimport json\nclass ValidationErrorLoggingRoute(APIRoute):\n    def get_route_handler(self) -> Callable:\n        original_route_handler = super().get_route_handler()\n        async def custom_route_handler(request: Request) -> Response:\n            try:\n                return await original_route_handler(request)\n            # except RequestValidationError as exc:\n            except Exception as e:\n                is_json = False\n                try:\n                    body = await request.json()\n                    body = json.dumps(body, indent=4, ensure_ascii=False)\n                    is_json = True\n                except:\n                    body = await request.body()\n                logger_print(\n                    \"request{}\".format(\"_json\" if is_json else \"\")",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:208-235"
+    },
+    "1581": {
+        "file_id": 194,
+        "content": "This code defines a custom route handler class, `ValidationErrorLoggingRoute`, which extends the default FastAPI route handler. It attempts to handle requests, logging request details and potential exceptions while preserving the original route handler functionality.",
+        "type": "comment"
+    },
+    "1582": {
+        "file_id": 194,
+        "content": "                    .upper()\n                    .center(terminal_column_size, \"_\"),\n                    body,\n                )\n                logger_print(\"exception\".upper().center(terminal_column_size, \"_\"), e)\n                # detail = {\"errors\": exc.errors(), \"body\": body.decode()}\n                # raise HTTPException(status_code=422, detail=detail)\n                raise e\n        return custom_route_handler\napp.router.route_class = ValidationErrorLoggingRoute\n# @app.exception_handler(RequestValidationError)\n# async def request_validation_exception_handler(\n#     request: Request, exc: RequestValidationError\n# ) -> JSONResponse:\n#     # TODO: log request body\n#     # logger_print(\"request\", await request.body(), logger=logger)\n#     logger_print(\"exception\", exc.raw_errors, exc.body, logger=logger)\n#     return JSONResponse(\n#         status_code=HTTP_422_UNPROCESSABLE_ENTITY,\n#         content={\"detail\": jsonable_encoder(exc.errors())},\n#     )\nimport uuid\n@remove_stale_tasks_decorator\n@app.post(\n    \"/calculate_async\",",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:236-267"
+    },
+    "1583": {
+        "file_id": 194,
+        "content": "The code is defining a route for asynchronous task calculation and implementing exception handling. The `/calculate_async` route handles POST requests, and the `ValidationErrorLoggingRoute` class logs exceptions raised in the request handler. It also defines an exception handler for `RequestValidationError`, logging the request body and returning a 422 Unprocessable Entity response with error details. Additionally, it utilizes `logger_print` function to log strings formatted as underlines. The `uuid` module is imported but not utilized in this code snippet.",
+        "type": "comment"
+    },
+    "1584": {
+        "file_id": 194,
+        "content": "    tags=[\"async\"],\n    description=\"填写数据并提交拓扑图，如果还有计算资源，提交状态为成功，返回计算ID，否则不返回计算ID，提交状态为失败\",\n    summary=\"异步提交能流拓扑图\",\n    response_description=\"提交状态以及模型计算ID,根据ID获取计算结果\",\n    response_model=CalculationAsyncSubmitResult,\n)\ndef calculate_async(\n    graph: EnergyFlowGraph if not (ies_env.FAILSAFE or ies_env.STATIC_MOCK) else dict,\n    background_task: BackgroundTasks,\n) -> CalculationAsyncSubmitResult:\n    # use celery\n    calculation_id = None\n    submit_result = \"failed\"\n    if ies_env.STATIC_MOCK:\n        submit_result = \"success\"\n        calculation_id = uuid.uuid4().__str__()\n    else:\n        try:\n            function_id = \"fastapi_celery.calculate_energyflow_graph\"\n            task = celery_app.send_task(\n                function_id, args=(graph if isinstance(graph, dict) else graph.dict(),)\n            )  # async result?\n            taskInfo[task.id] = datetime.datetime.now()\n            taskDict[task.id] = task\n            background_task.add_task(background_on_message, task)\n            calculation_id = task.id",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:268-294"
+    },
+    "1585": {
+        "file_id": 194,
+        "content": "This function accepts an energy flow graph, and depending on the environment settings, it either returns a calculation ID or states that the submission has failed. In non-static mock or failsafe environments, the function uses Celery to send a task with the graph data for further processing. If successful, a unique calculation ID is generated and stored in the task dictionary.",
+        "type": "comment"
+    },
+    "1586": {
+        "file_id": 194,
+        "content": "            submit_result = \"success\"\n        except:\n            traceback.print_exc()\n    if ies_env.FAILSAFE:\n        if calculation_id is None:\n            calculation_id = uuid.uuid4().__str__()\n        if submit_result is not \"success\":\n            submit_result = \"success\"\n    return CalculationAsyncSubmitResult(\n        calculation_id=calculation_id,\n        submit_result=\"success\",\n    )\n@remove_stale_tasks_decorator\n@app.get(\n    \"/get_calculation_state\",\n    tags=[\"async\"],\n    response_model=CalculationStateResult,\n    response_description=\"Celery内置任务状态，如果是null则表示不存在该任务\",\n    summary=\"获取计算状态\",\n    description=\"根据计算ID获取计算状态\",\n)\ndef get_calculation_state(calculation_id: str) -> CalculationStateResult:\n    \"\"\"\n    根据计算ID获取计算状态\n    Args:\n        calculation_id (str): 计算ID\n    Returns:\n        calculation_state (CalculationStateResult): 计算状态\n    \"\"\"\n    if ies_env.STATIC_MOCK or ies_env.FAILSAFE:\n        calculation_state = \"SUCCESS\"\n        # return CalculationStateResult(calculation_state=\"SUCCESS\")\n    else:",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:295-331"
+    },
+    "1587": {
+        "file_id": 194,
+        "content": "Code tries to handle calculation state requests for a microgrid application. It handles the submission of calculations and retrieves their status using Celery's internal task state. If the environment is in FAILSAFE mode or static mock, it returns success as default calculation state. The code uses FastAPI for handling HTTP requests and return results in JSON format.",
+        "type": "comment"
+    },
+    "1588": {
+        "file_id": 194,
+        "content": "        # calculation_state = None\n        # task = taskDict.get(calculation_id, None)\n        if task := taskDict.get(calculation_id, None):\n            calculation_state = task.state\n        else:\n            calculation_state = \"NOT_CREATED\"\n    return CalculationStateResult(calculation_state=calculation_state)\n# from fastapi_datamodel_template import ParetoCurve\nfrom log_utils import logger_traceback\n@remove_stale_tasks_decorator\n@app.get(\n    \"/get_calculation_result_async\",\n    tags=[\"async\"],\n    description=\"提交计算ID，返回计算状态，如果计算完毕会一起返回数据，否则数据为空\",\n    summary=\"异步获取能流拓扑计算结果\",\n    response_description=\"计算状态和计算结果\",\n    response_model=CalculationAsyncResult,\n)\ndef get_calculation_result_async(calculation_id: str):\n    if ies_env.STATIC_MOCK:\n        calculation_result, calculation_state = getStaticCalculationResultAndState()\n    else:\n        try:\n            calculation_result = taskResult.get(calculation_id, None)\n            calculation_state = get_calculation_state(calculation_id).calculation_state\n            if calculation_result is None:",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:332-362"
+    },
+    "1589": {
+        "file_id": 194,
+        "content": "Function returns the current state of a calculation asynchronously and the result if completed. If the calculation is not yet completed, the result is empty. It fetches task details for the given ID, checks its state, and retrieves the result from `taskResult` dictionary if available. The function can be used to track and retrieve results for calculations performed in a microgrid system.",
+        "type": "comment"
+    },
+    "1590": {
+        "file_id": 194,
+        "content": "                if calculation_state == \"FAILURE\":\n                    if ies_env.FAILSAFE:\n                        (\n                            calculation_result,\n                            calculation_state,\n                        ) = getStaticCalculationResultAndState()\n                    else:\n                        error_log = error_log_dict.get(calculation_id, None)\n                        if error_log:\n                            calculation_result = CalculationResult(\n                                resultList=[], success=False, error_log=error_log\n                            ).dict()\n            else:\n                calculation_result = CalculationResult.parse_obj(calculation_result)\n        except Exception as exc:\n            if ies_env.FAILSAFE:\n                (\n                    calculation_result,\n                    calculation_state,\n                ) = getStaticCalculationResultAndState()\n                logger_traceback()\n            else:\n                raise exc\n        # calculation_result = (",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:363-386"
+    },
+    "1591": {
+        "file_id": 194,
+        "content": "This code handles failed calculations. If the calculation state is \"FAILURE\", it checks if ies_env's FAILSAFE flag is set. If set, it retrieves a static calculation result and state. If not, it gets the error log associated with the calculation ID and creates a new CalculationResult object with an empty result list, success=False, and the error log. Otherwise, if any exception occurs during the execution of the code, it again checks the FAILSAFE flag. If set, it retrieves a static calculation result and state and logs the traceback. If not, it re-raises the exception.",
+        "type": "comment"
+    },
+    "1592": {
+        "file_id": 194,
+        "content": "        #     CalculationResult.parse_obj(calculation_result)\n        #     if calculation_result\n        #     else None\n        # )\n    # this is for generating pareto curve. since we cannot persist it, leave it to frontend.\n    # if isinstance(calculation_result, CalculationResult):\n    #     if len(RL:=calculation_result.resultList)>1:\n    #         plotList = []\n    #         for result in RL:\n    #             OR = result.objectiveResult\n    #             plotList.append((OR.financialObjective,OR.environmentalObjective))\n    #         plotList.sort(lambda x: x[0])\n    #         calculation_result.paretoCurve = ParetoCurve(x=[e[0] for e in plotList],x_label='经济', y=[e[1] for e in plotList], y_label='环保')\n    return CalculationAsyncResult(\n        calculation_state=calculation_state,\n        calculation_result=calculation_result,\n    )\ndef getStaticCalculationResultAndState():\n    calculation_result = mock_calculation_result.copy()\n    calculation_state = \"SUCCESS\"\n    return calculation_result, calculation_state",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:387-412"
+    },
+    "1593": {
+        "file_id": 194,
+        "content": "This code segment calculates and generates a Pareto curve from the result list of a CalculationResult object, if the length of the result list is greater than 1. It sorts the data based on financial objective values and sets the x-label to \"经济\" (economy) and y-label to \"环保\" (environment). The getStaticCalculationResultAndState() function returns a mock calculation result and state as success for testing purposes.",
+        "type": "comment"
+    },
+    "1594": {
+        "file_id": 194,
+        "content": "@remove_stale_tasks_decorator\n@app.get(\n    \"/revoke_calculation\",\n    tags=[\"async\"],\n    description=\"提交计算ID，撤销计算\",\n    summary=\"撤销计算任务\",\n    response_description=\"返回撤销计算状态\",\n    response_model=RevokeResult,\n    # different code and different response models.\n    # so you would return in different models and the api will handle the code.\n    # by default there are some reserved code, for every api. no need to define your own? or the system will merge the custom response code with default ones automatically?\n    # responses={\"200\": {\"description\": \"撤销成功\", \"model\": RevokeResult}},\n)\ndef revoke_calculation(calculation_id: str):\n    revoke_result = \"failed\"\n    calculation_state = None\n    if ies_env.STATIC_MOCK:\n        revoke_result = \"success\"\n        calculation_state = \"REVOKED\"\n    else:\n        if calculation_id in taskDict.keys():\n            logger_print(\"TERMINATING TASK:\", calculation_id)\n            taskDict[calculation_id].revoke(terminate=True)\n            revoke_result = \"success\"\n            calculation_state = get_calculation_state(calculation_id).calculation_state",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:415-440"
+    },
+    "1595": {
+        "file_id": 194,
+        "content": "This code defines an API endpoint for revoking a calculation. If the static mock environment is enabled, it returns success and sets the state to \"REVOKED\". Otherwise, if the calculation ID exists in the task dictionary, it terminates the task and returns success with the new calculation state.",
+        "type": "comment"
+    },
+    "1596": {
+        "file_id": 194,
+        "content": "        else:\n            logger_print(\"TASK DOES NOT EXIST:\", calculation_id)\n            calculation_state = \"NOT_CREATED\"\n    if ies_env.FAILSAFE:\n        if revoke_result is not \"success\":\n            revoke_result = \"success\"\n        if calculation_state is not \"REVOKED\":\n            calculation_state = \"REVOKED\"\n    return RevokeResult(\n        revoke_result=revoke_result, calculation_state=calculation_state\n    )\nfrom typing import List\n@app.get(\n    \"/get_calculation_ids\",\n    tags=[\"async\"],\n    response_model=List[str],\n    response_description=\"缓存中可查询的任务ID列表\",\n    description=\"任务如果24小时内没有状态更新会被清出缓存，检查缓存中的所有可查询任务ID\",\n    summary=\"查询任务ID\",\n)\ndef get_calculation_ids() -> List[str]:\n    if ies_env.STATIC_MOCK:\n        calculation_ids = []\n    else:\n        calculation_ids = list(taskDict.keys())\n    return calculation_ids\nimport uvicorn\nuvicorn.run(app, host=host, port=port)",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_server_template.py:441-476"
+    },
+    "1597": {
+        "file_id": 194,
+        "content": "The code includes a function that handles task revocation and returns a RevokeResult object. It also has an endpoint to retrieve a list of calculation IDs from the cache. If the environment is in FAILSAFE mode, it ensures the task revocation and state are properly updated. The code imports necessary modules and runs the FastAPI server using Uvicorn.",
+        "type": "comment"
+    },
+    "1598": {
+        "file_id": 195,
+        "content": "/microgrid_base/fastapi_terminate_service.sh",
+        "type": "filepath"
+    },
+    "1599": {
+        "file_id": 195,
+        "content": "This script kills the rabbitmq and redis processes using the TERM signal, then waits for 3 seconds before terminating any remaining panes with tmux's kill-server command.",
+        "type": "summary"
+    }
+}

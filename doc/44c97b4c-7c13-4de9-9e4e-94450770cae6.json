@@ -1,0 +1,10 @@
+{
+    "summary": "This code installs required dependencies and generates a TypeScript client for a FastAPI server using the openapi-typescript-codegen tool, based on the provided fastapi_openapi.json file.",
+    "details": [
+        {
+            "comment": "This code installs required dependencies and generates a TypeScript client for a FastAPI server using the openapi-typescript-codegen tool, based on the provided fastapi_openapi.json file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_generate_nodejs_client_typescript.cmd\":0-2",
+            "content": "REM install the thing first.\nREM npm i -g openapi openapi-typescript-codegen \nopenapi --file fastapi_openapi.json --output-dir typescript_fastapi_client"
+        }
+    ]
+}

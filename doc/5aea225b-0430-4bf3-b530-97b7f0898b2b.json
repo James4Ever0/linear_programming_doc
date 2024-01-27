@@ -1,0 +1,10 @@
+{
+    "summary": "Macro definition and loop through Python files, creating rules for each file. For each file, it generates an output rule with the joined outputs, input file name, and joined inputs. It then executes a Python command using the macro to build the file.",
+    "details": [
+        {
+            "comment": "Macro definition and loop through Python files, creating rules for each file. For each file, it generates an output rule with the joined outputs, input file name, and joined inputs. It then executes a Python command using the macro to build the file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Makefile.j2\":0-5",
+            "content": "{%macro J(mlist)%}{{\" \".join(mlist)}}{% endmacro%}\n{% for e in python_files%}\n{{J(e.outputs)}}: {{e.fname}} {{J(e.inputs)}}\n    python3 $< {{J(e.args)}}\n{% endfor %}"
+        }
+    ]
+}

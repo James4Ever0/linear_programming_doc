@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the regular expression module, assigns a source string and a source_2 string, defines a pattern using regex to extract text inside parentheses, uses findall to search for matches in source_2, if there is at least one match, assigns them to variables 'a' and 'b', prints these values, otherwise, it prints the value of source_2.",
+    "details": [
+        {
+            "comment": "This code imports the regular expression module, assigns a source string and a source_2 string, defines a pattern using regex to extract text inside parentheses, uses findall to search for matches in source_2, if there is at least one match, assigns them to variables 'a' and 'b', prints these values, otherwise, it prints the value of source_2.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/regex_extract_bracket.py\":0-13",
+            "content": "import re\nsource = \"\u989d\u5b9a\u53d1\u7535\u529f\u7387(kW)\"\nsource_2 = \"\u751f\u4ea7\u5382\u5546\"\npattern = r'(\\w+)\\((\\w+)\\)'\nresult = re.findall(pattern, source_2)\nif len(result) > 0:\n    a, b = result[0]\n    print(f\"a={a}\\nb={b}\")\nelse:\n    print(f\"a={source_2}\")\n#a = \"\u989d\u5b9a\u53d1\u7535\u529f\u7387\"\n#b = \"kW\""
+        }
+    ]
+}

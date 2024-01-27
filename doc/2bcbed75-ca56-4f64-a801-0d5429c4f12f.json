@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the datetime module, creates two date objects (a and b), calculates the time difference between them using timedelta function, and then prints the result. The purpose is to determine the number of days between the given dates.",
+    "details": [
+        {
+            "comment": "This code imports the datetime module, creates two date objects (a and b), calculates the time difference between them using timedelta function, and then prints the result. The purpose is to determine the number of days between the given dates.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_timedelta.py\":0-7",
+            "content": "import datetime\na=datetime.datetime(year=2023,month=3,day=21)\nb=datetime.datetime(year=2023,month=4,day=23)\ntimedelta=b-a\nprint(timedelta)\nbreakpoint()"
+        }
+    ]
+}

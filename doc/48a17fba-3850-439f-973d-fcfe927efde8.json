@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a class called \"Value\" that takes a solution object as input. It has a method \"value()\" which returns the value of a variable based on its type, supporting various data types including integers, floats, lists of variables, and numpy arrays. It handles different types of variables and ensures proper handling of solution values.",
+    "details": [
+        {
+            "comment": "This code defines a class called \"Value\" that takes a solution object as input. It has a method \"value()\" which returns the value of a variable based on its type, supporting various data types including integers, floats, lists of variables, and numpy arrays. It handles different types of variables and ensures proper handling of solution values.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/result_processlib.py\":0-29",
+            "content": "import docplex\n# from docplex.mp.model import Model\nimport numpy\nclass Value(object):\n    def __init__(self, sol):\n        self.sol = sol\n    def value(self, x):\n        if isinstance(x, int):\n            return x\n        elif isinstance(x, float):\n            print(\"float\")\n            return x\n        elif isinstance(x, list) and isinstance(x[0], docplex.mp.dvar.Var):\n            return self.sol.get_values(x)\n        elif isinstance(x, docplex.mp.dvar.Var):\n            return self.sol.get_value(x)\n        elif isinstance(x, list) and isinstance(x[0], int):\n            return x\n        elif isinstance(x, list) and isinstance(x[0], float):\n            return x\n        elif isinstance(x, numpy.ndarray):\n            return x\n        else:\n            print(\"type error\")\n            return None"
+        }
+    ]
+}

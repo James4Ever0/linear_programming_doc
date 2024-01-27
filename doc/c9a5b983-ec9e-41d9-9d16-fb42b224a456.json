@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the necessary syntax from ninja and creates a new Ninja file named 'test.ninja'. The Writer class is used to write comment text into the file, which may be utilized for documentation or other purposes within the build system.",
+    "details": [
+        {
+            "comment": "This code imports the necessary syntax from ninja and creates a new Ninja file named 'test.ninja'. The Writer class is used to write comment text into the file, which may be utilized for documentation or other purposes within the build system.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/construct_ninja_file.py\":0-6",
+            "content": "import ninja.ninja_syntax as NS\noutput_path = \"test.ninja\"\nwith open(output_path, 'w+') as f:\n    wt = NS.Writer(f)\n    wt.comment('comment text')\n    # wt.close()"
+        }
+    ]
+}

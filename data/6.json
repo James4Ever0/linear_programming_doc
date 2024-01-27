@@ -1,0 +1,540 @@
+{
+    "600": {
+        "file_id": 78,
+        "content": "<a id=\"line-16\" name=\"line-16\"></a><span class=\"linenos\">16</span>    <span class=\"p\">(</span><span class=\"n\">b</span><span class=\"p\">,</span> <span class=\"mi\">1</span><span class=\"p\">,</span> <span class=\"mi\">10</span><span class=\"p\">),</span>\n<a id=\"line-17\" name=\"line-17\"></a><span class=\"linenos\">17</span><span class=\"p\">)</span>\n<a id=\"line-18\" name=\"line-18\"></a><span class=\"linenos\">18</span><span class=\"c1\"># summation = sympy.Sum(a, (a, 1, b), r)</span>\n<a id=\"line-19\" name=\"line-19\"></a><span class=\"linenos\">19</span><span class=\"c1\"># summation = sympy.Sum(c[a], (a, 1, b), r)</span>\n<a id=\"line-20\" name=\"line-20\"></a><span class=\"linenos\">20</span><span class=\"c1\"># summation</span>\n<a id=\"line-21\" name=\"line-21\"></a><span class=\"linenos\">21</span><span class=\"k\">with</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">assuming</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Q</span><span class=\"o\">.</span><",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:227-232"
+    },
+    "601": {
+        "file_id": 78,
+        "content": "The code defines a summation using SymPy's Sum function, where 'a' ranges from 1 to 'b', and the sum is performed over 'r'. The comments indicate alternative ways to define the summation with 'c[a]' instead of 'a'. No computation or assignment is being done; it seems like a placeholder for later implementation.",
+        "type": "comment"
+    },
+    "602": {
+        "file_id": 78,
+        "content": "span class=\"n\">integer</span><span class=\"p\">(</span><span class=\"n\">a</span><span class=\"p\">)):</span>\n<a id=\"line-22\" name=\"line-22\"></a><span class=\"linenos\">22</span>    <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">pretty_print</span><span class=\"p\">(</span><span class=\"n\">summation</span><span class=\"p\">)</span>\n<a id=\"line-23\" name=\"line-23\"></a><span class=\"linenos\">23</span>    <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">summation</span><span class=\"p\">)</span>\n<a id=\"line-24\" name=\"line-24\"></a><span class=\"linenos\">24</span>\n<a id=\"line-25\" name=\"line-25\"></a><span class=\"linenos\">25</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">pretty_print</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Derivative</span><span class=\"p\">(</span><span class=\"n\">b</span><span class=\"p\">,</span> <span class=\"n\">b</span><span class=\"p\">))</span>",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:232-236"
+    },
+    "603": {
+        "file_id": 78,
+        "content": "This code is using Sympy library to perform mathematical operations. Line 22 prints the pretty-printed representation of the summation variable, line 23 prints its LaTeX equivalent, and line 25 calculates and prints the derivative of variable 'b' with respect to itself.",
+        "type": "comment"
+    },
+    "604": {
+        "file_id": 78,
+        "content": "<a id=\"line-26\" name=\"line-26\"></a><span class=\"linenos\">26</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Derivative</span><span class=\"p\">(</span><span class=\"n\">b</span><span class=\"p\">,</span> <span class=\"n\">b</span><span class=\"p\">),</span> <span class=\"n\">diff_operator</span><span class=\"o\">=</span><span class=\"sa\">r</span><span class=\"s2\">&quot;\\mathrm</span><span class=\"si\">{d}</span><span class=\"s2\">&quot;</span><span class=\"p\">)</span>\n<a id=\"line-27\" name=\"line-27\"></a><span class=\"linenos\">27</span>\n<a id=\"line-28\" name=\"line-28\"></a><span class=\"linenos\">28</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Integral</span><span class=\"p\">(</span><span class=\"n\">b</span><span class=\"p\">,</span> <span class=\"n\">b</span><span class=\"p\">))</span>",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:237-239"
+    },
+    "605": {
+        "file_id": 78,
+        "content": "Code snippet is using Sympy library to convert Latex notation to Python code. It prints the derivative of variable 'b' with respect to itself and the integral of 'b'. The diff_operator is set as \"d\" in the Latex notation format.",
+        "type": "comment"
+    },
+    "606": {
+        "file_id": 78,
+        "content": "<a id=\"line-29\" name=\"line-29\"></a><span class=\"linenos\">29</span><span class=\"c1\"># sympy.print_latex(sympy.Q.negative(a))</span>\n<a id=\"line-30\" name=\"line-30\"></a><span class=\"linenos\">30</span><span class=\"c1\"># sympy.print_latex(b)</span>\n<a id=\"line-31\" name=\"line-31\"></a><span class=\"linenos\">31</span><span class=\"n\">c</span><span class=\"p\">,</span> <span class=\"n\">d</span> <span class=\"o\">=</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">symbols</span><span class=\"p\">(</span><span class=\"s2\">&quot;变量1 变量2&quot;</span><span class=\"p\">)</span>\n<a id=\"line-32\" name=\"line-32\"></a><span class=\"linenos\">32</span><span class=\"c1\"># unacceptable form.</span>\n<a id=\"line-33\" name=\"line-33\"></a><span class=\"linenos\">33</span><span class=\"c1\"># sympy.print_latex(10&gt;= c &gt;=1)</span>\n<a id=\"line-34\" name=\"line-34\"></a><span class=\"linenos\">34</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"mi\">10</span> <span class=\"o\">&gt;=</span> <span class=\"n\">c</span><span class=\"p\">)</span>",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:240-245"
+    },
+    "607": {
+        "file_id": 78,
+        "content": "Code snippet shows usage of SymPy for symbolic mathematical operations. Line 29 and 30 show comments about printing latex versions of negative a and variable b. Lines 31-34 declare variables \"c\" and \"d\", and print latex version of the inequality \"10 > c\".",
+        "type": "comment"
+    },
+    "608": {
+        "file_id": 78,
+        "content": "<a id=\"line-35\" name=\"line-35\"></a><span class=\"linenos\">35</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Reals</span><span class=\"p\">)</span>  <span class=\"c1\"># working.</span>\n<a id=\"line-36\" name=\"line-36\"></a><span class=\"linenos\">36</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Interval</span><span class=\"p\">(</span><span class=\"mi\">0</span><span class=\"p\">,</span> <span class=\"mi\">1</span><span class=\"p\">)</span><span class=\"o\">.</span><span class=\"n\">contains</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">))</span>\n<a id=\"line-37\" name=\"line-37\"></a><span class=\"linenos\">37</span>\n<a id=\"line-38\" name=\"line-38\"></a><span class=\"linenos\">38<",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:246-249"
+    },
+    "609": {
+        "file_id": 78,
+        "content": "Line 35: Prints the Latex representation of Sympy's Reals.\nLine 36: Checks if constant 'c' is contained within Interval (0, 1).\nLine 37-38: Incomplete code or missing.",
+        "type": "comment"
+    },
+    "610": {
+        "file_id": 78,
+        "content": "/span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Reals</span><span class=\"o\">.</span><span class=\"n\">contains</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">))</span>\n<a id=\"line-39\" name=\"line-39\"></a><span class=\"linenos\">39</span><span class=\"nb\">print</span><span class=\"p\">()</span>\n<a id=\"line-40\" name=\"line-40\"></a><span class=\"linenos\">40</span><span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"nb\">dir</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">))</span>\n<a id=\"line-41\" name=\"line-41\"></a><span class=\"linenos\">41</span><span class=\"nb\">print</span><span class=\"p\">()</span>\n<a id=\"line-42\" name=\"line-42\"></a><span class=\"linenos\">42</span><span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"nb\">dir</span><span class=\"p\">(</span",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:249-253"
+    },
+    "611": {
+        "file_id": 78,
+        "content": "This code is using SymPy library to print the Latex representation of a symbolic variable 'c' from the Reals set, and then it prints the attributes of the variable 'c', followed by empty lines for separation.",
+        "type": "comment"
+    },
+    "612": {
+        "file_id": 78,
+        "content": "><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Reals</span><span class=\"p\">))</span>\n<a id=\"line-43\" name=\"line-43\"></a><span class=\"linenos\">43</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">ceiling</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">))</span>\n<a id=\"line-44\" name=\"line-44\"></a><span class=\"linenos\">44</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Interval</span><span class=\"p\">(</span><span class=\"mi\">0</span><span class=\"p\">,</span> <span class=\"mi\">1</span><span class=\"p\">))</span>\n<a id=\"line-45\" name=\"line-45\"></a><span class=\"linenos\">45</span><span class=\"c1\"># sympy.print_latex(c*d) # this is bad syntax.</span>",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:253-256"
+    },
+    "613": {
+        "file_id": 78,
+        "content": "Code snippet imports SymPy and uses it to print the Latex representation of a ceiling function, an Interval object, and a mathematical expression c*d. However, there is a syntax error in line 45 as \"c*d\" cannot be directly passed to sympy.print_latex().",
+        "type": "comment"
+    },
+    "614": {
+        "file_id": 78,
+        "content": "<a id=\"line-46\" name=\"line-46\"></a><span class=\"linenos\">46</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">c</span> <span class=\"o\">*</span> <span class=\"n\">d</span><span class=\"p\">,</span> <span class=\"n\">mul_symbol</span><span class=\"o\">=</span><span class=\"sa\">r</span><span class=\"s2\">&quot;\\times&quot;</span><span class=\"p\">)</span>\n<a id=\"line-47\" name=\"line-47\"></a><span class=\"linenos\">47</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Contains</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">,</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Reals</span><span class=\"p\">))</span>\n<a id=\"line-48\" name=\"line-48\"></a><span class=\"linenos\">48</span>\n<a id=\"line-49\" name=\"line",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:257-260"
+    },
+    "615": {
+        "file_id": 78,
+        "content": "The code is using the SymPy library in Python to print the Latex representation of a mathematical expression. Line 46 multiplies two variables 'c' and 'd', with the multiplication symbol represented by \"\\times\". Line 47 checks if 'c' is contained within the Reals of SymPy's S class. No action is taken on line 48, as it seems to be incomplete.",
+        "type": "comment"
+    },
+    "616": {
+        "file_id": 78,
+        "content": "-49\"></a><span class=\"linenos\">49</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Intersection</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Naturals</span><span class=\"p\">,</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Interval</span><span class=\"p\">(</span><span class=\"mi\">0</span><span class=\"p\">,</span> <span class=\"n\">c</span><span class=\"p\">)))</span>\n<a id=\"line-50\" name=\"line-50\"></a><span class=\"linenos\">50</span>\n<a id=\"line-51\" name=\"line-51\"></a><span class=\"linenos\">51</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">ConditionSet</span><span class=\"p\">(</span><span class=\"n\">c</span",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:260-262"
+    },
+    "617": {
+        "file_id": 78,
+        "content": "The code is using Sympy library to calculate the intersection of Natural numbers and an interval defined by variable 'c'. The result is printed in LaTeX format.",
+        "type": "comment"
+    },
+    "618": {
+        "file_id": 78,
+        "content": "><span class=\"p\">,</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Contains</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">,</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Interval</span><span class=\"p\">(</span><span class=\"mi\">1</span><span class=\"p\">,</span><span class=\"n\">d</span><span class=\"p\">)),</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Integers</span><span class=\"p\">))</span>\n<a id=\"line-52\" name=\"line-52\"></a><span class=\"linenos\">52</span><span class=\"c1\"># sympy.print_latex(sympy.ConditionSet(c, (c &gt; 1) &amp; (c &lt; 10), sympy.S.Reals))</span>\n<a id=\"line-53\" name=\"line-53\"></a><span class=\"linenos\">53</span>\n<a id=\"line-54\" name=\"line-54\"></a><span class=\"linenos\">54</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">print_latex</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span cl",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:262-265"
+    },
+    "619": {
+        "file_id": 78,
+        "content": "This code creates a condition set using Sympy, specifying the interval (1, d) and using Sympy's Integer set. It then prints the LaTeX representation of this condition set.",
+        "type": "comment"
+    },
+    "620": {
+        "file_id": 78,
+        "content": "ass=\"o\">.</span><span class=\"n\">imageset</span><span class=\"p\">(</span><span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">Lambda</span><span class=\"p\">(</span><span class=\"n\">c</span><span class=\"p\">,</span> <span class=\"mi\">2</span> <span class=\"o\">*</span> <span class=\"n\">c</span><span class=\"p\">),</span> <span class=\"n\">sympy</span><span class=\"o\">.</span><span class=\"n\">S</span><span class=\"o\">.</span><span class=\"n\">Integers</span><span class=\"p\">))</span>\n</pre></div>\n</body>\n</html>",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/example_snippet.md:265-268"
+    },
+    "621": {
+        "file_id": 78,
+        "content": "This code creates a symbolic function using SymPy library, representing the function y(x) = 2*c where c is a constant. It then sets the values of this function for integer values of its domain using sympy.S.Integers.",
+        "type": "comment"
+    },
+    "622": {
+        "file_id": 79,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/extract_line_range_from_html.py",
+        "type": "filepath"
+    },
+    "623": {
+        "file_id": 79,
+        "content": "This code reads an HTML file, identifies lines to remove based on a specified range, removes the corresponding lines from the HTML, and writes the modified HTML to a new file. It uses BeautifulSoup for parsing and manipulation.",
+        "type": "summary"
+    },
+    "624": {
+        "file_id": 79,
+        "content": "input_file = \"test_code.html\"\noutput_path = \"test_code_line_10_to_20.html\"\nfrom bs4 import BeautifulSoup\nsoup = BeautifulSoup(open(input_file, \"r\").read())\nline_range = range(10, 20 + 1)\n# import rich\nelements_to_delete = []\nfor a in soup.find_all(\"a\"):\n    # print(a)\n    a_id = a.attrs[\"id\"]\n    id_no = int(a_id.split(\"-\")[-1])\n    if id_no not in line_range:\n        print(\"removing line:\", id_no)\n        elements_to_delete.append(a)\n        for elem in a.next_siblings:\n            # print(elem, elem.name)\n            if elem.name == \"a\":\n                # if elem.name !='span':\n                break\n            else:\n                elements_to_delete.append(elem)\n    # span = a.next_sibling()\n    # print(span)\n    # print(dir(a))\n    # find next sibling of \"span\".\nfor elem in elements_to_delete:\n    elem.extract()\nwith open(output_path, \"w+\") as f:\n    f.write(str(soup))",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/extract_line_range_from_html.py:1-35"
+    },
+    "625": {
+        "file_id": 79,
+        "content": "This code reads an HTML file, identifies lines to remove based on a specified range, removes the corresponding lines from the HTML, and writes the modified HTML to a new file. It uses BeautifulSoup for parsing and manipulation.",
+        "type": "comment"
+    },
+    "626": {
+        "file_id": 80,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/highlight_html.py",
+        "type": "filepath"
+    },
+    "627": {
+        "file_id": 80,
+        "content": "This code snippet uses BeautifulSoup to parse and manipulate HTML. It identifies specific elements, applies JavaScript and CSS highlighting, and saves the updated HTML document. This is part of a web scraping process.",
+        "type": "summary"
+    },
+    "628": {
+        "file_id": 80,
+        "content": "input_file = \"test_code.html\"\noutput_path = \"test_code_highlight.html\"\nfrom bs4 import BeautifulSoup\nsoup = BeautifulSoup(open(input_file, \"r\").read())\n# line_range = range(10, 20 + 1)\n# import rich\n# insert into head\ncss = open('highlight_line.css', 'r').read()\njs = open('highlight_line.js', 'r').read()\ncss_tag = soup.new_tag('style', type=\"text/css\")\ncss_tag.append(css)\njs_tag = soup.new_tag('script')\njs_tag.append(js)\nhead = soup.find('head')\nhead.append(js_tag)\nhead.append(css_tag)\nelements_to_wrap = {}\nfor a in soup.find_all(\"a\"):\n    # print(a)\n    a_id = a.attrs[\"id\"]\n    id_no = int(a_id.split(\"-\")[-1])\n    elements_to_wrap[id_no] = []\n    # if id_no not in line_range:\n    print(\"changing line:\", id_no)\n    elements_to_wrap[id_no].append(a)\n    for elem in a.next_siblings:\n        # print(elem, elem.name)\n        if elem.name == \"a\":\n            # if elem.name !='span':\n            break\n        else:\n            elements_to_wrap[id_no].append(elem)\n    # span = a.next_sibling()\n    # print(span)\n    # print(dir(a))",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/highlight_html.py:1-43"
+    },
+    "629": {
+        "file_id": 80,
+        "content": "The code reads an input HTML file, applies highlighting to specific line ranges using JavaScript and CSS, and then writes the modified HTML output. It uses BeautifulSoup for parsing and manipulation. The code identifies elements with specific IDs in the given range, wraps them with JavaScript and CSS tags, and updates a dictionary of elements to wrap.",
+        "type": "comment"
+    },
+    "630": {
+        "file_id": 80,
+        "content": "    # find next sibling of \"span\".\npre = soup.find('pre')\nfor key, elems in elements_to_wrap.items():\n    div = soup.new_tag('div',id=f'div-line-{key}')\n    for elem in elems:\n        # print(elem)\n        elem.extract()\n        div.append(elem)\n    pre.append(div)\n        #\n        # # Find the tag you wish to append to.\n        # original_tag = content.find(\"body\")\n        #\n        # # Create & append new tags.\n        # new_tag = content.new_tag(\"button\",\n        #\n        #\n        # class =\"accordion\")\n        # original_tag.append(new_tag)\n        #\n        # new_tag = content.new_tag(\"div\", class =\"panel\")\n        # original_tag.append(new_tag)\n        #\n        # new_tag = content.new_tag(\"p\")\n        # original_tag.append(new_tag)\nwith open(output_path, \"w+\") as f:\n    f.write(str(soup))",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/highlight_html.py:44-72"
+    },
+    "631": {
+        "file_id": 80,
+        "content": "This code snippet is part of a web scraping process. It searches for specific HTML elements, wraps them in new \"div\" tags, and appends the modified elements back to the original HTML document. The updated HTML document is then saved in a file.",
+        "type": "comment"
+    },
+    "632": {
+        "file_id": 81,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/highlight_line.css",
+        "type": "filepath"
+    },
+    "633": {
+        "file_id": 81,
+        "content": "This CSS code highlights lines of code by setting the \"highlight_line\" class's background color to green and the \"linenos\" class's text color to orange.",
+        "type": "summary"
+    },
+    "634": {
+        "file_id": 81,
+        "content": ".highlight_line {\n    background-color: green !important;\n}\n.linenos {\n    color: orange !important;\n}",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/highlight_line.css:1-7"
+    },
+    "635": {
+        "file_id": 81,
+        "content": "This CSS code highlights lines of code by setting the \"highlight_line\" class's background color to green and the \"linenos\" class's text color to orange.",
+        "type": "comment"
+    },
+    "636": {
+        "file_id": 82,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md",
+        "type": "filepath"
+    },
+    "637": {
+        "file_id": 82,
+        "content": "The code includes various mathematical notations and formulas, such as summation, integration, functions, and ranges for variables. It defines Variable 1 as a real number between 1 and 10, and Variable 2 as an integer within the range [1, Z].",
+        "type": "summary"
+    },
+    "638": {
+        "file_id": 82,
+        "content": "[link to line one](./test_code.html#line-50)\n[link to line two](./test_code.py)\nformula:\n$$\n\\sum_{b=1}^{10} {a}_{b}\n$$\n$$\n\\frac{d}{d b} b\n$$\n$$\n\\int b\\, \\mathrm{d}b ,{\\rm where} \\  10 \\ge b \\ge 1\n$$\n$$\n\\operatorname{Q}_{\\text{negative}}(a)\n$$\n$$\n\\mathbb{R}\n$$\n$$\n0 \\leq c \\leq 1\n$$\nfor reals:\n$$\nc \\in \\mathbb{R}\n$$\n$$\n\\left\\lceil{c}\\right\\rceil\n$$\n$$\nc \\in \\left[0, 1\\right] \\cap \\mathbb{Z}\n$$\n$$\n{\\rm dt}\n$$\n$$\n{c}' = \\cfrac{a}{1+\\cfrac{c}{d}} \n$$\n$$\n\\sqrt[3]{n} \n\\lim_{x \\to \\infty} \\frac{x}{x+1} $$\n$$\na \\bmod 24 \n$$\n$$\n\\Gamma(x) = x^2 \n\\sigma \\delta \\psi \\epsilon \\varepsilon \n$$\n$$\n{x+1 \\over x-1} + {c \\over d} \n$$\n$$\na \\times b \n$$\n$$\n变量_{1}\\times变量_{2}\n$$\n$$\n\\frac{\\mathrm{d}}{\\mathrm{d} b} b\n$$\n$$\n变量_{1} \\in \\mathbb{Q}, 变量_{1} > 0\n$$\nnatural does not contain zero, but natural_0 does\nintersection\n$$\n\\left\\{1, 2, \\ldots, 10\\right\\} \n$$\n$$\n\\left[0, 变量_{1}\\right] \\cap \\mathbb{N}\n$$\n$$\n\\left[-1, 1\\right] \\times \\left[10, 100\\right]\n$$\n$$\n\\left\\{变量_{1}\\; \\middle|\\; 变量_{1} \\in \\mathbb{R} \\wedge 变量_{1} > 1 \\right\\} \n$$\n$$\n\\left\\{2 变量_{1}\\; \\middle|\\; 变量_{1} \\in \\mathbb{Z}\\right\\} ",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md:1-104"
+    },
+    "639": {
+        "file_id": 82,
+        "content": "This code snippet contains various mathematical notations and formulas, likely used in a programming context. It includes summation, integration, functions, and more. It seems to cover different types of mathematical expressions and ranges for variables. The code appears to be documentation or a reference list of different mathematical operations and formulations.",
+        "type": "comment"
+    },
+    "640": {
+        "file_id": 82,
+        "content": "$$\n$$\n\\left\\{变量_{1}\\; \\middle|\\; 变量_{1} \\in \\mathbb{R} \\wedge 变量_{1} > 1 \\wedge 变量_{1} < 10 \\right\\} \n$$\n$$\n\\mathbb{Z} \\cap \\left[1, 变量_{2}\\right]\n$$",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/jump_to_line.md:105-113"
+    },
+    "641": {
+        "file_id": 82,
+        "content": "This code defines a set of variables. Variable 1 is a real number greater than 1 and less than 10, while Variable 2 is an integer within the range [1, Z].",
+        "type": "comment"
+    },
+    "642": {
+        "file_id": 83,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_to_html.cmd",
+        "type": "filepath"
+    },
+    "643": {
+        "file_id": 83,
+        "content": "The code snippet demonstrates various methods for rendering Markdown with LaTeX to different formats, including HTML, PDF, and executing a Playwright PDF conversion. It utilizes several tools like Pandoc, markdown-it, and npm packages.",
+        "type": "summary"
+    },
+    "644": {
+        "file_id": 83,
+        "content": "@REM python -m markdown -f jump_to_line.html -o html jump_to_line.md\n@REM https://facelessuser.github.io/pymdown-extensions/extensions/arithmatex/\n@REM https://mdit-py-plugins.readthedocs.io/\n@REM python render_markdown_with_latex.py\n@REM pandoc -o jump_to_line.html jump_to_line.md\n@REM markdown-it jump_to_line.md > jump_to_line.html\n@REM npm install markdown-it markdown-it-mathjax3\nnode render_latex.js\n@REM then pdf\n@REM no unicode support?\n@REM pandoc -o jump_to_line.pdf --pdf-engine lualatex jump_to_line.md\n@REM pandoc -o jump_to_line.pdf --pdf-engine xelatex jump_to_line.md\n@REM pandoc -o jump_to_line.pdf  jump_to_line.html\nplaywright pdf jump_to_line.html jump_to_line.pdf",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_to_html.cmd:1-15"
+    },
+    "645": {
+        "file_id": 83,
+        "content": "The code snippet demonstrates various methods for rendering Markdown with LaTeX to different formats, including HTML, PDF, and executing a Playwright PDF conversion. It utilizes several tools like Pandoc, markdown-it, and npm packages.",
+        "type": "comment"
+    },
+    "646": {
+        "file_id": 84,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_with_latex.py",
+        "type": "filepath"
+    },
+    "647": {
+        "file_id": 84,
+        "content": "This code imports the MarkdownIt library and its dollarmath_plugin for rendering LaTeX expressions in markdown. The provided sample markdown includes a LaTeX equation, and the code converts it to an HTML string. The resulting HTML string is printed.",
+        "type": "summary"
+    },
+    "648": {
+        "file_id": 84,
+        "content": "# import markdown\n# md = markdown.Markdown(extensions=[\"pymdownx.arithmatex\"], output_format=\"html\")\n# md.convertFile(input=\"jump_to_line.md\", output=\"jump_to_line.html\", encoding=\"utf-8\")\nfrom markdown_it import MarkdownIt\nfrom mdit_py_plugins.dollarmath import dollarmath_plugin\n# shall you import some script around this.\n# no better than markdown-it-mathjax3\nmd = MarkdownIt().use(dollarmath_plugin)\nsample_markdown=r\"\"\"\n# hello latex\n$$\n\\alpha = \\beta\n$$\n\"\"\"\nhtml_string = md.render(sample_markdown)\nprint(html_string)",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_with_latex.py:1-23"
+    },
+    "649": {
+        "file_id": 84,
+        "content": "This code imports the MarkdownIt library and its dollarmath_plugin for rendering LaTeX expressions in markdown. The provided sample markdown includes a LaTeX equation, and the code converts it to an HTML string. The resulting HTML string is printed.",
+        "type": "comment"
+    },
+    "650": {
+        "file_id": 85,
+        "content": "/microgrid_base/chatgpt_convert_latex_to_python/test_code.py",
+        "type": "filepath"
+    },
+    "651": {
+        "file_id": 85,
+        "content": "The code utilizes SymPy to manipulate expressions, symbols, and intervals, printing various attributes and LaTeX representations. It showcases different functions and defines conditional sets with logical expressions.",
+        "type": "summary"
+    },
+    "652": {
+        "file_id": 85,
+        "content": "print(\"first line\")\nprint(\"second line\")\nimport sympy\n# ref: https://github.com/sympy/sympy/issues/9861\n# a, b= sympy.symbols(\"a b\")\n# a, b= sympy.symbols(\"a_b b\")\n# a, b= sympy.symbols(\"a^b b\")\n# r = sympy.Range(1,10)\nb = sympy.symbols(\"b\", positive=True, integer=True)\na = sympy.IndexedBase(\"a\")\nsummation = sympy.Sum(\n    a[b],\n    (b, 1, 10),\n)\n# summation = sympy.Sum(a, (a, 1, b), r)\n# summation = sympy.Sum(c[a], (a, 1, b), r)\n# summation\nwith sympy.assuming(sympy.Q.integer(a)):\n    sympy.pretty_print(summation)\n    sympy.print_latex(summation)\nsympy.pretty_print(sympy.Derivative(b, b))\nsympy.print_latex(sympy.Derivative(b, b), diff_operator=r\"\\mathrm{d}\")\nsympy.print_latex(sympy.Integral(b, b))\n# sympy.print_latex(sympy.Q.negative(a))\n# sympy.print_latex(b)\nc, d = sympy.symbols(\"变量1 变量2\")\n# unacceptable form.\n# sympy.print_latex(10>= c >=1)\nsympy.print_latex(10 >= c)\nsympy.print_latex(sympy.S.Reals)  # working.\nsympy.print_latex(sympy.Interval(0, 1).contains(c))\nsympy.print_latex(sympy.S.Reals.contains(c))\nprint()",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/test_code.py:1-39"
+    },
+    "653": {
+        "file_id": 85,
+        "content": "First line: imports Sympy and references a GitHub issue.\nSecond line: defines symbols \"a\" and \"b\" with specific constraints, calculates a summation using them.\nFollowing lines: manipulate and print different expressions in various formats, including pretty-printed and Latex versions, and check interval containment.\nFinal line: prints an empty line for readability.",
+        "type": "comment"
+    },
+    "654": {
+        "file_id": 85,
+        "content": "print(dir(c))\nprint()\nprint(dir(sympy.S.Reals))\nsympy.print_latex(sympy.ceiling(c))\nsympy.print_latex(sympy.Interval(0, 1))\n# sympy.print_latex(c*d) # this is bad syntax.\nsympy.print_latex(c * d, mul_symbol=r\"\\times\")\nsympy.print_latex(sympy.Contains(c, sympy.S.Reals))\nsympy.print_latex(sympy.Intersection(sympy.S.Naturals, sympy.Interval(0, c)))\nsympy.print_latex(sympy.ConditionSet(c, sympy.Contains(c, sympy.Interval(1,d)), sympy.S.Integers))\n# sympy.print_latex(sympy.ConditionSet(c, (c > 1) & (c < 10), sympy.S.Reals))\nsympy.print_latex(sympy.imageset(sympy.Lambda(c, 2 * c), sympy.S.Integers))",
+        "type": "code",
+        "location": "/microgrid_base/chatgpt_convert_latex_to_python/test_code.py:40-54"
+    },
+    "655": {
+        "file_id": 85,
+        "content": "This code uses the SymPy library to manipulate mathematical expressions, symbols, and intervals. It prints various attributes of the variables c and sympy.S.Reals, then outputs LaTeX representations of symbolic calculations using different functions like ceiling, Contains, Intersection, ConditionSet, and imageset. The code also demonstrates the use of a custom multiplication symbol and demonstrates how to define conditional sets with logical expressions.",
+        "type": "comment"
+    },
+    "656": {
+        "file_id": 86,
+        "content": "/microgrid_base/code_checker.py",
+        "type": "filepath"
+    },
+    "657": {
+        "file_id": 86,
+        "content": "The code performs file checking, exception handling, logger replacement, and Pyomo environment fixes. It also ensures correct syntax by analyzing ASTs for Field calls, raising exceptions, and providing location and source details.",
+        "type": "summary"
+    },
+    "658": {
+        "file_id": 86,
+        "content": "from log_utils import logger_print\nimport ast\nimport os\nimport astor\nimport re\nfrom typing import Callable\nfrom error_utils import ErrorManager\n# import traceback\nEXCEPTION_LIST = [\"exceptional_print.py\", \"conflict_utils.py\"]\nPYOMO_ENVIRON_SCRIPT = \"pyomo_environ.py\"\nwith ErrorManager() as em:\n    for exceptional_filepath in EXCEPTION_LIST:\n        if not os.path.exists(exceptional_filepath):\n            em.append(\n                \"exceptional filepath '%s' does not exist.\" % exceptional_filepath\n            )\n# errorManager.raise_if_any()\nIMPORT_LOGGER_PRINT = \"from log_utils import logger_print\"\nIMPORT_LOGGER_PRINT_REGEX = r\"^from[ ]+?log_utils[ ]+?import[ ]+?logger_print(?:| .+)$\"\nfixed = False\nSETUP_PYOMO_ENVIRON = \"from pyomo_environ import *\"\n# SETUP_PYOMO_ENVIRON = \"from pyomo_patch import *\"\ndef open_file_and_modify_content(\n    fpath: str, func: Callable[[str], str], modify_msg: str\n):\n    global fixed\n    with open(fpath, \"r\") as f:\n        cnt = f.read()\n    fixed_cnt = func(cnt)\n    if fixed_cnt != cnt:",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:1-39"
+    },
+    "659": {
+        "file_id": 86,
+        "content": "The code is checking the existence of specific files and preparing to modify their contents. It imports necessary functions and defines a list of exceptional files it will work with. It also handles exceptions using an ErrorManager object. The code will search for specific lines of code (logger_print import) in each file, and if not found, will raise an exception. Finally, the code is preparing to open each file, read its content, apply modifications, and store the updated version back.",
+        "type": "comment"
+    },
+    "660": {
+        "file_id": 86,
+        "content": "        logger_print(f\"fixing {modify_msg} issue in file: {fpath}\")\n        fixed = True\n        with open(fpath, \"w+\") as f:  # only modify file when necessary.\n            f.write(fixed_cnt)\n    return fixed_cnt\ndef fix_import_logger_in_content(fpath):\n    # fixed_cnt = \"\\n\\n\".join([IMPORT_LOGGER_PRINT, cnt])\n    fixed_cnt = open_file_and_modify_content(\n        fpath, lambda cnt: \"\\n\\n\".join([IMPORT_LOGGER_PRINT, cnt]), \"logger import\"\n    )\n    return fixed_cnt\ndef fix_pyomo_environ_in_content(fpath, linenos, has_toplevel_import_fix):\n    # logger_print(fpath, linenos, has_toplevel_import_fix)\n    # breakpoint()\n    def fix_pyomo_environ(cnt: str):\n        if linenos == []:\n            return cnt\n        output = []\n        if not has_toplevel_import_fix:\n            output.append(SETUP_PYOMO_ENVIRON)\n        lines = cnt.split(\"\\n\")\n        for lineno, line in enumerate(lines):\n            if lineno in linenos:\n                line = f\"# {line}\"\n            output.append(line)\n        return \"\\n\".join(output)",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:40-69"
+    },
+    "661": {
+        "file_id": 86,
+        "content": "The code snippet includes three functions: \n1. fix_import_logger_in_content: Modifies the content of a file, inserting \"logger import\" to ensure logger is imported before logging statements are executed.\n2. open_file_and_modify_content: Modifies file content by joining specified strings and potentially fixing a specified issue.\n3. fix_pyomo_environ_in_content: Modifies the content of a file, potentially inserting a line to import Pyomo environ before certain lines, based on provided linenos and has_toplevel_import_fix parameters.",
+        "type": "comment"
+    },
+    "662": {
+        "file_id": 86,
+        "content": "    fixed_cnt = open_file_and_modify_content(fpath, fix_pyomo_environ, \"pyomo environ\")\n    return fixed_cnt\n# TODO: use a single regex instead of two.\nFIND_PRINT_REGEX = r\"(?<!logger_)((rich.|)(?P<print_statement>print\\())\"\nFIND_PRINT_REGEX_FROMSTART = r\"^((rich.|)(?P<print_statement>print\\())\"\n# FIND_PRINT_REGEX = r\"(?<!logger_)((rich.|)(?P<print_statement>print\\(.*\\)))\" # \"rich.\" is part of the match, so it will be replaced. composing the replacement string only needs part of the match (not the \"rich.\" part), so we don't include that in the named group.\nREPLACE_PRINT_REGEX = \"logger_\\g<print_statement>\"\ndef fix_print_statement_in_content(fpath: str):\n    # with open(fpath, 'r') as f:\n    #     cnt = f.read()\n    # fixed_cnt = re.sub(FIND_PRINT_REGEX, REPLACE_PRINT_REGEX, cnt, re.MULTILINE)\n    def fix_print_statement(cnt: str):\n        for regex in [FIND_PRINT_REGEX, FIND_PRINT_REGEX_FROMSTART]:\n            cnt = re.sub(regex, REPLACE_PRINT_REGEX, cnt, re.MULTILINE)\n        return cnt\n    fixed_cnt = open_file_and_modify_content(",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:71-91"
+    },
+    "663": {
+        "file_id": 86,
+        "content": "This code fixes print statements in a file by replacing them with logger_ (potentially for logging purposes). It uses regular expressions to find and replace the print statements. The code provides two regex patterns, one for finding the print statements starting from any position in the line (FIND_PRINT_REGEX) and another for finding them only at the beginning of the line (FIND_PRINT_REGEX_FROMSTART). The replacement pattern, REPLACE_PRINT_REGEX, includes the \"logger_\" prefix. It reads the file content, applies the fixes using the regex patterns, and saves the modified content back to the file.",
+        "type": "comment"
+    },
+    "664": {
+        "file_id": 86,
+        "content": "        fpath,\n        fix_print_statement,\n        \"print statement\",\n    )\n    # with open(fpath, 'w+') as f:\n    #     f.write(fixed_cnt)\n    return fixed_cnt\nstripped_source = lambda el: astor.to_source(el).strip()\nfiles = os.listdir(\".\")\n# files = [\n#     \"test_replace_logger.py\",\n#     \"test_replace_logger_no_template.py\",\n#     \"test_replace_logger.py.j2\",\n# ]  # files for test!\nfor fpath in files:\n    if fpath.endswith(\".py\"):\n        if fpath in EXCEPTION_LIST:\n            logger_print(\"skipping file %s\" % fpath)\n            continue\n        with_template = (template_path := f\"{fpath}.j2\") in files\n        # with open(template_path, 'r') as f:\n        #     template_content = f.read()\n        found_import_log_utils = False if fpath != \"log_utils.py\" else True\n        found_setup_pyomo_environ = False\n        pyomo_environ_to_be_fixed_linenos = []\n        # read and fix this file.\n        content = fix_print_statement_in_content(fpath)\n        # with open(fpath, \"r\") as f:\n        #     content = f.read()\n        # # fixing print statement issue.",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:92-130"
+    },
+    "665": {
+        "file_id": 86,
+        "content": "This code reads Python files, skips certain exceptions, and checks for specific imports before fixing print statements. It also handles file templates and maintains a list of lines with Pyomo environment issues to be fixed.",
+        "type": "comment"
+    },
+    "666": {
+        "file_id": 86,
+        "content": "        # with open(fpath, 'w+') as f:\n        #     f.write(fix_print_statement_in_content(content))\n        # check pydantic field issues.\n        try:\n            tree = ast.parse(content)\n            # walk over this.\n        except:\n            # traceback.print_exc()\n            logger_print(f\"Invalid syntax found in file: {fpath}\")\n            continue\n            # might have some invalid syntax.\n        for el in ast.walk(tree):\n            if isinstance(el, ast.Call):\n                # breakpoint()\n                funcName = stripped_source(el.func)\n                if \"Field\" in funcName.split(\".\"):\n                    if len(el.args) > 0 or len(el.keywords) == 0:\n                        source_code = stripped_source(el)\n                        raise Exception(\n                            f\"Found erroneous `Field` call:\\n    Location: '{fpath}:{el.lineno}':\\n    {source_code}\"\n                            # f\"Found erroneous `Field` call:\\n    File: {fpath} line {el.lineno}:\\n    {source_code}\"\n                        )",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:131-153"
+    },
+    "667": {
+        "file_id": 86,
+        "content": "The code checks the syntax of a file and walks through its Abstract Syntax Tree (AST). It raises an exception if it encounters any erroneous `Field` call, providing the location and source code.",
+        "type": "comment"
+    },
+    "668": {
+        "file_id": 86,
+        "content": "            elif isinstance(el, ast.ImportFrom):\n                # check if really imported.\n                if el.module == \"pyomo.environ\":\n                    lineno = el.lineno\n                    pyomo_environ_to_be_fixed_linenos.append(lineno)\n                if el.level == 0:  # root level.\n                    el_source = stripped_source(el)\n                    if el_source == IMPORT_LOGGER_PRINT:\n                        found_import_log_utils = True\n                    elif el_source == SETUP_PYOMO_ENVIRON:\n                        found_setup_pyomo_environ = True\n        if fpath != PYOMO_ENVIRON_SCRIPT:\n            fix_pyomo_environ_in_content(\n                fpath, pyomo_environ_to_be_fixed_linenos, found_setup_pyomo_environ\n            )\n        if (\n            not found_import_log_utils and fpath != PYOMO_ENVIRON_SCRIPT\n        ):  # just import, do not change the print logic.\n            # if no template was found, fix just one. if template found, fix both.\n            # logger_print(f\"fixing logging issue in file: {fpath}\")",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:154-175"
+    },
+    "669": {
+        "file_id": 86,
+        "content": "Checks if \"pyomo.environ\" is imported and marks the line numbers for potential fixes. If at root level, it identifies if the import is for either \"log_utils\" or \"setup\". If not in a specific file or missing \"log_utils\", only imports \"pyomo.environ\" without changing print logic.",
+        "type": "comment"
+    },
+    "670": {
+        "file_id": 86,
+        "content": "            fix_import_logger_in_content(fpath)\n            # with open(fpath, 'w+') as f:\n            #     f.write(fix_import_logger_in_content(content))\n        if with_template:\n            template_content = fix_print_statement_in_content(template_path)\n            has_import_on_root = re.findall(\n                IMPORT_LOGGER_PRINT_REGEX, template_content, re.MULTILINE\n            )\n            if len(has_import_on_root) == 0:\n                # logger_print(f\"fixing logging issue in template: {template_path}\")\n                fix_import_logger_in_content(template_path)\n                # with open(template_path, 'w+') as f:\n                #     f.write(fix_import_logger_in_content(template_content))\nif fixed:\n    import sys\n    # logger_print(\"Please rerun the `make` command for changes!\")\n    cmdargs = \" \".join(sys.argv)\n    spliter = \"--\"\n    if spliter in sys.argv:\n        logger_print(\"Rerunning `make` command for changes.\")\n        make_cmd = cmdargs.split(spliter)[-1].strip()\n        logger_print(\"Command: %s\" % make_cmd)",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:176-202"
+    },
+    "671": {
+        "file_id": 86,
+        "content": "This code appears to be a part of a larger script or program. It checks if there are any issues with logging imports in both the content of a file and a template file. If no import statement is found, it fixes the issue by modifying the content and template files accordingly. Finally, it informs the user to rerun the `make` command if necessary, depending on the command arguments used when running the script.",
+        "type": "comment"
+    },
+    "672": {
+        "file_id": 86,
+        "content": "        os.system(make_cmd)\n    # sys.exit(1)",
+        "type": "code",
+        "location": "/microgrid_base/code_checker.py:203-204"
+    },
+    "673": {
+        "file_id": 86,
+        "content": "The code executes a command using the 'os.system()' function, which runs the command in the background and returns the completion status. The commented out line 'sys.exit(1)' suggests an alternative way to terminate the script if the command execution fails or encounters an error.",
+        "type": "comment"
+    },
+    "674": {
+        "file_id": 87,
+        "content": "/microgrid_base/conda_init.sh",
+        "type": "filepath"
+    },
+    "675": {
+        "file_id": 87,
+        "content": "This script removes all packages from the \"cplex\" conda environment and installs Python 3.11.2 in it.",
+        "type": "summary"
+    },
+    "676": {
+        "file_id": 87,
+        "content": "# source ~/.bashrc\nconda remove -n cplex --all\nconda install -n cplex python==3.11.2",
+        "type": "code",
+        "location": "/microgrid_base/conda_init.sh:1-3"
+    },
+    "677": {
+        "file_id": 87,
+        "content": "This script removes all packages from the \"cplex\" conda environment and installs Python 3.11.2 in it.",
+        "type": "comment"
+    },
+    "678": {
+        "file_id": 88,
+        "content": "/microgrid_base/config.py",
+        "type": "filepath"
+    },
+    "679": {
+        "file_id": 88,
+        "content": "This code imports necessary modules and retrieves an instance of the IESEnv data class using getConfig function. It then exports the ies_env variable to be accessed by other parts of the program.",
+        "type": "summary"
+    },
+    "680": {
+        "file_id": 88,
+        "content": "from log_utils import logger_print\nfrom config_utils import getConfig\nfrom config_dataclasses import IESEnv\nies_env = getConfig(IESEnv)\n__all__ = [\"ies_env\"]\n# if __name__ == \"__main__\":\n#     # let's test\n#     # import rich\n#     dat: IESEnv = IESEnvConfig.load()\n#     logger_print(dat)",
+        "type": "code",
+        "location": "/microgrid_base/config.py:1-14"
+    },
+    "681": {
+        "file_id": 88,
+        "content": "This code imports necessary modules and retrieves an instance of the IESEnv data class using getConfig function. It then exports the ies_env variable to be accessed by other parts of the program.",
+        "type": "comment"
+    },
+    "682": {
+        "file_id": 89,
+        "content": "/microgrid_base/config_dataclasses.py",
+        "type": "filepath"
+    },
+    "683": {
+        "file_id": 89,
+        "content": "The code defines classes for IES algorithm configurations and Docker processes, setting options like diagnostics, error handling, and docker image updates.",
+        "type": "summary"
+    },
+    "684": {
+        "file_id": 89,
+        "content": "from log_utils import logger_print\nfrom pydantic import confloat, Field  # , validator, ValidationError\nfrom config_utils import EnvBaseModel, Union\nfrom typing import Literal, Optional\nimport psutil\nphysical_cpu_core_count = psutil.cpu_count(logical=False)\nclass IESEnv(EnvBaseModel):\n    \"\"\"\n    IES algorithm program configurations.\n    \"\"\"\n    VAR_INIT_AS_ZERO: Union[None, str] = Field(\n        default=None,\n        title=\"If set to an nonempty string, then all variables will be initialized as zero, otherwise left uninitialized.\",\n    )\n    UNIT_WARNING_AS_ERROR: bool = Field(\n        default=False,\n        title=\"Treat unit related warnings as errors, such as percentage related warnings.\",\n    )\n    PERCENT_WARNING_THRESHOLD: confloat(gt=0) = Field(\n        default=1,\n        title=\"Emit warnings when any percentage values is less than given value.\",\n    )\n    STATIC_MOCK: Union[None, str] = Field(\n        default=None,\n        title=\"If set to an nonempty string, then the server will return static mock results.\",",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:1-30"
+    },
+    "685": {
+        "file_id": 89,
+        "content": "This code defines a config class `IESEnv` for the IES algorithm program configurations. It includes settings such as initializing all variables as zero, treating unit warnings as errors, and setting a percentage warning threshold to trigger warnings. The `STATIC_MOCK` setting allows the server to return static mock results when set to a nonempty string.",
+        "type": "comment"
+    },
+    "686": {
+        "file_id": 89,
+        "content": "    )\n    GENERATED_MOCK: bool = Field(\n        default=False,\n        title=\"If set to True, the server will generate mock results by analyzing the input parameters (if MOCK_TEST is False))\",\n    )\n    DETERMINISTIC_MOCK: bool = Field(\n        default=False,\n        title=\"If set to True, then the server will return deterministic synthetic mock results based on input hash.\",\n    )\n    MOCK_DATA_THRESHOLD: float = Field(\n        default=0.001,\n        title=\"Threshold for mock data manipulation, under which will not change.\",\n    )\n    ANSWER_TO_THE_UNIVERSE: int = Field(\n        default=42,\n        title=\"Answer to the universe (value related to randomness restoration)\",\n    )\n    FAILSAFE: bool = Field(\n        default=False,\n        title=\"Enable failsafe mode, which guarantees that task output will be generated in any condition.\",\n    )\n    DETERMINISTIC_FAILSAFE: bool = Field(\n        default=False, title=\"Ensure determinism in failsafe mode.\"\n    )\n    INFEASIBILITY_DIAGNOSTIC: bool = Field(\n        default=False,",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:31-60"
+    },
+    "687": {
+        "file_id": 89,
+        "content": "The code defines several boolean Field variables for configuring server behavior, such as generating mock results based on input parameters or enabling failsafe mode. It also includes a field with the default value of 42, which relates to restoring randomness, and boolean fields for diagnostic purposes.",
+        "type": "comment"
+    },
+    "688": {
+        "file_id": 89,
+        "content": "        title=\"Enable infeasibility diagnostic mode, which will perform various tests to detect and analyze infeasibility, before and after accessing the solver.\",\n    )\n    DYNAMIC_TYPE_VERIFICATION: bool = Field(\n        default=False,\n        # default = True,\n        title=\"Enable dynamic type verification on topology.\",\n    )\n    ADDER_ERROR_COMPENSATION: Literal[\n        \"none\", \"positive\", \"negative\", \"combined\"\n    ] = Field(\n        default=\"none\",\n        title=\"Mode for adder error compensation, 'none' for no compensation, 'positive' for too much input, 'negative' for too little input, and 'combined' for both.\",\n    )\n    IGNORE_ANCHOR_EXCEPTIONS: bool = Field(\n        default=True, title=\"Ignore exceptions raised by anchors in topology checks.\"\n    )\n    ADDER_ERROR_WEIGHT: float = Field(\n        default=1e9,\n        # default=1e20,\n        # default=1e7,\n        title=\"Weight of adder error in objective passed to solver.\",\n    )\n    PROLOG_STACK_LIMIT: Optional[int] = Field(\n        default=None, title=\"Prolog stack limit in gigabytes.\"",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:61-89"
+    },
+    "689": {
+        "file_id": 89,
+        "content": "The code defines several boolean and Literal fields for configuring a microgrid system. It includes options for enabling infeasibility diagnostic mode, dynamic type verification on the topology, setting adder error compensation modes, and ignoring exceptions raised by anchors. Additionally, it sets a default weight of adder error in the objective function passed to the solver and allows specifying a prolog stack limit.",
+        "type": "comment"
+    },
+    "690": {
+        "file_id": 89,
+        "content": "    )\n    PROLOG_TABLE_SIZE_LIMIT: Optional[int] = Field(\n        default=None, title=\"Prolog table limit in gigabytes.\"\n    )\n    PROLOG_SHARED_TABLE_LIMIT: Optional[int] = Field(\n        default=None, title=\"Prolog shared table limit in gigabytes.\"\n    )\n    THREAD_COUNT: Optional[int] = Field(\n        default=physical_cpu_core_count,\n        title=f\"Thread count for cplex solver, default is available physical cpu core count ({physical_cpu_core_count}).\",\n    )\n    USE_PROLOG_CODE: bool = Field(\n        default=False,\n        title=\"Use prolog (slower) instead of python for type checking state enumeration.\",\n    )\n    UNCHECK_CONNECTIVITY_IN_DYNAMIC_TYPE_VERIFICATION: bool = Field(\n        default=True,\n        # default=False,\n        title=\"If set to True, then connectivity checks will be skipped in dynamic type verification.\",\n    )\n    # @validator(\"MOCKGEN\")\n    # def validate_mockgen(cls, values, v):\n    #     mock_test = values.get(\"MOCK_TEST\", None)\n    #     if v is True:\n    #         if mock_test is None:",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:90-117"
+    },
+    "691": {
+        "file_id": 89,
+        "content": "The code defines various configuration options for a system. It includes parameters such as PROLOG_TABLE_SIZE_LIMIT, PROLOG_SHARED_TABLE_LIMIT, THREAD_COUNT, USE_PROLOG_CODE, and UNCHECK_CONNECTIVITY_IN_DYNAMIC_TYPE_VERIFICATION. The code also mentions a validator function for the \"MOCKGEN\" option but does not define it.",
+        "type": "comment"
+    },
+    "692": {
+        "file_id": 89,
+        "content": "    #             raise ValidationError(\n    #                 \"MOCKGEN shall not be set to True if MOCK_TEST is not set.\"\n    #             )\nclass DockerLauncherConfig(IESEnv):\n    \"\"\"\n    IES Docker launcher configurations.\n    Also parse algorithm related configs.\n    \"\"\"\n    NO_HALFDONE: bool = Field(\n        default=False,\n        title=\"Disable pulling half-done images from Dockerhub and build from ubuntu base image.\",\n    )\n    JUST_BUILD: bool = Field(\n        default=False, title=\"Just build docker image, don't run service.\"\n    )\n    TERMINATE_ONLY: bool = Field(\n        default=False, title=\"Only terminate all running containers and exit.\"\n    )\n    DETACH_KEYS: str = Field(\n        default=\"ctrl-d,d\",\n        title=\"Key sequence to detach from Docker container (not working on Windows)\",\n    )\n    UNITTEST: bool = Field(\n        default=False, title=\"Perform unittest before launching the service\"\n    )\n    FINAL_IMAGE_TAG: str = Field(\n        default=\"latest\",\n        title='Tag name(setting anything other than \"latest\" will skip image building and run final image with that tag instead)',",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:118-149"
+    },
+    "693": {
+        "file_id": 89,
+        "content": "The code defines a class called `DockerLauncherConfig` which is a data class for IES Docker launcher configurations. It includes various attributes such as `NO_HALFDONE`, `JUST_BUILD`, `TERMINATE_ONLY`, `DETACH_KEYS`, `UNITTEST`, and `FINAL_IMAGE_TAG`. These attributes control different aspects of the Docker image building and running process, including pulling half-done images, just building docker images, terminating all running containers, detaching from Docker container, performing unittest, and specifying final image tag.",
+        "type": "comment"
+    },
+    "694": {
+        "file_id": 89,
+        "content": "    )\n    # FORCE_UPDATE: bool = Field(\n    #     default=False,\n    #     title=\"Force updating ultimate docker image even if up-to-date (not older than 7 days).\",\n    # )\n    # UPDATE_INTERVAL_IN_DAYS: int = Field(\n    #     default=7, title=\"Update/rebuild image interval in days\"\n    # )",
+        "type": "code",
+        "location": "/microgrid_base/config_dataclasses.py:150-157"
+    },
+    "695": {
+        "file_id": 89,
+        "content": "This code snippet defines two configurable class variables, `FORCE_UPDATE` and `UPDATE_INTERVAL_IN_DAYS`, for the purpose of updating docker images. The default value for `FORCE_UPDATE` is set to False, indicating that updates will only occur if the image is older than 7 days. `UPDATE_INTERVAL_IN_DAYS` is set by default to 7 days as the interval between updates.",
+        "type": "comment"
+    },
+    "696": {
+        "file_id": 90,
+        "content": "/microgrid_base/conflict_utils.py",
+        "type": "filepath"
+    },
+    "697": {
+        "file_id": 90,
+        "content": "The code reads models, checks for conflicts using CPLEX, and creates a ConflictRefiner object. It allows users to specify output file path, conflict resolution method, and timeout in seconds through command line arguments.",
+        "type": "summary"
+    },
+    "698": {
+        "file_id": 90,
+        "content": "import sys\nassert sys.version_info >= (3, 6) and sys.version_info < (\n    3,\n    7,\n), f\"Python version mismatch!\\nExpected: >= 3.6, < 3.7\\nActual: {sys.version.split()[0]}\"\n# import argparse\nfrom argparse_utils import conflictRefinerManager\n# would you like not to modify print statements here?\n# cause we might not have anything to do with logging in \"docplex\" environment\nfrom docplex.mp.model import Model\nfrom docplex.mp.model_reader import ModelReader\nimport threading\nimport time\nimport cplex\ndef kill_cplex_after_duration(duration: int):\n    def run():\n        # pythoncom.CoInitialize()\n        print(f\"will kill cplex after {duration} secs.\")\n        time.sleep(duration)\n        print(\"calling kill_cplex\")\n        # cplex._internal._procedual.refineconflictext\n        # which uses \"cplex._internal._procedual.SigIntHandler\"\n        # \"cplex._internal._pycplex.CPXXrefineconflictext\" is taking forever.\n        # consider override that.\n        # only works on higher python versions.\n        # signal.raise_signal(signal.SIGINT)",
+        "type": "code",
+        "location": "/microgrid_base/conflict_utils.py:1-31"
+    },
+    "699": {
+        "file_id": 90,
+        "content": "Imports necessary libraries, checks Python version, defines a function to kill CPLEX after specified duration, and mentions potential issues with higher Python versions.",
+        "type": "comment"
+    }
+}

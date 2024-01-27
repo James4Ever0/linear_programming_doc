@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the 'sympy' library and defines a function called 'calc'. The function uses symbolic variables 'i' and 'x' to calculate an expression for financial calculations, specifically for annuity factors. It then iterates over the 'a_arr' list of values to update the result expression. Finally, it prints the calculated expression and returns the result after substituting values for 'i' and 'x'. The code also provides example values for 'a_arr', 'i', and 'x' to test the function.",
+    "details": [
+        {
+            "comment": "The code imports the 'sympy' library and defines a function called 'calc'. The function uses symbolic variables 'i' and 'x' to calculate an expression for financial calculations, specifically for annuity factors. It then iterates over the 'a_arr' list of values to update the result expression. Finally, it prints the calculated expression and returns the result after substituting values for 'i' and 'x'. The code also provides example values for 'a_arr', 'i', and 'x' to test the function.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/financial/financial_calc.py\":0-45",
+            "content": "import sympy\nfrom typing import cast\ndef calc(i0, a_arr: list, x0):\n    i, x = sympy.symbols('i x')\n    f = lambda i, n, a: a / ((1 + i) ** n)\n    result = cast(sympy.Expr, -x)\n    for n, a in enumerate(a_arr):\n        result += f(i, n + 1, a)\n    print('[expr]', result)\n    return result.evalf(subs={i:i0, x:x0})\n# a_arr = [\n#     -28197.28,\n#     -4789.57,\n#     6691,\n#     8706.48,\n#     8932.69,\n#     9605.62,\n#     11030.94,\n#     11281.97,\n#     11259.61,\n#     11236.13,\n#     11609.99,\n#     2075.55,\n# ]\na_arr = [\n    -28197.28,\n    -5172.43,\n    5884.55,\n    7848.69,\n    7518.68,\n    8149.41,\n    9051.99,\n    9191.49,\n    9174.72,\n    9157.11,\n    9537.14,\n    1817.88,\n]\ni = 0.05\nx = 29695.24\nret = calc(i, a_arr, x)\nprint('[val]',ret)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code reads an HTML file, identifies lines to remove based on a specified range, removes the corresponding lines from the HTML, and writes the modified HTML to a new file. It uses BeautifulSoup for parsing and manipulation.",
+    "details": [
+        {
+            "comment": "This code reads an HTML file, identifies lines to remove based on a specified range, removes the corresponding lines from the HTML, and writes the modified HTML to a new file. It uses BeautifulSoup for parsing and manipulation.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/extract_line_range_from_html.py\":0-34",
+            "content": "input_file = \"test_code.html\"\noutput_path = \"test_code_line_10_to_20.html\"\nfrom bs4 import BeautifulSoup\nsoup = BeautifulSoup(open(input_file, \"r\").read())\nline_range = range(10, 20 + 1)\n# import rich\nelements_to_delete = []\nfor a in soup.find_all(\"a\"):\n    # print(a)\n    a_id = a.attrs[\"id\"]\n    id_no = int(a_id.split(\"-\")[-1])\n    if id_no not in line_range:\n        print(\"removing line:\", id_no)\n        elements_to_delete.append(a)\n        for elem in a.next_siblings:\n            # print(elem, elem.name)\n            if elem.name == \"a\":\n                # if elem.name !='span':\n                break\n            else:\n                elements_to_delete.append(elem)\n    # span = a.next_sibling()\n    # print(span)\n    # print(dir(a))\n    # find next sibling of \"span\".\nfor elem in elements_to_delete:\n    elem.extract()\nwith open(output_path, \"w+\") as f:\n    f.write(str(soup))"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "The code moves two temporary files, a .lp file and a .cplex.log file, to their respective final locations for further use or analysis.",
+    "details": [
+        {
+            "comment": "The code moves two temporary files, a .lp file and a .cplex.log file, to their respective final locations for further use or analysis.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/init.sh\":0-1",
+            "content": "# mv /var/folders/23/y4njnnmn6td1ndrthpj_shk40000gn/T/tmpkkx0lad7.pyomo.lp .\n# mv /var/folders/23/y4njnnmn6td1ndrthpj_shk40000gn/T/tmptemoyncb.cplex.log ."
+        }
+    ]
+}

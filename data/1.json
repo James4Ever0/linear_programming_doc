@@ -1,0 +1,537 @@
+{
+    "100": {
+        "file_id": 12,
+        "content": "/cloudpss_model_template.py.j2",
+        "type": "filepath"
+    },
+    "101": {
+        "file_id": 12,
+        "content": "The code defines classes for simulation parameters, initializes device instances, calculates duration and steps, builds a ConcreteModel with power variables and constraints, and likely contains a loop to add economic constraints.",
+        "type": "summary"
+    },
+    "102": {
+        "file_id": 12,
+        "content": "from pyomo.environ import *\n{# from dataclasses import dataclass #}\nfrom pydantic import BaseModel\nimport uuid\nimport numpy as np\nimport math\nimport datetime\n{# the ConcreteModel is coming from outside, not here. \nthere are many \"hidden\" properties unknown to us. but still used in calculation, not just input and output. #}\n{# @dataclass #}\n{# you use that dash to prevent jinja from adding newline because of the comment. #}\nclass 环境(BaseModel):  # shall be array. not just numbers.\n    {%for a, b in env_param_list%}\n    _{{a}}: np.ndarray\n    \"\"\"单位：({{b}})\"\"\"\n    {%endfor%}\n    {%for a, b, c in env_param_converted_list%}\n    @property\n    def {{a}}(self):\n        \"\"\"单位：{{b}}\"\"\"\n        return self._{{a}}{{c}}\n    {%endfor%}\n{# @dataclass #}\nclass 模拟参数(BaseModel):\n    开始时间: datetime.datetime\n    结束时间: datetime.datetime\n    _步长: float\n    \"\"\"单位：分钟\"\"\"\n    @property\n    def 步长(self):\n        \"\"\"单位: 年\"\"\"\n        return self._步长 * {{(1*ureg.分钟).to(ureg.年).magnitude}}\n    @property\n    def _仿真时长(self):\n        \"\"\"单位: 天\"\"\"\n        return (self.结束时间 - self.开始时间).days",
+        "type": "code",
+        "location": "/cloudpss_model_template.py.j2:1-43"
+    },
+    "103": {
+        "file_id": 12,
+        "content": "This code defines two classes, 环境 and 模拟参数, as Pydantic models. These classes have properties representing environmental parameters and simulation parameters. The properties have units specified in comments, and some of them are converted based on given conversions. Some properties also have unit conversions defined using the ureg library.",
+        "type": "comment"
+    },
+    "104": {
+        "file_id": 12,
+        "content": "    @property\n    def 仿真时长(self):\n        \"\"\"单位: 年\"\"\"\n        return self._仿真时长 * {{(1*ureg.天).to(ureg.年).magnitude}}\n    @property\n    def 仿真步数(self):\n        \"\"\"总仿真步数\"\"\"\n        return math.floor(self.仿真时长 / self.步长)\nclass 设备:\n    def __init__(\n        self,\n        model: ConcreteModel,\n        生产厂商: str,\n        生产型号: str,\n        设备配置台数: int,\n        environ: 环境,\n        simulation_params: 模拟参数,\n        设备额定运行参数: dict = {},  # if any\n        设备运行约束: dict = {},  # if any\n        设备经济性参数: dict = {},  #  if any\n        设备工况: dict = {},  # OperateParam\n        输出类型列表: list = [],\n        输入类型列表: list = [],\n    ):\n        self.model = model\n        self.uuid = str(uuid.uuid4())\n        self.生产厂商 = 生产厂商\n        self.生产型号 = 生产型号\n        self.设备额定运行参数 = 设备额定运行参数\n        self.设备运行约束 = 设备运行约束\n        self.设备经济性参数 = 设备经济性参数\n        self.设备工况 = 设备工况\n        self.环境 = environ\n        self.模拟参数 = simulation_params\n        self.设备配置台数 = Param(initialize=设备配置台数) if type(设备配置台数) is int else Var(domain=NonNegativeIntegers)\n        self.model.add_component(f\"{self.uuid}_设备配置台数\", self.设备配置台数)",
+        "type": "code",
+        "location": "/cloudpss_model_template.py.j2:45-85"
+    },
+    "105": {
+        "file_id": 12,
+        "content": "This code defines a `Device` class that takes various parameters such as the model, manufacturer, and production model. It also includes device-specific configurations and constraints, environmental factors, and simulation parameters. The class initializes an instance of the `Device` with these parameters and adds it to a model component. The `仿真时长` property calculates the simulation duration in years, and the `仿真步数` property returns the total number of simulation steps based on the duration and step size.",
+        "type": "comment"
+    },
+    "106": {
+        "file_id": 12,
+        "content": "        {# shall you create this variable in the model please? #}\n        self.输入功率 = {}\n        self.输出功率 = {}\n        self.输入类型列表 = 输入类型列表\n        self.输出类型列表 = 输出类型列表\n        self.建立输入功率(输入类型列表)\n        self.建立输出功率(输出类型列表)\n        self.variable_indices = [i for i in range(self.模拟参数.仿真步数)]\n    def 建立输入功率(self, input_types):\n        for input_type in input_types:\n            self.输入功率[input_type] = Var(self.variable_indices)\n            {# when you use `VarList`, you use varlist.add() to create variables with index starting from 1. #}\n            self.model.add_component(\n                f\"{self.uuid}_输入功率_{input_type}\", self.输入功率[input_type]\n            )\n    def 建立输出功率(self, output_types):\n        for output_type in output_types:\n            self.输出功率[output_type] = Var(self.variable_indices)\n            self.model.add_component(\n                f\"{self.uuid}_输出功率_{output_type}\", self.输出功率[output_type]\n            )\n{% for device_name, mydict in mylist %}\nclass {{device_name}}(设备):\n    def __init__(\n        self,",
+        "type": "code",
+        "location": "/cloudpss_model_template.py.j2:86-116"
+    },
+    "107": {
+        "file_id": 12,
+        "content": "The code creates input and output power variables for a model, initializes empty dictionaries for storing them, builds input and output power lists using input/output types provided, adds these variables to the model with unique names.",
+        "type": "comment"
+    },
+    "108": {
+        "file_id": 12,
+        "content": "        model: ConcreteModel,\n        生产厂商: str,\n        生产型号: str,\n        设备配置台数: int,\n        environ: 环境,\n        simulation_params: 模拟参数,\n        设备额定运行参数: dict = {},  # if any\n        设备运行约束: dict = {},  # if any\n        设备经济性参数: dict = {},  #  if any\n        设备工况: dict = {},  # OperateParam 挡位\n        输出类型列表: list = [],\n        输入类型列表: list = [],\n    ):\n        super().__init__(\n            model=model,\n            生产厂商=生产厂商,\n            生产型号=生产型号,\n            设备配置台数=设备配置台数,\n            environ=environ,\n            simulation_params=simulation_params,\n            设备额定运行参数=设备额定运行参数,\n            设备运行约束=设备运行约束,\n            设备经济性参数=设备经济性参数,\n            设备工况=设备工况,\n            输出类型列表=输出类型列表,  # add this later.\n            输入类型列表=输入类型列表,\n        )\n        {% for key in [\"设备额定运行参数\",\"设备运行约束\",\"设备经济性参数\",\"设备工况\"]%}\n        ## 设置{{key}} ##\n        {% for a,b,c in mydict[key] %}\n        self.{{a}} = self.{{key}}[\"{{a}}\"]{{c}}\n        \"\"\"{{b}}\"\"\"\n        {% endfor %}\n        {% endfor %}\n    def add_constraints(self):\n        ...",
+        "type": "code",
+        "location": "/cloudpss_model_template.py.j2:117-154"
+    },
+    "109": {
+        "file_id": 12,
+        "content": "This code defines a ConcreteModel class with various parameters such as model, manufacturer, model number, device configuration count, environment, simulation parameters, and additional device parameters. It sets default values for optional parameters and adds constraints.",
+        "type": "comment"
+    },
+    "110": {
+        "file_id": 12,
+        "content": "    def add_economic_constraints(self):\n        ...\n{% endfor %}",
+        "type": "code",
+        "location": "/cloudpss_model_template.py.j2:156-159"
+    },
+    "111": {
+        "file_id": 12,
+        "content": "The function \"add_economic_constraints\" likely contains a loop that iterates over some economic constraints, possibly from a list or database. The code snippet provided is the end of this loop, marked by \"{% endfor %}\". It seems to indicate the termination of a for-loop block where economic constraint related tasks are being executed within the function.",
+        "type": "comment"
+    },
+    "112": {
+        "file_id": 13,
+        "content": "/cloudpss_port_get.sh",
+        "type": "filepath"
+    },
+    "113": {
+        "file_id": 13,
+        "content": "The code sends a GET request to 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' with headers, cookies for authentication and session management, and CORS settings for browser detection.",
+        "type": "summary"
+    },
+    "114": {
+        "file_id": 13,
+        "content": "curl 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' \\\n  -H 'authority: ies.cloudpss.net:8202' \\\n  -H 'accept: */*' \\\n  -H 'accept-language: zh-CN,zh;q=0.9' \\\n  -H 'cookie: first=1; theme=default; csrftoken=3FDpA3heSB6cmzwGFwUstfQ7PBCMjXi8fyhyOdAGEKlRDBCgS5n0xTLtRg3dqWF7; first=1; theme=default; TK=4e128a76808f4e283cb57df7d3fd098e18c91354; username=Steven0128; email=; id=1197; setlang=test; setlang1=test213; SECKEY_ABVK=V2LDA8s7CsTqpEEHZq0kunbrSZIbVUyBKuZLzkxV+vw%3D; BMAP_SECKEY=Gn9oAOjImVjpMeGQEOuqu-zE2PUFOpAlR0LOJUXUUmQkP5Nkqu-6wpuNDgbgk1mXXjumQhwk7yBTOiU-jHcWek_wLf9N8O3r2yss8J30VnEmuhyI2HR7aJsENkDqXayJ8W5qBUpZNx4ZXmCRabQpy15Rc0cFryLOVOB7VhKJ3qqIErNMIjvaToW7irv6Anss; csrf=y44LdL8zKAS5ekFb0juN8AQIT4sUFULlm6zyM7COSOVS2zCiYTtJGTl7xNmg5s5r; csrftoken=y44LdL8zKAS5ekFb0juN8AQIT4sUFULlm6zyM7COSOVS2zCiYTtJGTl7xNmg5s5r; sessionid=mqn7ewz4kiayaun1ztsde5vfnrxg1udl' \\\n  -H 'referer: https://ies.cloudpss.net:8202/editor/?id=21559' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"' \\",
+        "type": "code",
+        "location": "/cloudpss_port_get.sh:1-7"
+    },
+    "115": {
+        "file_id": 13,
+        "content": "The code is making a GET request to 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' with various headers and cookies. It sets the authority, accepts any content type, specifies the language as Chinese, and includes various cookies for authentication and session management. The referer is set to 'https://ies.cloudpss.net:8202/editor/?id=21559'.",
+        "type": "comment"
+    },
+    "116": {
+        "file_id": 13,
+        "content": "  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"Windows\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-origin' \\\n  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36' \\\n  -H 'x-requested-with: XMLHttpRequest'",
+        "type": "code",
+        "location": "/cloudpss_port_get.sh:8-14"
+    },
+    "117": {
+        "file_id": 13,
+        "content": "Headers being set for a CORS request, including user-agent and x-requested-with, with specific values for browser detection.",
+        "type": "comment"
+    },
+    "118": {
+        "file_id": 14,
+        "content": "/cloudpss_sdk_demo.py",
+        "type": "filepath"
+    },
+    "119": {
+        "file_id": 14,
+        "content": "The code imports the cloudpss module and defines a token for authentication. The developer plans to create APIs for algo services, annotate them with openapi doc, handle compute-intensive tasks using BackgroundTasks or celery, and investigate the cloudpss sdk for designing overall API structure.",
+        "type": "summary"
+    },
+    "120": {
+        "file_id": 14,
+        "content": "SDK_TOKEN='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjQ5NiwidXNlcm5hbWUiOiJTdGV2ZW4wMTI4Iiwic2NvcGVzIjpbXSwidHlwZSI6ImFwcGx5IiwiZXhwIjoxNzEwMzg4NjQ3LCJpYXQiOjE2NzkyODQ2NDd9.bn-opCnMyy7Fgj8oIKPdeyaUTvcTxNLgdmC4TUv-MEigA6xiStlAJrsdOOpUDTB_ccH1ERIs292gUjLaXnLt9ZJ4ncrCeq0Pf_nTsSHWYXwDXjZU4xhJ66zk917N0Cr-cEiiLU-iHBZhmovhg6RHnfGKMoToALWqszHbMXDGlcQ'\n\"\"\"\n# Plan on creating APIs for algo services\n- [create openapi doc annotation](https://fastapi.tiangolo.com/tutorial/schema-extra-example/) with fastapi\n- use [BackgroundTasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) or [celery](https://docs.celeryq.dev/en/stable/userguide/tasks.html) (check [fastapi-celery](https://github.com/GregaVrbancic/fastapi-celery/blob/master/app/main.py)) to handle comp intensive tasks\n- [investigate cloudpss sdk](https://docs.cloudpss.net/sdk/instruction_manual/guide) to design the overall APIs\n\"\"\"\nimport cloudpss\n# cloudpss.ModelTopology",
+        "type": "code",
+        "location": "/cloudpss_sdk_demo.py:1-16"
+    },
+    "121": {
+        "file_id": 14,
+        "content": "The code imports the cloudpss module and defines a token for authentication. The developer plans to create APIs for algo services, annotate them with openapi doc, handle compute-intensive tasks using BackgroundTasks or celery, and investigate the cloudpss sdk for designing overall API structure.",
+        "type": "comment"
+    },
+    "122": {
+        "file_id": 15,
+        "content": "/cloudpss_unit_conversions_test.py",
+        "type": "filepath"
+    },
+    "123": {
+        "file_id": 15,
+        "content": "This code utilizes Pint for unit conversions, defining new units, and handling invalid characters. It tests unit compatibility, converts to base units, and prints references.",
+        "type": "summary"
+    },
+    "124": {
+        "file_id": 15,
+        "content": "# there involves multiplication, division, scale factors.\nimport pint\n# similar projects: https://pint.readthedocs.io/en/stable/getting/faq.html\nureg = pint.UnitRegistry()\na = 1 * ureg.cm\nprint(a)  # centimeter?\n# either load from definition file or just here.\n# https://pint.readthedocs.io/en/stable/advanced/defining.html\nureg.define(\"元 = [currency]\")\nureg.define(\"dollar = 7 元\")\nureg.define(\"百- = 100\")\nureg.define(\"千- = 1000\")\nureg.define(\"万- = 10000\")\nureg.define(\"亿- = 100000000\")\n# b = ureg.dollar # not defined? let's define new units?\nb = 1 * ureg.元\nprint(b)\nureg.define(\"年 = year\")\nureg.define(\"m2 = meter ** 2\")  # working or not?\n# equals to \"meter * meter\"\nc = ureg.celsius\n# you cannot do this: ureg['℃']\n# this is not a valid name.\n# ureg.__getattr__(\"°C\")\nprint(c)  # invalid charactor: ℃\nprint(\n    ureg.W, ureg.kW, ureg.kWh, ureg.年, ureg.MPa, ureg.m2, ureg.MVA, ureg.Ω, ureg.MΩ\n)  # great.\nval = b.to(ureg.万元)\nprint(val, val.magnitude)  # the float val.\n# breakpoint()\nval2 = ureg.Quantity(100, \"元/kWh\").to(\"万元/kWh\")",
+        "type": "code",
+        "location": "/cloudpss_unit_conversions_test.py:1-38"
+    },
+    "125": {
+        "file_id": 15,
+        "content": "Code imports the pint library for unit conversions, defines custom units, and performs calculations with them. It demonstrates creating a UnitRegistry, defining new units, converting between units, and handling invalid characters.",
+        "type": "comment"
+    },
+    "126": {
+        "file_id": 15,
+        "content": "print(val2, val2.magnitude)\nprint()\nroot_units = val2.to_root_units()\nserialized_quantity = val2.to_tuple()\nprint(root_units)\nprint(serialized_quantity)\n# (0.01, (('万元', 1), ('kilowatt_hour', -1)))\n# how to detect and convert?\nmagnitude, unit_tuple = serialized_quantity\n# how to parse the unit tuple?\n# ureg.parse_units()\nmyUnit = ureg.UnitsContainer(unit_tuple)\nprint(\"MYUNIT:\", myUnit)\n# once you know the trick...\n# convert to preferred unit system: https://pint.readthedocs.io/en/stable/user/systems.html\n# how to create a unit system?\ntarget_base_units = ['万元','kWh']\n# # what is the target unit?\n# group = ureg.Group('IES_Unit_Group')\n# group.add_units('万元','kWh')\n# system = ureg.System(\"IES_Unit_System\")\n# system.add_groups('IES_Unit_Group')\nval_test = ureg.Quantity(100,'元/kWh')\nprint(\"TEST QUANTITY:\",val_test)\ntest_magnitude, test_unit_tuple = val_test.to_tuple()\nfor unit_name, unit_power in test_unit_tuple:\n    print(\"TEST_UNIT?\", unit_name)\n    compatible_units = ureg.get_compatible_units(unit_name) # shall be frozen set.",
+        "type": "code",
+        "location": "/cloudpss_unit_conversions_test.py:39-76"
+    },
+    "127": {
+        "file_id": 15,
+        "content": "Code is using Pint library to handle unit conversions. It converts a quantity from one set of units to another, and shows how to define a new unit system based on desired base units. The code also demonstrates getting compatible units for a specific unit name.",
+        "type": "comment"
+    },
+    "128": {
+        "file_id": 15,
+        "content": "    # why [currency] is not good?\n    print(\"COMPATIBLE UNITS:\", compatible_units)\n    breakpoint()\n# # uncertainty calculation package:\n# # https://pythonhosted.org/uncertainties/\n# ureg.default_system = \"IES_Unit_System\"\n# test_base_units = val_test.to_base_units()\n# print(\"TEST BASE UNITS:\", test_base_units)",
+        "type": "code",
+        "location": "/cloudpss_unit_conversions_test.py:77-87"
+    },
+    "129": {
+        "file_id": 15,
+        "content": "The code is testing the compatibility of units and converting them to base units using the uncertainty calculation package. It also prints out the compatible units and test base units for reference. The comment explains the purpose of this specific block of code within the larger context of the program.",
+        "type": "comment"
+    },
+    "130": {
+        "file_id": 16,
+        "content": "/cloudpss_unit_create_convert_compatible.py",
+        "type": "filepath"
+    },
+    "131": {
+        "file_id": 16,
+        "content": "Code imports the pint library for unit conversion and defines a UnitRegistry called ureg. It loads definitions from \"currency_units.txt\" file, enables contexts, and tries to get compatible units for \"元\". Compatible units are printed and the code ends with a breakpoint.",
+        "type": "summary"
+    },
+    "132": {
+        "file_id": 16,
+        "content": "import pint\n# similar projects: https://pint.readthedocs.io/en/stable/getting/faq.html\n# ureg = pint.UnitRegistry(filename = \"currency_units.txt\") # not compatible? can we merge UnitRegistries?\nureg = pint.UnitRegistry()\n# myGroup = ureg.Group(\"new_group\")\n# ureg.define(\"元 = [currency]\")\n# ureg.define(\"dollar = 7 元\")\nureg.load_definitions(\"currency_units.txt\")\n# ureg.define(\"dollar = [currency]\")\n# ureg.define(\"million_dollar = 10000000 dollar\")\nureg.enable_contexts()\n# error! \n# File \"D:\\ProgramFiles\\anaconda\\envs\\py37\\lib\\site-packages\\pint\\registry.py\", line 939, in _get_compatible_units\n#     return self._cache.dimensional_equivalents[src_dim]\nprint(\"EQUIVS:\")\nprint(ureg._cache.dimensional_equivalents)\ncompatible_units = ureg.get_compatible_units(\"元\") # maybe in different unit system?\n# compatible_units = ureg.get_compatible_units(\"dollar\")\nprint(\"COMPAT:\", compatible_units)\nbreakpoint()\n# still working for standard units?",
+        "type": "code",
+        "location": "/cloudpss_unit_create_convert_compatible.py:1-27"
+    },
+    "133": {
+        "file_id": 16,
+        "content": "Code imports the pint library for unit conversion and defines a UnitRegistry called ureg. It loads definitions from \"currency_units.txt\" file, enables contexts, and tries to get compatible units for \"元\". Compatible units are printed and the code ends with a breakpoint.",
+        "type": "comment"
+    },
+    "134": {
+        "file_id": 17,
+        "content": "/cmd_startup.cmd",
+        "type": "filepath"
+    },
+    "135": {
+        "file_id": 17,
+        "content": "This code is setting the \"Autorun\" value in the Microsoft Command Processor registry key to point to a startup script located at D:\\project\\jubilant-adventure\\startup.cmd, which will run automatically upon system startup.",
+        "type": "summary"
+    },
+    "136": {
+        "file_id": 17,
+        "content": "REG ADD \"HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Command Processor\" /v \"Autorun\" /t REG_SZ /d D:\\project\\jubilant-adventure\\startup.cmd",
+        "type": "code",
+        "location": "/cmd_startup.cmd:1-1"
+    },
+    "137": {
+        "file_id": 17,
+        "content": "This code is setting the \"Autorun\" value in the Microsoft Command Processor registry key to point to a startup script located at D:\\project\\jubilant-adventure\\startup.cmd, which will run automatically upon system startup.",
+        "type": "comment"
+    },
+    "138": {
+        "file_id": 18,
+        "content": "/cmd_startup.reg",
+        "type": "filepath"
+    },
+    "139": {
+        "file_id": 18,
+        "content": "This code adds a registry value for the \"Command Processor\" key to run the startup.cmd file located at D:\\project\\jubilant-adventure\\startup.cmd upon system startup.",
+        "type": "summary"
+    },
+    "140": {
+        "file_id": 18,
+        "content": "Windows Registry Editor Version 5.00\n[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Command Processor]\n\"AutoRun\"=D:\\project\\jubilant-adventure\\startup.cmd",
+        "type": "code",
+        "location": "/cmd_startup.reg:1-4"
+    },
+    "141": {
+        "file_id": 18,
+        "content": "This code adds a registry value for the \"Command Processor\" key to run the startup.cmd file located at D:\\project\\jubilant-adventure\\startup.cmd upon system startup.",
+        "type": "comment"
+    },
+    "142": {
+        "file_id": 19,
+        "content": "/commit.py",
+        "type": "filepath"
+    },
+    "143": {
+        "file_id": 19,
+        "content": "This code calculates MD5 checksums, handles exceptions using `better_exceptions`, modifies sys.excepthook for Git commits on Windows and Unix systems, counts modifications, verifies hooks, sets up gptcommit, and manages commit times.",
+        "type": "summary"
+    },
+    "144": {
+        "file_id": 19,
+        "content": "# this file shall be identical anywhere else.\n# TODO: fallback to default commit message when git commit failed (just add another line `git commit -m 'update'` right after `git commit --noedit`\nimport pytz\nimport datetime\nimport os\nimport shutil\nfrom easyprocess import EasyProcess\nimport traceback\nimport filelock\nfrom hashlib import md5\n# this is equivalent to commandline 'md5sum' command\ndef md5sum(filename, buf_size=8192):\n    m = md5()\n    # the with statement makes sure the file will be closed\n    with open(filename, 'rb') as f:\n        # We read the file in small chunk until EOF\n        data = f.read(buf_size)\n        while data:\n            # We had data to the md5 hash\n            m.update(data)\n            data = f.read(buf_size)\n    # We return the md5 hash in hexadecimal format\n    return m.hexdigest()\n# from easyprocess import EasyProcessError, log\n# from typing import Any\n# import tempfile\n# import subprocess\n# def start(self) -> \"EasyProcess\":\n#     \"\"\"start command in background and does not wait for it.",
+        "type": "code",
+        "location": "/commit.py:1-33"
+    },
+    "145": {
+        "file_id": 19,
+        "content": "This code defines a function for calculating the MD5 checksum of a file and imports necessary modules. It also mentions starting a command in the background without waiting for it to finish.",
+        "type": "comment"
+    },
+    "146": {
+        "file_id": 19,
+        "content": "#     :rtype: self\n#     \"\"\"\n#     if self.is_started:\n#         raise EasyProcessError(self, \"process was started twice!\")\n#     stdout: Any = None\n#     stderr: Any = None\n#     if self.use_temp_files:\n#         self._stdout_file = tempfile.TemporaryFile(prefix=\"stdout_\")\n#         self._stderr_file = tempfile.TemporaryFile(prefix=\"stderr_\")\n#         stdout = self._stdout_file\n#         stderr = self._stderr_file\n#     else:\n#         stdout = subprocess.PIPE\n#         stderr = subprocess.PIPE\n#     # cmd = list(map(uniencode, self.cmd))\n#     try:\n#         self.popen = subprocess.Popen(\n#             self.cmd,\n#             stdout=stdout,\n#             stderr=stderr,\n#             cwd=self.cwd,\n#             env=self.env,\n#             shell=True,  # override shell support.\n#         )\n#     except OSError as oserror:\n#         log.debug(\"OSError exception: %s\", oserror)\n#         self.oserror = oserror\n#         raise EasyProcessError(self, \"start error\")\n#     self.is_started = True\n#     log.debug(\"process was started (pid=%s)\", self.pid)",
+        "type": "code",
+        "location": "/commit.py:35-68"
+    },
+    "147": {
+        "file_id": 19,
+        "content": "The code is initializing a process by first checking if it has already been started. If not, it sets the stdout and stderr to temporary files or PIPEs depending on the use_temp_files setting. It then creates a Popen object using the cmd, cwd, env, and shell parameters. If an OSError occurs during process startup, it logs the error and raises EasyProcessError. Finally, it sets is_started to True and logs the process pid.",
+        "type": "comment"
+    },
+    "148": {
+        "file_id": 19,
+        "content": "#     return self\n# EasyProcess.start = start\n# on windows nt, alert us (using tkinter or native api?) if commit has failed.\n# on other platforms, please improvise.\nbase_repo = os.path.basename(os.curdir)\nrepo_basedir = os.path.abspath(\".\")\nos_name = os.name\nimport platform\nplatform_name = platform.system()\ntoast_title = f\"commit error at '{base_repo}'\"\ndef raise_exception(msg):\n    raise Exception(msg)\ndef check_proc_exit_status_base(proc: EasyProcess, action: str, printer):\n    if proc.return_code != 0:\n        printer(f\"Abnormal exit code {proc.return_code} during {action}.\")\ndef run_and_check_proc_base(cmd, action, printer=raise_exception):\n    proc = EasyProcess(cmd).call()\n    print(f\"Stdout:\\n{proc.stdout}\\nStderr:\\n{proc.stderr}\")\n    check_proc_exit_status_base(proc, action, printer)\ndef check_if_executable_in_path(\n    executable: str, extra_info=\"\", raise_exception: bool = True\n):\n    lookup_result = shutil.which(executable)\n    if lookup_result:\n        print(\"executable {} found in path: {}\".format(executable, lookup_result))",
+        "type": "code",
+        "location": "/commit.py:69-105"
+    },
+    "149": {
+        "file_id": 19,
+        "content": "Code handles exception raising for commit process, checks if executable is in system path, and prints stdout and stderr for debugging purposes.",
+        "type": "comment"
+    },
+    "150": {
+        "file_id": 19,
+        "content": "        return True\n    elif raise_exception:\n        base_exc = \"executable {} not found in path.\".format(executable)\n        if extra_info:\n            base_exc = \"\\n\".join([base_exc, extra_info])\n        raise Exception(base_exc)\n    return False\nif platform_name == \"Windows\":\n    from win10toast import ToastNotifier\n    toaster = ToastNotifier()\n    def show_toast(msg):\n        toaster.show_toast(title=toast_title, msg=msg)\nelif platform_name == \"Darwin\":\n    notifier_exec = \"terminal-notifier\"\n    check_if_executable_in_path(notifier_exec)\n    def show_toast(msg):\n        cmd = [notifier_exec, \"-title\", toast_title, \"-message\", msg]\n        run_and_check_proc_base(cmd, \"sending macos toast\")\nelif platform_name == \"Linux\":\n    notifier_exec = \"notify-send\"\n    check_if_executable_in_path(notifier_exec)\n    def show_toast(msg):\n        cmd = [notifier_exec, toast_title, msg]\n        run_and_check_proc_base(cmd, \"sending linux toast\")\nelse:\n    raise Exception(f\"\\nunable to show toast message due to unknown os: {platform_name}\")",
+        "type": "code",
+        "location": "/commit.py:106-140"
+    },
+    "151": {
+        "file_id": 19,
+        "content": "This code handles showing toast notifications on different operating systems. If the executable is found in the path, it returns True. If raise_exception is set and the executable is not found, it raises an Exception. For Windows, it uses win10toast to show a toast notification. For macOS, it uses terminal-notifier. For Linux, it uses notify-send. If an unsupported OS is detected, it raises an Exception.",
+        "type": "comment"
+    },
+    "152": {
+        "file_id": 19,
+        "content": "def emit_message_and_raise_exception(exc_info: str):\n    show_toast(exc_info)\n    raise Exception(exc_info)\nimport sys\nimport better_exceptions\ndef excepthook(exc_type, exc_value, tb):\n    better_exceptions.SUPPORTS_COLOR = False\n    formatted = \"\".join(better_exceptions.format_exception(exc_type, exc_value, tb))\n    formatted_exc = [\"<TOPLEVEL EXCEPTION>\", formatted]\n    msg = \"\\n\".join(formatted_exc)\n    with open(os.path.join(repo_basedir, \".last_failed_commit\"), \"w+\") as f:\n        f.write(msg)\n    better_exceptions.SUPPORTS_COLOR = True\n    better_exceptions.excepthook(exc_type, exc_value, tb)\nsys.excepthook = excepthook\n# currently only enable gitcommit support for each (sub)repo. no recursive commit support yet.\nrepodirs = []\nfor path, dirpath, filepath in os.walk(\".\"):\n    if \".git\" in dirpath:\n        repodirs.append(path)\ndef get_script_path_and_exec_cmd(script_prefix):\n    if os.name == \"nt\":\n        script_suffix = \"cmd\"\n        exec_prefix = \"cmd /C\"\n    else:\n        script_suffix = \"sh\"\n        exec_prefix = \"bash\"",
+        "type": "code",
+        "location": "/commit.py:143-179"
+    },
+    "153": {
+        "file_id": 19,
+        "content": "This code defines a custom exception handling process using the `better_exceptions` library. It modifies the global `sys.excepthook`, which is called whenever an unhandled Python exception occurs. When an exception happens, it formats the traceback and writes it to a file named \".last_failed_commit\" in the repo directory. This is specifically designed for handling exceptions in Git commit operations, as it searches for directories containing a \".git\" folder. The code also provides different script execution commands for Windows (cmd) and Unix-based systems (bash).",
+        "type": "comment"
+    },
+    "154": {
+        "file_id": 19,
+        "content": "    script_path = f\"{script_prefix}.{script_suffix}\"\n    cmd = f\"{exec_prefix} {script_path}\"\n    try:\n        assert os.path.exists(script_path)\n        return script_path, cmd\n    except:\n        emit_message_and_raise_exception(\n            \"script {} not found in path.\".format(script_path)\n        )\n_, COMMIT_EXEC = get_script_path_and_exec_cmd(\"commit\")\ntry:\n    assert \".\" in repodirs\nexcept:\n    emit_message_and_raise_exception(\n        f\"current directory is not a git repo root dir!\\nLocation: {repo_basedir}\"\n    )\nbase_repo_name_and_location = f\"repo {base_repo}\\nLocation: {repo_basedir}\"\n# CHECK_GPTCOMMIT_KEYS = \"gptcommit config keys\"\n# check_if_exist_keylist = [\"openai.apibase\", \"openai.api_key\"]\ndef check_proc_exit_status(proc, action):\n    check_proc_exit_status_base(proc, action, emit_message_and_raise_exception)\ndef run_and_check_proc(cmd, action):\n    run_and_check_proc_base(cmd, action, emit_message_and_raise_exception)\nreserved_repos = ['.git_backup']\nrepo_absdirs = [os.path.abspath(p) for p in repodirs if os.path.basename(p) not in reserved_repos]",
+        "type": "code",
+        "location": "/commit.py:180-215"
+    },
+    "155": {
+        "file_id": 19,
+        "content": "This code retrieves the path and command for a script named \"commit\" and checks if it exists. It then asserts that the current directory is a git repo root, obtaining the base repository name and location. The code defines functions to check process exit status and run commands while handling exceptions. It creates a list of repository directories excluding any with names from the reserved_repos list.",
+        "type": "comment"
+    },
+    "156": {
+        "file_id": 19,
+        "content": "check_if_executable_in_path(\n    \"gptcommit\", \"please install by running `cargo install --locked gptcommit`.\"\n)\nlast_commit_time_filepath = \".last_commit_time\"\n# import pathlib\n# GPTCOMMIT_HOOKED = \".gptcommit_hooked\"\nGPTCOMMIT_HOOK_MD5SUM = '69de652c2f76f0c3a209363c4943821c'\nGPTCOMMIT_HOOK_PATH = '.git/hooks/prepare-commit-msg'\ntotal_modification = 0\nrepo_absdir_to_modification = {}\nfor repo_absdir in repo_absdirs:  # is there anything needed to commit?\n    os.chdir(repo_absdir)\n    proc = EasyProcess(\"git status -s\").call()\n    check_proc_exit_status(proc, \"checking git status at %s\" % repo_absdir)\n    git_status_lines = proc.stdout.split(\"\\n\")\n    modification = 0\n    for line in git_status_lines:\n        line = line.strip()\n        if last_commit_time_filepath == line.split(\" \")[-1].strip():\n            continue\n        else:\n            modification += 1\n    print(\"Location:\", repo_absdir)\n    repo_reldir = os.path.basename(repo_absdir)\n    # proc = EasyProcess(CHECK_GPTCOMMIT_KEYS).call()\n    # check_proc_exit_status(proc, \"checking gptcommit config keys\")",
+        "type": "code",
+        "location": "/commit.py:217-245"
+    },
+    "157": {
+        "file_id": 19,
+        "content": "This code checks if the \"gptcommit\" executable is installed and then iterates through a list of repository directories. For each directory, it changes to that directory, runs \"git status -s\" to determine if there are any untracked or modified files, and counts the modifications. If there are any modifications, it continues; otherwise, it skips that directory. It also checks for the presence of a file called \".last_commit_time\".",
+        "type": "comment"
+    },
+    "158": {
+        "file_id": 19,
+        "content": "    repo_name_and_location = f\"repo {repo_reldir}\\nLocation: {repo_absdir}\"\n    # if any([k for k in check_if_exist_keylist if k not in proc.stdout]):\n    repo_absdir_to_modification[repo_absdir] = modification\n    total_modification += modification\n    # TODO: checksum the '.git/hooks/prepare-commit-msg' file if exists\n    # if not os.path.exists(GPTCOMMIT_HOOKED):\n    hooked = False\n    if os.path.exists(GPTCOMMIT_HOOK_PATH):\n        if md5sum(GPTCOMMIT_HOOK_PATH) == GPTCOMMIT_HOOK_MD5SUM:\n            hooked = True\n        else:\n            print(\"WARNING: md5sum mismatch.\")\n            print(\"Installing the hook will overwrite the existing hook.\")\n    else:\n        print(\"Could not find the hook.\")\n    if not hooked:\n        print(\n            f\"setting up gptcommmit locally at repo {repo_reldir}.\\nLocation: {repo_absdir}\"\n        )\n        setup_file, SETUP_GPTCOMMIT = get_script_path_and_exec_cmd(\"setup_gptcommit\")\n        if not os.path.exists(setup_file):\n            emit_message_and_raise_exception(",
+        "type": "code",
+        "location": "/commit.py:247-272"
+    },
+    "159": {
+        "file_id": 19,
+        "content": "This code checks if the 'prepare-commit-msg' hook exists at the specified location and verifies its MD5 sum. If it does not exist or has a mismatched MD5 sum, it will set up 'gptcommmit' locally at the repo's absolute directory.",
+        "type": "comment"
+    },
+    "160": {
+        "file_id": 19,
+        "content": "                f\"setup file '{setup_file}' does not exist in {repo_name_and_location}\"\n            )\n        run_and_check_proc(SETUP_GPTCOMMIT, \"setting up gptcommit\")\n        # pathlib.Path(GPTCOMMIT_HOOKED).touch()\n    else:\n        print(f\"assume gptcommit already setup at repo {repo_reldir}.\\nLocation: {repo_absdir}\")\nif total_modification == 0:\n    print(\"no modification, no need to commit\")\n    exit(0)\n# exit()\nos.chdir(repo_basedir)\n# setup timezone as Shanghai\ntimezone_str = \"Asia/Shanghai\"\ntimezone = pytz.timezone(timezone_str)\nprint(\"using timezone:\", timezone)\ndef get_time_now():\n    return datetime.datetime.now(tz=timezone)\ncommit_min_interval = datetime.timedelta(minutes=30)\ndef get_last_commit_time():\n    read_from_file = False\n    last_commit_time = datetime.datetime.fromtimestamp(0, tz=timezone)\n    if os.path.exists(last_commit_time_filepath):\n        with open(last_commit_time_filepath, \"r\") as f:\n            content = f.read()\n        try:\n            last_commit_time = datetime.datetime.fromisoformat(content)",
+        "type": "code",
+        "location": "/commit.py:273-311"
+    },
+    "161": {
+        "file_id": 19,
+        "content": "The code checks if the setup file for gptcommit exists in the given repository. If it does not exist, it proceeds to set up gptcommit and records its location. If the setup file already exists, it assumes gptcommit is already set up. If there are no modifications to be committed, the script exits without any action. The code then changes directory to the repository's base directory and sets the timezone to Shanghai. It defines a function to get the current time in this timezone and another to retrieve the last commit time from a file (if it exists) or initializes it to zero. If a last commit time is found, it uses ISO format, ensuring easy conversion back to datetime object when needed.",
+        "type": "comment"
+    },
+    "162": {
+        "file_id": 19,
+        "content": "            print(\"last commit time:\", last_commit_time)\n            read_from_file = True\n        except:\n            traceback.print_exc()\n    if not read_from_file:\n        print(\"using default last commit time:\", last_commit_time)\n    return last_commit_time\ndef check_if_commitable():\n    last_commit_time = get_last_commit_time()\n    time_now = get_time_now()\n    commitable = False\n    await_interval = last_commit_time + commit_min_interval - time_now\n    if await_interval.total_seconds() < 0:\n        print(\"able to commit.\")\n        commitable = True\n    else:\n        print(\n            f\"need to wait for {await_interval.total_seconds() // 60} minutes till next commit.\"\n        )\n    return commitable\ndef commit():\n    if check_if_commitable():\n        with filelock.FileLock(f\".commit_lock{'_nt' if os.name == 'nt' else ''}\" , timeout=1):\n            exit_code = os.system(COMMIT_EXEC)\n            if exit_code != 0:\n                emit_message_and_raise_exception(\n                    f\"commit changes at {base_repo_name_and_location}\"",
+        "type": "code",
+        "location": "/commit.py:312-344"
+    },
+    "163": {
+        "file_id": 19,
+        "content": "The code defines functions to check if a commit can be made based on the last commit time, and to execute the commit command if it's possible. It also handles printing error messages and exceptions for debugging purposes.",
+        "type": "comment"
+    },
+    "164": {
+        "file_id": 19,
+        "content": "                )\n            with open(last_commit_time_filepath, \"w+\") as f:\n                time_now = get_time_now()\n                print(f\"successfully commited at: {time_now}\\nLocation: {repo_basedir}\")\n                content = time_now.isoformat()\n                f.write(content)\nif __name__ == \"__main__\":\n    commit()",
+        "type": "code",
+        "location": "/commit.py:345-355"
+    },
+    "165": {
+        "file_id": 19,
+        "content": "This code snippet saves the current time as the last commit time in a file. The `get_time_now()` function retrieves the current time, which is then formatted using `isoformat()`. The content is written to the file at the specified path (`last_commit_time_filepath`) and the success message is printed to the console.",
+        "type": "comment"
+    },
+    "166": {
+        "file_id": 20,
+        "content": "/config.py",
+        "type": "filepath"
+    },
+    "167": {
+        "file_id": 20,
+        "content": "This code configures simulation parameters such as simulation rounds, time intervals, and default values. It initializes variables for the number of hours in a day (based on year setting), sunlight intensity per hour, and large numbers. The code also includes debug settings to adjust the number of hours based on run mode.",
+        "type": "summary"
+    },
+    "168": {
+        "file_id": 20,
+        "content": "\"\"\"\n仿真共享参数\n\"\"\"\n# ma = 0  # not using? moving average?\nimport numpy as np\nimport time\nlocaltime1 = time.time()\ndebug = 1\nepsilon = 1e-10\n\"\"\"\n作用:如果设置为1,将把num_hour0乘以year(year的默认值是1)\n\"\"\"\nrun = 0\nyear = 1\nday_node = 24\n\"\"\"\n一天24小时\n\"\"\"\nnode = day_node * 1 * 1\nif debug == 0:\n    num_hour = node\nelse:\n    num_hour = node * year\n# total simulation rounds?\nsimulationTime = 3600\n# a big number\nbigNumber = 10e10\n\"\"\"\n设置一个大的数,默认值为10的10次方\n\"\"\"\n# every hour of one day?\nintensityOfIllumination = np.ones(shape=num_hour)\n\"\"\"\n24小时光照强度数组,数组形状为`(num_hour0,)`,所有元素初始化为1\n\"\"\"\n# what is this \"ha\"? just sunlight stats per hour in a day?",
+        "type": "code",
+        "location": "/config.py:2-47"
+    },
+    "169": {
+        "file_id": 20,
+        "content": "This code configures simulation parameters such as simulation rounds, time intervals, and default values. It initializes variables for the number of hours in a day (based on year setting), sunlight intensity per hour, and large numbers. The code also includes debug settings to adjust the number of hours based on run mode.",
+        "type": "comment"
+    },
+    "170": {
+        "file_id": 21,
+        "content": "/create_shim_for_ipopt.ps1",
+        "type": "filepath"
+    },
+    "171": {
+        "file_id": 21,
+        "content": "This code creates a new shim file called \"ipopt.shim\" with a specified value, and then copies the \"pandoc.exe\" file to \"ipopt.exe\" in the same directory.",
+        "type": "summary"
+    },
+    "172": {
+        "file_id": 21,
+        "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/ipopt.shim -Value 'path = C:\\Users\\ss\\Downloads\\Ipopt-3.14.11-win64-msvs2019-md\\bin\\ipopt.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/ipopt.exe",
+        "type": "code",
+        "location": "/create_shim_for_ipopt.ps1:1-3"
+    },
+    "173": {
+        "file_id": 21,
+        "content": "This code creates a new shim file called \"ipopt.shim\" with a specified value, and then copies the \"pandoc.exe\" file to \"ipopt.exe\" in the same directory.",
+        "type": "comment"
+    },
+    "174": {
+        "file_id": 22,
+        "content": "/create_shim_for_nodejs.ps1",
+        "type": "filepath"
+    },
+    "175": {
+        "file_id": 22,
+        "content": "This code creates shims for Node.js executables, such as node and npm, by setting their paths to the corresponding versions and copying the pandoc.exe file. It effectively creates a shim named \"npx\" for Node.js in the specified directory.",
+        "type": "summary"
+    },
+    "176": {
+        "file_id": 22,
+        "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/node.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\node.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/node.exe\nNew-Item -Path C:/Users/ss/scoop/shims/npm.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\npm.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/npm.exe\nNew-Item -Path C:/Users/ss/scoop/shims/tsc.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\bin\\tsc.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/tsc.exe\nNew-Item -Path C:/Users/ss/scoop/shims/openapi.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\bin\\openapi.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/openapi.exe\nNew-Item -Path C:/Users/ss/scoop/shims/npx.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\npx.cmd'",
+        "type": "code",
+        "location": "/create_shim_for_nodejs.ps1:1-17"
+    },
+    "177": {
+        "file_id": 22,
+        "content": "This code creates shims for various Node.js executables (node, npm, tsc, openapi, and npx) by setting their paths to the corresponding versions. It copies the pandoc.exe file as a destination for each shim's execution path in the specified directory.",
+        "type": "comment"
+    },
+    "178": {
+        "file_id": 22,
+        "content": "Copy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/npx.cmd",
+        "type": "code",
+        "location": "/create_shim_for_nodejs.ps1:18-18"
+    },
+    "179": {
+        "file_id": 22,
+        "content": "This code is copying the pandoc.exe file from C:/Users/ss/scoop/shims to C:/Users/ss/scoop/shims/npx.cmd, effectively creating a shim named \"npx\" for Node.js.",
+        "type": "comment"
+    },
+    "180": {
+        "file_id": 23,
+        "content": "/create_shim_for_shot.ps1",
+        "type": "filepath"
+    },
+    "181": {
+        "file_id": 23,
+        "content": "Creating a shim named SHOT.shim with the specified path and copying pandoc executable to SHOT executable location.",
+        "type": "summary"
+    },
+    "182": {
+        "file_id": 23,
+        "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/SHOT.shim -Value 'path = C:\\Users\\ss\\Downloads\\SHOT\\SHOT.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/SHOT.exe",
+        "type": "code",
+        "location": "/create_shim_for_shot.ps1:1-3"
+    },
+    "183": {
+        "file_id": 23,
+        "content": "Creating a shim named SHOT.shim with the specified path and copying pandoc executable to SHOT executable location.",
+        "type": "comment"
+    },
+    "184": {
+        "file_id": 24,
+        "content": "/curl_component_get.py",
+        "type": "filepath"
+    },
+    "185": {
+        "file_id": 24,
+        "content": "The code utilizes Jinja2 templating to generate files using IDs and access paths from JSON, rendering templates for each combination and writing content to new output files.",
+        "type": "summary"
+    },
+    "186": {
+        "file_id": 24,
+        "content": "template_paths = dict(\n    optim=\"curl_optim_component_get.sh.j2\", simu=\"curl_simu_component_get.sh.j2\"\n)\nid_paths = dict(\n    optim=\"cloudpss_component_optimize_ports.json\",\n    simu=\"cloudpss_component_ports.json\"\n)\nimport json\ndef get_ids(id_path:str):\n    ids = []\n    with open(id_path) as f:\n        data = json.loads(f.read())\n        cmp = data['cmp']\n        for component in cmp:\n            _id = component['id']\n            ids.append(_id)\n    return ids\nids = {key: get_ids(val) for key, val in id_paths.items()}\nimport jinja2\nfrom jinja2 import StrictUndefined\nimport subprocess\noutput_script_path = \"script.sh\"\ncmd = ['bash', output_script_path]\n# access_paths = ['CPS','Heat']\naccess_paths = ['Heat']\n# there is no component using 'CPS'\n# simply add a new line after each call.\nimport os\nfor key, template_path in template_paths.items():\n    output_path = f\"cloudpss_{key}.mjson\"\n    os.system(f\"rm -rf {output_path}\")\n    with open(template_path,'r', encoding='utf-8') as f:\n        source = f.read()\n        template = jinja2.Template(source = source, undefined=StrictUndefined)",
+        "type": "code",
+        "location": "/curl_component_get.py:1-40"
+    },
+    "187": {
+        "file_id": 24,
+        "content": "The code defines templates for different types of components, retrieves IDs from JSON files, removes existing output files, and then generates new files using Jinja2 templating. The access paths are used to generate files based on the selected options.",
+        "type": "comment"
+    },
+    "188": {
+        "file_id": 24,
+        "content": "        for _id in ids[key]:\n            for access_path in access_paths:\n                script_content = template.render(access_path=access_path, id=_id, output_path=output_path)\n                with open(output_script_path, 'w+') as f0:\n                    f0.write(script_content)\n                output = subprocess.getoutput(cmd)\n                print(\"ACCESS PATH:\", access_path, \"ID:\", _id)\n                print(\"OUTPUT?\", output[:20])\n                with open(output_path, 'a+', encoding='utf-8') as f1:\n                    f1.write('\\n')",
+        "type": "code",
+        "location": "/curl_component_get.py:41-50"
+    },
+    "189": {
+        "file_id": 24,
+        "content": "The code iterates over IDs and access paths, rendering a template for each combination. It then writes the rendered content to a file, executes a command, prints the first 20 characters of output along with the access path and ID, and appends a newline character to an output file.",
+        "type": "comment"
+    },
+    "190": {
+        "file_id": 25,
+        "content": "/curl_optim_component_get.sh.j2",
+        "type": "filepath"
+    },
+    "191": {
+        "file_id": 25,
+        "content": "The code makes a CURL request to the specified URL with headers, retrieving a component by access_path and id from a server endpoint. Another code sets headers for curl request, redirects to an empty destination with CORS and same-origin mode, and appends the resulting command to output_path.",
+        "type": "summary"
+    },
+    "192": {
+        "file_id": 25,
+        "content": "curl 'https://ies.cloudpss.net:8201/editor/getComponentFor{{access_path}}/?id={{id}}' \\\n  -H 'authority: ies.cloudpss.net:8201' \\\n  -H 'accept: application/json, text/javascript, */*; q=0.01' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'cookie: first=1; csrftoken=Digx2EfnYitLn08WpmRGcQU4Gz1Q3mh6hpgEF1juKFXldQq1U2OiOBb7oaWDbKeX; setlang=1; TK=4e128a76808f4e283cb57df7d3fd098e18c91354; username=Steven0128; email=; id=1197; setlang1=test213; first=1; setlang=test; SECKEY_ABVK=Ep8Zj2+Hk2VQz+GHI2Xh9HpjvRnr1CRieYk6oTiz8kA%3D; BMAP_SECKEY=O6M7JkIg5MejfsdnUNF_wPSZR_1vflwZJkB4gjMH0QD4_TYMzo9Z1Ibknz3YFBF9-U9elAk74_LvBRewX_deuW8W77BePTlTJhVijK3KvQBlRYcL58bscgrR16hNwL5c1epYFdu9l7gptzM8QbEsHfZeo7sPwP7XhwlSu1eQ0VmxLqazEtzZUmVNhIFxvGNB; csrf=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; csrftoken=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; sessionid=p77kf9zc05ptkxuu69aa41karcc1hvsp' \\\n  -H 'referer: https://ies.cloudpss.net:8201/editor/?id=20983' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"' \\",
+        "type": "code",
+        "location": "/curl_optim_component_get.sh.j2:1-7"
+    },
+    "193": {
+        "file_id": 25,
+        "content": "This code is making a CURL request to the specified URL with various headers like accept, accept-language, cookie, referer, and sec-ch-ua. The purpose seems to retrieve a component by access_path and id from a server endpoint.",
+        "type": "comment"
+    },
+    "194": {
+        "file_id": 25,
+        "content": "  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-origin' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36' \\\n  -H 'x-requested-with: XMLHttpRequest' >> {{output_path}}",
+        "type": "code",
+        "location": "/curl_optim_component_get.sh.j2:8-14"
+    },
+    "195": {
+        "file_id": 25,
+        "content": "This code sets HTTP headers for a curl request, including user-agent and x-requested-with, redirecting to an empty destination with CORS and same-origin mode. It appends the resulting command to the output_path.",
+        "type": "comment"
+    },
+    "196": {
+        "file_id": 26,
+        "content": "/curl_simu_component_get.sh.j2",
+        "type": "filepath"
+    },
+    "197": {
+        "file_id": 26,
+        "content": "This code sends a HTTP request to 'https://ies.cloudpss.net:8202/editor/getComponentFor{{access_path}}/?id={{id}}' API endpoint using various headers, cookies, and referer. It requests JSON or JavaScript data in English and includes multiple session IDs, CSRF token, and CSKEY. The curl command sets user-agent, x-requested-with headers, and redirects output to output_path.",
+        "type": "summary"
+    },
+    "198": {
+        "file_id": 26,
+        "content": "curl 'https://ies.cloudpss.net:8202/editor/getComponentFor{{access_path}}/?id={{id}}' \\\n  -H 'authority: ies.cloudpss.net:8202' \\\n  -H 'accept: application/json, text/javascript, */*; q=0.01' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'cookie: first=1;  csrftoken=Digx2EfnYitLn08WpmRGcQU4Gz1Q3mh6hpgEF1juKFXldQq1U2OiOBb7oaWDbKeX; setlang=1; TK=4e128a76808f4e283cb57df7d3fd098e18c91354; username=Steven0128; email=; id=1197; setlang1=test213; first=1; setlang=test; SECKEY_ABVK=Ep8Zj2+Hk2VQz+GHI2Xh9HpjvRnr1CRieYk6oTiz8kA%3D; BMAP_SECKEY=O6M7JkIg5MejfsdnUNF_wPSZR_1vflwZJkB4gjMH0QD4_TYMzo9Z1Ibknz3YFBF9-U9elAk74_LvBRewX_deuW8W77BePTlTJhVijK3KvQBlRYcL58bscgrR16hNwL5c1epYFdu9l7gptzM8QbEsHfZeo7sPwP7XhwlSu1eQ0VmxLqazEtzZUmVNhIFxvGNB; csrf=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; csrftoken=17WRYDJs3XaCXwZejApSf5SxynslSX5UP31Edv2DOy9Its0lVXz69kwtKCeqqQh3; sessionid=d1mx1eci22ddalw7f72os0uhb6b0bjld' \\\n  -H 'referer: https://ies.cloudpss.net:8202/editor/?id=21559' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"' \\",
+        "type": "code",
+        "location": "/curl_simu_component_get.sh.j2:1-7"
+    },
+    "199": {
+        "file_id": 26,
+        "content": "This code is making a HTTP request to 'https://ies.cloudpss.net:8202/editor/getComponentFor{{access_path}}/?id={{id}}' API endpoint with various headers, cookies and referer. It asks for JSON or JavaScript data in English (accept header), accepts any data if not available (*/*; q=0.01) and sets language to English-US (accept-language). It also includes multiple cookies, session IDs, CSRF token and CSKEY.",
+        "type": "comment"
+    }
+}

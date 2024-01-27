@@ -1,0 +1,10 @@
+{
+    "summary": "This CSS code highlights lines of code by setting the \"highlight_line\" class's background color to green and the \"linenos\" class's text color to orange.",
+    "details": [
+        {
+            "comment": "This CSS code highlights lines of code by setting the \"highlight_line\" class's background color to green and the \"linenos\" class's text color to orange.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/highlight_line.css\":0-6",
+            "content": ".highlight_line {\n    background-color: green !important;\n}\n.linenos {\n    color: orange !important;\n}"
+        }
+    ]
+}

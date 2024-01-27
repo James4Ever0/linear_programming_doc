@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary libraries and defines a neural network model with an input layer, two hidden layers, and an output layer. The activation function used is Hardtanh, and the model structure is created using nn.Sequential.",
+    "details": [
+        {
+            "comment": "The code imports necessary libraries and defines a neural network model with an input layer, two hidden layers, and an output layer. The activation function used is Hardtanh, and the model structure is created using nn.Sequential.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/neural_network_demo.py\":0-16",
+            "content": "# import torch\nimport torch.nn as nn\n# from torch import Tensor\nhidden_size = 40\ninput_layer = nn.Linear(2, hidden_size)\n# activation_func = nn.ReLU()\n# activation_func = nn.RReLU()\nactivation_func = nn.Hardtanh()\nhidden_layer = nn.Linear(hidden_size, hidden_size)\noutput_layer = nn.Linear(hidden_size, 1)\n# model = nn.Sequential(input_layer, output_layer)\nmodel = nn.Sequential(\n    input_layer, activation_func, hidden_layer, activation_func, output_layer\n)"
+        }
+    ]
+}

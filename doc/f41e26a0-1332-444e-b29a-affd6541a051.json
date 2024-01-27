@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary libraries, creates a ConcreteModel with a variable v initialized as 1 and expression e defined as 2v^2 + 2. The expression is then converted to Sympy format using sympyify_expression function and logged. The logged expression is then simplified into terms and symbols using as_terms() function, which logs the result.",
+    "details": [
+        {
+            "comment": "The code imports necessary libraries, creates a ConcreteModel with a variable v initialized as 1 and expression e defined as 2v^2 + 2. The expression is then converted to Sympy format using sympyify_expression function and logged. The logged expression is then simplified into terms and symbols using as_terms() function, which logs the result.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/get_poly_degree_decompose_expression.py\":0-30",
+            "content": "from log_utils import logger_print\nfrom pyomo_environ import *\n# from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.v = Var(initialize=1)\nmodel.e = 2 * model.v * model.v + 2\n# import pyomo.core.expr as E\nfrom pyomo.core.expr.sympy_tools import sympyify_expression\n# to sympy.\nobjmap, vis = sympyify_expression(model.e)\nimport rich\nlogger_print(objmap)\nfrom sympy import Mul\n# 'getPyomoSymbol', 'getSympySymbol', 'i', 'pyomo2sympy', 'sympy2pyomo', 'sympyVars'\nlogger_print(vis)  # sympy expression.\nbreakpoint()\nlogger_print(\n    vis.as_terms()\n)  # ([(2, ((2.0, 0.0), (0,), ())), (2*x0**2, ((2.0, 0.0), (2,), ()))], [x0])\n# (terms, symbols)\n# terms = [(expr, deg, pow)]"
+        }
+    ]
+}

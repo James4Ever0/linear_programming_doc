@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a class A that extends BaseModel, and uses @validator to set the attribute 'a' to 2 when setting the attribute 'b'. The class instance b is then created with 'b'='a', and printed. This results in 'a' being updated to 2.",
+    "details": [
+        {
+            "comment": "This code defines a class A that extends BaseModel, and uses @validator to set the attribute 'a' to 2 when setting the attribute 'b'. The class instance b is then created with 'b'='a', and printed. This results in 'a' being updated to 2.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_setting_calculated_value.py\":0-11",
+            "content": "from pydantic import BaseModel, validator\nclass A(BaseModel):\n    a :int = 1\n    b:str\n    @validator('b')\n    def validate_b(cls, v, values):\n            values['a'] = 2 # working.\n            return v\nb = A(b='a')\nprint(b)"
+        }
+    ]
+}

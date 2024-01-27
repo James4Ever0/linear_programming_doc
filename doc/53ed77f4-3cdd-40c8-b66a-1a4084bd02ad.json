@@ -1,0 +1,20 @@
+{
+    "summary": "The code reads and parses microgrid topology data, creates a node list, generates a graph displaying devices and connections by type, and plots multiple topologies. This is done using the input file path, data variable, and plotMultipleTopologies function, while logging information with logger_print.",
+    "details": [
+        {
+            "comment": "This code reads and parses a dictionary containing topology data of a microgrid. It extracts information about devices, connections, and their types to create a list of nodes with specific attributes like symbol, size, and category. The extracted data is then utilized in further steps for plotting the topology.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/plot_utils.py\":0-29",
+            "content": "from pyecharts.charts import Graph\nfrom pyecharts.options import InitOpts\nimport json\nfrom log_utils import logger_print\nextract_data_key = \"mDictList\"\ndef plotSingleTopology(data: dict, output_path: str, index=0):\n    devices = data[extract_data_key][index][\"nodes\"]\n    connections = data[extract_data_key][index][\"links\"]\n    categories = [{}, {\"name\": \"\u8bbe\u5907\"}, {\"name\": \"\u6bcd\u7ebf\"}, {\"name\": \"\u951a\u70b9\"}, {\"name\": \"\u5176\u4ed6\"}]\n    # \u521b\u5efa\u8282\u70b9\u5217\u8868\n    nodes = []\n    for device in devices:\n        if device[\"type\"] == \"\u8bbe\u5907\":\n            device[\"name\"] = f\"{device['subtype']} {device.get('id')}\"\n            device[\"symbol\"] = \"diamond\"\n            device[\"symbolSize\"] = [100, 30]\n            device[\"category\"] = 1\n        elif device[\"type\"] == \"\u6bcd\u7ebf\":\n            device[\"name\"] = f\"{device['type']} {device.get('id')}\"\n            device[\"symbol\"] = \"circle\"\n            device[\"symbolSize\"] = 50\n            device[\"category\"] = 2\n        elif device[\"type\"] == \"\u951a\u70b9\":\n            device[\"name\"] = f\"{device['port_name']} {device.get('id')}\"\n            device[\"symbol\"] = \"pin\""
+        },
+        {
+            "comment": "Creates a graph of microgrid devices and connections, categorized by device type.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/plot_utils.py\":30-60",
+            "content": "            device[\"symbolSize\"] = 40\n            device[\"category\"] = 3\n        else:\n            device[\"name\"] = f\"{device['type']} {device.get('id')}\"\n            device[\"symbol\"] = \"roundRect\"\n            device[\"symbolSize\"] = [50, 5]\n            device[\"category\"] = 4\n        nodes.append(device)\n    # \u521b\u5efa\u8fde\u63a5\u7ebf\u5217\u8868\n    links = []\n    for connection in connections:\n        connection[\"symbol\"] = [\"arrow\"]\n        connection[\"lineStyle\"] = {\"width\": 2}\n        links.append(connection)\n    graph = Graph(init_opts=InitOpts(height=\"900px\", width=\"1000px\", bg_color=\"white\"))\n    graph.add(\"\", nodes, links, repulsion=1000, categories=categories)\n    logger_print(f\"graph #{index} saved to {output_path}\")\n    graph.render(output_path)\nimport os\ndef plotMultipleTopologies(data: dict, output_dir: str):\n    for i in range(len(data[extract_data_key])):\n        output_path = os.path.join(output_dir, f\"plot_{i}.html\")\n        plotSingleTopology(data, output_path, i)\ndef plotMultipleTopologiesFromFile(input_path: str, output_dir: str):"
+        },
+        {
+            "comment": "Reading the file at input_path and loading data into variable 'data' for plotting topologies using function 'plotMultipleTopologies'. The logger_print is logging information about the plot.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/plot_utils.py\":61-64",
+            "content": "    logger_print(f\"plotting topologies from file '{input_path}'\")\n    with open(input_path, \"r\") as f:\n        data = json.loads(f.read())\n    plotMultipleTopologies(data, output_dir)"
+        }
+    ]
+}

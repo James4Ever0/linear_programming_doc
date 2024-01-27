@@ -1,0 +1,10 @@
+{
+    "summary": "The code replaces the original topology with a new one, adds nodes and edges to the graph, converts the graph, and prints the serialized data.",
+    "details": [
+        {
+            "comment": "The code replaces the original topology with a new one, adds nodes and edges to the graph, converts the graph, and prints the serialized data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/topology_conversion.py\":0-27",
+            "content": "# replace the original topology with other stuff.\nimport networkx\nG = networkx.Graph(attr_0=1)\na = G.add_node(\"a\", node_type=\"device\")\nb = G.add_node(\"b\", node_type=\"device\")\nc = G.add_node(\"c\", node_type=\"device\")\nG.add_edge(\"a\", \"b\")\nG.add_edge(\"b\", \"c\")\nG.add_edge(\"c\", \"a\")\n# convert the graph.\n#                        b\n#                        |\n#   b                 [io_2]\n#  / \\              /        \\\n# a - c  =>   a - [io_0] - [io_1] - c\n#\n# ###########################\n# is that necessary?\nfrom networkx.readwrite import json_graph\nserialized = json_graph.adjacency_data(G)\nimport rich\nrich.print(serialized)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports Pyomo and math libraries, creates a model with variables x, y, and z. Adds components to the model for x_0, y_0, c1_1, and obj_0, defines a constraint c1, sets objective as minimize z, attempts to solve using IPOPT solver but fails due to issues with imports and definitions. Displays objective value and variables x and y.",
+    "details": [
+        {
+            "comment": "Code imports Pyomo and math libraries, creates a model with variables x, y, and z. Adds components to the model for x_0, y_0, c1_1, and obj_0, defines a constraint c1, sets objective as minimize z, attempts to solve using IPOPT solver but fails due to issues with imports and definitions. Displays objective value and variables x and y.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pyomo_shot_test.py\":0-34",
+            "content": "from pyomo.environ import *\nfrom math import pi\n# this will not work.\nmodel = ConcreteModel()\nx = Var(bounds=(0, 3))\ny = Var(bounds=(0, 2 * pi))\nz = Var()\nmodel.add_component(\"z_0\",z)\nmodel.add_component(\"x_0\",x)\nmodel.add_component(\"y_0\",y)\n# model.c1 = Constraint(expr=model.z == model.x+model.y)\nimport pint\nureg = pint.UnitRegistry()\nc1 = Constraint( # add some unit?\n    expr=z == x * sin(y)\n)  # this is not working. sorry!\nmodel.add_component(\"c1_1\",c1)\nobj = Objective(expr=z, sense=minimize)\nmodel.add_component(\"obj_0\",obj)\nopt = SolverFactory(\"ipopt\") # not working!\nopt.solve(model)\nobj.display()\nx.display()\ny.display()"
+        }
+    ]
+}

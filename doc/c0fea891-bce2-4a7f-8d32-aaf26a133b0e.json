@@ -1,0 +1,10 @@
+{
+    "summary": "Executes SCIP solver with constraints from 'converted.mps', limits time to 30 seconds and sets it to find only one solution, optimizes the model, writes relaxed solution to 'relaxed_scip.sol', then quits.",
+    "details": [
+        {
+            "comment": "Executes SCIP solver with constraints from 'converted.mps', limits time to 30 seconds and sets it to find only one solution, optimizes the model, writes relaxed solution to 'relaxed_scip.sol', then quits.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/scip_get_relaxed_sol.cmd\":0-0",
+            "content": "scip -c \"read converted.mps\" -c \"set limits solutions 1\" -c \"set limits time 30\" -c \"change minuc\" -c \"optimize\" -c \"write solution relaxed_scip.sol\" -c \"quit\""
+        }
+    ]
+}

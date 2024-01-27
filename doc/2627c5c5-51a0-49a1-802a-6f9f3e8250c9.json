@@ -1,0 +1,10 @@
+{
+    "summary": "The code is using the CPLEX optimization software to read a file named \"conflict\" and display all conflict information. This could be related to solving a mixed-integer linear programming problem with potential conflicts in the solution.",
+    "details": [
+        {
+            "comment": "The code is using the CPLEX optimization software to read a file named \"conflict\" and display all conflict information. This could be related to solving a mixed-integer linear programming problem with potential conflicts in the solution.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/get_iis_cplex.cmd\":0-1",
+            "content": "cplex -c \"read \" \"tools conflict\" \"display conflict all\"\n@REM cplex -c \"read \" \"conflict\" \"display conflict all\""
+        }
+    ]
+}

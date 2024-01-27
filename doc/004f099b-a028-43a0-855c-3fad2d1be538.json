@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary libraries, defines a Pydantic class 'Item' with attributes name, description, price, and tax. An instance of 'Item' is created with given values, then converted to JSON string using 'json.dumps()', and printed to the console.",
+    "details": [
+        {
+            "comment": "The code imports necessary libraries, defines a Pydantic class 'Item' with attributes name, description, price, and tax. An instance of 'Item' is created with given values, then converted to JSON string using 'json.dumps()', and printed to the console.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/dump_pydantic_to_json.py\":0-9",
+            "content": "import json\nfrom pydantic import BaseModel\nclass Item(BaseModel):\n    name: str\n    description: str = None\n    price: float\n    tax: float = None\nitem = Item(name='test', price=9.99)\njson_str = json.dumps(item.dict()) # working.\nprint(json_str)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports necessary libraries and defines variables x and y with lower and upper bounds. It then generates a Delaunay triangulation of the input variables' sample points using pyomo's generate_delaunay function. The code creates an N-dimensional piecewise function based on the Delaunay triangulation and z values, which can be used in actual optimization problems. The last line tests the function with input [1, 2] and compares its output to the sin(2) value.",
+    "details": [
+        {
+            "comment": "Code imports necessary libraries and defines variables x and y with lower and upper bounds. It then generates a Delaunay triangulation of the input variables' sample points using pyomo's generate_delaunay function. The code creates an N-dimensional piecewise function based on the Delaunay triangulation and z values, which can be used in actual optimization problems. The last line tests the function with input [1, 2] and compares its output to the sin(2) value.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pyomo_triangulate_multivariate_linearization.py\":0-27",
+            "content": "import pyomo\nimport pyomo.core.kernel.piecewise_library.util\nfrom linearization_config import *\n# func: z = x*sin(y)\nfrom pyomo.core.kernel.variable import variable\nx = variable(lb=x_lb, ub=x_ub)\ny = variable(lb=y_lb, ub=y_ub)\ndelaunay = pyomo.core.kernel.piecewise_library.util.generate_delaunay(\n    [x, y], num=x_sample_size\n)\n# print(delaunay) # what is it?\n# breakpoint()\nxy_points = delaunay.points  # (10000,2)\nz_vals = z_func(xy_points[:, 0], xy_points[:, 1])\nfrom pyomo.core.kernel.piecewise_library.transforms_nd import piecewise_nd\npiecewise_z_func = piecewise_nd(delaunay, z_vals)\n# breakpoint()\n# can it be used in actual optimization?\nprint(piecewise_z_func(np.array([1,2])), np.sin(2))"
+        }
+    ]
+}

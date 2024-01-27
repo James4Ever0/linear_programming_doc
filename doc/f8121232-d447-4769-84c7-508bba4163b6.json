@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports networkx library and defines drawing options, then creates a directed graph with nodes \"PV\", \"BESS\", \"LOAD\", \"[NODE1]\", and \"GRID\". Edges represent connections between nodes. Imports matplotlib for visualization and draws the graph with specified options before displaying it.",
+    "details": [
+        {
+            "comment": "Code imports networkx library and defines drawing options, then creates a directed graph with nodes \"PV\", \"BESS\", \"LOAD\", \"[NODE1]\", and \"GRID\". Edges represent connections between nodes. Imports matplotlib for visualization and draws the graph with specified options before displaying it.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/mini_ies_topology.py\":0-29",
+            "content": "import networkx as nx\ndraw_options = {\n    \"node_color\": \"yellow\",\n    \"node_size\": 1000,\n}\nG = nx.DiGraph()\nG.add_node(\"PV\")\nG.add_node(\"BESS\")\nG.add_node(\"LOAD\")\nG.add_node(\"[NODE1]\")\nG.add_node(\"GRID\")\nG.add_edge(\"PV\", \"[NODE1]\")\nG.add_edge(\"BESS\", \"[NODE1]\")\nG.add_edge(\"[NODE1]\", \"BESS\")\nG.add_edge(\"GRID\", \"[NODE1]\")\nG.add_edge(\"[NODE1]\", \"GRID\")\nG.add_edge(\"[NODE1]\", \"LOAD\")\nimport matplotlib.pyplot as plt\nnx.draw(G, with_labels=True, font_weight=\"bold\", **draw_options)\nplt.show()"
+        }
+    ]
+}

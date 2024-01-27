@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines a Pyomo model with various variables and constraints, writes it to file, and prints the solution symbols and associated names, stripping brackets from variable names. It also iterates through model components, retrieving their base and original object names.",
+    "details": [
+        {
+            "comment": "This code defines a Pyomo model with various variables and constraints. It then prints the base and original names of each object in the model, writes the model to file, and prints the solution symbols and their associated names, stripping any brackets from variable names.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py\":0-42",
+            "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.a = Var()\nmodel.b = Var([1, 2])\nmodel.pw = Piecewise(\n    model.b[1],\n    model.a,\n    pw_pts=[1, 2, 3],\n    pw_repn=\"MC\",\n    f_rule=[3, 2, 1],\n    pw_constr_type=\"EQ\",\n    unbounded_domain_var=True,\n)\nmodel.g = Var([1, 2, 3], [4, 5, 6])\nmodel.subm = model.clone()\nmodel.cons = Constraint(expr=model.a >= model.b[2] + model.g[1, 4] - model.subm.b[1])\nmodel.obj = Objective(expr=0, sense=minimize)\nimport re\nBRACKETS_RE = re.compile(r\"\\[.*?\\]\")\ndef getBaseAndOriginalObjectName(obj) -> tuple[str, str]:\n    objname = obj.name\n    base_objname, _ = BRACKETS_RE.subn(\"\", objname)\n    return objname, base_objname\nfor obj in model.component_data_objects():\n    print(\"\\t\".join(getBaseAndOriginalObjectName(obj)))\nmodel.write(\"associativity_output.lp\")\nprint(\"_\" * 60)\nfor it in model.solutions.symbol_map.values():\n    for k, v in it.bySymbol.items():\n        print(k, v().name)  # strip away rectangular brackets\n# if it is not block, just keep the base name\n# if it is, keep its names of components"
+        },
+        {
+            "comment": "Iterating through model components, retrieving and printing their base and original object names.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py\":43-49",
+            "content": "# for c in [model.b, model.pw]:\nfor c in [model.a, model.b, model.pw, model.cons, model.subm]:\n    if (func := getattr(c, \"component_data_objects\", None)) is not None:\n        for obj in func():\n            print(\"\\t\".join(getBaseAndOriginalObjectName(obj)))\n    else:\n        print(c.name)"
+        }
+    ]
+}

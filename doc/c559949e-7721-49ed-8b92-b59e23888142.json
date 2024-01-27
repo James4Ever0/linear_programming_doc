@@ -1,0 +1,10 @@
+{
+    "summary": "The code is defining a whitelist of devices for the microgrid system, including various types such as diesel generators, solar panels, wind turbines, and more. The list consists of Chinese terms representing different energy sources and components.",
+    "details": [
+        {
+            "comment": "The code is defining a whitelist of devices for the microgrid system, including various types such as diesel generators, solar panels, wind turbines, and more. The list consists of Chinese terms representing different energy sources and components.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/device_whitelist.py\":0-16",
+            "content": "from log_utils import logger_print\ndevice_whitelist = [\n    \"\u67f4\u6cb9\",\n    \"\u7535\u8d1f\u8377\",\n    \"\u5149\u4f0f\u53d1\u7535\",\n    \"\u98ce\u529b\u53d1\u7535\",\n    \"\u67f4\u6cb9\u53d1\u7535\",\n    \"\u71c3\u6c14\u53d1\u7535\u673a\",\n    \"\u9502\u7535\u6c60\",\n    \"\u53d8\u538b\u5668\",\n    \"\u53d8\u6d41\u5668\",\n    \"\u53cc\u5411\u53d8\u6d41\u5668\",\n    \"\u4f20\u8f93\u7ebf\",\n    \"\u7535\u89e3\u69fd\",\n    \"\u6c22\u8d1f\u8377\",\n]"
+        }
+    ]
+}

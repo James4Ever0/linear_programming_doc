@@ -1,0 +1,10 @@
+{
+    "summary": "This code attempts to import a variable 'a' from the file circular_import_a.py and assigns it to variable 'b'. However, this leads to an error due to circular imports between the two files.",
+    "details": [
+        {
+            "comment": "This code attempts to import a variable 'a' from the file circular_import_a.py and assigns it to variable 'b'. However, this leads to an error due to circular imports between the two files.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/circular_import_b.py\":0-3",
+            "content": "from circular_import_a import a\nb = a\n# error!"
+        }
+    ]
+}

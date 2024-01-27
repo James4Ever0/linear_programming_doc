@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets up an environment for running a Python script named \"docplex_conflict_refiner.py\" using Conda and redirects output without capturing it. The \"send_ctrl_c.py\" is used to pipe control-C signals to the script.",
+    "details": [
+        {
+            "comment": "This code sets up an environment for running a Python script named \"docplex_conflict_refiner.py\" using Conda and redirects output without capturing it. The \"send_ctrl_c.py\" is used to pipe control-C signals to the script.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/run_docplex.cmd\":0-2",
+            "content": "@REM python send_ctrl_c.py | conda run -n docplex --live-stream --no-capture-output python docplex_conflict_refiner.py\n@REM python send_ctrl_c.py\nconda run -n docplex --live-stream --no-capture-output python docplex_conflict_refiner.py"
+        }
+    ]
+}

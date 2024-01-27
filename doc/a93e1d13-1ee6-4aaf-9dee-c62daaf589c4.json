@@ -1,0 +1,10 @@
+{
+    "summary": "This script sources ~/.bashrc and executes three bash scripts in sequence: init_apt_environ.sh, init_solver.sh, and init_update_conda.sh. This may set up APT environment variables, initialize a solver for the microgrid system, and update the Conda environment. The comment advises that executables outside of Conda environments can still be used but may require differentiating with environment variables.",
+    "details": [
+        {
+            "comment": "This script sources ~/.bashrc and executes three bash scripts in sequence: init_apt_environ.sh, init_solver.sh, and init_update_conda.sh. This may set up APT environment variables, initialize a solver for the microgrid system, and update the Conda environment. The comment advises that executables outside of Conda environments can still be used but may require differentiating with environment variables.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init.sh\":0-4",
+            "content": "# source ~/.bashrc\nbash init_apt_environ.sh\nbash init_solver.sh\nbash init_update_conda.sh\n# you can still use executables outside conda environments, but you may need to pass some environment variables to differentiate."
+        }
+    ]
+}

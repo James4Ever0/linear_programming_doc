@@ -1,0 +1,10 @@
+{
+    "summary": "The code deletes the existing \"questions.zip\" file and creates a new one by adding all specified files (integratedEnergySystemPrototypes.py, cloudpss_inputs.json, questions.md, questions.pdf, cloudpss_ieslab_connectivity_matrix.xlsx, and cloudpss_topology_screenshot.jpg) into it using the 7z compression tool (questions.zip).",
+    "details": [
+        {
+            "comment": "The code deletes the existing \"questions.zip\" file and creates a new one by adding all specified files (integratedEnergySystemPrototypes.py, cloudpss_inputs.json, questions.md, questions.pdf, cloudpss_ieslab_connectivity_matrix.xlsx, and cloudpss_topology_screenshot.jpg) into it using the 7z compression tool (questions.zip).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/questions_packup.cmd\":0-1",
+            "content": "rm -rf questions.zip\n7z a questions.zip integratedEnergySystemPrototypes.py cloudpss_inputs.json questions.md questions.pdf cloudpss_ieslab_connectivity_matrix.xlsx cloudpss_topology_screenshot.jpg"
+        }
+    ]
+}

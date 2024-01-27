@@ -1,0 +1,15 @@
+{
+    "summary": "The code is a VBS script that runs batch files or console commands in hidden windows, checks syntax and usage, and displays author credit before terminating with an exit code.",
+    "details": [
+        {
+            "comment": "The code is a VBS script for running batch files or console commands in a hidden window. It checks syntax and usage, takes arguments as input, and executes the command in a hidden manner based on a one-liner by Alistair Johnson.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/runhide.vbs\":0-30",
+            "content": "Option Explicit\nDim i, strArguments, wshShell\nIf WScript.Arguments.Count = 0 Then Syntax\nIf WScript.Arguments(0) = \"/?\" Then Syntax\nstrArguments = \"\"\nFor i = 0 To WScript.Arguments.Count - 1\n\tstrArguments = strArguments & \" \" & WScript.Arguments(i)\nNext\nSet wshShell = CreateObject( \"WScript.Shell\" )\nwshShell.Run Trim( strArguments ), 0, False\nSet wshShell = Nothing\nSub Syntax\n\tDim strMsg\n\tstrMsg = \"RunNHide.vbs,  Version 2.00\" & vbCrLf _\n\t       & \"Run a batch file or (console) command in a hidden window\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Usage:  RUNNHIDE.VBS  some_command  [ some_arguments ]\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Where:  \"\"some_command\"\"    is the batch file or (console) command\" & vbCrLf _\n\t       & \"                          you want to run hidden\" & vbCrLf _\n\t       & \"        \"\"some_arguments\"\"  are optional arguments for \"\"some_command\"\"\" & vbCrLf _\n\t       & vbCrLf _\n\t       & \"Based on a \"\"one-liner\"\" by Alistair Johnson\" & vbCrLf _\n\t       & \"www.microsoft.com/technet/scriptcenter/csc/scripts/scripts/running/cscte009.mspx\" _"
+        },
+        {
+            "comment": "This code snippet displays a message with author credit and website link, then terminates the script with an exit code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/runhide.vbs\":31-36",
+            "content": "\t       & vbCrLf & vbCrLf _\n\t       & \"Written by Rob van der Woude\" & vbCrLf _\n\t       & \"http://www.robvanderwoude.com\"\n\tWScript.Echo strMsg\n\tWScript.Quit 1\nEnd Sub"
+        }
+    ]
+}

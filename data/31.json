@@ -1,0 +1,534 @@
+{
+    "3100": {
+        "file_id": 338,
+        "content": "import openpyxl\nfilepath = \"device_parameters_v3.3.xlsx\"\nexcel_file = openpyxl.load_workbook(filename=filepath)\n# print(excel_file.sheetnames) # ['Sheet1']\nfrom openpyxl.worksheet.worksheet import Worksheet\n# from openpyxl.cell.cell import Cell, MergedCell\nsheet1 = excel_file[\"Sheet1\"]\nif type(sheet1) == Worksheet:\n    # order: category; name (unit), example, delete or not\n    # you need to scan through all cells to find some cell with specific color.\n    # and with some example.\n    # COL: A;B,C,D;F,G,H for all data need to export\n    # after (partial) serialization, you can do something more interesting with it.\n    dims = sheet1.row_dimensions, sheet1.column_dimensions\n    # print(dims)\n    # breakpoint()\n    # print(sheet1)\n    # print(type(sheet1))\n    # breakpoint()\n    # print(dir(sheet1))\n    # breakpoint()\n    uniqs = {}\n    def getColumnRangePerRow(start, end):\n        flag = True\n        for index, row in enumerate(sheet1.rows):\n            if flag:\n                flag = False\n                continue",
+        "type": "code",
+        "location": "/parse_device_parameters_excel_v2.py:1-33"
+    },
+    "3101": {
+        "file_id": 338,
+        "content": "Code imports openpyxl library, loads an Excel file, selects the \"Sheet1\" worksheet, and checks if it's of type Worksheet. The code then retrieves row and column dimensions, defines a function to get column range per row, and initializes an empty dictionary named uniqs.",
+        "type": "comment"
+    },
+    "3102": {
+        "file_id": 338,
+        "content": "            yield index, [col.value for col in row[start:end]]\n    heads = getColumnRangePerRow(0, 1)\n    # cursor = None\n    headMaps = {}\n    prevHead = None\n    mHeads = []\n    for index, [head] in heads:\n        print(index, head)\n        if head:\n            # print(type(head))\n            prevHead = head\n            mHeads.append(head)\n        if prevHead:\n            headMaps.update({index: prevHead})\n    import rich\n    rich.print(headMaps)\n    BCD = getColumnRangePerRow(1, 4)\n    FGH = getColumnRangePerRow(5, 8)\n    def checkEmpty(val):\n        if type(val) == str:\n            if val.strip() == \"\":\n                return None\n        return val\n    target_json = {h: {} for h in mHeads}\n    def processBCD(_BCD):\n        device_name = None\n        for index, [b, c, d] in _BCD:\n            head = headMaps[index]\n            b, c, d = checkEmpty(b), checkEmpty(c), checkEmpty(d)\n            # print(b,c,d) # value can be None or \"\"\n            if all([elem is None for elem in [b, c, d]]):\n                print(\"LINE BREAK\")",
+        "type": "code",
+        "location": "/parse_device_parameters_excel_v2.py:34-71"
+    },
+    "3103": {
+        "file_id": 338,
+        "content": "This code is parsing device parameters from an Excel file. It extracts column headers, checks for empty values, and creates a target JSON structure. The code defines functions to get column ranges per row, check if a value is empty, and processes BCD (Basic Configuration Data). It prints the head maps, handles empty values, and displays a line break when all values are None or empty strings.",
+        "type": "comment"
+    },
+    "3104": {
+        "file_id": 338,
+        "content": "                device_name = None\n            else:\n                if device_name is None:\n                    device_name = b\n                    target_json[head].update({device_name: []})\n                else:\n                    target_json[head][device_name].append((b, c, d))\n                print(\"DEVICE NAME?\", device_name)\n    processBCD(BCD)\n    processBCD(FGH)\n    rich.print(target_json)\n    import json\n    output_path = \"device_params_intermediate.json\"\n    with open(output_path, \"w+\") as f:\n        f.write(json.dumps(target_json, indent=4, ensure_ascii=False))\n    print(\"WRITE TO:\", output_path)",
+        "type": "code",
+        "location": "/parse_device_parameters_excel_v2.py:72-90"
+    },
+    "3105": {
+        "file_id": 338,
+        "content": "This code appears to be parsing device parameters from an Excel file. It creates a target_json dictionary, where the key is the device name and the value is a list containing tuples of BCD, FGH, and some additional information. The code then writes this target_json dictionary into a \"device_params_intermediate.json\" file for further use.",
+        "type": "comment"
+    },
+    "3106": {
+        "file_id": 339,
+        "content": "/pendulum.jl",
+        "type": "filepath"
+    },
+    "3107": {
+        "file_id": 339,
+        "content": "The code defines a pendulum model, creates an ODE problem with external torque, solves it using solve() and calculates angular deflections and velocities.",
+        "type": "summary"
+    },
+    "3108": {
+        "file_id": 339,
+        "content": "# create single pendulum model\nusing DifferentialEquations\n# using Plots\nl = 1.0                             # length [m]\nm = 1.0                             # mass [kg]\ng = 9.81                            # gravitational acceleration [m/s²]\n# (state_derivatives, states, external_control_function, time)\nfunction pendulum!(du,u,p,t)\n    du[1] = u[2]                    # θ'(t) = ω(t)\n    du[2] = -3g/(2l)*sin(u[1]) + 3/(m*l^2)*p(t) # ω'(t) = -3g/(2l) sin θ(t) + 3/(ml^2)M(t)\nend\nθ₀ = 0.01                           # initial angular deflection [rad]\nω₀ = 0.0                            # initial angular velocity [rad/s]\nu₀ = [θ₀, ω₀]                       # initial state vector\ntspan = (0.0,10.0)                  # time interval\nM = t->0.1sin(t)                    # external torque [Nm], function\n# (ode_function, initial_states, timespan, )\nprob = ODEProblem(pendulum!,u₀,tspan,M)\nsol = solve(prob)\n# Plots.gr()\n# Plots.PyPlotBackend()\n# Plots.plot(sol,linewidth=2,xaxis=\"t\",label=[\"θ [rad]\" \"ω [rad/s]\"],layout=(2,1))",
+        "type": "code",
+        "location": "/pendulum.jl:1-32"
+    },
+    "3109": {
+        "file_id": 339,
+        "content": "This code defines a pendulum model using the DifferentialEquations package. It creates an ODE problem to simulate the motion of a pendulum with an external torque function M(t). The initial angular deflection and velocity, length, mass, and gravitational acceleration are specified. The solve() function is used to find the solution to the ODE problem over the given time interval. The code could be visualized using Plots package but it's currently commented out.",
+        "type": "comment"
+    },
+    "3110": {
+        "file_id": 339,
+        "content": "# println(u)\nstates = sol.u\nstates_matrix = mapreduce(permutedims, vcat,states)\nangular_deflections = states_matrix[:,1]\nangular_velocities = states_matrix[:,2]",
+        "type": "code",
+        "location": "/pendulum.jl:34-39"
+    },
+    "3111": {
+        "file_id": 339,
+        "content": "This code is calculating the angular deflections and velocities of a pendulum system. It first prints the array u, then stores the solution's u values in states, rearranges them using permutedims and vcat, assigns the 1st column to angular_deflections and the 2nd column to angular_velocities.",
+        "type": "comment"
+    },
+    "3112": {
+        "file_id": 340,
+        "content": "/pendulum.py",
+        "type": "filepath"
+    },
+    "3113": {
+        "file_id": 340,
+        "content": "This Python code simulates the motion of a pendulum using the scipy library's solve_ivp function. It defines the pendulum dynamics in the pendulum() function, sets initial conditions and time span, includes an external torque as M(t), solves the system of ODEs with RK45 method, and plots the resulting angular deflections and velocities over time.",
+        "type": "summary"
+    },
+    "3114": {
+        "file_id": 340,
+        "content": "from scipy.integrate import solve_ivp\nimport numpy as np\nimport matplotlib.pyplot as plt\nl = 1.0                             # length [m]\nm = 1.0                             # mass [kg]\ng = 9.81                            # gravitational acceleration [m/s²]\ndef pendulum(t, u, M):\n    θ, ω = u\n    return [ω, -3*g/(2*l)*np.sin(θ) + 3/(m*l**2)*M(t)]\nθ0 = 0.01                          # initial angular deflection [rad]\nω0 = 0.0                            # initial angular velocity [rad/s]\nu0 = [θ0, ω0]                       # initial state vector\nt_span = (0.0, 10.0)                # time interval\nM = lambda t: 0.1*np.sin(t)         # external torque [Nm], function\nsol = solve_ivp(lambda t, y: pendulum(t, y, M), t_span, u0, method='RK45')\nangular_deflections = sol.y[0]\nangular_velocities = sol.y[1]\nplt.plot(sol.t, angular_deflections, label='θ [rad]')\nplt.plot(sol.t, angular_velocities, label='ω [rad/s]')\nplt.xlabel('t')\nplt.legend()\nplt.show()",
+        "type": "code",
+        "location": "/pendulum.py:1-28"
+    },
+    "3115": {
+        "file_id": 340,
+        "content": "This Python code simulates the motion of a pendulum using the scipy library's solve_ivp function. It defines the pendulum dynamics in the pendulum() function, sets initial conditions and time span, includes an external torque as M(t), solves the system of ODEs with RK45 method, and plots the resulting angular deflections and velocities over time.",
+        "type": "comment"
+    },
+    "3116": {
+        "file_id": 341,
+        "content": "/pendulum_finite_differentiate.py",
+        "type": "filepath"
+    },
+    "3117": {
+        "file_id": 341,
+        "content": "This code uses the finite difference method to simulate a pendulum system, storing and plotting θ and ω over time, with Matplotlib's `plt.show()` for display.",
+        "type": "summary"
+    },
+    "3118": {
+        "file_id": 341,
+        "content": "import numpy as np\nimport matplotlib.pyplot as plt\nl = 1.0                             # length [m]\nm = 1.0                             # mass [kg]\ng = 9.81                            # gravitational acceleration [m/s²]\nθ0 = 0.01                          # initial angular deflection [rad]\nω0 = 0.0                            # initial angular velocity [rad/s]\nt_span = (0.0, 10.0)                # time interval\ndt = 0.01                           # time step\nM = lambda t: 0.1*np.sin(t)         # external torque [Nm], function\n# initialize arrays to store results\nn = int((t_span[1] - t_span[0])/dt) + 1\nθ = np.zeros(n)\nω = np.zeros(n)\nt = np.linspace(t_span[0], t_span[1], n)\n# set initial values\nθ[0] = θ0\nω[0] = ω0\n# iterate over time steps and update values using finite difference method\nfor i in range(1, n):\n    θ[i] = θ[i-1] + dt*ω[i-1]\n    ω[i] = ω[i-1] - 3*g/(2*l)*np.sin(θ[i-1])*dt + 3/(m*l**2)*M(t[i-1])*dt\n# plot results\nplt.plot(t, θ, label='θ [rad]')\nplt.plot(t, ω, label='ω [rad/s]')\nplt.xlabel('t')\nplt.legend()",
+        "type": "code",
+        "location": "/pendulum_finite_differentiate.py:1-32"
+    },
+    "3119": {
+        "file_id": 341,
+        "content": "Code implements a pendulum system using the finite difference method. It calculates and stores θ and ω for each time step, then plots them over time.",
+        "type": "comment"
+    },
+    "3120": {
+        "file_id": 341,
+        "content": "plt.show()",
+        "type": "code",
+        "location": "/pendulum_finite_differentiate.py:33-33"
+    },
+    "3121": {
+        "file_id": 341,
+        "content": "This code displays the current figure using Matplotlib's `plt.show()` function.",
+        "type": "comment"
+    },
+    "3122": {
+        "file_id": 342,
+        "content": "/piecewise_approximation_test.py",
+        "type": "filepath"
+    },
+    "3123": {
+        "file_id": 342,
+        "content": "The code defines functions for piecewise approximation using linear interpolation and creates a piecewise function for sine and powers of 2 within specified bounds. The z_func_approx function approximates a value based on input x and y, and is tested against the sine function.",
+        "type": "summary"
+    },
+    "3124": {
+        "file_id": 342,
+        "content": "# z = x*sin(y)\n# y_s ~= sin(y)\n# i_0 = (x+y_s)/2, i_1 = (x-y_s)/2\n# z = i_0^2-i_1^2\nfrom linearization_config import *\ny_s_lb = -1\ny_s_ub = 1\ni_0_lb = (x_lb + y_s_lb) / 2\ni_0_ub = (x_ub + y_s_ub) / 2\ni_1_lb = (x_lb - y_s_ub) / 2\ni_1_ub = (x_ub - y_s_lb) / 2\nimport numpy as np\nfrom scipy.interpolate import interp1d\n# # 定义输入和输出数组\n# x = np.array([0, 1, 2, 3, 4, 5])\n# y = np.array([0, 1, 4, 9, 16, 25])\ndef interpolate_from_input_and_output_array(x, y):\n    # 使用interp1d函数将输入和输出数组转化为分段函数\n    f = interp1d(x, y, kind=\"linear\")  # put np.ndarray here\n    return f\ndef get_piecewise_function(lb, ub, sample_size, func):\n    print(\"LB:\", lb, \"UB:\", ub)\n    input_array = np.linspace(lb, ub, sample_size)\n    output_array = func(input_array)\n    piecewise_func = interpolate_from_input_and_output_array(input_array, output_array)\n    return piecewise_func\npiecewise_sample_size = 1000\npiecewise_y_sin = get_piecewise_function(\n    y_lb, y_ub, piecewise_sample_size, lambda x: np.sin(x)\n)\npiecewise_pow_2_1 = get_piecewise_function(\n    i_0_lb, i_0_ub, piecewise_sample_size, lambda x: x**2",
+        "type": "code",
+        "location": "/piecewise_approximation_test.py:1-43"
+    },
+    "3125": {
+        "file_id": 342,
+        "content": "The code defines functions for piecewise approximation, using linear interpolation from input and output arrays. It creates a piecewise function for the sine function and powers of 2 within specified bounds, with adjustable sample sizes.",
+        "type": "comment"
+    },
+    "3126": {
+        "file_id": 342,
+        "content": ")\npiecewise_pow_2_2 = get_piecewise_function(\n    i_1_lb, i_1_ub, piecewise_sample_size, lambda x: x**2\n)\nimport math\ndef z_func_approx(x: float, y: float):\n    assert x > x_lb\n    assert x < x_ub\n    assert y > y_lb\n    assert y < y_ub\n    y = np.array([y])\n    x = np.array([x])\n    y_s = piecewise_y_sin(y)\n    i_0 = (x + y_s) / 2\n    i_1 = (x - y_s) / 2\n    pow_2_i_0 = piecewise_pow_2_1(i_0)\n    pow_2_i_1 = piecewise_pow_2_2(i_1)\n    z_approx = pow_2_i_0 - pow_2_i_1\n    return z_approx\nprint(z_func_approx(0.5, 2), 0.5 * np.sin(2))",
+        "type": "code",
+        "location": "/piecewise_approximation_test.py:44-74"
+    },
+    "3127": {
+        "file_id": 342,
+        "content": "The code defines a function z_func_approx that takes in two float parameters x and y. It asserts the input values are within specified bounds, then calculates intermediate values i_0 and i_1 using x and y. These values are used to calculate power of 2 approximations pow_2_i_0 and pow_2_i_1 from piecewise functions piecewise_pow_2_1 and piecewise_pow_2_2, respectively. Finally, it calculates z_approx as the difference between these two power of 2 approximations and returns it. The code also includes a print statement to test the function by calling it with input values (0.5, 2) and comparing the result to half of sine of 2.",
+        "type": "comment"
+    },
+    "3128": {
+        "file_id": 343,
+        "content": "/pint_convert_units.py",
+        "type": "filepath"
+    },
+    "3129": {
+        "file_id": 343,
+        "content": "This function, `unitFactorCalculator`, utilizes the pint library to convert an old unit into a compatible standard unit within a given UnitRegistry. It appends units, converts quantities, prints both old and new values, obtains magnitude and new unit name, then returns these as output.",
+        "type": "summary"
+    },
+    "3130": {
+        "file_id": 343,
+        "content": "import pint\ndef unitFactorCalculator(\n    ureg: pint.UnitRegistry, standard_units: frozenset, old_unit_name: str\n):  # like \"元/kWh\"\n    assert old_unit_name != \"\"\n    assert type(old_unit_name) == str\n    ## now, the classic test?\n    standard_units_mapping = {ureg.get_compatible_units(unit):unit for unit in standard_units}\n    try:\n        quantity = ureg.Quantity(1, old_unit_name)  # one, undoubtable.\n    except:\n        raise Exception(\"Unknown unit name:\", old_unit_name)\n    # quantity = ureg.Quantity(1, ureg.元/ureg.kWh)\n    magnitude, units = quantity.to_tuple()\n    new_units_list = []\n    for unit, power in units:\n        # if type(unit)!=str:\n        print(\"UNIT?\", unit, \"POWER?\", power)\n        compat_units = ureg.get_compatible_units(unit)  # the frozen set, as the token for exchange.\n        target_unit = standard_units_mapping.get(compat_units,None)\n        if target_unit:\n            # ready to convert?\n            unit = str(target_unit)\n        else:\n            raise Exception(\"No common units for:\",unit)",
+        "type": "code",
+        "location": "/pint_convert_units.py:1-31"
+    },
+    "3131": {
+        "file_id": 343,
+        "content": "The code defines a function `unitFactorCalculator` which takes in a UnitRegistry, a set of standard units, and an old unit name as input. It converts the old unit to a compatible standard unit using pint library functions and raises an exception if no common units are found.",
+        "type": "comment"
+    },
+    "3132": {
+        "file_id": 343,
+        "content": "        new_units_list.append((unit, power))\n    print(\"NEW UNITS LIST:\", new_units_list)\n    new_unit = ureg.UnitsContainer(tuple(new_units_list))\n    new_quantity = quantity.to(new_unit)\n    print(\"OLD QUANTITY:\", quantity)\n    print(\"NEW QUANTITY:\", new_quantity)\n    # get the magnitude?\n    new_magnitude = new_quantity.magnitude  # you multiply that.\n    print(\"FACTOR:\", new_magnitude)\n    new_unit_name = str(new_unit)\n    print(\"NEW UNIT NAME:\", new_unit_name)\n    return new_magnitude, new_unit_name",
+        "type": "code",
+        "location": "/pint_convert_units.py:32-47"
+    },
+    "3133": {
+        "file_id": 343,
+        "content": "Appends units to list, prints new units list, creates new unit container, converts quantity using new unit, prints old and new quantities, obtains magnitude of new quantity, gets new unit name as string, returns new magnitude and unit name.",
+        "type": "comment"
+    },
+    "3134": {
+        "file_id": 344,
+        "content": "/pint_merge_units.py",
+        "type": "filepath"
+    },
+    "3135": {
+        "file_id": 344,
+        "content": "The code imports Pint, creates a UnitRegistry with default and custom units, saves them, and checks compatibility. It then prints two sets of units for testing or configuration purposes.",
+        "type": "summary"
+    },
+    "3136": {
+        "file_id": 344,
+        "content": "additionalUnitDefinitions = \"\"\"\n元 = [currency]\n万元 = 10000 元\n年 = year\n天 = day\n小时 = hour\n分钟 = minute\n秒 = second\nm2 = meter ** 2\nm3 = meter ** 3\n台 = [quantity_1]\none = [quantity_2]\npercent = 0.01 one\np_u_ = [quantity_3]\n\"\"\"\n# by not using prefixes, you have all the units.\noutput_path = \"merged_units.txt\"\nimport pint\nimport os\ndirectory_path = os.path.dirname(pint.__file__)\ndefault_unit_file = os.path.join(\n    directory_path, \"default_en.txt\"\n)  # there are some file we must have.\nconstant_file = \"constants_en.txt\"\nimport shutil\nshutil.copy(os.path.join(directory_path, constant_file), constant_file)\nwith open(default_unit_file, \"r\") as f0:\n    default_units_definitions = f0.read()\nwith open(output_path, \"w+\", encoding=\"utf-8\") as f:\n    f.write(default_units_definitions)\n    f.write(additionalUnitDefinitions)\n# we are going to check this.\nureg = pint.UnitRegistry(output_path)\ncompat_units_0 = ureg.get_compatible_units(ureg.万元)\ncompat_units_1 = ureg.get_compatible_units(ureg.元) # there are no base units?\n# it will be converted to base units?",
+        "type": "code",
+        "location": "/pint_merge_units.py:1-52"
+    },
+    "3137": {
+        "file_id": 344,
+        "content": "The code imports the Pint module and creates a UnitRegistry with default unit definitions. It then adds additional custom unit definitions, saves them to a file, and checks for compatible units using the created UnitRegistry.",
+        "type": "comment"
+    },
+    "3138": {
+        "file_id": 344,
+        "content": "print(compat_units_0)\nprint(\"_\" * 20)\nprint(compat_units_1)  # frozen set.\n# breakpoint()\n# print(list(compat_units_0))\nfrom pint_convert_units import unitFactorCalculator\nstandard_units = frozenset([ureg.万元, ureg.kWh])\nunitFactorCalculator(ureg, standard_units, old_unit_name=\"元/kWh\")  # just a test.\n# breakpoint()",
+        "type": "code",
+        "location": "/pint_merge_units.py:54-64"
+    },
+    "3139": {
+        "file_id": 344,
+        "content": "The code snippet is printing two sets of units: compat_units_0 and compat_units_1, separated by a horizontal line. It then defines standard units using frozenset and calls the unitFactorCalculator function with arguments. This seems to be for unit conversion testing or configuration purposes.",
+        "type": "comment"
+    },
+    "3140": {
+        "file_id": 345,
+        "content": "/plot_arr.py",
+        "type": "filepath"
+    },
+    "3141": {
+        "file_id": 345,
+        "content": "This code plots non-zero values from an array and labels the axes 'Time/h' and 'Power/kW'. It creates a legend, saves the figure with title_content name in 'fig/' directory, and initializes with solution (sol).",
+        "type": "summary"
+    },
+    "3142": {
+        "file_id": 345,
+        "content": "# import docplex\n# from docplex.mp.model import Model\n# import pandas as pd\n# import numpy as np\nimport matplotlib.pyplot as plt\nfrom matplotlib import style\nfrom result_processlib import Value\nclass IGESPlot(object):\n    def __init__(self, sol):\n        self.sol = sol\n    # n 行向量\n    def plot_list(self, arr, legend_title, title_content):\n        value = Value(self.sol)\n        if isinstance(arr, list):\n            xlen = len(arr)\n            if isinstance(arr[0], list):\n                ylen = len(arr[0])\n            else:\n                ylen = 1\n        else:\n            xlen = 1\n        print('xlen:',xlen,' ylen:',ylen)\n        wide = 4\n        # 全部为0的时候就不显示\n        index = 1\n        title2 = list()\n        index = 0\n        for row in range(0, xlen):\n            arrtemp: list = value.value(arr[row])\n            flag = 0\n            for col in range(0, ylen):\n                if arrtemp[col] >= 1 or arrtemp[col] <= -1:\n                    flag = 1\n            if flag == 0:\n                # 全部为0\n                np_ = 0",
+        "type": "code",
+        "location": "/plot_arr.py:1-40"
+    },
+    "3143": {
+        "file_id": 345,
+        "content": "Class IGESPlot initializes with a solution (sol) and plots a list of values. The plot_list method takes an array and plots its contents if any value is not equal to 0. It checks the dimensions of the array, prints xlen and ylen, creates a title based on legend_title and title_content, and only plots non-zero values.",
+        "type": "comment"
+    },
+    "3144": {
+        "file_id": 345,
+        "content": "            else:\n                #print(arrtemp)\n                plt.plot(arrtemp)\n                #print('index:', index, ' row:', row)\n                title2.append(legend_title[row])\n                print('row:',row)\n                index = index + 1\n        plt.xlabel('Time/h')\n        plt.ylabel('Power/kW')\n        # plt.set(gca, 'Fontsize', 20)\n        plt.legend(title2)\n        plt.title(title_content)\n        plt.savefig('fig/'+title_content+'.png')",
+        "type": "code",
+        "location": "/plot_arr.py:41-54"
+    },
+    "3145": {
+        "file_id": 345,
+        "content": "This code plots an array of data (arrtemp) and labels the x-axis as 'Time/h' and y-axis as 'Power/kW'. It creates a legend based on the row number and saves the figure with the title_content name in the 'fig/' directory.",
+        "type": "comment"
+    },
+    "3146": {
+        "file_id": 346,
+        "content": "/pydantic_validator_test.py",
+        "type": "filepath"
+    },
+    "3147": {
+        "file_id": 346,
+        "content": "This code demonstrates the usage of Pydantic for data validation and modeling in Python. It defines a TestDataClass that includes properties with various types, such as string, optional string, and list. The code also shows how to parse and construct objects using the defined class, while highlighting the flexibility and tolerance for minor data source discrepancies.",
+        "type": "summary"
+    },
+    "3148": {
+        "file_id": 346,
+        "content": "from pydantic import BaseModel, validator\nfrom typing import Optional, List\nimport json\nclass TestDataClass(BaseModel):\n    key_1: str\n    key_2: Optional[str]\n    key_3: str\n    key_4: List\n    @validator(\"key_1\")\n    def validate_key_1(cls, value) -> dict:  # validator can also process things?\n        cmp = json.loads(value)  # will raise error if it is not parseable.\n        return cmp  # now it is dict.\n# try parsing?\nobj = dict(key_1=json.dumps({\"k\": \"abc\"}), key_3=\"def\", key_4=[])  # now we are talking.\nTestDataClass.parse_raw(json.dumps(obj))  # this is string.\n# how to construct one though?\n# data = TestDataClass(key_1=2, key_3=\"10\")  # invalid input! no error?\ndata_1 = TestDataClass(key_1=json.dumps({\"k\": \"abc\"}), key_2=\"11\", key_3=1, key_4=[])\n# not allowed None as list, but allow number as string.\n# minor tolerance for data sources.\n# breakpoint()\ndata_2 = TestDataClass(\n    key_1=\"{}\", key_2=\"2\", key_3=\"3\", key_4=[]\n)  # all must be filled?",
+        "type": "code",
+        "location": "/pydantic_validator_test.py:1-30"
+    },
+    "3149": {
+        "file_id": 346,
+        "content": "This code demonstrates the usage of Pydantic for data validation and modeling in Python. It defines a TestDataClass that includes properties with various types, such as string, optional string, and list. The code also shows how to parse and construct objects using the defined class, while highlighting the flexibility and tolerance for minor data source discrepancies.",
+        "type": "comment"
+    },
+    "3150": {
+        "file_id": 347,
+        "content": "/pyomo_define_array_list.py",
+        "type": "filepath"
+    },
+    "3151": {
+        "file_id": 347,
+        "content": "This code demonstrates defining arrays, parameters and variables in Pyomo, setting bounds and constraints, creating an objective function, and solving with CPLEX.",
+        "type": "summary"
+    },
+    "3152": {
+        "file_id": 347,
+        "content": "##在Pyomo中，可以使用以下方式定义数组和变量组：\n##1. 定义数组：可以使用Python中的列表（list）或Numpy中的数组（array）定义数组，然后使用pyomo.environ.Param组件定义Pyomo中的参数。例如，定义一个包含10个元素的数组，可以使用以下代码：\nimport numpy as np\nfrom pyomo.environ import *\n# 定义数组\narr = np.arange(10)\n# 定义参数\nmodel = ConcreteModel()\n# model.A = Param(range(10), initialize={i: arr[i] for i in range(10)}) # index: 0 to 9\n##2. 定义变量组：可以使用pyomo.environ.Set组件定义变量组，并使用pyomo.environ.Var组件定义变量。例如，定义一个包含10个变量的变量组，可以使用以下代码：\n# 定义变量组\n# model.I = Set(initialize  = [0,0])\n# model.I = Set(initialize=range(10)) # index: 1 to 10\n# 定义变量\n# variables must be assigned to model as attribute\nmodel.x = Var([0, 1], bounds=(-10, 10))  # indexes, other keywords\n# model.x = Var(model.I, initialize=0, domain=(-10,10)) # index from 0 to 1\n##在上述代码中，我们定义了一个变量组I，其中包含10个变量，然后使用pyomo.environ.Var组件定义了一个变量x，它是变量组I中的每个变量。\n# breakpoint()\n# model.Y = Var()\n# Constraint(model.I[1] == 2*model.x)\n# Constraint(model.I[2] == 2*model.y)\nmodel.p = Param(initialize=2) # shall be constant.\n# breakpoint()\ndef objective(self):\n    # return sum(model.I[i] * model.A[j] for i in range(1,11) for j in range(10))",
+        "type": "code",
+        "location": "/pyomo_define_array_list.py:1-35"
+    },
+    "3153": {
+        "file_id": 347,
+        "content": "This code demonstrates how to define arrays and variables in Pyomo using Python lists, NumPy arrays, and Pyomo components. It shows how to create an array with 10 elements, define a parameter, and set the bounds for variables. It also illustrates defining a set of variables based on a variable group, assigning initial values, and setting domain constraints. Lastly, it defines a constant parameter and creates an objective function.",
+        "type": "comment"
+    },
+    "3154": {
+        "file_id": 347,
+        "content": "    return (model.x[0] - model.x[1]) * model.p\nmodel.OBJ = Objective(rule=objective, sense=minimize)\nsolver = SolverFactory(\"cplex\")\nresults = solver.solve(model)\n# model.I.display()\nmodel.OBJ.display()\nmodel.x.display()",
+        "type": "code",
+        "location": "/pyomo_define_array_list.py:36-44"
+    },
+    "3155": {
+        "file_id": 347,
+        "content": "This code defines an objective function using Pyomo, solves the problem with CPLEX solver, and displays the objective value and variable values.",
+        "type": "comment"
+    },
+    "3156": {
+        "file_id": 348,
+        "content": "/pyomo_shot_test.py",
+        "type": "filepath"
+    },
+    "3157": {
+        "file_id": 348,
+        "content": "Code imports Pyomo and math libraries, creates a model with variables x, y, and z. Adds components to the model for x_0, y_0, c1_1, and obj_0, defines a constraint c1, sets objective as minimize z, attempts to solve using IPOPT solver but fails due to issues with imports and definitions. Displays objective value and variables x and y.",
+        "type": "summary"
+    },
+    "3158": {
+        "file_id": 348,
+        "content": "from pyomo.environ import *\nfrom math import pi\n# this will not work.\nmodel = ConcreteModel()\nx = Var(bounds=(0, 3))\ny = Var(bounds=(0, 2 * pi))\nz = Var()\nmodel.add_component(\"z_0\",z)\nmodel.add_component(\"x_0\",x)\nmodel.add_component(\"y_0\",y)\n# model.c1 = Constraint(expr=model.z == model.x+model.y)\nimport pint\nureg = pint.UnitRegistry()\nc1 = Constraint( # add some unit?\n    expr=z == x * sin(y)\n)  # this is not working. sorry!\nmodel.add_component(\"c1_1\",c1)\nobj = Objective(expr=z, sense=minimize)\nmodel.add_component(\"obj_0\",obj)\nopt = SolverFactory(\"ipopt\") # not working!\nopt.solve(model)\nobj.display()\nx.display()\ny.display()",
+        "type": "code",
+        "location": "/pyomo_shot_test.py:1-35"
+    },
+    "3159": {
+        "file_id": 348,
+        "content": "Code imports Pyomo and math libraries, creates a model with variables x, y, and z. Adds components to the model for x_0, y_0, c1_1, and obj_0, defines a constraint c1, sets objective as minimize z, attempts to solve using IPOPT solver but fails due to issues with imports and definitions. Displays objective value and variables x and y.",
+        "type": "comment"
+    },
+    "3160": {
+        "file_id": 349,
+        "content": "/pyomo_test_solve_nonlinear_cplex.py",
+        "type": "filepath"
+    },
+    "3161": {
+        "file_id": 349,
+        "content": "The code sets up an optimization model using Pyomo, defines a ConcreteModel with variables x and y, creates model c1 with objective function z, imports necessary libraries, and solves the model using the \"mindtpy\" solver.",
+        "type": "summary"
+    },
+    "3162": {
+        "file_id": 349,
+        "content": "# no enviroment tweaks. (will not work at all) just create shim for scoop.\n# MINLP open source solvers:\n# https://pyomo.readthedocs.io/en/stable/contributed_packages/mindtpy.html\n# SHOT\n# https://projects.coin-or.org/Couenne\n# https://projects.coin-or.org/Bonmin\n# from pyomo.contrib.simplemodel import SimpleModel\nfrom math import pi  # do not use `sin` from here!\n# pip install pyomocontrib_simplemodel\nfrom pyomo.environ import *  # different approaches gives different import paths. may not always share all solvers.\n# from pyomo.core.expr import current as EXPR\n# from pyomo.core import ConcreteModel, Var, Objective, minimize, sin\nfrom pyomo.environ import units as u\nu.load_definitions_from_file(\"currency_units.txt\")\nmodel = ConcreteModel()\nx_ub = 0\nx_lb = 3\nx_ub/=1000\nx_lb/=1000\nmodel.x = Var(bounds=(x_ub,x_lb))\nmodel.y = Var(bounds=(0, 2 * pi))\nmodel.z = Var()\n# convert_result =  u.convert(model.x, to_units=u.m)\n# print(\"CONVERT RESULT:\",convert_result)\n# model.x = model.x*convert_result\nmodel.c1 = Constraint(expr=model.z == model.x * sin(model.y))",
+        "type": "code",
+        "location": "/pyomo_test_solve_nonlinear_cplex.py:1-36"
+    },
+    "3163": {
+        "file_id": 349,
+        "content": "Code imports necessary libraries and defines a ConcreteModel with variables x, y, and z. Variable x has bounds (0 to 1) and variable y has bounds (0 to 2π. Model c1 is defined as z equals x times sin(y).",
+        "type": "comment"
+    },
+    "3164": {
+        "file_id": 349,
+        "content": "# from pyomo.opt import SolverFactory # not good!\nmodel.obj = Objective(expr=model.z, sense=minimize)\nopt = SolverFactory(\"mindtpy\")  # <- this thing does not support.\nopt.solve(model, mip_solver=\"cplex\",\n        #   nlp_solver=\"SHOT\",\n          nlp_solver=\"ipopt\",\n        #  Error: value SHOT not in domain ['ipopt', 'appsi_ipopt', 'gams', 'baron']\n          tee=True)\nmodel.obj.display()\nmodel.x.display()\nmodel.y.display()\nmodel.z.display()\nbreakpoint()",
+        "type": "code",
+        "location": "/pyomo_test_solve_nonlinear_cplex.py:38-54"
+    },
+    "3165": {
+        "file_id": 349,
+        "content": "The code imports the necessary libraries and sets up an optimization model using Pyomo. It then uses a SolverFactory to specify the solver to be used, in this case \"mindtpy\". The solve method is called on the model, specifying the MIP and NLP solvers to be used, and displaying the objective function and variable values after solving.",
+        "type": "comment"
+    },
+    "3166": {
+        "file_id": 350,
+        "content": "/pyomo_triangulate_multivariate_linearization.py",
+        "type": "filepath"
+    },
+    "3167": {
+        "file_id": 350,
+        "content": "Code imports necessary libraries and defines variables x and y with lower and upper bounds. It then generates a Delaunay triangulation of the input variables' sample points using pyomo's generate_delaunay function. The code creates an N-dimensional piecewise function based on the Delaunay triangulation and z values, which can be used in actual optimization problems. The last line tests the function with input [1, 2] and compares its output to the sin(2) value.",
+        "type": "summary"
+    },
+    "3168": {
+        "file_id": 350,
+        "content": "import pyomo\nimport pyomo.core.kernel.piecewise_library.util\nfrom linearization_config import *\n# func: z = x*sin(y)\nfrom pyomo.core.kernel.variable import variable\nx = variable(lb=x_lb, ub=x_ub)\ny = variable(lb=y_lb, ub=y_ub)\ndelaunay = pyomo.core.kernel.piecewise_library.util.generate_delaunay(\n    [x, y], num=x_sample_size\n)\n# print(delaunay) # what is it?\n# breakpoint()\nxy_points = delaunay.points  # (10000,2)\nz_vals = z_func(xy_points[:, 0], xy_points[:, 1])\nfrom pyomo.core.kernel.piecewise_library.transforms_nd import piecewise_nd\npiecewise_z_func = piecewise_nd(delaunay, z_vals)\n# breakpoint()\n# can it be used in actual optimization?\nprint(piecewise_z_func(np.array([1,2])), np.sin(2))",
+        "type": "code",
+        "location": "/pyomo_triangulate_multivariate_linearization.py:1-28"
+    },
+    "3169": {
+        "file_id": 350,
+        "content": "Code imports necessary libraries and defines variables x and y with lower and upper bounds. It then generates a Delaunay triangulation of the input variables' sample points using pyomo's generate_delaunay function. The code creates an N-dimensional piecewise function based on the Delaunay triangulation and z values, which can be used in actual optimization problems. The last line tests the function with input [1, 2] and compares its output to the sin(2) value.",
+        "type": "comment"
+    },
+    "3170": {
+        "file_id": 351,
+        "content": "/questions.md",
+        "type": "filepath"
+    },
+    "3171": {
+        "file_id": 351,
+        "content": "This code models pipeline temperature and pressure, transforms nonlinear models to linear using Pyomo, provides financial evaluation results for CloudPSS project with input parameters, output financial data, NPV, IRR, and a comprehensive financial category table. The table structure represents revenue/tax categories like business income, taxes, and value-added tax.",
+        "type": "summary"
+    },
+    "3172": {
+        "file_id": 351,
+        "content": "<!-- using https://upmath.me/ to convert markdown to html with latex-->\n# 文件内容\n|  文件名                                  |  文件内容                      |\n|------------------------------------------|-------------------------------|\n| integratedEnergySystemPrototypes.py      | 线性能源规划模型               |\n| cloudpss_inputs.json                     |  IESLab输入参数               |\n| cloudpss_ieslab_connectivity_matrix.xlsx | IESLab设备连接矩阵（不含蒸汽） |\n| cloudpss_topology_screenshot.jpg         | IESLab拓扑搭建截图            |\n# 问题\n1. 如何对有管道厚度$$t$$的水管管道的温度下降方程进行非线性建模？<br>无管道厚度的温度降方程为：$$e^{\\frac{{\\lambda}L}{c_{p}m}} = \\frac{T_{start}-T_a}{T_{end}-T_a}$$\n其中$$\\lambda$$是管段单位长度总传热系数，$$L$$是管段长度，$$m$$是管段质量流率，$$T_a$$是环境空气温度，$$T_{start}$$和$$T_{end}$$是管段起点和终点的水温。\n2. 如何对含有蒸汽的管道的温度下降方程和压力下降方程进行非线性建模？\n3. 如何根据`cloudpss_inputs.json`文件内的参数和`cloudpss_ieslab_connectivity_matrix.xlsx`内的设备连接矩阵对每个设备和任意合理的设备间端口相连形成的拓扑结构利用`pyomo`进行Python建模以及根据目标函数（例如总成本最小）求最小值，不涉及微分方程，只有非线性和线性约束？\n4. 如何将非线性模型转化为如同`integratedEnergySystemPrototypes.py`的线性模型？\n5. 如何根据优化结果输出的设备出力情况、不确定性范围计算财务报表和敏感性分析？",
+        "type": "code",
+        "location": "/questions.md:1-19"
+    },
+    "3173": {
+        "file_id": 351,
+        "content": "This code is asking questions about nonlinear modeling of temperature and pressure drops in pipelines, using Pyomo to model a network topology based on provided input parameters and connectivity matrix, transforming a nonlinear model into a linear one, and calculating financial reports and sensitivity analysis using optimization results.",
+        "type": "comment"
+    },
+    "3174": {
+        "file_id": 351,
+        "content": "# 附录\n## CloudPSS财务报表目录\n- 基础参数（输入）\n  - 投资组成\n    - 投资批次及比例\n    - 建设投资明细\n      - 名称\n      - 建筑工程费\n      - 设备购置费\n      - 安装工程费\n      - 其他费用\n  - 资金来源\n    - 资本金比例（%）\n    - 借款年利率（%）\n    - 贷款年限\n    - 宽限期（年）\n    - 计息次数\n    - 还款方式（等额本金等）\n  - 资产形式\n    - 固定资产比例（%）\n    - 残值（%）\n    - 折旧年限\n    - 摊销年限\n  - 生产成本\n    - 定员（人）\n    - 工资（万元/（人·年））\n    - 福利系数（%）\n    - 保险费率（%）\n    - 材料费（万元/年）\n    - 其他费用（万元/年）\n  - 流动资金及财务费用\n    - 流动资金贷款比例（%）\n    - 短期贷款及流动资金利率（%）\n    - 应收账款年周转次数\n    - 存货年周转次数\n    - 现金年周转次数\n    - 应付账款年周转次数\n  - 税率及附加\n    - 售电增值税税率%\n    - 售汽增值税率%\n    - 售冷热增值税税率%\n    - 燃料增值税税率%\n    - 材料费进项增值税率%\n    - 法定公积金率%\n    - 任意公积金率%\n    - 城市维护建设税税率%\n    - 教育费附加%\n    - 地方教育附加%\n    - 企业所得税税率%\n    - 基准折现率%\n- 财务评价结果（输出）\n  - 概览\n    - 工程动态投资（万元）\n    - 销售收入（万元）\n    - 总投资收益率（%）\n    - 平均年总成本费用（万元）\n    - 资本金利润率（%）\n    - 资本金内部收益率（%）\n    - 项目投资内部收益率（%）\n      - 所得税前\n      - 所得税后\n    - 净现值（万元）\n      - 所得税前\n      - 所得税后\n    - 投资回报期（年）\n      - 所得税前\n      - 所得税后\n  - 基本报表\n    - 利润与利润分配\n      - 产品销售收入\n        - 售电收入\n        - 售冷收入\n        - 售热收入\n        - 售气收入\n      - 销售税金及附加\n        - 销售税金\n        - 城建税",
+        "type": "code",
+        "location": "/questions.md:21-99"
+    },
+    "3175": {
+        "file_id": 351,
+        "content": "This code appears to be a table of input parameters and output financial evaluation results for the CloudPSS project. It includes sections for investment composition, funding sources, asset forms, production costs, liquid assets and financial fees, tax rates and surcharges, as well as financial evaluation results like net present value and internal rates of return.",
+        "type": "comment"
+    },
+    "3176": {
+        "file_id": 351,
+        "content": "        - 教育费附加\n        - 地方教育费附加\n      - 总成本费用\n      - 利润总额\n      - 弥补以前年度亏损\n      - 应纳税所得额\n      - 所得税\n      - 净利润\n      - 未分配利润\n      - 息税前利润\n      - 息税前折旧摊销前利润\n    - 财务计划现金流量\n      - 经营活动净现金流量\n        - 经营活动现金流入\n        - 经营活动现金流出\n      - 投资筹资活动净现金流量\n        - 投资筹资活动现金流入\n        - 投资筹资活动现金流出\n      - 净现金流量\n      - 累计盈余资金\n    - 资产负债\n      - 资产\n        - 流动资产总额\n        - 在建工程\n        - 固定资产净值\n        - 无形资产净值\n      - 负债\n        - 流动负债总额\n        - 建设投资借款\n      - 所有者权益\n        - 资本金\n        - 资本公积金\n        - 累计盈余公积金\n        - 累计未分配利润\n  - 辅助报表\n    - 投资使用计划与资金筹措\n      - 项目总投资\n        - 建设投资\n        - 建设期利息\n        - 流动资金\n      - 资金筹措\n        - 项目资本金\n        - 债务资金\n    - 借款还本付息计划\n      - 长期借款\n        - 期初长期借款余额\n        - 当期长期借款还本付息\n      - 流动资金借款\n        - 期初流动资金借款余额\n        - 当期流动资金借款还本付息\n      - 短期借款\n        - 期初短期借款余额\n        - 当期短期借款还本付息\n      - 借款合计\n        - 期初借款余额\n        - 当期借款还本付息\n    - 流动资金估算\n      - 流动资产\n        - 应收账款\n        - 存货\n        - 现金\n      - 流动负债\n        - 应付账款\n      - 流动资金\n      - 流动资金本年增加额\n    - 资产折旧与摊销估算\n      - 固定资产合计\n        - 固定资产原值",
+        "type": "code",
+        "location": "/questions.md:100-167"
+    },
+    "3177": {
+        "file_id": 351,
+        "content": "Code is a list of accounting categories, including income and expenses, net cash flow, balance sheet items, auxiliary reports, loan repayment plans, liquidity estimation, and depreciation and amortization estimates. This information may be used for financial planning and analysis purposes.",
+        "type": "comment"
+    },
+    "3178": {
+        "file_id": 351,
+        "content": "        - 固定资产折旧费\n        - 固定资产净值\n      - 无形资产合计\n        - 无形资产原值\n        - 无形资产摊销费\n        - 无形资产净值\n    - 总成本费用估算表\n      - 生产成本\n        - 燃料及动力费\n        - 材料费\n        - 工资及福利费\n        - 折旧\n        - 摊销费\n        - 修理费\n        - 其它费用\n        - 保险费\n      - 财务费用\n        - 长期借款利息\n        - 流动资金利息\n        - 短期借款利息\n      - 总成本费用\n        - 固定成本\n        - 可变成本\n      - 经营成本\n    - 项目总投资现金流量\n      - 现金流入 \n        - 产品销售（营业）收入\n        - 回收固定资产余值\n        - 回收流动资金   \n      - 现金流出     \n        - 建设投资\n        - 流动资金   \n        - 经营成本    \n        - 城建税 \n        - 教育费附加\n        - 地方教育费附加 \n      - 所得税前净现金流量\n      - 所得税前累计净现金流量\n      - 调整所得税\n      - 所得税后净现金流量\n      - 所得税后累计净现金流量\n    - 项目资本金现金流量\n      - 现金流入\n        - 产品销售（营业）收入\n        - 回收固定资产余值\n        - 回收自有流动资金\n        - 短期借款\n      - 现金流出\n        - 建设投资资本金\n        - 自有流动资金\n        - 经营成本\n        - 长期借款本金偿还\n        - 流动资金借款本金偿还\n        - 短期借款本金偿还\n        - 长期借款利息支付\n        - 流动资金借款利息支付\n        - 短期借款利息支付\n        - 城建税\n        - 教育费附加\n        - 地方教育费附加\n        - 所得税\n      - 净现金流量\n      - 累计净现金流量\n    - 营业收入、税金、附加和增值税估算",
+        "type": "code",
+        "location": "/questions.md:168-231"
+    },
+    "3179": {
+        "file_id": 351,
+        "content": "This code is a table outlining various financial expenses, investments, and cash flows involved in a project. It includes estimates for fixed assets depreciation, intangible asset total, operating costs, project investment cash flow, capital cash flow, business revenue, taxes, and more. The table helps in assessing the net cash flow, accumulated net cash flow, tax adjustments, and post-tax net cash flow of a given project.",
+        "type": "comment"
+    },
+    "3180": {
+        "file_id": 351,
+        "content": "      - 营业收入\n        - 售电收入\n        - 售冷收入\n        - 售热收入\n        - 售汽收入\n      - 营业税金及附加\n        - 城建税\n        - 教育费附加\n        - 地方教育费附加\n      - 增值税\n        - 销项税额\n        - 进项税额",
+        "type": "code",
+        "location": "/questions.md:232-243"
+    },
+    "3181": {
+        "file_id": 351,
+        "content": "This code represents a table structure where the rows are categories of revenue and taxes. The first row lists various types of business income such as sales from electricity, cooling, heating, and gasoline. The second row lists different taxes like urban construction tax, education fee surcharge, and local education fee surcharge. Lastly, the third row is for value-added tax where it shows sales tax amount and purchase tax amount.",
+        "type": "comment"
+    },
+    "3182": {
+        "file_id": 352,
+        "content": "/questions_packup.cmd",
+        "type": "filepath"
+    },
+    "3183": {
+        "file_id": 352,
+        "content": "The code deletes the existing \"questions.zip\" file and creates a new one by adding all specified files (integratedEnergySystemPrototypes.py, cloudpss_inputs.json, questions.md, questions.pdf, cloudpss_ieslab_connectivity_matrix.xlsx, and cloudpss_topology_screenshot.jpg) into it using the 7z compression tool (questions.zip).",
+        "type": "summary"
+    },
+    "3184": {
+        "file_id": 352,
+        "content": "rm -rf questions.zip\n7z a questions.zip integratedEnergySystemPrototypes.py cloudpss_inputs.json questions.md questions.pdf cloudpss_ieslab_connectivity_matrix.xlsx cloudpss_topology_screenshot.jpg",
+        "type": "code",
+        "location": "/questions_packup.cmd:1-2"
+    },
+    "3185": {
+        "file_id": 352,
+        "content": "The code deletes the existing \"questions.zip\" file and creates a new one by adding all specified files (integratedEnergySystemPrototypes.py, cloudpss_inputs.json, questions.md, questions.pdf, cloudpss_ieslab_connectivity_matrix.xlsx, and cloudpss_topology_screenshot.jpg) into it using the 7z compression tool (questions.zip).",
+        "type": "comment"
+    },
+    "3186": {
+        "file_id": 353,
+        "content": "/regex_extract_bracket.py",
+        "type": "filepath"
+    },
+    "3187": {
+        "file_id": 353,
+        "content": "This code imports the regular expression module, assigns a source string and a source_2 string, defines a pattern using regex to extract text inside parentheses, uses findall to search for matches in source_2, if there is at least one match, assigns them to variables 'a' and 'b', prints these values, otherwise, it prints the value of source_2.",
+        "type": "summary"
+    },
+    "3188": {
+        "file_id": 353,
+        "content": "import re\nsource = \"额定发电功率(kW)\"\nsource_2 = \"生产厂商\"\npattern = r'(\\w+)\\((\\w+)\\)'\nresult = re.findall(pattern, source_2)\nif len(result) > 0:\n    a, b = result[0]\n    print(f\"a={a}\\nb={b}\")\nelse:\n    print(f\"a={source_2}\")\n#a = \"额定发电功率\"\n#b = \"kW\"",
+        "type": "code",
+        "location": "/regex_extract_bracket.py:1-14"
+    },
+    "3189": {
+        "file_id": 353,
+        "content": "This code imports the regular expression module, assigns a source string and a source_2 string, defines a pattern using regex to extract text inside parentheses, uses findall to search for matches in source_2, if there is at least one match, assigns them to variables 'a' and 'b', prints these values, otherwise, it prints the value of source_2.",
+        "type": "comment"
+    },
+    "3190": {
+        "file_id": 354,
+        "content": "/reset_codepage.reg",
+        "type": "filepath"
+    },
+    "3191": {
+        "file_id": 354,
+        "content": "This Registry file sets the command prompt settings, such as CodePage, FontFamily, FontWeight, FaceName, ScreenBufferSize, and WindowSize, for the current user under the HKEY_CURRENT_USER\\Console key.",
+        "type": "summary"
+    },
+    "3192": {
+        "file_id": 354,
+        "content": "Windows Registry Editor Version 5.00\n[HKEY_CURRENT_USER\\Console\\%SystemRoot%_system32_cmd.exe]\n\"CodePage\"=dword:0000fde9\n\"FontFamily\"=dword:00000036\n\"FontWeight\"=dword:00000190\n\"FaceName\"=\"Consolas\"\n\"ScreenBufferSize\"=dword:232900d2\n\"WindowSize\"=dword:002b00d2",
+        "type": "code",
+        "location": "/reset_codepage.reg:1-9"
+    },
+    "3193": {
+        "file_id": 354,
+        "content": "This Registry file sets the command prompt settings, such as CodePage, FontFamily, FontWeight, FaceName, ScreenBufferSize, and WindowSize, for the current user under the HKEY_CURRENT_USER\\Console key.",
+        "type": "comment"
+    },
+    "3194": {
+        "file_id": 355,
+        "content": "/result_processlib.py",
+        "type": "filepath"
+    },
+    "3195": {
+        "file_id": 355,
+        "content": "The code imports docplex library and defines a Value class to handle variable values. It checks the type of input and returns corresponding value or raises a \"type error\" if not recognized.",
+        "type": "summary"
+    },
+    "3196": {
+        "file_id": 355,
+        "content": "# import docplex_test\nimport docplex\n# from docplex.mp.model import Model\nimport numpy\nclass Value(object):\n    def __init__(self, sol):\n        self.sol = sol\n    def value(self, x):\n        if isinstance(x, int):\n            return x\n        elif isinstance(x, float):\n            print('float')\n            return x\n        elif isinstance(x, list) and isinstance(x[0], docplex.mp.dvar.Var):\n            return self.sol.get_values(x)\n        elif isinstance(x, docplex.mp.dvar.Var):\n            return self.sol.get_value(x)\n        elif isinstance(x, list) and isinstance(x[0], int):\n            return x\n        elif isinstance(x, list) and isinstance(x[0], float):\n            return x\n        elif isinstance(x, numpy.ndarray):\n            return x\n        else:\n            print('type error')\n            return None",
+        "type": "code",
+        "location": "/result_processlib.py:1-30"
+    },
+    "3197": {
+        "file_id": 355,
+        "content": "The code imports docplex library and defines a Value class to handle variable values. It checks the type of input and returns corresponding value or raises a \"type error\" if not recognized.",
+        "type": "comment"
+    },
+    "3198": {
+        "file_id": 356,
+        "content": "/runhide.vbs",
+        "type": "filepath"
+    },
+    "3199": {
+        "file_id": 356,
+        "content": "The code is a VBS script that runs batch files or console commands in hidden windows, checks syntax and usage, and displays author credit before terminating with an exit code.",
+        "type": "summary"
+    }
+}

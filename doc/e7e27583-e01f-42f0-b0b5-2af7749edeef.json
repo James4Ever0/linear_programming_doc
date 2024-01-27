@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the MarkdownIt library and its dollarmath_plugin for rendering LaTeX expressions in markdown. The provided sample markdown includes a LaTeX equation, and the code converts it to an HTML string. The resulting HTML string is printed.",
+    "details": [
+        {
+            "comment": "This code imports the MarkdownIt library and its dollarmath_plugin for rendering LaTeX expressions in markdown. The provided sample markdown includes a LaTeX equation, and the code converts it to an HTML string. The resulting HTML string is printed.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_with_latex.py\":0-22",
+            "content": "# import markdown\n# md = markdown.Markdown(extensions=[\"pymdownx.arithmatex\"], output_format=\"html\")\n# md.convertFile(input=\"jump_to_line.md\", output=\"jump_to_line.html\", encoding=\"utf-8\")\nfrom markdown_it import MarkdownIt\nfrom mdit_py_plugins.dollarmath import dollarmath_plugin\n# shall you import some script around this.\n# no better than markdown-it-mathjax3\nmd = MarkdownIt().use(dollarmath_plugin)\nsample_markdown=r\"\"\"\n# hello latex\n$$\n\\alpha = \\beta\n$$\n\"\"\"\nhtml_string = md.render(sample_markdown)\nprint(html_string)"
+        }
+    ]
+}

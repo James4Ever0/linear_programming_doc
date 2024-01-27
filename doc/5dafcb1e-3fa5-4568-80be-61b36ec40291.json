@@ -1,0 +1,15 @@
+{
+    "summary": "The Dockerfile installs Ubuntu 22.04, necessary packages, copies setup files, updates package lists, and sets up the container environment for Miniconda3 and IBM ILOG CPLEX installation.",
+    "details": [
+        {
+            "comment": "This Dockerfile sets up a Ubuntu 22.04 base image, installs necessary packages like curl and bzip2, copies required files for environment setup, updates the package list, and prepares for Conda installation through shell scripts without explicitly mentioning Mamba or Miniconda.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_backup\":0-24",
+            "content": "FROM ubuntu:22.04\n# ENTRYPOINT [ \"/bin/bash\" ]\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\n# ARG MODIFY_BASHRC=modify_bashrc_for_mamba.py\nARG BASHRC=.bashrc\nARG BASH=/bin/bash\nARG CPLEX_INSTALL_BIN=cplex_128.bin\n# TODO: fill in the blank.\n# ARG MAIN_SCRIPT_PATH=...\nARG CONDA_INIT=conda_init.sh\n# ARG CPLEX_PATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/bin/x86-64_linux\nARG CONDA_INSTALL=conda_install.sh\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/ubuntu_environment /etc/environment\nCOPY ${MICROGRID_DIR}/${MODIFY_BASHRC} .\nCOPY ./cplex_install_packages/cplex_studio128.linux-x86-64.bin ${CPLEX_INSTALL_BIN}\n# RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak\n# COPY ${MICROGRID_DIR}/ubuntu_jammy_sources.list /etc/apt/sources.list\n# RUN cat /etc/apt/sources.list.bak >> /etc/apt/sources.list\n# RUN rm /etc/apt/sources.list.bak\nRUN apt update\nRUN apt install -y curl bzip2\n# RUN curl -o ${MAMBA_INSTALL} https://micro.mamba.pm/install.sh\n# RUN bash ${MAMBA_INSTALL}\n# RUN curl -o ${CONDA_INSTALL} https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh"
+        },
+        {
+            "comment": "This code sets up the container environment by copying necessary files, installing Miniconda3, configuring PATH variables, and executing initialization scripts. It also installs IBM ILOG CPLEX and prepares for potential command execution on CMD.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_backup\":25-43",
+            "content": "COPY ./miniconda_installer/Miniconda3-py39_4.12.0-Linux-x86_64.sh ${CONDA_INSTALL}\nRUN chmod u+x ${CONDA_INSTALL}\nRUN ./${CONDA_INSTALL} -b\n# ENV PATH=\"/root/miniconda/bin:${PATH}\"\n# RUN python3 ${MODIFY_BASHRC}\n# RUN source ${BASHRC}\n# RUN ${BASH} ln -s $(which micromamba) /bin/conda\nCOPY ${MICROGRID_DIR}/${INIT} .\nCOPY ${MICROGRID_DIR}/${CONDA_INIT} .\nRUN ${BASH} ${CONDA_INIT}\nRUN ${BASH} ${INIT}\nRUN chmod +x ${CPLEX_INSTALL_BIN}\nRUN echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./${CPLEX_INSTALL_BIN}\n# RUN echo \"export PATH=\\$PATH:${CPLEX_PATH}\" >> ${BASHRC}\n# shall we ensure self-updates.\n# shall we mount some paths from local directory and put entry script there when launch container from python script.\n# CMD ${BASH} ${MAIN_SCRIPT_PATH}\n# think we can do more with less constraints.\nCMD ${BASH}"
+        }
+    ]
+}

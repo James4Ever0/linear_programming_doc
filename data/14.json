@@ -1,0 +1,545 @@
+{
+    "1400": {
+        "file_id": 183,
+        "content": "/microgrid_base/export_format_units.py.j2",
+        "type": "filepath"
+    },
+    "1401": {
+        "file_id": 183,
+        "content": "This code imports logger_print from log_utils, then imports paramWithUnits from export_format_validate.py and creates a class for each device name with parameters and units as attributes using a loop.",
+        "type": "summary"
+    },
+    "1402": {
+        "file_id": 183,
+        "content": "from log_utils import logger_print\n{% from \"export_format_validate.py.j2\" import paramWithUnits with context%}\n{% for devName, paramNameAndUnitList in paramWithUnits.items() %}\nclass {{devName}}仿真结果导出单位:\n    {% for PN, unit in paramNameAndUnitList %}\n    {{PN}} = {{repr(unit)}}\n    {% endfor %}\n{% endfor %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_units.py.j2:1-10"
+    },
+    "1403": {
+        "file_id": 183,
+        "content": "This code imports logger_print from log_utils, then imports paramWithUnits from export_format_validate.py and creates a class for each device name with parameters and units as attributes using a loop.",
+        "type": "comment"
+    },
+    "1404": {
+        "file_id": 184,
+        "content": "/microgrid_base/export_format_validate.py",
+        "type": "filepath"
+    },
+    "1405": {
+        "file_id": 184,
+        "content": "This code defines classes for PV, wind power, and battery simulations with time and device parameters, considers diesel generators, and includes hydrogen production and output curves. It also defines load curve classes.",
+        "type": "summary"
+    },
+    "1406": {
+        "file_id": 184,
+        "content": "from log_utils import logger_print\nfrom typing import List\nfrom constants import *\nfrom pyomo_environ import *\nfrom pydantic import BaseModel, validator\nfrom ies_optim import *\nimport statistics\nfrom pyomo.core.base.var import IndexedVar\ndef sumVarList(varList: IndexedVar):\n    return sum(varList.values())\ndef addListElem(*args):\n    vals = []\n    for elem_zip in zip(*args):\n        vals.append(sum(elem_zip))\n    return vals\nimport cmath\ndef safeValue(val):\n    try:\n        return value(val)\n    except:\n        return val\ndef safeDiv(val, div):\n    try:\n        return safeValue(val) / safeValue(div)\n    except:\n        return cmath.nan\ndef safeAbs(val):\n    if type(val) in [str]:\n        return val\n    try:\n        return abs(val)\n    except:\n        return cmath.nan\ndef ReLU(val):\n    if type(val) not in [int, float]:\n        val = value(val)\n    if val > 0:\n        return val\n    else:\n        return 0\n############\n# 仿真结果 #\n############\nclass 柴油仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    ## UNIQ PARAMS ##\n    柴油消耗量: float\n    \"\"\"",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:1-73"
+    },
+    "1407": {
+        "file_id": 184,
+        "content": "The code defines a class for simulated diesel results, with attributes like component name and type, and parameters like diesel consumption. It also includes various utility functions such as summing indexed variables, adding lists of elements, handling values safely, and applying the Rectified Linear Unit (ReLU) function. The code imports from various libraries including log_utils, constants, pyomo_environ, pydantic, and ies_optim. It also includes some mathematical operations for handling complex numbers (cmath).",
+        "type": "comment"
+    },
+    "1408": {
+        "file_id": 184,
+        "content": "    单位: L <- m3\n    \"\"\"\n    @validator(\"柴油消耗量\")\n    def standard_unit_to_custom_柴油消耗量(cls, v):\n        return v / 0.0010000000000000002\n    柴油消耗费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    @staticmethod\n    def export(model: 柴油模型, timeParam: float):\n        return 柴油仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            柴油消耗费用=safeAbs(value(model.总成本年化)),\n            柴油消耗量=safeAbs(\n                ((statistics.mean([value(e) for e in model.燃料接口.values()])) * timeParam)\n            ),\n        )\nclass 电负荷仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    ## UNIQ PARAMS ##\n    电负荷: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    电收入: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    @staticmethod\n    def export(model: 电负荷模型, timeParam: float):\n        return 电负荷仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            电负荷=safeAbs(\n                ((statistics.mean([-value(e) for e in model.电接口.values()])) * timeParam)",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:74-120"
+    },
+    "1409": {
+        "file_id": 184,
+        "content": "This code contains two classes, 柴油仿真结果 and 电负荷仿真结果. The 柴油仿真结果 class has attributes for fuel consumption amount (in L) and fuel consumption cost (in millions). It also has a static method export that returns an instance of the class with calculated values based on model parameters. The 电负荷仿真结果 class has attributes for load, income (both in millions), and also has a static method export that calculates and returns these values based on model parameters. Both classes use static methods to calculate results from given models and time parameters.",
+        "type": "comment"
+    },
+    "1410": {
+        "file_id": 184,
+        "content": "            ),\n            电收入=safeAbs(-value(model.总成本年化)),\n        )\nclass 光伏发电仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    产电量: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    @staticmethod\n    def export(model: 光伏发电模型, timeParam: float):\n        return 光伏发电仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            产电量=safeAbs(\n                ((statistics.mean([value(e) for e in model.电接口.values()])) * timeParam)\n            ),\n        )\nclass 风力发电仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    产电量: float\n    \"\"\"",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:121-184"
+    },
+    "1411": {
+        "file_id": 184,
+        "content": "This code defines two classes, 光伏发电仿真结果 (PV simulation result) and 风力发电仿真结果 (Wind power simulation result), which inherit from BaseModel. These classes store the properties of photovoltaic and wind power devices, including their name, type, model, number of units, maintenance costs, and energy production. The classes also have an export method to generate simulation results for a given time parameter.",
+        "type": "comment"
+    },
+    "1412": {
+        "file_id": 184,
+        "content": "    单位: kWh\n    \"\"\"\n    @staticmethod\n    def export(model: 风力发电模型, timeParam: float):\n        return 风力发电仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            产电量=safeAbs(\n                ((statistics.mean([value(e) for e in model.电接口.values()])) * timeParam)\n            ),\n        )\nclass 柴油发电仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    产电量: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    柴油消耗量: float\n    \"\"\"\n    单位: L <- m3\n    \"\"\"\n    @validator(\"柴油消耗量\")\n    def standard_unit_to_custom_柴油消耗量(cls, v):\n        return v / 0.0010000000000000002\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 柴油发电模型, timeParam: float):",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:185-242"
+    },
+    "1413": {
+        "file_id": 184,
+        "content": "This code defines a class for the simulation result of wind power and diesel generators. It calculates the production quantity, device count, and maintenance costs based on the model inputs and time parameter. The diesel generator simulation results also include custom units for diesel consumption and average efficiency.",
+        "type": "comment"
+    },
+    "1414": {
+        "file_id": 184,
+        "content": "        return 柴油发电仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            产电量=safeAbs(\n                ((statistics.mean([value(e) for e in model.电接口.values()])) * timeParam)\n            ),\n            柴油消耗量=safeAbs(\n                ((statistics.mean([value(e) for e in model.燃料接口.values()])) * timeParam)\n            ),\n            平均效率_平均COP=safeAbs(\n                (\n                    safeDiv(\n                        (\n                            (statistics.mean([value(e) for e in model.电接口.values()]))\n                            * timeParam\n                        ),\n                        model.燃料热值\n                        * (\n                            (\n                                (\n                                    statistics.mean(",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:243-268"
+    },
+    "1415": {
+        "file_id": 184,
+        "content": "This code seems to be a part of a larger function that takes a model as input and returns simulation results for a diesel generator device. It calculates various parameters like maintenance costs, power production, fuel consumption, and average efficiency based on the provided model information. The code utilizes various functions from the 'statistics' module for calculation and safety checks with 'safeAbs' and 'safeDiv'. It also converts the input model values to float using 'value' function.",
+        "type": "comment"
+    },
+    "1416": {
+        "file_id": 184,
+        "content": "                                        [value(e) for e in model.燃料接口.values()]\n                                    )\n                                )\n                                * timeParam\n                            )\n                        ),\n                    )\n                )\n                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 锂电池仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 锂电池模型, timeParam: float):\n        return 锂电池仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            平均效率_平均COP=safeAbs(",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:269-315"
+    },
+    "1417": {
+        "file_id": 184,
+        "content": "This code defines a class \"锂电池仿真结果\" (Lithium-ion battery simulation result) which inherits from BaseModel. It contains various properties such as device name, model, type, and maintenance fees. The method \"export\" takes in a Lithium-ion battery model and time parameter, and returns an instance of the class with calculated values for the properties.",
+        "type": "comment"
+    },
+    "1418": {
+        "file_id": 184,
+        "content": "                (\n                    safeDiv(\n                        ReLU(\n                            (\n                                (\n                                    (\n                                        statistics.mean(\n                                            [ReLU(e) for e in model.电接口.values()]\n                                        )\n                                    )\n                                    * timeParam\n                                )\n                            )\n                            - (model.InitSOC * model.TotalCapacity)\n                        ),\n                        (\n                            -(\n                                (\n                                    (\n                                        statistics.mean(\n                                            [-ReLU(-e) for e in model.电接口.values()]\n                                        )\n                                    )\n                                    * timeParam\n                                )",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:316-340"
+    },
+    "1419": {
+        "file_id": 184,
+        "content": "This code calculates the mean of ReLU-processed elements from a model's 电接口 values, multiplies by a time parameter, subtracts initial SOC times total capacity, and applies another ReLU function.",
+        "type": "comment"
+    },
+    "1420": {
+        "file_id": 184,
+        "content": "                            )\n                        ),\n                    )\n                )\n                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 变压器仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 变压器模型, timeParam: float):\n        return 变压器仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            平均效率_平均COP=safeAbs(\n                (\n                    -safeDiv(\n                        statistics.mean([value(e) for e in model.电输入.values()]),\n                        statistics.mean([value(e) for e in model.电输出.values()]),",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:341-387"
+    },
+    "1421": {
+        "file_id": 184,
+        "content": "This code defines a class named `变压器仿真结果` (TransformerSimulationResult) that represents the simulation results of transformers. It includes properties such as component name, type, model, and maintenance cost. The class has an `export` method which takes `model` and `timeParam` as parameters, and returns a TransformerSimulationResult object with the specified data. The calculation for the maintenance cost is based on the total fixed and variable maintenance costs, annualized, multiplied by timeParam divided by the number of hours per year.",
+        "type": "comment"
+    },
+    "1422": {
+        "file_id": 184,
+        "content": "                    )\n                )\n                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 变流器仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 变流器模型, timeParam: float):\n        return 变流器仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            平均效率_平均COP=safeAbs(\n                (\n                    -safeDiv(\n                        statistics.mean([value(e) for e in model.电输入.values()]),\n                        statistics.mean([value(e) for e in model.电输出.values()]),\n                    )\n                )",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:388-434"
+    },
+    "1423": {
+        "file_id": 184,
+        "content": "This code defines a class called \"변형器仿真결과\" (Variable Transformer Simulation Result) that represents the simulation results of a variable transformer. The class has attributes such as component name, type, model, and device specifications. It also includes maintenance fees and average efficiency. There is a static method called \"export\" which takes a model object and time parameter to generate the simulation result object with calculated values.",
+        "type": "comment"
+    },
+    "1424": {
+        "file_id": 184,
+        "content": "                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 双向变流器仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 双向变流器模型, timeParam: float):\n        return 双向变流器仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            平均效率_平均COP=safeAbs(\n                (\n                    value(\n                        (\n                            safeDiv(\n                                sumVarList(model.储能端_.x_pos),\n                                sumVarList(model.线路端_.x_neg),\n                            )\n                            * sumVarList(model.储能端_.b_pos)",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:435-481"
+    },
+    "1425": {
+        "file_id": 184,
+        "content": "This code defines a class called \"双向变流器仿真结果\" (Bidirectional Converter Simulation Result) which extends the BaseModel class. It has attributes such as component name, type, model, number of devices, maintenance cost, and average efficiency (COP). The export method takes in a model and time parameter, and returns an instance of the Bidirectional Converter Simulation Result class with calculated values for the device count, maintenance fee, and average COP.",
+        "type": "comment"
+    },
+    "1426": {
+        "file_id": 184,
+        "content": "                        )\n                        + (\n                            safeDiv(\n                                sumVarList(model.线路端_.x_pos),\n                                sumVarList(model.储能端_.x_neg),\n                            )\n                            * sumVarList(model.线路端_.b_pos)\n                        )\n                    )\n                    / model.计算参数.迭代步数\n                )\n                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 传输线仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    平均效率_平均COP: float\n    \"\"\"\n    单位: one\n    \"\"\"\n    @staticmethod\n    def export(model: 传输线模型, timeParam: float):\n        return 传输线仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:482-524"
+    },
+    "1427": {
+        "file_id": 184,
+        "content": "This code is validating the export format of a microgrid model. It calculates various parameters related to transmission lines and converts them into a TransmissionLineSimulationResult class object. The function takes a model and time parameter as inputs and returns a result object containing information like component name, type, model, maintenance cost, average efficiency, and COP.",
+        "type": "comment"
+    },
+    "1428": {
+        "file_id": 184,
+        "content": "            平均效率_平均COP=safeAbs(\n                (\n                    -safeDiv(\n                        statistics.mean([value(e) for e in model.电输入.values()]),\n                        statistics.mean([value(e) for e in model.电输出.values()]),\n                    )\n                )\n                * ((timeParam / model.计算参数.总计算时长))\n            ),\n        )\nclass 氢负荷仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    ## UNIQ PARAMS ##\n    氢气消耗量: float\n    \"\"\"\n    单位: t\n    \"\"\"\n    氢气收入: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    @staticmethod\n    def export(model: 氢负荷模型, timeParam: float):\n        return 氢负荷仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            氢气消耗量=safeAbs(\n                (\n                    (statistics.mean([-value(e) for e in model.氢气接口.values()]))\n                    * timeParam\n                )\n            ),\n            氢气收入=safeAbs(-value(model.总成本年化)),\n        )\nclass 燃气发电机仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:525-575"
+    },
+    "1429": {
+        "file_id": 184,
+        "content": "This code defines classes for hydrogen load simulation results and gas turbine generator simulation results. The hydrogen load simulation result class has attributes for component name, type, hydrogen consumption, and income. The gas turbine generator simulation result class has attributes for component name, type, model, and number of units. Both classes have static export methods that return an instance of the respective class with calculated values based on input models and time parameters.",
+        "type": "comment"
+    },
+    "1430": {
+        "file_id": 184,
+        "content": "    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    产热量: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    产电量: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    天然气消耗量: float\n    \"\"\"\n    单位: m3\n    \"\"\"\n    @staticmethod\n    def export(model: 燃气发电机模型, timeParam: float):\n        return 燃气发电机仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            产电量=safeAbs(\n                ((statistics.mean([value(e) for e in model.电接口.values()])) * timeParam)\n            ),\n            天然气消耗量=safeAbs(\n                ((statistics.mean([value(e) for e in model.燃料接口.values()])) * timeParam)\n            ),\n            产热量=safeAbs(\n                (\n                    (\n                        (statistics.mean([value(e) for e in model.高温烟气余热接口.values()]))",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:576-620"
+    },
+    "1431": {
+        "file_id": 184,
+        "content": "This function takes a gas turbine model and a time parameter, then returns a GasTurbineSimulationResult object with various attributes such as device maintenance cost, power generated, and gas consumed. The results are calculated based on the model's specifications and the given time period.",
+        "type": "comment"
+    },
+    "1432": {
+        "file_id": 184,
+        "content": "                        * timeParam\n                    )\n                )\n                + (\n                    (\n                        (statistics.mean([value(e) for e in model.缸套水余热接口.values()]))\n                        * timeParam\n                    )\n                )\n            ),\n        )\nclass 电解槽仿真结果(BaseModel):\n    元件名称: str\n    元件类型: str\n    设备型号: str\n    设备台数: int\n    \"\"\"\n    单位: one\n    \"\"\"\n    设备维护费用: float\n    \"\"\"\n    单位: 万元\n    \"\"\"\n    ## UNIQ PARAMS ##\n    产热量: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    电负荷: float\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    氢气产量: float\n    \"\"\"\n    单位: t\n    \"\"\"\n    @staticmethod\n    def export(model: 电解槽模型, timeParam: float):\n        return 电解槽仿真结果(\n            元件名称=safeAbs(model.设备信息.设备名称),\n            元件类型=safeAbs(model.设备信息.__class__.__name__.strip(\"信息\")),\n            设备型号=safeAbs(model.设备信息.设备型号),\n            设备维护费用=safeAbs(\n                ((value(model.总固定维护成本 + model.总可变维护成本年化)) * ((timeParam / 每年小时数)))\n            ),\n            设备台数=safeAbs(value(model.DeviceCount)),\n            电负荷=safeAbs(",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:621-677"
+    },
+    "1433": {
+        "file_id": 184,
+        "content": "This code defines a class `电解槽仿真结果` (ElectrolyzerSimulationResult) that inherits from `BaseModel` and contains properties such as device parameters, maintenance costs, and simulation results. It also has a static method `export()` which takes in an `电解槽模型` (ElectrolyzerModel) and time parameter, and returns an instance of the class with the calculated values for electrolyzer simulation results.",
+        "type": "comment"
+    },
+    "1434": {
+        "file_id": 184,
+        "content": "                ((statistics.mean([-value(e) for e in model.电接口.values()])) * timeParam)\n            ),\n            氢气产量=safeAbs(\n                ((statistics.mean([value(e) for e in model.制氢接口.values()])) * timeParam)\n            ),\n            产热量=safeAbs(\n                (\n                    (statistics.mean([value(e) for e in model.设备余热接口.values()]))\n                    * timeParam\n                )\n            ),\n        )\n################\n# 设备出力曲线 #\n################\nclass 光伏发电出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    发电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 光伏发电模型, timeParam: float):\n        return 光伏发电出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            发电功率=[value(e) for e in model.电接口.values()],\n        )\nclass 风力发电出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    发电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:678-734"
+    },
+    "1435": {
+        "file_id": 184,
+        "content": "This code defines classes for hydrogen production and solar/wind power output curves, and includes a method to export these curves for models. The classes have attributes for device information, time, and power output. The `export` method generates an instance of the curve class using the device's model information and the given time parameter.",
+        "type": "comment"
+    },
+    "1436": {
+        "file_id": 184,
+        "content": "    def export(model: 风力发电模型, timeParam: float):\n        return 风力发电出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            发电功率=[value(e) for e in model.电接口.values()],\n        )\nclass 柴油发电出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    发电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 柴油发电模型, timeParam: float):\n        return 柴油发电出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            发电功率=[value(e) for e in model.电接口.values()],\n        )\nclass 锂电池出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    荷电容量: List[float]\n    \"\"\"\n    单位: kWh\n    \"\"\"\n    荷电状态: List[float]\n    \"\"\"\n    单位: percent <- one\n    \"\"\"\n    @validator(\"荷电状态\")\n    def standard_unit_to_custom_荷电状态(cls, v):\n        return [e / 0.01 for e in v]\n    电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 锂电池模型, timeParam: float):",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:735-795"
+    },
+    "1437": {
+        "file_id": 184,
+        "content": "This code defines three classes: WindPowerCurve, DieselPowerCurve, and LithiumBatteryCurve. Each class represents the output power of a respective energy source over time. The classes inherit from BaseModel and have attributes for time, device name, and power/energy output. The WindPowerCurve and DieselPowerCurve classes also include export methods to generate their corresponding power curves. The LithiumBatteryCurve class includes additional attributes for battery capacity, battery state, and power output, as well as a validator function to convert the battery state unit from percent (default) to custom units.",
+        "type": "comment"
+    },
+    "1438": {
+        "file_id": 184,
+        "content": "        return 锂电池出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            电功率=[value(e) for e in model.电接口.values()],\n            荷电容量=[value(e) for e in model.CurrentTotalCapacity.values()],\n            荷电状态=[\n                value(safeDiv(e, model.TotalCapacity))\n                for e in model.CurrentTotalCapacity.values()\n            ],\n        )\nclass 变压器出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    转换功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 变压器模型, timeParam: float):\n        return 变压器出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            转换功率=[value(e) for e in model.电输出.values()],\n        )\nclass 变流器出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    转换功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 变流器模型, timeParam: float):\n        return 变流器出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:796-848"
+    },
+    "1439": {
+        "file_id": 184,
+        "content": "This code defines classes for battery, transformer, and inverter output curves. The `export` method generates the output curve data by iterating over model parameters and values, then creating a new instance of the respective output curve class with time as a range of iteration steps, component name, and power or capacity values from the model.",
+        "type": "comment"
+    },
+    "1440": {
+        "file_id": 184,
+        "content": "            元件名称=model.设备信息.设备名称,\n            转换功率=[value(e) for e in model.电输出.values()],\n        )\nclass 双向变流器出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    转换功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 双向变流器模型, timeParam: float):\n        return 双向变流器出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            转换功率=addListElem(\n                [value(e) for e in model.储能端_.x_pos.values()],\n                [-value(e) for e in model.线路端_.x_pos.values()],\n            ),\n        )\nclass 电负荷出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    耗电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 电负荷模型, timeParam: float):\n        return 电负荷出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            耗电功率=[-value(e) for e in model.电接口.values()],\n        )\nclass 传输线出力曲线(BaseModel):\n    元件名称: str",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:849-904"
+    },
+    "1441": {
+        "file_id": 184,
+        "content": "Classes for exporting load curves of bi-directional converter, uni-directional load, and transmission lines. Each class inherits from BaseModel and takes in a model object and time parameter to generate the output curve. The output curves contain information about the device name, time, and power values (converted or consumed).",
+        "type": "comment"
+    },
+    "1442": {
+        "file_id": 184,
+        "content": "    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    传输功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 传输线模型, timeParam: float):\n        return 传输线出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            传输功率=[-value(e) for e in model.电输入.values()],\n        )\nclass 电解槽出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    耗电功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    产氢流量: List[float]\n    \"\"\"\n    单位: kg <- metric_ton\n    \"\"\"\n    @validator(\"产氢流量\")\n    def standard_unit_to_custom_产氢流量(cls, v):\n        return [e / 0.001 for e in v]\n    产热功率: List[float]\n    \"\"\"\n    单位: kW\n    \"\"\"\n    @staticmethod\n    def export(model: 电解槽模型, timeParam: float):\n        return 电解槽出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            耗电功率=[-value(e) for e in model.电接口.values()],\n            产氢流量=[value(e) for e in model.制氢接口.values()],\n            产热功率=[value(e) for e in model.设备余热接口.values()],",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:906-961"
+    },
+    "1443": {
+        "file_id": 184,
+        "content": "This code defines two classes: \"传输线出力曲线\" and \"电解槽出力曲线\". The \"export\" method of each class takes a model object and a time parameter to create an instance of the respective class with properties such as time, power, and other relevant data. The \"standard_unit_to_custom_产氢流量\" validator method converts the standard unit of hydrogen flow rate into a custom unit for the 电解槽出力曲线 class.",
+        "type": "comment"
+    },
+    "1444": {
+        "file_id": 184,
+        "content": "        )\nclass 氢负荷出力曲线(BaseModel):\n    元件名称: str\n    时间: List[int]\n    \"\"\"\n    单位: one\n    \"\"\"\n    ## UNIQ PARAMS ##\n    耗氢流量: List[float]\n    \"\"\"\n    单位: kg <- metric_ton\n    \"\"\"\n    @validator(\"耗氢流量\")\n    def standard_unit_to_custom_耗氢流量(cls, v):\n        return [e / 0.001 for e in v]\n    @staticmethod\n    def export(model: 氢负荷模型, timeParam: float):\n        return 氢负荷出力曲线(\n            时间=list(range(model.计算参数.迭代步数)),\n            元件名称=model.设备信息.设备名称,\n            耗氢流量=[-value(e) for e in model.氢气接口.values()],\n        )",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py:962-989"
+    },
+    "1445": {
+        "file_id": 184,
+        "content": "This code defines a class for \"HydrogenLoadCurve\" that inherits from BaseModel. It has attributes for component name, time, and customized hydrogen flow rate in kg. The class also includes a validator to convert standard units to custom units and a static method export to create instances of the model with given parameters.",
+        "type": "comment"
+    },
+    "1446": {
+        "file_id": 185,
+        "content": "/microgrid_base/export_format_validate.py.j2",
+        "type": "filepath"
+    },
+    "1447": {
+        "file_id": 185,
+        "content": "This code imports libraries, defines functions and macros, sets up a microgrid simulation, performs efficiency and cost calculations, creates device classes, updates objects with parameters, handles exceptions, exports data related to device output curves, generates time series, and provides an overview of planning schemes.",
+        "type": "summary"
+    },
+    "1448": {
+        "file_id": 185,
+        "content": "from log_utils import logger_print\n{# from ies_optim import {{ \",\".join(model_names) }} #}\n{# import device ports. #}\n{# TODO: check export logic of lithium battery. #}\n{# TODO: mark out #}\n{% macro assert(expr, message) %}\n  {% if expr != true %}\n    {% error message %}\n  {% endif %}\n{% endmacro %}\n{# {% set nonCountableDevNames = ['传输线']%} #}\nfrom typing import List\nfrom constants import *\n{# import numpy as np #}\nfrom pyomo_environ import *\n{# from pyomo.environ import value #}\nfrom pydantic import BaseModel, validator\n{# if unit is one, use \"int\" as type, else \"float\"#}\n{# timeParam: how many hours have passed #}\nfrom ies_optim import *\n{# import math #}\nimport statistics\nfrom pyomo.core.base.var import IndexedVar\ndef sumVarList(varList:IndexedVar):\n    return sum(varList.values())\ndef addListElem(*args):\n    vals = []\n    for elem_zip in zip(*args):\n        vals.append(sum(elem_zip))\n    return vals\nimport cmath\ndef safeValue(val):\n    try:\n        return value(val)\n    except:\n        return val\ndef safeDiv(val, div):",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:1-46"
+    },
+    "1449": {
+        "file_id": 185,
+        "content": "Imports necessary libraries and defines functions for data manipulation, error handling, and conversion. Imports specific models and variables from 'ies_optim' and 'constants'.",
+        "type": "comment"
+    },
+    "1450": {
+        "file_id": 185,
+        "content": "    try:\n        return safeValue(val)/safeValue(div)\n    except:\n        return cmath.nan\n    {# EPS = 1e-10\n    return (val)/(div+EPS if (type(div) not in [int, float] or div == 0 ) else div) #}\ndef safeAbs(val):\n    if type(val) in [str]: return val\n    try:\n        return abs(val)\n    except:\n        return cmath.nan\ndef ReLU(val):\n    if type(val) not in [int, float]:\n        val = value(val)\n    if val>0:\n        return val\n    else:\n        return 0\n{# where you prepare the export data. #}\n{# in simulation mode #}\n{% set totalSimulationTimeInHour = \"model.计算参数.总计算时长\"%}\n{% set 典型日权重 = \"(timeParam / {})\".format(totalSimulationTimeInHour)%}\n{% set 年化权重 = \"(timeParam / 每年小时数)\" %}\n{% set extraParams = {\"平均效率_平均COP\": 典型日权重} %}\n{% macro BANNER(msg)%}\n    {% set msglen = namespace(val=0)%}\n        {% for e in list(msg)%}\n            {% set l = ord(e)%}\n            {% if l > 500 %}\n                {% set msglen.val =2+msglen.val%}\n            {% else %}\n                {% set msglen.val =1+msglen.val%}\n            {% endif %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:47-83"
+    },
+    "1451": {
+        "file_id": 185,
+        "content": "This code contains various functions and macro definitions. It includes safe division, safe absolute value, ReLU function for activation function in machine learning, macro BANNER for printing messages with character count, and some calculation parameters used for simulation mode.",
+        "type": "comment"
+    },
+    "1452": {
+        "file_id": 185,
+        "content": "        {% endfor %}\n{{ \"#\" * (msglen.val+4)}}\n# {{msg}} #\n{{ \"#\" * (msglen.val+4)}}\n{% endmacro %}\n{% set exceptionList = [\"平均效率_平均COP\"] %}\n{% set commonParamNames = [\n    \"元件名称\",\n    \"元件类型\",\n    \"设备型号\",\n    \"设备台数\",\n    \"设备维护费用\",\n    \"时间\"\n]%}\n{% set paramWithUnits = dict() %}\n{% macro iterParamDict(paramDict, has_list, className, needUpdate) %}\n    {% if needUpdate %}\n        {% do paramWithUnits.update({className:list()}) %}\n    {% endif %}\n    {% set flag = namespace(val=False) %}\n    {% for paramName, paramDef in paramDict.items() %}\n        {% set PN = paramName.replace(\"/\",\"_\") %}\n        {% if flag.val == False %}\n            {% if PN not in commonParamNames %}\n                {% set flag.val=True %}\n    ## UNIQ PARAMS ##\n            {% endif %}\n        {% endif %}\n        {% if paramDef == None %}\n            {% set t = 'str'%}\n        {% elif paramDef[1] == 'one' and paramDef[0] == 1 and PN not in exceptionList %}\n            {% set t = 'int'%}\n        {% else%}\n            {% set t = 'float'%}\n        {% endif %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:84-118"
+    },
+    "1453": {
+        "file_id": 185,
+        "content": "This code snippet defines a macro to iterate through a parameter dictionary and update a \"paramWithUnits\" dictionary based on certain conditions. It also sets two lists, \"exceptionList\" and \"commonParamNames\", and initializes an empty dictionary \"paramWithUnits\". The code checks for unique parameters and assigns the appropriate data type for each parameter value in the dictionary.",
+        "type": "comment"
+    },
+    "1454": {
+        "file_id": 185,
+        "content": "    {{PN}} :{{'List[{}]'.format(t) if ( t!='str' and has_list) else t}}\n        {% if t!='str' %}\n    {# mag, std, old #}\n    {% if needUpdate %}\n        {% do paramWithUnits[className].append((PN, paramDef[2])) %}\n    {% endif%}\n    \"\"\"\n    单位: {{paramDef[2] if paramDef[0] == 1 else \"{} <- {}\".format(paramDef[2], paramDef[1])}}\n    \"\"\"\n            {% if paramDef[0] !=1 %}\n    @validator(\"{{PN}}\")\n    def standard_unit_to_custom_{{PN}}(cls, v):\n                {% if has_list%}\n        return [e / {{paramDef[0]}} for e in v]\n                {% else%}\n        return v / {{paramDef[0]}}\n                {% endif%}\n            {% endif %}\n        {% endif %}\n    {% endfor %}\n{% endmacro %}\n{% macro TP(val)%}(({{val}}) * timeParam){%endmacro%}\n{% macro TP_ANNUAL(val)%}(({{val}}) * ({{年化权重}})){%endmacro%}\n{% macro IV(vlist)%}for e in {{vlist}}.values(){% endmacro%}\n{%macro VLIST(vlist)%}[value(e) {{IV(vlist)}}]{% endmacro%}\n{%macro ELIST(elist)%}[value(e) for e in {{elist}}]{% endmacro%}\n{% macro VLIST_PAT(vlist, pattern) %}[value({{pattern.format('e')}}) {{IV(vlist)}}]{% endmacro %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:119-146"
+    },
+    "1455": {
+        "file_id": 185,
+        "content": "This code defines several macros for generating Python classes with validators and properties, dealing with unit conversions and customized formats. It also performs calculations based on time parameters, annual weights, and lists of values. The purpose appears to be to facilitate the creation of well-structured, validated data models in a concise manner using Jinja2 templating language.",
+        "type": "comment"
+    },
+    "1456": {
+        "file_id": 185,
+        "content": "{%macro VLISTINV(vlist)%}[-value(e) {{IV(vlist)}}]{% endmacro%}\n{%macro VLISTDIV(vlist, div)%}[value(safeDiv(e,{{div}})) {{IV(vlist)}}]{% endmacro%}\n{%macro VLISTPOS(vlist)%}[ReLU(e) {{IV(vlist)}}]{% endmacro%}\n{%macro VLISTNEG(vlist)%}[-ReLU(-e) {{IV(vlist)}}]{% endmacro%}\n{%macro MVLIST(vlist)%}statistics.mean({{VLIST(vlist)}}){% endmacro%}\n{%macro MVLISTPOS(vlist)%}statistics.mean({{VLISTPOS(vlist)}}){% endmacro%}\n{%macro MVLISTNEG(vlist)%}statistics.mean({{VLISTNEG(vlist)}}){% endmacro%}\n{%macro MVLISTINV(vlist)%}statistics.mean({{VLISTINV(vlist)}}){% endmacro%}\n{% macro TP_MVLIST(vlist)%}{{TP(MVLIST(vlist))}}{% endmacro %}\n{% macro TP_MVLISTPOS(vlist)%}{{TP(MVLISTPOS(vlist))}}{% endmacro %}\n{% macro TP_MVLISTNEG(vlist)%}{{TP(MVLISTNEG(vlist))}}{% endmacro%}\n{% macro TP_MVLISTINV(vlist)%}{{TP(MVLISTINV(vlist))}}{% endmacro%}\n{% macro BIDIR_SINGLE_CVT(x,y)%}(safeDiv(sumVarList(model.{{x}}.x_pos),sumVarList(model.{{y}}.x_neg)) * sumVarList(model.{{x}}.b_pos)){%endmacro%}\n{% macro BIDIR_CVT_COP(x,y)%}value({{BIDIR_SINGLE_CVT(x,y)}}+ {{BIDIR_SINGLE_CVT(y,x)}})/model.计算参数.迭代步数{% endmacro%}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:147-160"
+    },
+    "1457": {
+        "file_id": 185,
+        "content": "This code defines macros for various transformations and calculations, such as VLISTINV (inverse list), VLISTDIV (divide by a constant), VLISTPOS (positive ReLU), VLISTNEG (negative ReLU), MVLIST (mean of the list), MVLISTPOS (mean of positive ReLU list), MVLISTNEG (mean of negative ReLU list), MVLISTINV (mean of inverse list), TP_MVLIST (transformed mean list with TP function), TP_MVLISTPOS (same but for positive ReLU list), TP_MVLISTNEG (same but for negative ReLU list), and TP_MVLISTINV (same but for inverse list). Additionally, there are macros for bidirectional single conversion (BIDIR_SINGLE_CVT) and bidirectional conversion with copy (BIDIR_CVT_COP), which calculate conversion values based on model variables.",
+        "type": "comment"
+    },
+    "1458": {
+        "file_id": 185,
+        "content": "{# {% set EPS = \"1e-10\"%} #}\n{% set commonSimParams = {\n    \"产电量\": TP_MVLIST(\"model.电接口\"),\n    \"柴油消耗量\": TP_MVLIST(\"model.燃料接口\"),\n    \"天然气消耗量\": TP_MVLIST(\"model.燃料接口\"),\n    \"单向电转换COP\": \"- safeDiv({},{})\".format(MVLIST(\"model.电输入\"), MVLIST(\"model.电输出\")),\n    '电收入': \"-value(model.总成本年化)\",\n    '氢气收入': \"-value(model.总成本年化)\",\n    \"柴油消耗费用\": \"value(model.总成本年化)\"\n}%}\n{% set CSPL = {} %}\n{% macro dictValueToKeyValuePair(a,b)%}\n{% for k,v in a.items() %}\n    {% do b.update({k: (k,v)}) %}\n{% endfor %}\n{% endmacro %}\n{% do dictValueToKeyValuePair(commonSimParams, CSPL) %}\n{% set simDevParamMapping = {\n    \"柴油\": [\n        CSPL['柴油消耗费用'],\n        CSPL['柴油消耗量'],\n    ],\n    \"电负荷\": [\n        (\"电负荷\", TP_MVLISTINV(\"model.电接口\")),\n        CSPL['电收入']\n    ],\n    \"氢负荷\": [\n        (\"氢气消耗量\", TP_MVLISTINV(\"model.氢气接口\")),\n        CSPL['氢气收入']\n    ],\n    \"光伏发电\": [\n        CSPL['产电量']\n    ],\n    \"风力发电\": [\n        CSPL['产电量']\n    ],\n    \"柴油发电\": [\n        CSPL['产电量'],\n        CSPL['柴油消耗量'],\n        (\"平均效率_平均COP\",\"safeDiv({}, model.燃料热值 * ({}))\".format(commonSimParams['产电量'],commonSimParams['柴油消耗量']))",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:161-200"
+    },
+    "1459": {
+        "file_id": 185,
+        "content": "This code sets up various parameters and their mappings for a microgrid simulation. It defines common parameters like energy production, fuel consumption, COP (Coefficient of Performance), and revenue. Then, it maps these parameters to specific energy sources such as solar, wind, hydrogen, gasoline, and diesel generators. The code also performs calculations to determine efficiency and cost for each generator based on the input data.",
+        "type": "comment"
+    },
+    "1460": {
+        "file_id": 185,
+        "content": "    ],\n    \"燃气发电机\":[\n        CSPL['产电量'],\n        CSPL['天然气消耗量'],\n        (\"产热量\", \"({}) + ({})\".format(TP_MVLIST(\"model.高温烟气余热接口\"), TP_MVLIST(\"model.缸套水余热接口\")))\n    ],\n    \"锂电池\":[\n        (\"平均效率_平均COP\", (\"safeDiv(ReLU(({}) - ({})) , (-({})))\".format(TP_MVLISTPOS(\"model.电接口\"), \"model.InitSOC * model.TotalCapacity\", TP_MVLISTNEG(\"model.电接口\"))))\n    ], \n    \"变压器\":[\n        (\"平均效率_平均COP\", commonSimParams['单向电转换COP'])\n    ],\n    \"变流器\": [\n        (\"平均效率_平均COP\", commonSimParams['单向电转换COP'])\n    ],\n    \"双向变流器\": [\n        (\"平均效率_平均COP\", BIDIR_CVT_COP(\"储能端_\",\"线路端_\"))\n    ],\n    \"传输线\": [\n        (\"平均效率_平均COP\", commonSimParams['单向电转换COP'])\n    ],\n    \"电解槽\": [\n        (\"电负荷\", TP_MVLISTINV(\"model.电接口\")),\n        (\"氢气产量\", TP_MVLIST(\"model.制氢接口\")),\n        (\"产热量\", TP_MVLIST(\"model.设备余热接口\"))\n    ]\n}%}\n{# 柴油发电等的燃料热值在解析拓扑结构的时候进行确定 #}\n{% macro export_data_with_model(devName, obj, classType, paramDict, needAbs=False)%}\n    @staticmethod\n    def export(model: {{devName}}模型, timeParam:float):\n    {% do obj.update(dict(元件名称 = \"model.设备信息.设备名称\")) %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:201-233"
+    },
+    "1461": {
+        "file_id": 185,
+        "content": "This code defines a dictionary with different types of energy components in a microgrid system and their associated parameters. It also includes macros for exporting data related to each component. The values for some parameters are determined during the parsing of the topological structure, while others like gas turbine fuel heat value or battery efficiency depend on specific models.",
+        "type": "comment"
+    },
+    "1462": {
+        "file_id": 185,
+        "content": "{{caller()}}\n{% set _paramKeys = []%}\n{% for key in paramDict.keys() %}\n    {% do _paramKeys.append(key.replace(\"/\",'_'))%}\n{% endfor%}\n{% set paramKeys = _set(_paramKeys) %}\n{% set objKeys = _set(obj.keys()) %}\n{% do assert(paramKeys.__eq__(objKeys), \"devName: {}\\n{} (code uniq)\\n{} (template uniq)\".format(devName, paramKeys.difference(objKeys), objKeys.difference(paramKeys))) %}\n        return {{devName}}{{classType}}(\n    {% for key, value in obj.items() %}\n        {% if needAbs %}\n            {{key}} = safeAbs({{value if key not in extraParams.keys() else \"({}) * ({})\".format(value, extraParams[key])}}),\n        {% else %}\n            {{key}} = {{value}},\n        {% endif %}\n    {% endfor %}\n        )\n{% endmacro%}\n{% macro update_obj(obj, paramDict, devName, CPN, check) %}\n    {% if devName in paramDict.keys() %}\n        {% if len(paramDict[devName]) == 0 %}\n            {% error \"设备'{}'的独有参数未设置\".format(devName) %}\n        {% endif%}\n        {% for k, v in paramDict[devName]%}\n            {% if k in CPN%}\n                {% error(\"设备'{}'的参数'{}'不是独有参数\".format(devName, k)) %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:234-260"
+    },
+    "1463": {
+        "file_id": 185,
+        "content": "This code defines a macro function `update_obj` that takes an object, parameter dictionary, device name, and a list of check parameters. It first checks if the device has unique parameters by comparing keys in both the parameter dictionary and the object's key set. If not, it raises an assertion error with relevant information for debugging. Then, it updates the object with the unique parameters from the dictionary and returns the updated object.",
+        "type": "comment"
+    },
+    "1464": {
+        "file_id": 185,
+        "content": "            {% endif%}\n            {% do obj.update({k : v}) %}\n        {% endfor%}\n    {% else%}\n        {% if check%}\n            {% error \"设备'{}'没有独有参数\".format(devName)%}\n        {% endif%}\n    {% endif %}\n{% endmacro %}\n{{ BANNER(\"仿真结果\") }}\n{% for devName, paramDict in main_data['仿真结果'].items() %}\n    {% if devName == 'ALL' %}\n        {% continue %}\n    {% endif %}\nclass {{devName}}仿真结果(BaseModel):\n{{iterParamDict(paramDict, false, devName, true)}}\n{% set obj = {} %}\n{% call export_data_with_model(devName, obj, '仿真结果', paramDict, needAbs=True)%}\n    {% do obj.update(                \n        元件类型 = \"model.设备信息.__class__.__name__.strip('信息')\"\n    )%}\n    {% if devName not in nonDevNames %}\n        {% do obj.update(\n            dict(\n                设备型号 = \"model.设备信息.设备型号\",\n                设备维护费用 = TP_ANNUAL(\"value(model.总固定维护成本 + model.总可变维护成本年化)\"),\n                )\n        )\n        %}\n        {% if devName not in nonCountableDevNames %}\n            {% do obj.update(\n                设备台数 = \"value(model.DeviceCount)\",",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:261-294"
+    },
+    "1465": {
+        "file_id": 185,
+        "content": "This code defines a macro named 'iterParamDict' and creates a class for each device type in the simulation results. It updates objects with parameters, validates if there are unique device-specific parameters, and adds additional attributes like device model and maintenance fees. The code also handles exceptions and provides error messages when needed.",
+        "type": "comment"
+    },
+    "1466": {
+        "file_id": 185,
+        "content": "            )%}\n        {% endif%}\n    {% endif %}\n    {% do update_obj(obj, simDevParamMapping, devName, commonParamNames, True) %}\n{% endcall %}\n{% endfor %}\n{% set commonTimeSeries = dict(\n 发电功率=VLIST('model.电接口'),\n 充电功率=VLISTNEG('model.电接口'),\n 放电功率=VLISTPOS('model.电接口'),\n 荷电容量=VLIST_PAT('model.CurrentTotalCapacity', \"{}\"),\n 荷电状态=VLIST_PAT('model.CurrentTotalCapacity', \"safeDiv({} , model.TotalCapacity)\"),\n 电转换功率=VLIST('model.电输出'),\n)\n%}\n{% set CTSL = {} %}\n{% do dictValueToKeyValuePair(commonTimeSeries, CTSL) %}\n{% set timeSeriesMapping = {\n    \"光伏发电\": [\n       CTSL['发电功率']\n    ],\n    \"风力发电\": [\n       CTSL['发电功率']\n    ],\n    \"柴油发电\":\n    [\n        CTSL['发电功率']\n    ],\n    \"燃气发电机\":\n    [\n        CTSL['发电功率'],\n        (\"每小时天然气耗量\", VLISTINV('model.燃料接口')),\n        (\"缸套水热功率\", VLIST('model.缸套水余热接口')),\n        (\"烟气热功率\", VLIST('model.高温烟气余热接口')),\n    ],\n    \"锂电池\":\n    [\n        (\"电功率\",VLIST('model.电接口')),\n        CTSL['荷电容量'],\n        CTSL['荷电状态']\n    ],\n    \"变压器\":[\n        ('转换功率',commonTimeSeries['电转换功率'])\n    ],\n    \"变流器\":[\n        ('转换功率', commonTimeSeries['电转换功率'])",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:295-341"
+    },
+    "1467": {
+        "file_id": 185,
+        "content": "The code defines a dictionary called `commonTimeSeries` with various electricity parameters for different energy sources and devices. It then creates an empty dictionary `CTSL` and converts the key-value pairs from `commonTimeSeries` to key-value pairs in `CTSL`. Another dictionary `timeSeriesMapping` is created, which contains a list of energy source types as keys, and a list of corresponding time series parameters as values. The code then creates these time series for each energy source type using the data from `commonTimeSeries` and `CTSL`.",
+        "type": "comment"
+    },
+    "1468": {
+        "file_id": 185,
+        "content": "    ],\n    \"双向变流器\":[\n        ('转换功率', 'addListElem({}, {})'.format(VLIST('model.储能端_.x_pos'),VLISTINV('model.线路端_.x_pos')))\n    ],\n    \"电负荷\":[('耗电功率', VLISTINV('model.电接口'))],\n    \"氢负荷\":[('耗氢流量', VLISTINV('model.氢气接口'))],\n    \"传输线\":[('传输功率', VLISTINV('model.电输入'))],\n    \"电解槽\":[\n        ('耗电功率', VLISTINV('model.电接口')),\n        (\"产氢流量\", VLIST('model.制氢接口')),\n        (\"产热功率\", VLIST('model.设备余热接口')), \n    ]\n}\n%}\n{# use \"call\" here. #}\n{{ BANNER(\"设备出力曲线\") }}\n{% for devName, paramDict in main_data['设备出力曲线'].items() %}\nclass {{devName}}出力曲线(BaseModel):\n{% if devName == '锂电池' %}\n    {% do paramDict.pop('放电功率') %}\n    {% do paramDict.update(dict(电功率 = paramDict.pop('充电功率'))) %}\n    {# {% set paramDict['电功率'] = paramDict.pop('充电功率') %} #}\n{% endif %}\n{{ iterParamDict(paramDict, true, devName, false) }}\n{% set obj = {} %}\n{% do obj.update(dict(时间=\"list(range(model.计算参数.迭代步数))\")) %}\n{% call export_data_with_model(devName, obj, '出力曲线', paramDict) %}\n    {% do update_obj(obj, timeSeriesMapping, devName, [], False) %}\n{% endcall %}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:342-372"
+    },
+    "1469": {
+        "file_id": 185,
+        "content": "This code is defining a class called \"设备出力曲线\" and iterating over different device names in the main_data dictionary. It updates parameters for each device, such as removing \"放电功率\" for \"锂电池\". It creates an object with time series data for each device and calls a function to export data based on the device name. This class appears to be related to exporting data for device output curves.",
+        "type": "comment"
+    },
+    "1470": {
+        "file_id": 185,
+        "content": "{% endfor %}\n{# 规划方案概览就是把所有的规划结果详情统计一下放到这里 需要传入方案类型 #}\n{# moved to \"ies_optim.py\" #}",
+        "type": "code",
+        "location": "/microgrid_base/export_format_validate.py.j2:373-377"
+    },
+    "1471": {
+        "file_id": 185,
+        "content": "Ends the for loop and provides a comment explaining that this code block used to display an overview of planning schemes, requiring the scheme type as input. It has been moved to \"ies_optim.py\".",
+        "type": "comment"
+    },
+    "1472": {
+        "file_id": 186,
+        "content": "/microgrid_base/expr_utils.py",
+        "type": "filepath"
+    },
+    "1473": {
+        "file_id": 186,
+        "content": "The code simplifies subexpressions using regular expressions and SymPy library, offering two approaches to evaluate symbolic expressions and logging the length of found arrays.",
+        "type": "summary"
+    },
+    "1474": {
+        "file_id": 186,
+        "content": "# lineno = 45381\n# with open(\"error.log\", 'r') as f:\n#     for index, line in enumerate(f.readlines()):\n#         if index == lineno-1:\n#             with open(\"test_data.log\", 'w+') as f1:\n#                 f1.write(line)\n#                 break\nimport sys\nfrom sympy import sympify\n# import sympy\nfrom progressbar import progressbar\nfrom log_utils import logger_print\ntry:\n    from typing import Literal\nexcept:\n    from typing_extensions import Literal\n# shall you simplify expressions in some way.\ndef find_parentheses(s):\n    \"\"\"\n    Find all parentheses pairs in the given string.\n    Parameters:\n    - s (str): The input string to search for parentheses pairs.\n    Returns:\n    - result (List[str]): A list of all parentheses pairs found in the string.\n    \"\"\"\n    stack = []\n    result = []  # EIPList\n    for i, c in enumerate(progressbar(s)):\n        if c == \"(\":\n            stack.append(i)  # 记录左括号的位置\n        elif c == \")\":\n            if stack:  # 如果栈不为空\n                start = stack.pop()  # 弹出最近的左括号位置\n                if not stack:  # 如果栈为空，说明找到了一个最外层的括号对",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:1-41"
+    },
+    "1475": {
+        "file_id": 186,
+        "content": "This code snippet imports necessary libraries, defines a function find_parentheses to search for parentheses pairs in a given string, and uses a progress bar. The function utilizes a stack to record the positions of left parentheses and retrieves corresponding right parentheses when finding the pair.",
+        "type": "comment"
+    },
+    "1476": {
+        "file_id": 186,
+        "content": "                    result.append(s[start : i + 1])  # 将括号对加入结果列表\n    return result\nimport re\nfrom typing import ContextManager\nclass RecursionContext(ContextManager):\n    def __init__(self, recursion_limit=10**9):\n        self.recursion_limit = recursion_limit\n        self.sys_recursion_limit = sys.getrecursionlimit()\n    def __enter__(self):\n        \"\"\"\n        Set recursion_limit to desired limit.\n        Return `self` upon entering the runtime context.\n        \"\"\"\n        sys.setrecursionlimit(self.recursion_limit)\n        return self\n    def __exit__(self, exc_type, exc_value, traceback):\n        \"\"\"\n        Restore recursion_limit to previous limit.\n        Raise any exception triggered within the runtime context.\n        \"\"\"\n        sys.setrecursionlimit(self.sys_recursion_limit)\n        return None\ndef getExprStrParsedToExprList(data: str, approach: Literal[1, 2] = 1):\n    \"\"\"\n    Parses a string representing an expression and returns a list of simplified subexpressions.\n    Args:\n        data (str): The string representation of the expression.",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:42-77"
+    },
+    "1477": {
+        "file_id": 186,
+        "content": "This code defines a `RecursionContext` class that allows setting and restoring the Python recursion limit, which can be useful for deep nested function calls. The `getExprStrParsedToExprList()` function parses an input expression string into a list of simplified subexpressions using either approach 1 or 2 (default is approach 1).",
+        "type": "comment"
+    },
+    "1478": {
+        "file_id": 186,
+        "content": "        approach (Literal[1, 2], optional): The approach to use for simplification. Defaults to 1.\n    Returns:\n        list: A list of simplified subexpressions.\n    Raises:\n        AssertionError: If the approach is not 1 or 2.\n    \"\"\"\n    regex = re.compile(r\"(\\[\\d+\\])\")\n    subs = regex.findall(data)\n    logger_print(len(subs))\n    # for sub in set(subs):\n    #     data = data.replace(sub,\"_Array\")\n    data = regex.sub(\"_Array\", data)\n    #######################\n    # EXPR SIMPLIFICATION #\n    #######################\n    \"\"\"\n    APP1: subexpr (-> full_expr)\n    APP2: full_expr -> subexpr\n    APP1 is faster than APP2.\n    \"\"\"\n    import time\n    starting_time = time.time()\n    if approach == 1:\n        #####################APPROACH 1#####################\n        \"\"\"\n        parse and substitude terms.\n        \"\"\"\n        regex2 = re.compile(r\"(((?P<term>\\w+_Array) \\+ )+((?P=term)))\")\n        summation = [(e[0], e[2]) for e in regex2.findall(data)]\n        summation.sort(key=lambda x: -len(x[0]))\n        # logger_print(len(summation))",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:78-116"
+    },
+    "1479": {
+        "file_id": 186,
+        "content": "This code defines a function for simplifying subexpressions in a given expression. It uses regular expressions to find arrays within the data and then applies two different approaches (1 and 2) for simplification, with approach 1 being faster. The function also logs the length of found arrays using logger_print.",
+        "type": "comment"
+    },
+    "1480": {
+        "file_id": 186,
+        "content": "        # summation = set(summation)\n        # expr = \"\"\n        # breakpoint()\n        for e0, e2 in summation:\n            suffix = f\"_SUM_OF_{e0.count('+')+1}\"\n            data = data.replace(e0, e2 + suffix)\n        # logger_print(data)\n        expr_repr = data\n        from sympy.polys.polytools import Poly\n        # recursion error!\n        # expr = sympify(data)\n        EIPList = find_parentheses(data)\n        elems_in_parentheses = set(EIPList)\n        EIPMAP = {e: f\"EIP_{i}\" for i, e in enumerate(elems_in_parentheses)}\n        EIPMAP_REV = {v: k for k, v in EIPMAP.items()}\n        for EIP, EIP_CODE in EIPMAP.items():\n            expr_repr = expr_repr.replace(EIP, EIP_CODE)\n        subexpr_strs = expr_repr.replace(\"-\", \"+ -\").split(\"+\")\n        expr_list = []\n        with RecursionContext() as RC:\n            for subexpr in subexpr_strs:\n                # logger_print()\n                sympify_expr = sympify(subexpr)\n                sympify_expr = sympify_expr.simplify()\n                _p = Poly(sympify_expr)",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:117-147"
+    },
+    "1481": {
+        "file_id": 186,
+        "content": "This code is modifying and simplifying a mathematical expression using SymPy library. It replaces symbols with specific codes, identifies expressions within parentheses, and applies recursion to simplify each subexpression. The resulting simplified expressions are then processed by Poly class from the sympy.polys.polytools module.",
+        "type": "comment"
+    },
+    "1482": {
+        "file_id": 186,
+        "content": "                fs = _p.free_symbols\n                logger_print(f\"FS: {fs}\")\n                # logger_print()\n                for s in fs:\n                    sname = str(s)\n                    if sname in EIPMAP_REV.keys():\n                        eip = EIPMAP_REV[sname]\n                        eip_expr = sympify(eip)\n                        eip_expr = eip_expr.simplify()\n                        logger_print(f\"{sname} = {eip_expr}\")\n                        sympify_expr = sympify_expr.subs(sympify(sname), eip_expr)\n                logger_print(\"TERM EXPR:\", sympify_expr)\n                expr_list.append(sympify_expr)\n        # breakpoint()\n        final_expr = sum(expr_list)\n        logger_print(\"FINAL EXPR:\")\n        logger_print(final_expr)\n        #####################APPROACH 1#####################\n        endtime = time.time()\n        logger_print(\"APP1_TIME:\", endtime - starting_time)\n        return expr_list\n        # APP1_TIME: 4.300285339355469\n        # APP1_TIME: 4.084861993789673\n    elif approach == 2:",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:148-171"
+    },
+    "1483": {
+        "file_id": 186,
+        "content": "Code segment loops through free symbols in an expression, substitutes the corresponding EIP (expression intercept point) values for each symbol, and stores the resulting expressions in a list. Final sum of all expressions is calculated and returned. Additionally, it logs various messages during execution for debugging purposes. Two approaches are provided, with timing measurement for Approach 1.",
+        "type": "comment"
+    },
+    "1484": {
+        "file_id": 186,
+        "content": "        #####################APPROACH 2#####################\n        \"\"\"\n        use template to generate symbols and code.\n        \"\"\"\n        # import sys\n        # sys.setrecursionlimit(10*100000)\n        # sys.getrecursionlimit()\n        regex = re.compile(r\"\\w+\")\n        words = regex.findall(data)\n        words = set(words)\n        # mwords = []\n        codeLines = []\n        # codeLines.append(\"import sympy\")\n        for word in words:  # do not use progressbar in here!\n            try:\n                float(word)\n            except:\n                codeLines.append(f'{word} = sympify(\"{word}\")')\n                # mwords.append(word)\n        # exec(code)\n        # codeLines.append(f\"sympy_expr = {data}\")\n        for line in codeLines:\n            logger_print(\n                \"EXCECUTING: \", line[:200] + (\"\" if len(line) < 200 else \"...\")\n            )\n            exec(line)\n        logger_print(\"GETTING EXPR\")\n        with RecursionContext() as RC:\n            sympy_expr = eval(data)\n            logger_print(\"SIMPLIFYING EXPR\")",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:172-202"
+    },
+    "1485": {
+        "file_id": 186,
+        "content": "This code uses regular expressions to extract words from a given data string, then generates SymPy symbolic expressions for those words and stores them in a list of code lines. It executes these code lines and simplifies the resulting expression using SymPy's simplification capabilities.",
+        "type": "comment"
+    },
+    "1486": {
+        "file_id": 186,
+        "content": "            sympy_expr = sympy_expr.simplify()\n            # logger_print()\n            logger_print(sympy_expr)\n        #####################APPROACH 2#####################\n        logger_print(\"FINAL EXPR:\")\n        logger_print(sympy_expr)\n        terms = sympy_expr.as_terms()\n        termlist = []\n        for t in terms:\n            term = t[0]\n            termlist.append(term)\n        endtime = time.time()\n        logger_print(\"APP2_TIME:\", endtime - starting_time)\n        # APP2_TIME: 12.695726156234741\n        # APP2_TIME: 11.072844982147217\n        return termlist\n    else:\n        assert False, f\"Bad approach: {approach}\"\nif __name__ == \"__main__\":\n    data = open(\"test_data.log\", \"r\").read()  # entry: for test",
+        "type": "code",
+        "location": "/microgrid_base/expr_utils.py:203-227"
+    },
+    "1487": {
+        "file_id": 186,
+        "content": "This code simplifies a SymPy expression, logs it, then applies approach 2 by extracting terms from the expression, logging them, and returning the term list. It also measures the time taken for this process. If an invalid approach is used, it throws an assertion error. The code is part of a larger program that may use \"test_data.log\" for input data.",
+        "type": "comment"
+    },
+    "1488": {
+        "file_id": 187,
+        "content": "/microgrid_base/extra_models.py",
+        "type": "filepath"
+    },
+    "1489": {
+        "file_id": 187,
+        "content": "This code imports all necessary functions and classes from the ies_optim_jinja module and defines a variable logger_print. It is used for any additional models not included in the microgrid, allowing them to be created outside of the template and imported into ies_optim.py for use.",
+        "type": "summary"
+    },
+    "1490": {
+        "file_id": 187,
+        "content": "from log_utils import logger_print\n\"\"\"\nfor any other model not within the microgrid (or you don't want to write it in template), make it here.\nrename the template generated file: ies_optim.py -> ies_optim_jinja.py\ncreate a file named \"ies_optim.py\" which imports all things from ies_optim_jinja.py and extra_models.py\n\"\"\"\nfrom ies_optim_jinja import *",
+        "type": "code",
+        "location": "/microgrid_base/extra_models.py:1-10"
+    },
+    "1491": {
+        "file_id": 187,
+        "content": "This code imports all necessary functions and classes from the ies_optim_jinja module and defines a variable logger_print. It is used for any additional models not included in the microgrid, allowing them to be created outside of the template and imported into ies_optim.py for use.",
+        "type": "comment"
+    },
+    "1492": {
+        "file_id": 188,
+        "content": "/microgrid_base/failsafe_reload.sh",
+        "type": "filepath"
+    },
+    "1493": {
+        "file_id": 188,
+        "content": "This code sets the environment variable FAILSAFE to True and then executes the reload.sh script using Bash, likely for a failsafe reloading process in a microgrid context.",
+        "type": "summary"
+    },
+    "1494": {
+        "file_id": 188,
+        "content": "env FAILSAFE=True bash reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_reload.sh:1-1"
+    },
+    "1495": {
+        "file_id": 188,
+        "content": "This code sets the environment variable FAILSAFE to True and then executes the reload.sh script using Bash, likely for a failsafe reloading process in a microgrid context.",
+        "type": "comment"
+    },
+    "1496": {
+        "file_id": 189,
+        "content": "/microgrid_base/failsafe_synth_mock_reload.sh",
+        "type": "filepath"
+    },
+    "1497": {
+        "file_id": 189,
+        "content": "This code sets the environment variable FAILSAFE to True and executes a bash script named synth_mock_reload.sh. It's used in a microgrid context, likely for failsafe operations or testing purposes.",
+        "type": "summary"
+    },
+    "1498": {
+        "file_id": 189,
+        "content": "env FAILSAFE=True bash synth_mock_reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/failsafe_synth_mock_reload.sh:1-1"
+    },
+    "1499": {
+        "file_id": 189,
+        "content": "This code sets the environment variable FAILSAFE to True and executes a bash script named synth_mock_reload.sh. It's used in a microgrid context, likely for failsafe operations or testing purposes.",
+        "type": "comment"
+    }
+}

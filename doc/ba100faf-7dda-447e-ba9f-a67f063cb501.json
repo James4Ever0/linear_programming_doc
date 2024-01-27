@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the environment variable DETERMINISTIC_FAILSAFE to True, and then executes the bash script failsafe_reload.sh. This seems to be initializing a deterministic failsafe mode for a microgrid base system.",
+    "details": [
+        {
+            "comment": "This code sets the environment variable DETERMINISTIC_FAILSAFE to True, and then executes the bash script failsafe_reload.sh. This seems to be initializing a deterministic failsafe mode for a microgrid base system.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/det_failsafe_reload.sh\":0-0",
+            "content": "env DETERMINISTIC_FAILSAFE=True bash failsafe_reload.sh"
+        }
+    ]
+}

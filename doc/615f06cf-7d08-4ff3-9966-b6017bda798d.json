@@ -1,0 +1,10 @@
+{
+    "summary": "Converting HTML to PDF using Playwright with three different input files.",
+    "details": [
+        {
+            "comment": "Converting HTML to PDF using Playwright with three different input files.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/html_to_pdf.sh\":0-2",
+            "content": "# playwright pdf example_docstring_utf8.html example_docstring_utf8.pdf\nplaywright pdf html/processed.html original_example_docstring.pdf\n# playwright pdf html/example_docstring.html original_example_docstring.pdf"
+        }
+    ]
+}

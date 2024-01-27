@@ -1,0 +1,10 @@
+{
+    "summary": "Class definition for a new class with data and value attributes, initializing val from execute_init method call. Prints the val attribute value \"VAL\" after object creation.",
+    "details": [
+        {
+            "comment": "Class definition for a new class with data and value attributes, initializing val from execute_init method call. Prints the val attribute value \"VAL\" after object creation.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_class_create.py\":1-16",
+            "content": "class new_class:\n    def __init__(self,data, value):\n        self.data = data\n        self.value = value\n        \"\"\"\n        hint of value\n        \"\"\"\n        self.execute_init(2)\n    def execute_init(self,val):\n        self.val = val\n        \"\"\"\n        some hint of val? will not be displayed\n        \"\"\"\na = new_class(4,5)\nprint('VAL', a.val)"
+        }
+    ]
+}

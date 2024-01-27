@@ -1,0 +1,10 @@
+{
+    "summary": "This code generates all combinations of conjugate loads for 5 subjects using random values, stores them in a dictionary, and prints the total number of combinations (32).",
+    "details": [
+        {
+            "comment": "This code generates all combinations of conjugate loads for 5 subjects using random values, stores them in a dictionary, and prints the total number of combinations (32).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/conjugate_load_combinations_reduce.py\":0-16",
+            "content": "# find all combinations of conjugate loads\nimport random\nrng = lambda: random.randint(0,1)\narr_size = 8760\nsubject_count = 5\nsubjects = {i: [rng() for _ in range(arr_size)] for i in range(subject_count)}\nfrom frozendict import frozendict\ntotal_combs = set()\nfor arr_i in range(arr_size):\n    comb = {i:subjects[i][arr_i] for i in range(subject_count)}\n    comb = frozendict(comb)\n    total_combs.add(comb)\nprint(total_combs)\nprint(len(total_combs)) # 32"
+        }
+    ]
+}

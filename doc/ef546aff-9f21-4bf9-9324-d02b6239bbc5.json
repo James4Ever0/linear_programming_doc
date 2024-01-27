@@ -1,0 +1,10 @@
+{
+    "summary": "This Dockerfile patch installs Python 3.6.2 in a conda environment and installs the required CPLEX and docplex libraries for the microgrid_docplex target, using provided ARG variables to define paths and directories.",
+    "details": [
+        {
+            "comment": "This Dockerfile patch installs Python 3.6.2 in a conda environment and installs the required CPLEX and docplex libraries for the microgrid_docplex target, using provided ARG variables to define paths and directories.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_patch\":0-12",
+            "content": "FROM microgrid_server:latest\n# target: microgrid_docplex\n# install: python3.6 conda env & cplex python libraries\n# TODO: does container itself or its \"layers\" contain any \"ARG\" or \"ENV\" which defines ${VAR} that can be used in \"Dockerfile\"?\n# TODO: use hadolint\nARG CPLEX_PYPATH=/opt/ibm/ILOG/CPLEX_Studio128/cplex/python/3.6/x86-64_linux\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nRUN conda create -y -n docplex python==3.6.2\nRUN cd ${CPLEX_PYPATH} && conda run -n docplex python setup.py install\nRUN conda run -n docplex pip install -r requirements_docplex.txt"
+        }
+    ]
+}

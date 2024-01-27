@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary packages and functions for the microgrid base module. It brings in functionality from Pyomo Environ and utilizes logger_print from log_utils.",
+    "details": [
+        {
+            "comment": "This code imports necessary packages and functions for the microgrid base module. It brings in functionality from Pyomo Environ and utilizes logger_print from log_utils.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/__init__.py\":0-1",
+            "content": "# from pyomo_environ import *\nfrom log_utils import logger_print"
+        }
+    ]
+}

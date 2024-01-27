@@ -1,0 +1,15 @@
+{
+    "summary": "This code generates a Python file for Chimichang-App client with FastAPI and sends POST requests, utilizing subprocess module to run the script.",
+    "details": [
+        {
+            "comment": "This code dynamically generates a Python file that imports the Chimichang-App client and sets up a FastAPI client for a locally running server. The generated file includes import statements for various API endpoints and models, creates an instance of the client with specified settings, and uses it to send a POST request. The result is printed as the response.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_client_generated_test.py\":1-36",
+            "content": "from fastapi_server_with_doc import port # 9982?\nclient_location = 'D:/project/xianxing/chimichang-app-client'\nCODE = f\"\"\"\nport = {port}\nimport sys\nclient_location =\"{client_location}\"\nsys.path.append(client_location)\n# where's the path?\nimport chimichang_app_client as CA\n# import chimichang_app_client.api.default.post_item_api_name_items_post as POST\nfrom chimichang_app_client.api.default import * # in a hurry?\nimport chimichang_app_client.api.users as USERS\nimport chimichang_app_client.models as M\nclient = CA.Client(base_url=f\"http://localhost:{{port}}\", verify_ssl=False, raise_on_unexpected_status=True, timeout=5)\nsomeRandomDict=M.ItemMydict.from_dict(dict(a = 1))# strange it is\nmyItem = M.Item(name='myName', price=20,is_offer=True, my_dict = someRandomDict)\ndata = post_item_api_name_items_post.sync(client=client,json_body=myItem)\n# breakpoint()\nprint(\"RESPONSE:\", data)\n\"\"\"\nimport os\nfilepath = os.path.join(client_location,os.path.basename(__file__))\nwith open(filepath,'w+',encoding='utf-8') as f:\n    f.write(CODE)"
+        },
+        {
+            "comment": "Running a Python script in the given directory with subprocess module.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_client_generated_test.py\":38-40",
+            "content": "import subprocess\nsubprocess.run(['python', filepath],cwd=client_location)"
+        }
+    ]
+}

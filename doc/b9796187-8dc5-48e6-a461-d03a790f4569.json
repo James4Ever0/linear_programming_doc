@@ -1,0 +1,10 @@
+{
+    "summary": "Code creates a copy of the original function, then overrides the original function with new behavior and calls it to demonstrate the effect of copying the function.",
+    "details": [
+        {
+            "comment": "Code creates a copy of the original function, then overrides the original function with new behavior and calls it to demonstrate the effect of copying the function.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/override_method_by_copy.py\":0-11",
+            "content": "def original_func():\n    print('abc')\nimport copy\nnew_func = copy.copy(original_func)\ndef original_func():\n    print('new_func')\n    new_func()\noriginal_func() # working!"
+        }
+    ]
+}

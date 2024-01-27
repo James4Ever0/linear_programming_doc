@@ -1,0 +1,10 @@
+{
+    "summary": "Defines two Enum classes, A and B, with members MEMBER1, MEMBER2, MEMBER3, and MEMBER4. Class B has a mapping between its members and the members of class A. The __new__ method checks if the value passed is in B's mapping; if so, returns the corresponding member from A. If not, creates a new member in B with the given value. Prints lists of members for both classes A and B.",
+    "details": [
+        {
+            "comment": "Defines two Enum classes, A and B, with members MEMBER1, MEMBER2, MEMBER3, and MEMBER4. Class B has a mapping between its members and the members of class A. The __new__ method checks if the value passed is in B's mapping; if so, returns the corresponding member from A. If not, creates a new member in B with the given value. Prints lists of members for both classes A and B.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/mapping_relationship_in_enum_classes.py\":0-30",
+            "content": "import enum\nclass A(enum.Enum):\n    MEMBER1 = 'member1'\n    MEMBER2 = 'member2'\n# not working.\nclass B(enum.Enum):\n    MEMBER3 = 'member3'\n    MEMBER4 = 'member4'\n    # Define a mapping between B's members and A's members\n    _mapping = {\n        'member3': A.MEMBER1,\n        'member4': A.MEMBER2,\n    }\n    def __new__(cls, value):\n        # Check if the value is in B's mapping\n        # breakpoint()\n        if value in cls._mapping:\n            # If so, return the corresponding member from A\n            return cls._mapping[value]\n        # Otherwise, create a new member in B\n        obj = object.__new__(cls)\n        obj._value_ = value\n        return obj\nprint(list(A))  # [<A.MEMBER1: 'member1'>, <A.MEMBER2: 'member2'>]\nprint(list(B))  # [<A.MEMBER1: 'member3'>, <A.MEMBER2: 'member4'>]"
+        }
+    ]
+}

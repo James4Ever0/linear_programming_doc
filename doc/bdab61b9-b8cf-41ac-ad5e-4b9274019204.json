@@ -1,0 +1,10 @@
+{
+    "summary": "This Registry file sets the command prompt settings, such as CodePage, FontFamily, FontWeight, FaceName, ScreenBufferSize, and WindowSize, for the current user under the HKEY_CURRENT_USER\\Console key.",
+    "details": [
+        {
+            "comment": "This Registry file sets the command prompt settings, such as CodePage, FontFamily, FontWeight, FaceName, ScreenBufferSize, and WindowSize, for the current user under the HKEY_CURRENT_USER\\Console key.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/reset_codepage.reg\":0-8",
+            "content": "Windows Registry Editor Version 5.00\n[HKEY_CURRENT_USER\\Console\\%SystemRoot%_system32_cmd.exe]\n\"CodePage\"=dword:0000fde9\n\"FontFamily\"=dword:00000036\n\"FontWeight\"=dword:00000190\n\"FaceName\"=\"Consolas\"\n\"ScreenBufferSize\"=dword:232900d2\n\"WindowSize\"=dword:002b00d2"
+        }
+    ]
+}

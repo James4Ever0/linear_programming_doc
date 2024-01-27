@@ -1,0 +1,10 @@
+{
+    "summary": "This code calls \"copt_cmd\" to read an MPS file named \"converted.mps\" and perform various operations: \n1) \"feasrelax\" operation for feasibility analysis, \n2) \"optimize\" operation for solving the optimization problem, \n3) optional extra \"optimize\" and \"exit\" commands to finish the process.",
+    "details": [
+        {
+            "comment": "This code calls \"copt_cmd\" to read an MPS file named \"converted.mps\" and perform various operations: \n1) \"feasrelax\" operation for feasibility analysis, \n2) \"optimize\" operation for solving the optimization problem, \n3) optional extra \"optimize\" and \"exit\" commands to finish the process.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/read_lp_and_solve_copt.cmd\":0-2",
+            "content": "copt_cmd -c \"readmps converted.mps; feasrelax\"\n@REM copt_cmd -c \"readmps converted.mps; optimize\"\n@REM copt_cmd -c \"readmps converted.mps; optimize; exit\""
+        }
+    ]
+}

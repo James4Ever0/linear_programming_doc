@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary libraries and defines a concrete model. It creates a set with values [1, 2] and variables x and y corresponding to the set. The code then defines a piecewise function pw using the variables x and y with specific points and rules. The code comments indicate valid and invalid ways of defining variables and functions for the model.",
+    "details": [
+        {
+            "comment": "This code imports necessary libraries and defines a concrete model. It creates a set with values [1, 2] and variables x and y corresponding to the set. The code then defines a piecewise function pw using the variables x and y with specific points and rules. The code comments indicate valid and invalid ways of defining variables and functions for the model.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/pyomo_piecewise_set_concrete.py\":0-11",
+            "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.I = Set(initialize=[1,2])\nmodel.x = Var(model.I) # valid\n# model.y = Var([2,3]) # invalid\nmodel.y = Var([1,2]) # valid\n# model.y = Var(model.I)\nmodel.pw = Piecewise([1,2], model.y,model.x, pw_pts=[1,2], f_rule=[2,1], pw_constr_type='EQ',unbounded_domain_var=True) # valid\n# model.pw = Piecewise(model.I, model.y,model.x, pw_pts=[1,2], f_rule=[2,1], pw_constr_type='EQ',unbounded_domain_var=True) # valid"
+        }
+    ]
+}

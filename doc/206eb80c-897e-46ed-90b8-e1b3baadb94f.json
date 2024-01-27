@@ -1,0 +1,10 @@
+{
+    "summary": "Class TestClass uses slots to optimize memory usage, and includes a getter/setter for 'prop'. An attempt is made to set an unrelated property 'p', which works but may lead to unexpected behavior.",
+    "details": [
+        {
+            "comment": "Class TestClass uses slots to optimize memory usage, and includes a getter/setter for 'prop'. An attempt is made to set an unrelated property 'p', which works but may lead to unexpected behavior.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_getter_setter_dynamic_property.py\":0-10",
+            "content": "from functools import partial\nclass TestClass:\n    __slots__ = ['prop']\n    def __init__(self):...\n    # there's no \"getter/setter\" factory method.\ntc = TestClass()\nprint(tc.prop) # unbound.\ntc.prop = 1\nprint(tc.prop)\ntc.p = 1 # great."
+        }
+    ]
+}

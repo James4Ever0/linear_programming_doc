@@ -1,0 +1,20 @@
+{
+    "summary": "The code defines two classes with tracing methods for calling class methods and printing caller information, and calls the \"call\" method on an object.",
+    "details": [
+        {
+            "comment": "This code defines a class for tracing calls to methods in the same class that are not called from other methods within the class. The trace includes information about the caller's instance attributes and prints this information when the method is called.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py\":0-28",
+            "content": "import inspect\n# TODO: iterate components like piecewise functions, iterative constraints, indexed variables and bound each component to the line of code which creates them\ndef trace_frame_till_condition(frame, cond):\n    if not cond(frame):\n        return frame\n    else:\n        return trace_frame_till_condition(frame.f_back, cond)\nclass SelfContainedCallerTracer(object):\n    \"\"\"\n    This class is used to trace calls to methods of a class.\n    It is used to trace calls to methods of a class that are not\n    called from other methods of the same class.\n    \"\"\"\n    def __init__(self):\n        self.cond = lambda f: isinstance(f.f_locals.get(\"self\", None), self.__class__)\n    def call(self):\n        called_by = inspect.currentframe()\n        # you can trace more info like the instance attributes of the caller\n        called_by = trace_frame_till_condition(called_by, self.cond)\n        # print(dir(called_by))\n        # print(called_by)\n        # breakpoint()\n        print(\"-\" * 60)\n        print(f\"method {self.__class__.__name__}.call called_by:\", called_by)"
+        },
+        {
+            "comment": "This code defines two classes: SelfContainedCallerTracer and ChildClass. The SelfContainedCallerTracer class traces the caller of its methods, printing file, line number, and method name. It also has a self_call() method that calls the trace() method. ChildClass inherits from SelfContainedCallerTracer and adds a just_call() method. Two functions call methods on instances of both classes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py\":29-76",
+            "content": "        print(\n            \"file\",\n            repr(called_by.f_code.co_filename) + \",\",\n            \"line\",\n            called_by.f_lineno,\n        )\n        print(\"caller:\", called_by.f_code.co_name)\n        # print(\"-\"*60)\n    def self_call(self):\n        self.call()\n# TODO: make sure child classes are somehow working properly\n# TODO: using metaclass?\nclass ChildClass(SelfContainedCallerTracer):\n    def __init__(self):\n        sclass = SelfContainedCallerTracer\n        non_magic_method_names = [n for n in dir(sclass) if not n.startswith(\"__\")]\n        self.cond = lambda f: f.f_code.co_name in non_magic_method_names\n    def some_other(self):\n        self.self_call()\n    def just_call(self):\n        self.call()\ndef call1():\n    instance = SelfContainedCallerTracer()\n    instance.call()\n    instance.self_call()\ndef call2():\n    instance = ChildClass()\n    instance.some_other()\n    instance.call()\n    instance.just_call()\n    instance.self_call()\nif __name__ == \"__main__\":\n    call1()\n    call2()\n    obj = SelfContainedCallerTracer()"
+        },
+        {
+            "comment": "The line of code calls the \"call\" method on an object (obj). This suggests that the method is part of a class, and its purpose may involve triggering some action or behavior associated with the object.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py\":77-77",
+            "content": "    obj.call()"
+        }
+    ]
+}

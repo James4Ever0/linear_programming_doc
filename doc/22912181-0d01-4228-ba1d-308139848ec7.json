@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary modules, reads data from a file, sets a unique ID, makes a GET request to an API endpoint with the unique ID as parameters, gets the response status code and JSON data, and finally prints the JSON response.",
+    "details": [
+        {
+            "comment": "This code imports necessary modules, reads data from a file, sets a unique ID, makes a GET request to an API endpoint with the unique ID as parameters, gets the response status code and JSON data, and finally prints the JSON response.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_client.py\":0-20",
+            "content": "# shall we change the default encoding? not \"iso-8859-1\"\nimport requests\n# import json\nfrom test_server_client_configs import *\nwith open(TEST_GRAPH_CONFIG_PATH, \"r\") as f:\n    data = f.read()\n    # data_dict = json.loads(data)\nunique_id = \"e3c49fae-85e2-4cf2-915d-ea2ebb9b798f\"\nr = requests.get(check_result_async, params=dict(unique_id=unique_id))\n# r = requests.post(upload_url, json={'data':data})\n# r = requests.post(async_url, json={'data':data}) # just upload the graph, nothing more.\nstatus_code = r.status_code\nr_json = r.json()\nimport rich\nrich.print(r_json)\nprint(\"___RESPONSE___\")"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Command-line tool pdoc is used to generate HTML documentation from a Python file with example docstring.",
+    "details": [
+        {
+            "comment": "Command-line tool pdoc is used to generate HTML documentation from a Python file with example docstring.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/generate_html.ps1\":0-0",
+            "content": "pdoc --html ..\\example_docstring.py"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "In this code, a test model is created and a continuous variable named \"var\" is defined. The lower bound is set to 5 and the upper bound is set to 15. EnergySystemUtils is initialized with these bounds and the target value of 10 is assigned to the variable \"var\". Finally, the function check_conflict from mini_data_log_utils is imported and used to check for conflicts in the model.",
+    "details": [
+        {
+            "comment": "In this code, a test model is created and a continuous variable named \"var\" is defined. The lower bound is set to 5 and the upper bound is set to 15. EnergySystemUtils is initialized with these bounds and the target value of 10 is assigned to the variable \"var\". Finally, the function check_conflict from mini_data_log_utils is imported and used to check for conflicts in the model.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_add_lower_and_upper_bounds.py\":0-21",
+            "content": "from integratedEnergySystemPrototypes import EnergySystemUtils, Model\nmodel = Model(\"test_model\")\nvar = model.continuous_var(name=\"var\")\ntarget_value = 10  # 10>5, but we set 5 as lower bound, to check if this issue happens.\n# set 15 as upper bound.\nlower_bound, upper_bound = 4, 5\nutil = EnergySystemUtils(model, num_hour=1)\nutil.add_lower_and_upper_bounds([var], lower_bound, upper_bound)\nutil.equation(var, target_value)\n# check for conflicts?\nfrom mini_data_log_utils import check_conflict\ncheck_conflict(model)"
+        }
+    ]
+}

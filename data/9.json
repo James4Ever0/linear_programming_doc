@@ -1,0 +1,537 @@
+{
+    "900": {
+        "file_id": 113,
+        "content": "import cyipopt",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/ipopt_persistent.py:1-1"
+    },
+    "901": {
+        "file_id": 113,
+        "content": "This code imports the \"cyipopt\" library, which is an interface to IPOPT, a nonlinear optimization solver. This library will be used for solving optimization problems in further parts of the code.",
+        "type": "comment"
+    },
+    "902": {
+        "file_id": 114,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/load_feasopt_sol.py",
+        "type": "filepath"
+    },
+    "903": {
+        "file_id": 114,
+        "content": "Code imports BeautifulSoup to read and parse a feasopt.sol file, extracts variable values, stores them in a dictionary, writes the data as a JSON file with indentation, and prints the output path.",
+        "type": "summary"
+    },
+    "904": {
+        "file_id": 114,
+        "content": "# write a custom loader instead.\n# or use pyomo?\n# import lxml\nfrom bs4 import BeautifulSoup\n# sol_file = \"feasopt.xml\"\nsol_file = \"feasopt.sol\"\nwith open(sol_file, \"r\") as f:\n    file = f.read()\n# 'xml' is the parser used. For html files, which BeautifulSoup is typically used for, it would be 'html.parser'.\nsoup = BeautifulSoup(file, \"xml\")\n# breakpoint()\ndata = {}\nfor var in soup.find_all(\"variable\"):\n    name = var[\"name\"]\n    value = float(var[\"value\"])\n    data[name] = value\n    print(f\"%s: %s\" % (name, value))\nimport json\nwith open(output_path:=\"feasopt.json\", \"w+\") as f:\n    f.write(json.dumps(data, indent=4, ensure_ascii=False))\nprint(\"write to: %s\" % output_path)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/load_feasopt_sol.py:1-25"
+    },
+    "905": {
+        "file_id": 114,
+        "content": "Code imports BeautifulSoup to read and parse a feasopt.sol file, extracts variable values, stores them in a dictionary, writes the data as a JSON file with indentation, and prints the output path.",
+        "type": "comment"
+    },
+    "906": {
+        "file_id": 115,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py",
+        "type": "filepath"
+    },
+    "907": {
+        "file_id": 115,
+        "content": "Code creates a Pyomo model with 4 integer variables and defines disjuncts for units 1 & 2, applies constraints, solves using CPLEX/IPOPT, prints results for x1-x4 & objective value.",
+        "type": "summary"
+    },
+    "908": {
+        "file_id": 115,
+        "content": "from pyomo.environ import *\nfrom pyomo.gdp import *\n# Create a concrete model\nm = model =  ConcreteModel()\nm.x1 = Var(within=Integers, bounds=(-10,10))\nm.x2 = Var(within=Integers, bounds=(-10,10))\nm.x3 = Var(within=Integers, bounds=(-10,10))\nm.x4 = Var(within=Integers, bounds=(-10,10))\n# m.x1 = Var(within=Integers)\n# m.x2 = Var(within=Integers)\n# m.x3 = Var(within=Integers)\n# m.x4 = Var(within=Integers)\nm.unit1 = Disjunct()\nm.unit1.inout = Constraint(expr=2*m.x2 - 2 == m.x1)\n# m.unit1.inout = Constraint(expr=exp(m.x2) - 1 == m.x1)\nm.unit1.no_unit2_flow1 = Constraint(expr=m.x3 == 0)\nm.unit1.no_unit2_flow2 = Constraint(expr=m.x4 == 0)\nm.unit2 = Disjunct()\nm.unit2.inout = Constraint(expr=2*m.x4 - 1 <= m.x3) # linear\n# m.unit2.inout = Constraint(expr=exp(m.x4 / 1.2) - 1 == m.x3) # ipopt only!\nm.unit2.no_unit1_flow1 = Constraint(expr=m.x1 == 0)\nm.unit2.no_unit1_flow2 = Constraint(expr=m.x2 == 0)\nm.use_unit1or2 = Disjunction(expr=[m.unit1, m.unit2])\n# Set the objective\n# model.obj = Objective(expr=model.x[4]+model[1]+model.x[2]+model.x[3])",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py:1-30"
+    },
+    "909": {
+        "file_id": 115,
+        "content": "This code creates a concrete Pyomo model with four integer variables and defines two disjuncts representing units 1 and 2, each having input and output constraints. The objective is not set yet.",
+        "type": "comment"
+    },
+    "910": {
+        "file_id": 115,
+        "content": "# model.obj = Objective(expr=0, sense=minimize)\nmodel.obj = Objective(expr=m.x1+m.x2+m.x3+m.x4, sense=minimize)\n# model.obj = Objective(expr=quicksum(model.x), sense=minimize)\n# Solve the problem\n# apply to logical constraints, not gdp!\n# TransformationFactory('core.logical_to_linear').apply_to(m)\nTransformationFactory('gdp.bigm').apply_to(m, bigM = 1e7)\nsolver = SolverFactory('cplex')\n# solver = SolverFactory('ipopt')\n# no such option.\n# results = solver.solve(model, profile_memory=True)\nresults = solver.solve(model)\n# solver.print_profile()\n# Print the results\nfor i in range(1,5):\n    print(f\"x{i} =\", value(getattr(model,f\"x{i}\"), exception=False))\nprint(\"obj =\", value(model.obj, exception=False))",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py:31-48"
+    },
+    "911": {
+        "file_id": 115,
+        "content": "This code defines an optimization model with objectives, applies logical constraints transformation, and solves the problem using CPLEX or IPOPT solver. The results are printed for variables x1 to x4 and the objective value.",
+        "type": "comment"
+    },
+    "912": {
+        "file_id": 116,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/lp_to_mps.py",
+        "type": "filepath"
+    },
+    "913": {
+        "file_id": 116,
+        "content": "Code snippet shows the method of converting a model to MPS or LP format using either Pyomo or CPLEX. It reads an input file, creates a new model using the specified method (Pyomo in this case), and exports it as MPS for analysis. If the method is \"docplex\", it uses Docplex's ModelReader to read the LP file and export it as MPS. However, if the method is \"pyomo\", it uses Pyomo's environment to create a new model, sets its bounds and objective sense, and exports it as MPS for analysis.",
+        "type": "summary"
+    },
+    "914": {
+        "file_id": 116,
+        "content": "# either pyomo model to mps or lp to mps (cplex)\n# method = \"docplex\"\nmethod = \"pyomo\"\nprint(\"using method:\", method)\ntemp_input_file_name = \"E:\\\\works\\\\jubilant-adventure2\\\\microgrid_base\\\\logs\\\\pyomo_2023_08_08_17_15_44_141633+08_00\\\\model.lp\"\nif method == \"docplex\":\n    from docplex.mp.model import Model\n    from docplex.mp.model_reader import ModelReader\n    mdl:Model = ModelReader.read(temp_input_file_name, model_name=\"InfeasibleLP\")\n    mdl.export_as_mps(\"converted.mps\") # required for lp-analysis\nelif method ==\"pyomo\":\n    from pyomo.environ import *\n    model = ConcreteModel()\n    # model.load(\"converted.mps\")\n    # lp & mps unsupported.\n    # print(dir(model))\n    model.x = Var(bounds=(-1,1))\n    model.obj = Objective(expr=model.x, sense=minimize)\n    model.write(\"exported.mps\", 'mps') # working!\nelse:\n    raise Exception(\"Unknown mps export method: %s\" % method)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/lp_to_mps.py:1-28"
+    },
+    "915": {
+        "file_id": 116,
+        "content": "Code snippet shows the method of converting a model to MPS or LP format using either Pyomo or CPLEX. It reads an input file, creates a new model using the specified method (Pyomo in this case), and exports it as MPS for analysis. If the method is \"docplex\", it uses Docplex's ModelReader to read the LP file and export it as MPS. However, if the method is \"pyomo\", it uses Pyomo's environment to create a new model, sets its bounds and objective sense, and exports it as MPS for analysis.",
+        "type": "comment"
+    },
+    "916": {
+        "file_id": 117,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/mps_analyze.cmd",
+        "type": "filepath"
+    },
+    "917": {
+        "file_id": 117,
+        "content": "The code attempts to use the lp-analyzer tool on a .mps file, trying different approaches and expressing frustration due to potential compatibility issues or unexpected results.",
+        "type": "summary"
+    },
+    "918": {
+        "file_id": 117,
+        "content": "@REM failed to parse.\n@REM lp-analyzer converted.mps -o converted_analyzed.txt\n@REM maybe it only accepts gurobi converted mps files?\n@REM lp-analyzer exported.mps -o exported_analyzed.txt\n@REM this is trash.\n@REM lp-analyzer exported_remove_comment.mps -o exported_analyzed.txt",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/mps_analyze.cmd:1-6"
+    },
+    "919": {
+        "file_id": 117,
+        "content": "The code attempts to use the lp-analyzer tool on a .mps file, trying different approaches and expressing frustration due to potential compatibility issues or unexpected results.",
+        "type": "comment"
+    },
+    "920": {
+        "file_id": 118,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_cp_sat.py",
+        "type": "filepath"
+    },
+    "921": {
+        "file_id": 118,
+        "content": "Creates a CP model and solver, defines variables 'a' to 'f', adds constraints, solves the model using the solver, and prints the status and objective value.",
+        "type": "summary"
+    },
+    "922": {
+        "file_id": 118,
+        "content": "from ortools.sat.python import cp_model\n# https://github.com/google/or-tools/issues/973\nmodel = cp_model.CpModel()\nsolver = cp_model.CpSolver()\na = model.NewIntVar(0,15, 'a')\nb = model.NewIntVar(0,15, 'b')\nc = model.NewIntVar(0,15, 'c')\nd = model.NewIntVar(0,15, 'd')\ne = model.NewBoolVar('e')\nf = model.NewIntervalVar(0,10,10,'f')\nmodel.AddMaxEquality(d, [a,b,c]).OnlyEnforceIf(e)\nstatus = solver.Solve(model)\nprint(status)\nprint(solver.ObjectiveValue())",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_cp_sat.py:1-18"
+    },
+    "923": {
+        "file_id": 118,
+        "content": "Creates a CP model and solver, defines variables 'a' to 'f', adds constraints, solves the model using the solver, and prints the status and objective value.",
+        "type": "comment"
+    },
+    "924": {
+        "file_id": 119,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_load_custom_model.py",
+        "type": "filepath"
+    },
+    "925": {
+        "file_id": 119,
+        "content": "The code imports a custom model from the Or-Tools library and solves it using different solvers. It checks the solve status, prints the objective value, and variable values if the solution is optimal or feasible. If the model is invalid, it stops with a breakpoint.",
+        "type": "summary"
+    },
+    "926": {
+        "file_id": 119,
+        "content": "from ortools.linear_solver.python import model_builder, model_builder_helper\n# from ortools.sat.python.cp_model.\n# breakpoint()\n# not working for docplex exported format.\nmps_path ='converted.mps' \n# working? but how do we get result?\n# mps_path ='exported.mps'\nmodel = model_builder.ModelBuilder()\n# model.import_from_lp_file(\"no_bound.lp\")\n# error reading file.\nmodel.import_from_mps_file(mps_path)\nsolver = model_builder.ModelSolver('SAT')\n# solver = model_builder.ModelSolver('SCIP')\nstatus = solver.solve(model)\nfrom ortools.linear_solver import pywraplp\nif status == model_builder_helper.SolveStatus.OPTIMAL or status == model_builder_helper.SolveStatus.FEASIBLE:\n    print(f\"Total objective = {solver.objective_value}\\n\")\n    for var in model.get_variables():\n        val = solver.value(var)\n        print(f\"{var} = {val}\")\nelif status == model_builder_helper.SolveStatus.MODEL_INVALID:\n    breakpoint()\nelse:\n    print(\"STATUS?\", status)\n    print(\"No solution found.\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_load_custom_model.py:2-30"
+    },
+    "927": {
+        "file_id": 119,
+        "content": "The code imports a custom model from the Or-Tools library and solves it using different solvers. It checks the solve status, prints the objective value, and variable values if the solution is optimal or feasible. If the model is invalid, it stops with a breakpoint.",
+        "type": "comment"
+    },
+    "928": {
+        "file_id": 120,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_solver.py",
+        "type": "filepath"
+    },
+    "929": {
+        "file_id": 120,
+        "content": "This code utilizes OR-Tools library to solve a linear optimization problem involving workers and tasks, finding optimal assignments with constraints.",
+        "type": "summary"
+    },
+    "930": {
+        "file_id": 120,
+        "content": "from ortools.linear_solver import pywraplp\n# GLPK not working.\n# solver = pywraplp.Solver.CreateSolver(solver_name:='GLPK')\n# builtin backends:\nsolver = pywraplp.Solver.CreateSolver(solver_name:='SAT')\n# solver = pywraplp.Solver.CreateSolver(solver_name:=\"CBC\")\n# solver = pywraplp.Solver.CreateSolver(solver_name:=\"SCIP\")\nif not solver:\n    raise Exception(\"SOLVER %s NOT WORKING\" % solver_name)\n# breakpoint()\ncosts = [\n    [90, 80, 75, 70],\n    [35, 85, 55, 65],\n    [125, 95, 90, 95],\n    [45, 110, 95, 115],\n    [50, 100, 90, 100],\n]\nnum_workers = len(costs)\nnum_tasks = len(costs[0])\n# x[i, j] is an array of 0-1 variables, which will be 1\n# if worker i is assigned to task j.\nx = {}\nfor i in range(num_workers):\n    for j in range(num_tasks):\n        x[i, j] = solver.IntVar(0, 1, \"\")\n# Each worker is assigned to at most 1 task.\nfor i in range(num_workers):\n    solver.Add(solver.Sum([x[i, j] for j in range(num_tasks)]) <= 1)\n# Each task is assigned to exactly one worker.\nfor j in range(num_tasks):\n    solver.Add(solver.Sum([x[i, j] for i in range(num_workers)]) == 1)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_solver.py:1-39"
+    },
+    "931": {
+        "file_id": 120,
+        "content": "This code uses the OR-Tools library to create a linear solver, specifically using the SAT backend. It defines an optimization problem with workers and tasks, assigns binary variables x[i, j] for each assignment, and ensures that each worker is assigned at most 1 task and each task is assigned to exactly one worker.",
+        "type": "comment"
+    },
+    "932": {
+        "file_id": 120,
+        "content": "objective_terms = []\nfor i in range(num_workers):\n    for j in range(num_tasks):\n        objective_terms.append(costs[i][j] * x[i, j])\nsolver.Minimize(solver.Sum(objective_terms))\nstatus = solver.Solve()\nif status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:\n    print(f\"Total cost = {solver.Objective().Value()}\\n\")\n    for i in range(num_workers):\n        for j in range(num_tasks):\n            # Test if x[i,j] is 1 (with tolerance for floating point arithmetic).\n            if x[i, j].solution_value() > 0.5:\n                print(f\"Worker {i} assigned to task {j}.\" + f\" Cost: {costs[i][j]}\")\nelse:\n    print(\"STATUS?\", status)\n    print(\"No solution found.\")\nprint(\"ITERATIONS?\", solver.iterations())",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_solver.py:41-60"
+    },
+    "933": {
+        "file_id": 120,
+        "content": "This code uses the OR-Tools library to solve a linear optimization problem. It calculates the objective terms for each worker and task, sets them as the problem's objective function, solves the problem, and prints the optimal solution and total cost if it is feasible or optimal. If no solution is found, it indicates that status and the number of iterations taken by the solver are printed.",
+        "type": "comment"
+    },
+    "934": {
+        "file_id": 121,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/override_method_by_copy.py",
+        "type": "filepath"
+    },
+    "935": {
+        "file_id": 121,
+        "content": "Code creates a copy of the original function, then overrides the original function with new behavior and calls it to demonstrate the effect of copying the function.",
+        "type": "summary"
+    },
+    "936": {
+        "file_id": 121,
+        "content": "def original_func():\n    print('abc')\nimport copy\nnew_func = copy.copy(original_func)\ndef original_func():\n    print('new_func')\n    new_func()\noriginal_func() # working!",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/override_method_by_copy.py:1-12"
+    },
+    "937": {
+        "file_id": 121,
+        "content": "Code creates a copy of the original function, then overrides the original function with new behavior and calls it to demonstrate the effect of copying the function.",
+        "type": "comment"
+    },
+    "938": {
+        "file_id": 122,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/parse_scip_solution.py",
+        "type": "filepath"
+    },
+    "939": {
+        "file_id": 122,
+        "content": "Main entry point for script. It parses and prints the solution from given XML files.",
+        "type": "summary"
+    },
+    "940": {
+        "file_id": 122,
+        "content": "if __name__ == \"__main__\":\n    for fname in [\"sol.xml\", \"relaxed_scip.sol\"]:\n        print(\"parsing:\", fname)\n        with open(fname,'r') as f:\n            content = f.read()\n            solved, solution = parse_scip_solution_content(content)\n            print(\"solved?\", solved)\n            if solved:\n                print('solution:', str(solution)[:100]+\"...\")\n            print(\"=\"*70)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/parse_scip_solution.py:2-11"
+    },
+    "941": {
+        "file_id": 122,
+        "content": "Main entry point for script. It parses and prints the solution from given XML files.",
+        "type": "comment"
+    },
+    "942": {
+        "file_id": 123,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/print_all_transformation_documentation.py",
+        "type": "filepath"
+    },
+    "943": {
+        "file_id": 123,
+        "content": "This code iterates over transformation classes in Pyomo, retrieves their documentation and source file locations.",
+        "type": "summary"
+    },
+    "944": {
+        "file_id": 123,
+        "content": "from pyomo.environ import *\ndoc_dict = TransformationFactory._doc \nimport inspect\nfor transform_name, transform_doc in doc_dict.items():\n    cls = TransformationFactory._cls[transform_name]\n    sourcefile_path = inspect.getsourcefile(cls)\n    _, sourcelineno = inspect.getsourcelines(cls)\n    print(f'name: {transform_name}')\n    print(f'source: \"{sourcefile_path}:{sourcelineno}\"')\n    # print(f'doc:')\n    # class_doc = cls.__doc__\n    # if class_doc is None:\n    #     class_doc = transform_doc\n    # for line in class_doc.split('\\n'):\n    #     print('\\t'+line)\n    print('doc:', transform_doc)\n    print('='*60)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/print_all_transformation_documentation.py:1-18"
+    },
+    "945": {
+        "file_id": 123,
+        "content": "This code iterates over transformation classes in Pyomo, retrieves their documentation and source file locations.",
+        "type": "comment"
+    },
+    "946": {
+        "file_id": 124,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro",
+        "type": "filepath"
+    },
+    "947": {
+        "file_id": 124,
+        "content": "This code defines port and device types, establishes relationships, and includes functions for checking constraints. It can be used in microgrid systems to manage power flow or assign tasks, with predicates adder_port_status and adder_port_all_status for checking port statuses.",
+        "type": "summary"
+    },
+    "948": {
+        "file_id": 124,
+        "content": "port(bat_port1).\nport(generator_port1).\nport(load_port1).\ninput_port(bat_port1).\ninput_port(load_port1).\noutput_port(bat_port1).\noutput_port(generator_port1).\nidle_port(bat_port1).\nidle_port(generator_port1).\nidle_port(load_port1).\ndevice(battery).\ndevice(load).\ndevice(generator).\ndevice(DEVICE_NAME):- device(DEVICE_TYPE), call(DEVICE_TYPE, DEVICE_NAME).\nbattery(battery1).\nload(load1).\ngenerator(generator1).\nport_mapping(battery1, bat_port1).\nport_mapping(generator1, generator_port1).\nport_mapping(load1, load_port1).\nenergy(electricity).\nelectricity(bat_port1).\nelectricity(load_port1).\nelectricity(generator_port1).\nlist_member(X,[X|_]).\nlist_member(X,[_|TAIL]) :- list_member(X, TAIL).\nall_satisfy_constraint([], _).\nall_satisfy_constraint([H|T], Constraint) :-\n    call(Constraint, H),\n    all_satisfy_constraint(T, Constraint).\nall_with_same_type(PORT_LIST, ENERGY_TYPE) :- energy(ENERGY_TYPE), all_satisfy_constraint(PORT_LIST, ENERGY_TYPE).\nport_status(PORT, input) :- input_port(PORT).\nport_status(PORT, output):- output_port(PORT).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro:2-55"
+    },
+    "949": {
+        "file_id": 124,
+        "content": "This code defines a set of port and device types, and creates relationships between them. It also includes functions to check constraints on the ports and ensure all ports have the same energy type. This information could be used in a microgrid system for managing power flow or assigning tasks to different devices.",
+        "type": "comment"
+    },
+    "950": {
+        "file_id": 124,
+        "content": "port_status(PORT, idle):- idle_port(PORT).\ninput_status(STATUS) :- STATUS = input.\noutput_status(STATUS) :- STATUS = output.\nidle_status(STATUS) :- STATUS = idle.\napply_list([], [], _).\napply_list([INP], [RET], FUNC) :- call(FUNC, INP, RET).\napply_list([INP|INP_TAIL], [RET|RET_TAIL], FUNC) :- apply_list(INP_TAIL, RET_TAIL, FUNC), call(FUNC, INP, RET).\nport_status_list(PORT, STATUS) :- apply_list(PORT, STATUS, port_status).\nadder(adder1, [bat_port1, generator_port1, load_port1]).\nadder_port_status(ADDER, [ENERGY_TYPE|[STATUS_LIST]]) :- \n    adder(ADDER, PORT_LIST),\n    all_satisfy_constraint(PORT_LIST, port),\n    all_with_same_type(PORT_LIST, ENERGY_TYPE),\n    port_status_list(PORT_LIST, STATUS_LIST),\n    (\n        list_member(STATUS_X, STATUS_LIST), list_member(STATUS_Y, STATUS_LIST),STATUS_X=input, STATUS_Y = output;\n        all_satisfy_constraint(STATUS_LIST, idle_status)\n    ).\nadder_port_all_status(ADDER, ALL_STATUS):-\n    findall(STATUS, adder_port_status(ADDER, STATUS), ALL_STATUS).\nadder_port_statu",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro:56-83"
+    },
+    "951": {
+        "file_id": 124,
+        "content": "The code defines the `adder_port_status` predicate, which takes an adder and a list of energy types as input. It checks that all ports belong to the adder, have the same energy type, and are either both input and output or all idle. The `adder_port_all_status` uses `findall` to gather the statuses for each port in the adder.",
+        "type": "comment"
+    },
+    "952": {
+        "file_id": 124,
+        "content": "s_list(ADDER_LIST, ADDER_STATUS_LIST) :- apply_list(ADDER_LIST, ADDER_STATUS_LIST, adder_port_status).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro:83-83"
+    },
+    "953": {
+        "file_id": 124,
+        "content": "This code defines a relation 's_list' that takes two lists, ADDER_LIST and ADDER_STATUS_LIST, and applies each element of the ADDER_LIST to the corresponding element in ADder_STATUS_LIST using the predicate 'apply_list'. It uses this operation for adder_port_status.",
+        "type": "comment"
+    },
+    "954": {
+        "file_id": 125,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2",
+        "type": "filepath"
+    },
+    "955": {
+        "file_id": 125,
+        "content": "The code defines a templating language for microgrid simulation, creating port definitions and device definitions. It handles energy types and statuses using list processing, includes constraint checker, supports different port types, and handles adder and port status in the microgrid system.",
+        "type": "summary"
+    },
+    "956": {
+        "file_id": 125,
+        "content": "{# :- use_module(library(clpfd)). #}\n{% set state_to_ports = {\"input\":[], \"output\":[], \"idle\": []}%}\n{% set possible_states = [\"input\", \"output\", \"idle\"] %}\n{% for portName, portPossibleStates in portNameToPortPossibleStates.items()%}\nport({{portName}}).\n    {% for state in possible_states%}\n        {% if state in portPossibleStates%}\n            {% do state_to_ports[state].append(portName)%}\n        {% endif%}\n    {% endfor%}\n{% endfor %}\n{% for state, portNames in state_to_ports.items()%}\n    {% for portName in portNames%}\n{{state}}_port({{portName}}).\n    {% endfor%}\n{% endfor%}\n{% for deviceType in deviceTypes %}\ndevice({{deviceType}}).\n{% endfor %}\ndevice(DEVICE_NAME):- device(DEVICE_TYPE), call(DEVICE_TYPE, DEVICE_NAME).\n{% for deviceType, deviceNames in deviceTypeToDeviceNames.items()%}\n    {% for deviceName in deviceNames%}\n{{deviceType}}({{deviceName}}).\n    {% endfor%}\n{% endfor%}\n{% for deviceName, devicePortNames in deviceNameToPortNames.items()%}\n    {% for devicePortName in devicePortNames%}\nport_mapping({{deviceName}}, {{devicePortName}}).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2:1-36"
+    },
+    "957": {
+        "file_id": 125,
+        "content": "This code defines a set of rules using a templating language for a microgrid simulation. It creates port definitions, state-specific port definitions, device definitions, and port mappings based on input data.",
+        "type": "comment"
+    },
+    "958": {
+        "file_id": 125,
+        "content": "    {% endfor%}\n{% endfor%}\n{% for energyType in energyTypes%}\nenergy({{energyType}}).\n{% endfor%}\n{% for energyType, portNames in energyTypeToPortNames.items()%}\n    {% for portName in portNames %}\n{{energyType}}({{portName}}).\n    {% endfor%}\n{% endfor%}\nlist_member(X,[X|_]).\nlist_member(X,[_|TAIL]) :- list_member(X, TAIL).\nall_satisfy_constraint([], _).\nall_satisfy_constraint([H|T], Constraint) :-\n    call(Constraint, H),\n    all_satisfy_constraint(T, Constraint).\nall_with_same_type(PORT_LIST, ENERGY_TYPE) :- energy(ENERGY_TYPE), all_satisfy_constraint(PORT_LIST, ENERGY_TYPE).\nport_status(PORT, input) :- input_port(PORT).\nport_status(PORT, output):- output_port(PORT).\nport_status(PORT, idle):- idle_port(PORT).\ninput_status(STATUS) :- STATUS = input.\noutput_status(STATUS) :- STATUS = output.\nidle_status(STATUS) :- STATUS = idle.\napply_list([], [], _).\napply_list([INP], [RET], FUNC) :- call(FUNC, INP, RET).\napply_list([INP|INP_TAIL], [RET|RET_TAIL], FUNC) :- apply_list(INP_TAIL, RET_TAIL, FUNC), call(FUNC, INP, RET).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2:37-72"
+    },
+    "959": {
+        "file_id": 125,
+        "content": "This code defines functions for handling energy types, ports, and their statuses. It utilizes list processing to apply functions to lists of inputs and outputs. The code includes a constraint checker and supports various port types like input, output, and idle.",
+        "type": "comment"
+    },
+    "960": {
+        "file_id": 125,
+        "content": "port_status_list(PORT, STATUS) :- apply_list(PORT, STATUS, port_status).\n{% for adderName, adderPortNames in adderNameToAdderPortNames.items()%}\nadder({{adderName}}, {{ '[{}]'.format(', '.join(adderPortNames)) }}).\n{% endfor%}\nadder_port_status(ADDER, [ENERGY_TYPE|[STATUS_LIST]]) :- \n    adder(ADDER, PORT_LIST),\n    all_satisfy_constraint(PORT_LIST, port),\n    all_with_same_type(PORT_LIST, ENERGY_TYPE),\n    port_status_list(PORT_LIST, STATUS_LIST),\n    (\n        list_member(STATUS_X, STATUS_LIST), list_member(STATUS_Y, STATUS_LIST),STATUS_X=input, STATUS_Y = output;\n        all_satisfy_constraint(STATUS_LIST, idle_status)\n    ).\nadder_port_all_status(ADDER, ALL_STATUS):-\n    findall(STATUS, adder_port_status(ADDER, STATUS), ALL_STATUS).\nadder_port_status_list(ADDER_LIST, ADDER_STATUS_LIST) :- apply_list(ADDER_LIST, ADDER_STATUS_LIST, adder_port_status).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.pro.j2:74-93"
+    },
+    "961": {
+        "file_id": 125,
+        "content": "This code defines functions for handling adder status and port status in a microgrid system. It utilizes list processing to check the energy type, port statuses, and ensure input-output constraints. The code also generates a list of all adder port statuses and generates an adder port status list from a given list of adders.",
+        "type": "comment"
+    },
+    "962": {
+        "file_id": 126,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py",
+        "type": "filepath"
+    },
+    "963": {
+        "file_id": 126,
+        "content": "This code imports libraries, defines paths and parameters for Prolog code generation, utilizes Jinja templates to generate Prolog code from topology information, adds constraints, and outputs the generated Prolog code. It defines a dictionary of ports for an energy system and calls a function from jinja_utils module to generate Prolog dynamic verification code.",
+        "type": "summary"
+    },
+    "964": {
+        "file_id": 126,
+        "content": "import sys\n# frontend topo code -> generate names & render params & user defined disjunctive constraints -> render prolog code -> execute and verify -> get possible states -> add constraints to model\nsys.path.append(\"../\")\nimport jinja_utils\ntemplate_path = \"prolog_gen.pro.j2\"\noutput_path = \"prolog_gen.pro\"\n# portList = [{'name':..., 'possible_states': [...]]\n# render_params = dict(portList = [], deviceTypes = [], deviceNameToDeviceType = {}, deviceNameToPorts = {}, energyTypes = [], portNameToPortEnergyTypes = {}, adderNameToAdderPortNames = {})\nrender_params = dict(\n    portNameToPortPossibleStates={\n        \"bat_port1\": [\"idle\", \"input\", \"output\"],\n        \"generator_port1\": [\"idle\", \"output\"],\n        \"load_port1\": [\"idle\", \"input\"],\n    },\n    deviceTypes=[\"battery\", \"load\", \"generator\"],\n    deviceTypeToDeviceNames={\n        \"battery\": [\"battery1\"],\n        \"load\": [\"load1\"],\n        \"generator\": [\"generator1\"],\n    },\n    deviceNameToPortNames={\n        \"battery1\": [\"bat_port1\"],\n        \"generator1\": [\"generator_port1\"],",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py:1-28"
+    },
+    "965": {
+        "file_id": 126,
+        "content": "This code imports necessary libraries, defines paths and parameters for rendering Prolog code. It then utilizes Jinja templates to generate Prolog code from topology information, adds constraints to the model, and outputs the generated Prolog code.",
+        "type": "comment"
+    },
+    "966": {
+        "file_id": 126,
+        "content": "        \"load1\": [\"load_port1\"],\n    },\n    energyTypes=[\"electricity\"],\n    energyTypeToPortNames={\n        \"electricity\": [\"bat_port1\", \"load_port1\", \"generator_port1\"]\n    },\n    adderNameToAdderPortNames={\n        \"adder1\": [\"bat_port1\", \"generator_port1\", \"load_port1\"]\n    },\n)\njinja_utils.load_render_and_format(\n    template_path,\n    output_path,\n    render_params=render_params,\n    banner=\"Generating Prolog Dynamic Verification Code\",\n    needFormat=False,\n)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py:29-46"
+    },
+    "967": {
+        "file_id": 126,
+        "content": "The code defines a dictionary of ports for an energy system, with \"electricity\" as the only energy type. It also sets the energyTypeToPortNames and adderNameToAdderPortNames dictionaries to map adder names to their respective port names. Finally, it calls load_render_and_format function from jinja_utils module to generate Prolog dynamic verification code.",
+        "type": "comment"
+    },
+    "968": {
+        "file_id": 127,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py",
+        "type": "filepath"
+    },
+    "969": {
+        "file_id": 127,
+        "content": "The code contains a class for exception handling, utility functions, and Prolog interaction. It retrieves query results from Prolog scripts, verifies topology status, and maps to adder status for energy types. If valid, it writes the status to a file using pickle dump.",
+        "type": "summary"
+    },
+    "970": {
+        "file_id": 127,
+        "content": "######## ERROR UTILS START ########\nfrom typing import Union\nimport traceback\nimport sys\n# @beartype\nclass ErrorManager:\n    \"\"\"\n    Manage exceptions and errors.\n    Can be used in `with` statements to automate such management, which behavior can be configured by setting `suppress_error` and `suppress_exception` arguments.\n    Args:\n    suppress_error:bool: If suppressed, don't raise exception if having error messages\n    suppress_exception:bool: If suppressed, don't suppress exception raised by program\n    default_error:str: The default error message to display if any error occurs during execution\n    \"\"\"\n    def __init__(\n        self,\n        suppress_error: bool = False,\n        suppress_exception: bool = False,\n        default_error: Union[str, None] = None,\n    ):\n        self.errors = []\n        self.suppress_error = suppress_error\n        self.suppress_exception = suppress_exception\n        self.default_error = default_error\n    def __bool__(self):\n        return len(self.errors) > 0\n    @property\n    def has_error(self):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:1-38"
+    },
+    "971": {
+        "file_id": 127,
+        "content": "The code defines an ErrorManager class to manage exceptions and errors, which can be used in `with` statements for automatic error management. The class takes arguments such as suppress_error and suppress_exception to control exception handling behavior. It has methods to add and check if there are any errors present.",
+        "type": "comment"
+    },
+    "972": {
+        "file_id": 127,
+        "content": "        return bool(self)\n    @property\n    def has_exception(self):\n        last_exc = sys.exc_info()\n        return last_exc[0] is not None\n    def append(self, error: str):\n        self.errors.append(error)\n    def clear(self):\n        self.errors = []\n        self.default_error = None\n    def format_error(self, clear=True, join: str = \"\\n\"):\n        error_msg = join.join(\n            self.errors\n            + ([self.default_error] if (self and self.default_error) else [])\n        )\n        if clear:\n            self.clear()\n        return error_msg\n    def raise_if_any(self):\n        if self.errors:\n            self.print_if_any()\n            raise Exception(self.format_error())\n    def print_if_any(self):\n        if self.errors:\n            print(self.format_error())\n            return True\n        return False\n    def __enter__(self):\n        self.raise_if_any()\n        return self\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is None and not self.suppress_error:\n            self.raise_if_any()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:39-79"
+    },
+    "973": {
+        "file_id": 127,
+        "content": "This code defines a class that handles exception errors and provides methods for appending, clearing, and formatting them. It also includes methods for raising or printing exceptions if any exist. The `__enter__` and `__exit__` methods handle exception handling within the context of using this class as a context manager.",
+        "type": "comment"
+    },
+    "974": {
+        "file_id": 127,
+        "content": "        else:\n            self.print_if_any()\n        if self.has_exception:\n            traceback_exc = traceback.format_exc()\n            print(traceback_exc)\n        return True if self.suppress_exception else None\n    def __str__(self):\n        return self.format_error(clear=False)\n    def __repr__(self):\n        return self.format_error(clear=False)\n    def __len__(self):\n        return len(self.errors)\n    def __iter__(self):\n        return iter(self.errors)\n######## ERROR UTILS END ########\n######## FAILSAFE UTILS START #####\nfrom contextlib import contextmanager\n@contextmanager\ndef chdir_context(dirpath: str):\n    cwd = os.getcwd()\n    os.chdir(dirpath)\n    try:\n        yield\n    finally:\n        os.chdir(cwd)\n######## FAILSAFE UTILS END #####\nfrom swiplserver import PrologMQI, PrologThread\nfrom pydantic import BaseModel\nfrom typing import List, Dict\n# from HashableDict.HashableDict import HashDict\nfrom frozendict import frozendict\nimport rich\nimport os\nimport tempfile\nbanner = lambda title: print(title.center(60, \"-\"))",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:80-131"
+    },
+    "975": {
+        "file_id": 127,
+        "content": "This code snippet contains various utility functions for error handling, directory changes, and working with Prolog. It includes a context manager for changing directories, Prolog server connection functions, and Pydantic models for representing errors in a structured way. The code also uses rich library for printing and frozendict for immutable dictionaries. The snippet ends with a banner function that centers a given title between dashes.",
+        "type": "comment"
+    },
+    "976": {
+        "file_id": 127,
+        "content": "def query_result_from_prolog(prolog_script_content: str, adder_index_to_port_name):\n    banner(\"querying\")\n    topology_status_dict = {}\n    with tempfile.TemporaryDirectory() as temp_dir:\n        with chdir_context(temp_dir):\n            prolog_file_path = \"prolog_script.pro\"\n            prolog_file_path_abs = os.path.join(prolog_file_path)\n            with open(prolog_file_path_abs, \"w+\") as f:\n                f.write(prolog_script_content)\n            with PrologMQI() as mqi:\n                with mqi.create_thread() as prolog_thread:\n                    topology_status_dict = query_prolog_in_context(\n                        topology_status_dict,\n                        prolog_file_path,\n                        prolog_thread,\n                        adder_index_to_port_name,\n                    )\n    return topology_status_dict\ndef construct_query_result_iterator(thread, query):\n    thread.query_async(query, find_all=False)\n    while True:\n        it = thread.query_async_result()\n        if it is not None:",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:134-157"
+    },
+    "977": {
+        "file_id": 127,
+        "content": "This code defines a function \"query_result_from_prolog\" that queries a Prolog script and returns the result as a topology status dictionary. The code creates a temporary directory, writes the Prolog script content to a file, and uses the \"PrologMQI\" class to interact with the Prolog interpreter in a separate thread. The \"construct_query_result_iterator\" function constructs an iterator for querying the result from the Prolog interpreter's thread.",
+        "type": "comment"
+    },
+    "978": {
+        "file_id": 127,
+        "content": "            yield it\n        else:\n            break\ndef query_prolog_in_context(\n    topology_status_dict, prolog_file_path, prolog_thread, adder_index_to_port_name\n):\n    adder_name_list = []\n    adder_index_mapping = {}\n    for i, k in enumerate(adder_index_to_port_name.keys()):\n        adder_name_list.append(\"adder{}\".format(str(k).replace('-','_')))\n        adder_index_mapping[i] = k\n    adder_names = \", \".join(adder_name_list)\n    print('adder_names: ',adder_names)\n    # breakpoint()\n    prolog_thread.query(f'[\"{prolog_file_path}\"].')\n    # result = prolog_thread.query(\n    #     f\"findall(STATUS, adder_port_status_list([{adder_names}], STATUS), STATUS_LIST)\"\n    # )\n    query = f\"adder_port_status_list([{adder_names}], STATUS)\"\n    _iterator = construct_query_result_iterator(prolog_thread, query)\n    STATUS_LIST = []\n    for result in _iterator:\n        STATUS = result[0][\"STATUS\"]\n        STATUS_LIST.append(STATUS)\n    # print('STATUS_LIST: ')\n    # rich.print(STATUS_LIST)\n    # breakpoint()\n    for simutaneous_status in STATUS_LIST:",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:158-191"
+    },
+    "979": {
+        "file_id": 127,
+        "content": "This function, \"query_prolog_in_context\", queries a Prolog program to get the status of multiple adder ports in a network topology. It constructs a query based on the list of adder names and iterates through the results to extract the status of each port. The statuses are then stored in the \"STATUS_LIST\" variable.",
+        "type": "comment"
+    },
+    "980": {
+        "file_id": 127,
+        "content": "        adder_status_dict = {}\n        port_status_dict = {}\n        for _index, adder_simutaneous_status in enumerate(simutaneous_status):\n            adder_index = adder_index_mapping[_index]\n            adder_energy_type, adder_port_status = adder_simutaneous_status\n            adder_status_dict[adder_index] = adder_energy_type\n            print(f\"adder #{adder_index}\")\n            print(f\"\\tenergy type: {adder_energy_type}\")\n            print(f\"\\tport_status:\")\n            port_index_to_port_name = adder_index_to_port_name[adder_index]\n            for adder_port_index, port_status in enumerate(adder_port_status):\n                port_name = port_index_to_port_name[adder_port_index]\n                port_status_dict[port_name] = port_status\n                print(f\"\\t\\t{port_name}: {port_status}\")\n        key = frozendict(adder_status_dict)\n        value = frozendict(port_status_dict)\n        if key not in topology_status_dict.keys():\n            topology_status_dict[key] = set()\n        topology_status_dict[key].add(value)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:192-210"
+    },
+    "981": {
+        "file_id": 127,
+        "content": "This code iterates over simutaneous_status and creates dictionaries for adder_energy_type and port_status. It then prints the adder information and port statuses. Finally, it adds a key-value pair to topology_status_dict if the key does not already exist, and adds the value to its corresponding set in the dictionary.",
+        "type": "comment"
+    },
+    "982": {
+        "file_id": 127,
+        "content": "        print(\"-\" * 60)\n    # print(topology_status_dict)\n    # breakpoint()\n    return topology_status_dict\ndef verify_topology_status_dict(\n    topology_status_dict,\n    port_verifiers,\n    conjugate_port_verifiers,\n    adder_index_to_port_name,\n):\n    banner(\"unverified topo status\")\n    rich.print(topology_status_dict)\n    banner(\"verifying\")\n    verified_topology_status_dict = {}\n    for topo_status_index, (adder_status, topo_status) in enumerate(\n        topology_status_dict.items()\n    ):\n        topo_status_frame_flatten = {}\n        port_verified = {}\n        conjugate_port_verified = {}\n        port_name_to_energy_type = {\n            v_v: adder_status[k]\n            for k, v in adder_index_to_port_name.items()\n            for v_k, v_v in v.items()\n        }\n        for topo_status_frames in topo_status:\n            for topo_status_frame_index, (port_name, port_status) in enumerate(\n                topo_status_frames.items()\n            ):\n                # breakpoint()\n                if port_name not in topo_status_frame_flatten.keys():",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:211-248"
+    },
+    "983": {
+        "file_id": 127,
+        "content": "This function takes a topology status dictionary, port verifiers, conjugate port verifiers, and an index to port name mapping. It prints a banner for unverified topology status, then rich-prints the topology status dictionary. The function then proceeds to iterate through each topo status frame in the topology status dictionary and creates a topo status frame flatten dictionary, while checking if the port name is already in the topo status frame flatten keys.",
+        "type": "comment"
+    },
+    "984": {
+        "file_id": 127,
+        "content": "                    topo_status_frame_flatten[port_name] = set()\n                _conjugate_verified = True\n                with ErrorManager(suppress_error=True) as em:\n                    for (\n                        conjugate_ports,\n                        conjugate_verifier,\n                    ) in conjugate_port_verifiers.items():\n                        conds = [\n                            topo_status_frames[port_name] for port_name in conjugate_ports\n                        ]\n                        energytypes = [port_name_to_energy_type[port_name] for port_name in conjugate_ports]\n                        conjugate_verified = conjugate_verifier(*conds, *energytypes)\n                        # conjugate_verified = conjugate_verifier(*conds)\n                        if not conjugate_verified:\n                            em.append(\n                                f\"conjugate verification failed for conjugate ports '{conjugate_ports}' at topo status frame #{topo_status_frame_index}\"\n                            )",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:249-265"
+    },
+    "985": {
+        "file_id": 127,
+        "content": "This code is iterating over a list of conjugate ports and verifying their topo status frames. If the conjugate verification fails, it appends an error message using `ErrorManager`. It uses sets to store flattened topo_status_frames for each port. The `conjugate_verified` variable checks if the conjugate verification passed or failed.",
+        "type": "comment"
+    },
+    "986": {
+        "file_id": 127,
+        "content": "                            if _conjugate_verified:\n                                _conjugate_verified = False\n                if _conjugate_verified:\n                    topo_status_frame_flatten[port_name].add(port_status)\n                else:\n                    print(\n                        f\"skipping topo status frame #{topo_status_frame_index} due to failed conjugate ports verification\"\n                    )\n        for port_name, verifier in port_verifiers.items():\n            conds = topo_status_frame_flatten[port_name]\n            verified = verifier(conds)\n            port_verified[port_name] = verified\n            if not verified:\n                print(f\"verifier failed for port '{port_name}'\")\n        all_ports_verified = all(port_verified.values())\n        all_conjugate_ports_verified = all(conjugate_port_verified.values())\n        topo_verified = all_ports_verified and all_conjugate_ports_verified\n        if not all_ports_verified:\n            print(\"not all port vaildations have passed\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:266-286"
+    },
+    "987": {
+        "file_id": 127,
+        "content": "Code checks if topo status frame is skipped due to failed conjugate ports verification. It then iterates through each port, verifies its conditions using a verifier function, and marks the port as verified or not. If all ports are verified, it checks if all conjugate ports are also verified. Finally, it determines if the entire topology is valid based on all ports' and conjugate ports' verification statuses.",
+        "type": "comment"
+    },
+    "988": {
+        "file_id": 127,
+        "content": "        if not all_conjugate_ports_verified:\n            print(\"not all conjugate port vaildations have passed\")\n        if not topo_verified:\n            print(f\"topo verification failed for topo status #{topo_status_index}\")\n        else:\n            if len(topo_status) > 0:\n                verified_topology_status_dict[adder_status] = topo_status\n            else:\n                print(\"skipping due to empty topo status\")\n        banner(f\"processed topo status #{topo_status_index}\")\n    banner(\"verified topo status\")\n    rich.print(verified_topology_status_dict)\n    return verified_topology_status_dict\ndef isomorphicTopologyStatusCombinator(topology_status_dict: dict):\n    topo_status_to_adder_status_dict: Dict[frozenset, set] = {}\n    for adder_index_to_energy_type, topo_status in topology_status_dict.items():\n        topo_status_frozen = frozenset(topo_status)\n        if topo_status_frozen not in topo_status_to_adder_status_dict.keys():\n            topo_status_to_adder_status_dict[topo_status_frozen] = set()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:288-310"
+    },
+    "989": {
+        "file_id": 127,
+        "content": "The code checks if all conjugate port validations have passed and if the topology verification failed for a specific topo status index. It processes topo status, skipping empty ones, and returns a dictionary with verified topology status. The function `isomorphicTopologyStatusCombinator` creates a dictionary of topology statuses and adder statuses.",
+        "type": "comment"
+    },
+    "990": {
+        "file_id": 127,
+        "content": "        topo_status_to_adder_status_dict[topo_status_frozen].add(\n            adder_index_to_energy_type\n        )\n    return topo_status_to_adder_status_dict\ndef check_if_can_proceed(verified_topology_status_dict):\n    isomorphic_topo_status = None\n    possible_adder_energy_type_set_counts = len(verified_topology_status_dict)\n    print(\n        \"possible adder energy type set counts:\", possible_adder_energy_type_set_counts\n    )\n    isomorphic_topo_status = isomorphicTopologyStatusCombinator(\n        verified_topology_status_dict\n    )\n    banner(\"isomorphic topo status\")\n    rich.print(isomorphic_topo_status)\n    isomorphic_topo_status_counts = len(isomorphic_topo_status.keys())\n    print(\"isomorphic topo status counts:\", isomorphic_topo_status_counts)\n    can_proceed = False\n    if isomorphic_topo_status_counts == 0:\n        print(\"no adder energy type set\")\n    elif isomorphic_topo_status_counts > 1:\n        print(\"multiple adder energy type sets found\")\n    else:\n        can_proceed = True\n    if not can_proceed:",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:311-340"
+    },
+    "991": {
+        "file_id": 127,
+        "content": "Creates a dictionary mapping topology status to adder status, then checks if the verified topology status can proceed by determining if there's only one adder energy type set in the topology.",
+        "type": "comment"
+    },
+    "992": {
+        "file_id": 127,
+        "content": "        print(\"cannot proceed\")\n    else:\n        print(\"clear to proceed\")\n    return can_proceed, isomorphic_topo_status\ndef execute_prolog_script_and_check_if_can_proceed(\n    prolog_script_content,\n    adder_index_to_port_name,\n    port_verifiers,\n    conjugate_port_verifiers,\n):\n    topology_status_dict = query_result_from_prolog(\n        prolog_script_content, adder_index_to_port_name\n    )\n    verified_topology_status_dict = verify_topology_status_dict(\n        topology_status_dict,\n        port_verifiers,\n        conjugate_port_verifiers,\n        adder_index_to_port_name,\n    )\n    can_proceed, isomorphic_topo_status = check_if_can_proceed(verified_topology_status_dict)\n    return can_proceed, isomorphic_topo_status\nif __name__ == \"__main__\":\n    with open(\"prolog_gen.pro\", \"r\") as f:\n        prolog_script_content = f.read()\n    adder_index_to_port_name = {\n        1: {0: \"bat_port1\", 1: \"generator_port1\", 2: \"load_port1\"}\n    }\n    port_verifiers = {\n        \"bat_port1\": lambda conds: \"input\" in conds,\n        \"load_port1\": lambda conds: \"input\" in conds,",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:341-376"
+    },
+    "993": {
+        "file_id": 127,
+        "content": "The code reads a Prolog script, checks the topology status by querying and verifying, then determines if it can proceed. If not, \"cannot proceed\" is printed; otherwise, \"clear to proceed\" is printed before returning the results of verification and whether to proceed. The function executes in the context of the main block with specific parameters.",
+        "type": "comment"
+    },
+    "994": {
+        "file_id": 127,
+        "content": "    }\n    # {tuple_of_port_names: lambda cond1, cond2, etype1, etype2: ...}\n    conjugate_port_verifiers = {}\n    can_proceed, isomorphic_topo_status = execute_prolog_script_and_check_if_can_proceed(\n        prolog_script_content,\n        adder_index_to_port_name,\n        port_verifiers,\n        conjugate_port_verifiers,\n    )\n    output_fpath = \"isomorphic_topo_status.pkl\"\n    if can_proceed:\n        print('write data to:', output_fpath)\n        import pickle\n        with open(output_fpath, 'wb') as f:\n            pickle.dump(isomorphic_topo_status, f)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_typesys_dynamic_verification.py:377-394"
+    },
+    "995": {
+        "file_id": 127,
+        "content": "The code defines conjugate_port_verifiers dictionary and checks if it can proceed with the Prolog script execution. If it can proceed, it writes isomorphic_topo_status to \"isomorphic_topo_status.pkl\" file using pickle dump.",
+        "type": "comment"
+    },
+    "996": {
+        "file_id": 128,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/python_mip_conflict.py",
+        "type": "filepath"
+    },
+    "997": {
+        "file_id": 128,
+        "content": "The code imports the mip library and applies \"deletion filter\" and \"additive/elastic filter\" for improving integer infeasibility solutions.",
+        "type": "summary"
+    },
+    "998": {
+        "file_id": 128,
+        "content": "import mip\n# use \"deletion filter\" & \"additive/elastic filter\" for iis solving.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/python_mip_conflict.py:1-2"
+    },
+    "999": {
+        "file_id": 128,
+        "content": "The code imports the mip library and applies \"deletion filter\" and \"additive/elastic filter\" for improving integer infeasibility solutions.",
+        "type": "comment"
+    }
+}

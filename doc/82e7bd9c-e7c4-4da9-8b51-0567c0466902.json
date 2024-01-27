@@ -1,0 +1,20 @@
+{
+    "summary": "Code defines a Pyomo model with disjunctive variables, applies constraints for each option and solves using CPLEX. Outputs decision value, mret list, and transformed variables for debugging abnormal exit conditions.",
+    "details": [
+        {
+            "comment": "This code defines a Pyomo model with variables x and y, and three disjuncts representing decision options. It creates disjunction constraints for each decision option based on variable values x and y. The Piecewise function is defined but not instantiated or used in the current code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py\":0-32",
+            "content": "from pyomo.environ import *\nfrom pyomo.gdp import *\nmodel = ConcreteModel()\n# model.decision = Var(within=Integers, bounds=(0, 2))\n# x_points = [-2, 0.5, 1]\n# y_points = [2, 1.5, 0]\nmodel.x = Var(bounds=(-10, 10))\nmodel.y = Var(bounds=(-10, 10))\ndisj0 = Disjunct()\n# model.disj0.decision = Constraint(expr=model.decision == 0)\ndisj0.definition_x = Constraint(expr=model.x == -2)\ndisj0.definition_y = Constraint(expr=model.y == 2)\nmodel.disj0 = disj0\nmodel.disj1 = Disjunct()\n# model.disj1.decision = Constraint(expr=model.decision == 1)\nmodel.disj1.definition_x = Constraint(expr=model.x == 0)\nmodel.disj1.definition_y = Constraint(expr=model.y == 1)\nmodel.disj2 = Disjunct()\n# model.disj2.decision = Constraint(expr=model.decision == 2)\nmodel.disj2.definition_x = Constraint(expr=model.x == 1)\nmodel.disj2.definition_y = Constraint(expr=model.y == 0)\n# remember to use the expr argument.\nmodel.disj_unite = Disjunction(expr = [model.disj0, model.disj1, model.disj2])\n# model.pw = Piecewise(model.b, model.a, pw_pts = , f_rule = [2, 1.5, 0],pw_repn = 'MC' ,pw_constr_type='EQ')"
+        },
+        {
+            "comment": "The code performs a transformation on the model if it is found to be disjunctive, applies the \"gdp.bigm\" transformation with a given bigM value, solves the model using CPLEX solver, and prints the values of x, y, and objective function. It also prints binary indicator variables for disjunctive variables (disj0) and possibly others (disj1, disj2).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py\":34-62",
+            "content": "# model.obj = Objective(expr=0, sense=minimize)\n# model.obj = Objective(expr=model.x + model.y, sense=maximize)\nmodel.obj = Objective(expr=model.x + model.y, sense=minimize)\n# TransformationFactory(\"gdp.bigm\").apply_to(model)\ndef checkDisjunctive(model:ConcreteModel):\n    for _ in model.component_data_objects(ctype=Disjunct):\n        return True\n    return False\ndef transformDisjunctiveModel(model, bigM = 1e7):\n    is_disjunctive = checkDisjunctive(model)\n    if is_disjunctive: \n        TransformationFactory(\"gdp.bigm\").apply_to(model, bigM=bigM)\n    return is_disjunctive\ntransformed = transformDisjunctiveModel(model)\nsolver = SolverFactory(\"cplex\")\nsolver.solve(model, tee=True)\nprint(\"x:\", value(model.x))\nprint(\"y:\", value(model.y))\nprint(\"obj:\", value(model.obj))\nprint(\"disj0 bin_ind\", value(model.disj0.binary_indicator_var)) # 1.0\nprint(\"disj0 ind\", value(model.disj0.indicator_var)) # True, most likely to be logical\n# print(\"disj1\", value(model.disj1.binary_indicator_var))\n# print(\"disj2\", value(model.disj2.binary_indicator_var))"
+        },
+        {
+            "comment": "The code snippet prints the decision value from the model, a list of mret values, and transformed variables to help with debugging the abnormal exit condition in the CPLEX optimization problem.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py\":63-66",
+            "content": "# print(\"decision:\", value(model.decision))\n# print([mret])\n# \nprint(\"transformed:\", transformed)"
+        }
+    ]
+}

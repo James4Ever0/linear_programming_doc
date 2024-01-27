@@ -1,0 +1,10 @@
+{
+    "summary": "The code sets up a server URL base, defines endpoints for uploading graphs synchronously and asynchronously, and a URL to check result asynchronously. The server has a maximum task limit of 3, so it will refuse connections if the current task count is above that limit.",
+    "details": [
+        {
+            "comment": "The code sets up a server URL base, defines endpoints for uploading graphs synchronously and asynchronously, and a URL to check result asynchronously. The server has a maximum task limit of 3, so it will refuse connections if the current task count is above that limit.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_server_client_configs.py\":0-26",
+            "content": "port = 3398\nMAX_TASK_COUNT = 3\nTEST_GRAPH_CONFIG_PATH = \"test_graph_data.json\"\nclass endpoint_suffix:\n    UPLOAD_GRAPH_ASYNC: str = \"upload_graph_async\"\n    UPLOAD_GRAPH: str = \"upload_graph\"\n    CHECK_RESULT_ASYNC: str = \"check_result_async\"\nclass server_error_code:\n    MAX_TASK_LIMIT: str = \"MAX_TASK_LIMIT\"\n    NOTHING: str = \"NOTHING\"\n    PENDING: str = \"PENDING\"\nurl_base = f\"http://localhost:{port}\"\nget_url = lambda suffix: f\"{url_base}/{suffix}\"\n# will refuse connection if current task count is above 3.\nupload_url = get_url(endpoint_suffix.UPLOAD_GRAPH)\nasync_url = get_url(endpoint_suffix.UPLOAD_GRAPH_ASYNC)\ncheck_result_async = get_url(endpoint_suffix.CHECK_RESULT_ASYNC)"
+        }
+    ]
+}

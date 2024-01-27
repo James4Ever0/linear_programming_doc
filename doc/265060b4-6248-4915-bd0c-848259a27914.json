@@ -1,0 +1,10 @@
+{
+    "summary": "This code represents a Pyomo model for an optimization problem. The objective is to minimize the variable 'x'. The constraints involve variables 'y', 'z', and 'h' with specific bounds. Variables 'y' and 'z' are further constrained by upper and lower limits, while variable 'h' has both upper and lower bounds. There's also a constant defined as ONE_VAR_CONSTANT=1.0, and all variables have unbounded lower and upper limits.",
+    "details": [
+        {
+            "comment": "This code represents a Pyomo model for an optimization problem. The objective is to minimize the variable 'x'. The constraints involve variables 'y', 'z', and 'h' with specific bounds. Variables 'y' and 'z' are further constrained by upper and lower limits, while variable 'h' has both upper and lower bounds. There's also a constant defined as ONE_VAR_CONSTANT=1.0, and all variables have unbounded lower and upper limits.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/your_model_name.lp\":0-58",
+            "content": "\\* Source Pyomo model name=unknown *\\\nmin \nobj:\n+1 \u53d8\u91cfx\ns.t.\nc_u_expr_0_:\n-1 \u53d8\u91cfy\n+1 \u53d8\u91cfz\n<= 0\nc_l_expr_1_:\n+1 \u53d8\u91cfy\n>= 20\nc_u_expr_2_:\n+1 \u53d8\u91cfy\n<= 10\nc_l_expr_3_:\n+1 \u53d8\u91cfh\n>= 20\nc_u_expr_4_:\n+1 \u53d8\u91cfh\n<= 10\nc_u_expr_5_:\n+1 \u53d8\u91cfz\n<= 0\nc_l_expr_6_:\n+1 \u53d8\u91cfz\n>= -10\nc_u_expr_7_:\n+0.5 \u53d8\u91cfh\n+1 \u53d8\u91cfx\n+0.5 \u53d8\u91cfy\n<= 100\nc_u_expr_8_:\n+0.5 \u53d8\u91cfh\n-1 \u53d8\u91cfx\n+0.5 \u53d8\u91cfy\n-1 \u53d8\u91cfz\n<= 0\nc_e_ONE_VAR_CONSTANT: \nONE_VAR_CONSTANT = 1.0\nbounds\n    -inf <= \u53d8\u91cfx <= +inf\n    -inf <= \u53d8\u91cfy <= +inf\n    -inf <= \u53d8\u91cfz <= +inf\n    -inf <= \u53d8\u91cfh <= +inf\nend"
+        }
+    ]
+}

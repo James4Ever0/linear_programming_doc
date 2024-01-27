@@ -1,0 +1,3 @@
+rand = pyimport "random"
+val!= rand.choice! 0..10
+print! val!

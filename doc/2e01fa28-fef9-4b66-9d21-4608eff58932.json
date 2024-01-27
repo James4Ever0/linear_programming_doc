@@ -1,0 +1,10 @@
+{
+    "summary": "The code reads a UTF-16 encoded input file, converts it to UTF-8, and writes the resulting content into an output file.",
+    "details": [
+        {
+            "comment": "The code reads a UTF-16 encoded input file, converts it to UTF-8, and writes the resulting content into an output file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/convert_utf8.py\":0-5",
+            "content": "input_file = \"example_docstring.md\"\noutput_file = \"example_docstring_utf8.md\"\nwith open(input_file,\"r\",encoding=\"utf-16\") as f:\n    with open(output_file,'w+',encoding='utf-8') as f8:\n        f8.write(f.read())"
+        }
+    ]
+}

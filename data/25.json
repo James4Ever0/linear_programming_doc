@@ -1,0 +1,537 @@
+{
+    "2500": {
+        "file_id": 276,
+        "content": "/microgrid_base/test/circular_import_b.py",
+        "type": "filepath"
+    },
+    "2501": {
+        "file_id": 276,
+        "content": "This code attempts to import a variable 'a' from the file circular_import_a.py and assigns it to variable 'b'. However, this leads to an error due to circular imports between the two files.",
+        "type": "summary"
+    },
+    "2502": {
+        "file_id": 276,
+        "content": "from circular_import_a import a\nb = a\n# error!",
+        "type": "code",
+        "location": "/microgrid_base/test/circular_import_b.py:1-4"
+    },
+    "2503": {
+        "file_id": 276,
+        "content": "This code attempts to import a variable 'a' from the file circular_import_a.py and assigns it to variable 'b'. However, this leads to an error due to circular imports between the two files.",
+        "type": "comment"
+    },
+    "2504": {
+        "file_id": 277,
+        "content": "/microgrid_base/test/common_fixtures.py.j2",
+        "type": "filepath"
+    },
+    "2505": {
+        "file_id": 277,
+        "content": "This Python code is a fixtures template for microgrid simulation, using NumPy and Jinja templating. It sets environment variables, defines request protocol and session-scoped fixtures, and creates test fixtures based on devModelClassName.",
+        "type": "summary"
+    },
+    "2506": {
+        "file_id": 277,
+        "content": "{# serve as template for our fixtures. #}\n{# for better coding experience, refuse to use yaml but embrace python (autocomplete) #}\n{# render this to \".py.tmp\" first, then modify it. #}\n{% macro createTestFixture(className, params = \"\") %}\n@fixture\ndef 测试{{className}}({{params}}):\n    val = {{className}}(\n{{caller()}}\n    )\n    return val\n{% endmacro %}\nfrom pytest import fixture\nimport sys\nsys.path.append(\"../\")\n{# from ies_optim import * #}\nimport typing\nif typing.TYPE_CHECKING:\n    from ..ies_optim_legacy import * # workaround for pyright.\n    from ..constants import Solver    \n    from ..solve_model import *\nelse:\n    from ies_optim_legacy import *\n    from constants import Solver    \n    from solve_model import *\nimport os\nos.environ['VAR_INIT_AS_ZERO'] = '1'\n@fixture\ndef model_wrapper():\n    mw = ModelWrapper()\n    yield mw\n    del mw\nfrom typing import Protocol, Any\nclass Request(Protocol):\n    param: Any\n    cache: Any\n@fixture(scope=\"session\", params=[\"设计规划\", \"仿真模拟\"], ids=[\"PLANNING\", \"SIMULATION\"])\ndef 测试计算参数(request: Request):  # _pytest.fixtures.SubRequest",
+        "type": "code",
+        "location": "/microgrid_base/test/common_fixtures.py.j2:1-46"
+    },
+    "2507": {
+        "file_id": 277,
+        "content": "This code serves as a template for fixtures, using Python instead of YAML for better coding experience. It renders the code to \".py.tmp\" and modifies it before use. It also imports necessary modules, sets environment variables, and defines request protocol and session-scoped fixtures for planning and simulation tasks.",
+        "type": "comment"
+    },
+    "2508": {
+        "file_id": 277,
+        "content": "    import numpy as np\n    {# print(type(request)) #}\n    arr = abs(np.random.random((24,))).tolist()\n    return 计算参数(\n        计算目标=\"经济\",\n        # 计算目标=\"经济_环保\",\n        # 计算目标=\"环保\",\n        计算步长=\"小时\",\n        {# 计算步长=\"秒\", #}\n        典型日=True,\n        典型日代表的日期=[1],\n        计算类型=request.param,\n        风速=arr,\n        光照=arr,\n        气温=arr,\n        年利率=0.1,\n    )\n{% for _infoClassName, infoData in data.items() %}\n    {% set infoClassName = _infoClassName.strip('信息') %}\n{{'# {} #'.format(infoClassName.center(70, \"=\"))}}\n    {% if infoClassName != \"计算参数\" %}\n        {% set devInfoClassName = infoClassName+\"信息\"%}\n        {% set devModelClassName = infoClassName+\"模型\"%}\n        {% set devIDClassName = infoClassName+\"ID\"%}\n        {% call createTestFixture(devInfoClassName) %}\n            {%for infoName, infoValue in infoData.items()%}\n        {{infoName}} = {{repr(infoValue)}},\n            {%endfor%}\n        {% endcall %}\n        {% call createTestFixture(devIDClassName) %}\n            {% for k,v in id_data[_infoClassName].items() %}",
+        "type": "code",
+        "location": "/microgrid_base/test/common_fixtures.py.j2:47-82"
+    },
+    "2509": {
+        "file_id": 277,
+        "content": "This code is importing NumPy and using its random function to generate an array of random numbers. The array represents wind speed, sunlight, and temperature values in hourly intervals for a given day. These data are then passed as parameters to the '计算参数' function, along with other information such as typical day representation, annual interest rate, and different types of computation. It seems like this code is related to microgrid simulation or analysis, possibly for testing purposes, but it doesn't specify any particular operation being performed in this specific part of the code.",
+        "type": "comment"
+    },
+    "2510": {
+        "file_id": 277,
+        "content": "        {{k}} = {{v}},\n            {% endfor %}\n        {% endcall %}\n        {% call createTestFixture(devModelClassName, \"测试{className}信息: {className}信息, model_wrapper: ModelWrapper, 测试计算参数: 计算参数, 测试{className}ID: {className}ID\".format(className = infoClassName))%}\n        PD={}, mw=model_wrapper, 计算参数实例=测试计算参数, 设备ID=测试{{devIDClassName}}, 设备信息=测试{{devInfoClassName}}\n        {% endcall %}\n    {% else%}\n        {% call createTestFixture(\"设备模型\", \"model_wrapper: ModelWrapper, 测试计算参数: 计算参数\") %}\n        PD={}, mw=model_wrapper, 计算参数实例=测试计算参数, ID=0\n        {% endcall %}\n    {% endif %}\n{% endfor %}",
+        "type": "code",
+        "location": "/microgrid_base/test/common_fixtures.py.j2:83-96"
+    },
+    "2511": {
+        "file_id": 277,
+        "content": "This code creates test fixtures for a microgrid base. It checks the devModelClassName and based on that, it calls the createTestFixture function with appropriate parameters to create different types of test fixtures. It initializes variables such as model_wrapper, PD, testing calculation parameters, device ID, and device information for the test fixture. The code uses Jinja templating syntax for variable assignment and function calls.",
+        "type": "comment"
+    },
+    "2512": {
+        "file_id": 278,
+        "content": "/microgrid_base/test/conic_problem.py",
+        "type": "filepath"
+    },
+    "2513": {
+        "file_id": 278,
+        "content": "The code evaluates the expression x * y - 2 * (x + y) for varying inputs of x and y within specified ranges, finds the minimum and maximum values along with their corresponding input pairs, and prints them.",
+        "type": "summary"
+    },
+    "2514": {
+        "file_id": 278,
+        "content": "from sympy.abc import x, y\nimport numpy as np\nexpr = x * y - 2 * (x + y)\n# help(expr.evalf)\nx_min, x_max = -1, 3\ny_min, y_max = -2, 4\nmin_val = 1000\nmax_val = -1000\nmin_inputs = []\nmax_inputs = []\nfor _x in np.linspace(x_min, x_max, 100):\n    for _y in np.linspace(y_min, y_max, 100):\n        val = expr.evalf(subs={x: _x, y: _y})\n        if val < min_val:\n            min_val = val\n            min_inputs = [_x, _y]\n        if val > max_val:\n            max_val = val\n            max_inputs = [_x, _y]\nprint(f\"MIN: {min_val}, MAX: {max_val}\")\nprint(f\"MIN_INPUT: {min_inputs}, MAX_INPUT: {max_inputs}\")",
+        "type": "code",
+        "location": "/microgrid_base/test/conic_problem.py:1-26"
+    },
+    "2515": {
+        "file_id": 278,
+        "content": "The code evaluates the expression x * y - 2 * (x + y) for varying inputs of x and y within specified ranges, finds the minimum and maximum values along with their corresponding input pairs, and prints them.",
+        "type": "comment"
+    },
+    "2516": {
+        "file_id": 279,
+        "content": "/microgrid_base/test/dev_info_tmp_gen.py",
+        "type": "filepath"
+    },
+    "2517": {
+        "file_id": 279,
+        "content": "This code imports modules, defines variables, and generates device information for a microgrid system. It loads and formats two templates (TEST FIXTURES and TEST EXPORT) while sorting exportData dictionary and excluding specific parameter from devNames list.",
+        "type": "summary"
+    },
+    "2518": {
+        "file_id": 279,
+        "content": "# fpath = \"device_info.yml.tmp\"\nimport yaml\nimport sys\nimport rich\nsys.path.append(\"../\")\nimport jinja_utils\nimport ies_optim\nimport inspect\n# import copy\n计算参数 = \"计算参数\"\nexportData = {}\nexportIDData = {}\n_id = 0\nfor k, v in ies_optim.__dict__.items():\n    # for k, v in mglobals.items():\n    # print(k)\n    # print(k.__annotations__)\n    if k == 计算参数:\n        sig = inspect.signature(v)\n        commonParams = {}\n        for sigkey in sig.parameters.keys():\n            commonParams[sigkey] = None\n        exportData[k] = commonParams\n        # breakpoint()\n    elif k.endswith(\"信息\") and (not k.startswith(\"设备\")):\n        if issubclass(v, ies_optim.设备基础信息):\n            devName = k.strip(\"信息\")\n            devIDData = {}\n            # get ID classes.\n            devIDName = f\"{devName}ID\"\n            devIDClass = ies_optim.__dict__[devIDName]\n            devIDClassSignature = inspect.signature(devIDClass)\n            for sigkey in devIDClassSignature.parameters.keys():\n                devIDData[sigkey] = _id\n                _id += 1",
+        "type": "code",
+        "location": "/microgrid_base/test/dev_info_tmp_gen.py:1-39"
+    },
+    "2519": {
+        "file_id": 279,
+        "content": "This code imports necessary modules, appends a path, and defines variables. It iterates over ies_optim's attributes, checking for specific parameter names and \"信息\" class names. If found, it creates dictionaries to store the common parameters and IDs for each device type.",
+        "type": "comment"
+    },
+    "2520": {
+        "file_id": 279,
+        "content": "            exportIDData[k] = devIDData\n            commonParams = dict(设备名称=devName)\n            if issubclass(v, ies_optim.设备信息):\n                # 意味着有公共内容\n                commonParams.update(生产厂商=\"Any\", 设备型号=f\"{devName}1\")\n            sig = inspect.signature(v)\n            # print(sig)\n            # breakpoint()\n            print()\n            print(devName.center(30, \"=\"))\n            for sigkey in sig.parameters.keys():\n                # print(sigkey)\n                if sigkey in commonParams.keys():\n                    continue\n                else:\n                    commonParams.update({sigkey: None})\n            rich.print(commonParams)\n            exportData[k] = commonParams\n    # class/methods might have distinct annotations inside.\n# with open(fpath, \"w+\") as f:\n#     content = yaml.safe_dump(exportData, allow_unicode=True)\n#     f.write(content)\ncode_path, template_path = jinja_utils.code_and_template_path(\n    base_name := \"common_fixtures\"\n)\ncode_path += \".tmp\"\n# from collections import OrderedDict",
+        "type": "code",
+        "location": "/microgrid_base/test/dev_info_tmp_gen.py:40-70"
+    },
+    "2521": {
+        "file_id": 279,
+        "content": "This code appears to be generating device information for a microgrid system. It creates a dictionary of device parameters, updates it with common attributes if the device is a certain class, and writes the data to a file for further use. The code seems to involve some kind of template handling as well.",
+        "type": "comment"
+    },
+    "2522": {
+        "file_id": 279,
+        "content": "# exportedDataOrdered = OrderedDict()\njinja_utils.load_render_and_format(\n    template_path,\n    code_path,\n    render_params := dict(\n        data=dict(sorted(exportData.items(), key=lambda item: item[0] == 计算参数)),\n        id_data=exportIDData,\n    ),\n    banner := \"TEST FIXTURES\",\n)\ncode_path, template_path = jinja_utils.code_and_template_path(\"test_export\")\njinja_utils.load_render_and_format(\n    template_path,\n    code_path,\n    render_params=dict(\n        devNames=[key for key in render_params[\"data\"].keys() if key != 计算参数]\n    ),\n    banner=\"TEST EXPORT\",\n)",
+        "type": "code",
+        "location": "/microgrid_base/test/dev_info_tmp_gen.py:71-91"
+    },
+    "2523": {
+        "file_id": 279,
+        "content": "The code loads and formats two templates for testing purposes: one for fixtures with the banner \"TEST FIXTURES\", and another for exporting data with the banner \"TEST EXPORT\". It sorts the exportData dictionary, excluding a specific calculation parameter from the devNames list.",
+        "type": "comment"
+    },
+    "2524": {
+        "file_id": 280,
+        "content": "/microgrid_base/test/generate_test_model.py",
+        "type": "filepath"
+    },
+    "2525": {
+        "file_id": 280,
+        "content": "This code appends the parent directory to the system path, imports jinja_utils, retrieves code and template paths using the function from jinja_utils, and then loads, renders, and formats the template with specified parameters and banner.",
+        "type": "summary"
+    },
+    "2526": {
+        "file_id": 280,
+        "content": "import sys\nsys.path.append(\"../\")\nimport jinja_utils\ncode_path, template_path = jinja_utils.code_and_template_path(\"test_model\")\njinja_utils.load_render_and_format(\n    template_path, code_path, render_params=dict(), banner=\"TEST MODEL CODE\"\n)",
+        "type": "code",
+        "location": "/microgrid_base/test/generate_test_model.py:1-10"
+    },
+    "2527": {
+        "file_id": 280,
+        "content": "This code appends the parent directory to the system path, imports jinja_utils, retrieves code and template paths using the function from jinja_utils, and then loads, renders, and formats the template with specified parameters and banner.",
+        "type": "comment"
+    },
+    "2528": {
+        "file_id": 281,
+        "content": "/microgrid_base/test/mapping_relationship_in_enum_classes.py",
+        "type": "filepath"
+    },
+    "2529": {
+        "file_id": 281,
+        "content": "Defines two Enum classes, A and B, with members MEMBER1, MEMBER2, MEMBER3, and MEMBER4. Class B has a mapping between its members and the members of class A. The __new__ method checks if the value passed is in B's mapping; if so, returns the corresponding member from A. If not, creates a new member in B with the given value. Prints lists of members for both classes A and B.",
+        "type": "summary"
+    },
+    "2530": {
+        "file_id": 281,
+        "content": "import enum\nclass A(enum.Enum):\n    MEMBER1 = 'member1'\n    MEMBER2 = 'member2'\n# not working.\nclass B(enum.Enum):\n    MEMBER3 = 'member3'\n    MEMBER4 = 'member4'\n    # Define a mapping between B's members and A's members\n    _mapping = {\n        'member3': A.MEMBER1,\n        'member4': A.MEMBER2,\n    }\n    def __new__(cls, value):\n        # Check if the value is in B's mapping\n        # breakpoint()\n        if value in cls._mapping:\n            # If so, return the corresponding member from A\n            return cls._mapping[value]\n        # Otherwise, create a new member in B\n        obj = object.__new__(cls)\n        obj._value_ = value\n        return obj\nprint(list(A))  # [<A.MEMBER1: 'member1'>, <A.MEMBER2: 'member2'>]\nprint(list(B))  # [<A.MEMBER1: 'member3'>, <A.MEMBER2: 'member4'>]",
+        "type": "code",
+        "location": "/microgrid_base/test/mapping_relationship_in_enum_classes.py:1-31"
+    },
+    "2531": {
+        "file_id": 281,
+        "content": "Defines two Enum classes, A and B, with members MEMBER1, MEMBER2, MEMBER3, and MEMBER4. Class B has a mapping between its members and the members of class A. The __new__ method checks if the value passed is in B's mapping; if so, returns the corresponding member from A. If not, creates a new member in B with the given value. Prints lists of members for both classes A and B.",
+        "type": "comment"
+    },
+    "2532": {
+        "file_id": 282,
+        "content": "/microgrid_base/test/read_yaml.py",
+        "type": "filepath"
+    },
+    "2533": {
+        "file_id": 282,
+        "content": "The code imports the yaml module, opens a file named \"test_config.yaml\", safely loads its content into the 'data' variable using yaml.safe_load(), and prints the data. The code also demonstrates how to load multiple documents split by \"---\" using yaml.safe_load_all() and iterate over the resulting generator to print each document.",
+        "type": "summary"
+    },
+    "2534": {
+        "file_id": 282,
+        "content": "import yaml\nfpath = \"test_config.yaml\"\nimport rich\nwith open(fpath, \"r\") as file:\n    data = yaml.safe_load(file)\n    rich.print(data)\n    # {'db': {'abc': 'def', 'mykey': None, 'myotherkey': None}}\n    #################################\n    #     {\n    #     'db': {\n    #         'abc': 'def',\n    #         'mykey': None,\n    #         'myotherkey': [None, None]\n    #     }\n    # }\n    # dataList = yaml.safe_load_all(file) # generator.\n    # # load multiple documents splited by \"---\"\n    # for data in dataList:\n    #     rich.print(data)",
+        "type": "code",
+        "location": "/microgrid_base/test/read_yaml.py:1-23"
+    },
+    "2535": {
+        "file_id": 282,
+        "content": "The code imports the yaml module, opens a file named \"test_config.yaml\", safely loads its content into the 'data' variable using yaml.safe_load(), and prints the data. The code also demonstrates how to load multiple documents split by \"---\" using yaml.safe_load_all() and iterate over the resulting generator to print each document.",
+        "type": "comment"
+    },
+    "2536": {
+        "file_id": 283,
+        "content": "/microgrid_base/test/run_test.sh",
+        "type": "filepath"
+    },
+    "2537": {
+        "file_id": 283,
+        "content": "This code sets the PATH environment variable to include CPLEX Studio and runs pytest for running tests with various flags and parameters. It uses different combinations of live-stream, capture output, and file/directory options. The intention is to execute test cases related to the 'model' and other files in the directory using CPLEX Studio for optimization.",
+        "type": "summary"
+    },
+    "2538": {
+        "file_id": 283,
+        "content": "# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" conda run -n rosetta --live-stream --no-capture-output python -m pytest --lf --lfnf=all --capture=tee-sys .\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" conda run -n base --no-capture-output --live-stream pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-no $*\nenv PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys $*\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all --capture=tee-sys .\n# env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" pytest --lf --lfnf=all .\n# pytest --lf --lfnf=all --capture=tee-sys .\n# pytest --lf --lfnf=all --rootdir=../ .",
+        "type": "code",
+        "location": "/microgrid_base/test/run_test.sh:1-12"
+    },
+    "2539": {
+        "file_id": 283,
+        "content": "This code sets the PATH environment variable to include CPLEX Studio and runs pytest for running tests with various flags and parameters. It uses different combinations of live-stream, capture output, and file/directory options. The intention is to execute test cases related to the 'model' and other files in the directory using CPLEX Studio for optimization.",
+        "type": "comment"
+    },
+    "2540": {
+        "file_id": 284,
+        "content": "/microgrid_base/test/runtime_override_stepwise.py",
+        "type": "filepath"
+    },
+    "2541": {
+        "file_id": 284,
+        "content": "The code allows stepwise manipulation of source code for testing, using Pydantic and namedtuple. It provides a CLI tool with Python 3.9 support, defines classes for exchange data and a validator function, and outputs results in JSON format.",
+        "type": "summary"
+    },
+    "2542": {
+        "file_id": 284,
+        "content": "# shall not use shebang.\n#!/usr/bin/env conda run -n base --live-stream --no-capture-output python --\n# ref: https://www.baeldung.com/linux/shebang-types\n# import os\n# filename = os.path.basename(__file__)\n# __doc__ = \"\"\"Stepwise source code manipulation for testing.\n# Usage:\n#     -t\n# \"\"\".format(filename=filename)\n# doc = __doc__\nfrom pydantic import BaseModel\nfrom collections import namedtuple\nFuncSourceWithName = namedtuple(\"FuncSourceWithName\", [\"changed_source\", \"funcname\"])\n# it is a small function which can be run as commandline tool.\n# just invoke conda while testing. do not try to run the whole environment in python3.9\n# for compatibility, better use python3.9\n# though using \"redbaron\" or some other code refactor tool also works.\n# refs:\n# https://github.com/python-rope/rope\n# https://redbaron.readthedocs.io/en/latest/\n# https://pybowler.io/\n# https://libcst.readthedocs.io/en/stable/why_libcst.html\n# try:\n#     from pydantic import field_validator as validator\n# except:\n#     from pydantic import validator",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:1-32"
+    },
+    "2543": {
+        "file_id": 284,
+        "content": "Code snippet for stepwise source code manipulation in testing, importing Pydantic and namedtuple. Provides an example usage with '-t'. Written to be run as a command line tool using conda, preferably Python 3.9, for compatibility purposes.",
+        "type": "comment"
+    },
+    "2544": {
+        "file_id": 284,
+        "content": "from pydantic import validator\nimport os\ndef iterate_till_keyword(iterator, keyword: str):\n    \"\"\"\n    Iterate through the given iterator until the specified keyword is found.\n    Parameters:\n        - iterator: An iterator object.\n        - keyword: A string representing the keyword to stop the iteration.\n    Returns:\n        None\n    \"\"\"\n    while True:\n        it = next(iterator)\n        if it == keyword:\n            print(f\"Stopped iteration at keyword: '{keyword}'\")\n            break\nclass ExchangePaths:\n    input = \"input.json\"\n    output = \"output.json\"\n    @staticmethod\n    def getInputPath(basedir: str):\n        \"\"\"\n        A static method that takes a base directory as input and returns the path to the input file.\n        Parameters:\n            basedir (str): The base directory.\n        Returns:\n            str: The path to the input file.\n        \"\"\"\n        return os.path.join(basedir, ExchangePaths.input)\n    @staticmethod\n    def getOutputPath(basedir: str):\n        \"\"\"\n        Get the output path by joining the base directory with the output path.",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:33-76"
+    },
+    "2545": {
+        "file_id": 284,
+        "content": "This code defines an iterate_till_keyword function that stops iteration when a specified keyword is found, and a class ExchangePaths with two static methods to get the input and output file paths.",
+        "type": "comment"
+    },
+    "2546": {
+        "file_id": 284,
+        "content": "        Args:\n            basedir (str): The base directory.\n        Returns:\n            str: The output path.\n        \"\"\"\n        return os.path.join(basedir, ExchangePaths.output)\nclass SourceCodeExchange(BaseModel):\n    source_code: str\n    processed: bool\n    funcname: str = \"\"\n    keywords: set = set()  # validation values follows the order.\n    @validator(\"keywords\")\n    def validate_keywords(cls, v, values):\n        \"\"\"\n        Validate the \"keywords\" field.\n        Args:\n            cls: The class itself.\n            v: The value of the \"keywords\" field.\n            values: The values of all the fields in the model.\n        Returns:\n            The validated value of the \"keywords\" field.\n        \"\"\"\n        # print(values)\n        # breakpoint()\n        if processed := values.get(\"processed\"):  # ERROR\n            assert (\n                len(v) == 0\n            ), \"Processed: {}\\nInvalid keywords: {} (Shall be empty)\".format(\n                processed, v\n            )\n        else:\n            assert (\n                len(v) != 0",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:78-116"
+    },
+    "2547": {
+        "file_id": 284,
+        "content": "This code defines a `SourceCodeExchange` class which represents source code exchange data. The class has fields for source_code, processed status, and optional funcname and keywords. It also includes a validator function for the \"keywords\" field that checks if the processed flag is set to True or False. If processed is True, the keywords field should be empty; otherwise, it can contain non-empty values.",
+        "type": "comment"
+    },
+    "2548": {
+        "file_id": 284,
+        "content": "            ), \"Processed: {}\\nInvalid keywords: {} (Shall not be empty)\".format(\n                processed, v\n            )\n        return v\n    @validator(\"funcname\")\n    def validate_funcname(cls, v, values):\n        \"\"\"\n        Validate the funcname parameter.\n        Parameters:\n            cls (class): The class object.\n            v (Any): The value to be validated.\n            values (Dict[str, Any]): The dictionary of values.\n        Returns:\n            Any: The validated value.\n        \"\"\"\n        if processed := values.get(\"processed\"):\n            assert (\n                v != \"\"\n            ), \"Processed: {}\\nInvalid funcname: {} (Shall not be empty)\".format(\n                processed, repr(v)\n            )\n        else:\n            assert (\n                v == \"\"\n            ), \"Processed: {}\\nInvalid funcname: {} (Shall be empty)\".format(\n                processed, repr(v)\n            )\n        return v\nimport sys\nif sys.version_info >= (3, 9):\n    def add_stepwise_lines_to_func_source(func_source_cleaned, keywords: set):",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:117-154"
+    },
+    "2549": {
+        "file_id": 284,
+        "content": "The code is validating the 'funcname' parameter, ensuring it is not empty if the 'processed' value exists in the dictionary of values. If 'processed' does not exist, the funcname should be empty. The code also checks the Python version to ensure compatibility with Python 3.9 and higher.",
+        "type": "comment"
+    },
+    "2550": {
+        "file_id": 284,
+        "content": "        \"\"\"\n        Adds stepwise lines to the given function source code.\n        Parameters:\n            func_source_cleaned (str): The cleaned source code of the function.\n            keywords (set): A set of keywords to search for in the function source code.\n        Returns:\n            FuncSourceWithName: An object containing the changed source code and the function name.\n        \"\"\"\n        import ast_comments as ast\n        # import astunparse\n        # no comment support!\n        # unparse_func = astor.to_source\n        # unparse_func = astunparse.unparse\n        unparse_func = ast.unparse\n        # func_ast = ast.parse(func_source_cleaned, type_comments=True)\n        func_ast = ast.parse(func_source_cleaned)\n        print(func_ast)  # unexpected indent, if not cleaned.\n        print(func_ast.body)  # [<_ast.FunctionDef object at 0x1048a1a00>]\n        # for cn in ast.iter_child_nodes(func_ast):\n        #     print(cn)\n        funcdef = func_ast.body[0]\n        funcname = funcdef.name\n        print(funcdef.body)  # no comment?",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:155-181"
+    },
+    "2551": {
+        "file_id": 284,
+        "content": "This code imports the ast_comments module and defines a function to add stepwise lines to a given function's source code. It takes cleaned source code and a set of keywords as input, then uses ast.unparse from ast_comments to return an object containing the modified source code and function name. The code also includes debugging prints for testing purposes.",
+        "type": "comment"
+    },
+    "2552": {
+        "file_id": 284,
+        "content": "        # breakpoint()\n        # [<_ast.Expr object at 0x105359550>, <_ast.Expr object at 0x105368100>, <_ast.Assert object at 0x105395790>, <_ast.Expr object at 0x105395a60>]\n        print(dir(funcdef))\n        print(funcdef.decorator_list)  # [<_ast.Name object at 0x103081b50>]\n        # changed_source = ast.dump(funcdef)\n        new_body = []\n        for item in funcdef.body:\n            new_body.append(item)\n            item_code = unparse_func(item)\n            _k = None\n            for keyword in keywords:\n                if keyword in item_code:\n                    stepwise_expr = ast.parse(\"yield '{}'\".format(\"myflag\")).body[0]\n                    new_body.append(stepwise_expr)\n                    _k = keyword\n                    break\n            if _k:  # only use that keyword one time.\n                # can't you preserve comments in ast?\n                # pip3 install ast-comments\n                keywords.remove(_k)\n        funcdef.body = new_body\n        changed_source = unparse_func(funcdef)  # cannot convert comment back to source.",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:182-204"
+    },
+    "2553": {
+        "file_id": 284,
+        "content": "This code is modifying a function's body by inserting a yield expression containing the keyword 'myflag'. It removes any additional occurrences of that keyword and preserves comments in the process. The function's body is reconstructed with the new modifications before being unparsed into source form.",
+        "type": "comment"
+    },
+    "2554": {
+        "file_id": 284,
+        "content": "        print(\"CHANGED SOURCE\".center(70, \"=\"))\n        print(changed_source)\n        return FuncSourceWithName(changed_source=changed_source, funcname=funcname)\nelse:\n    def add_stepwise_lines_to_func_source(func_source_cleaned, keywords: set):\n        \"\"\"\n        Adds stepwise lines to the function source code.\n        Args:\n            func_source_cleaned (str): The cleaned source code of the function.\n            keywords (set): A set of keywords.\n        Returns:\n            FuncSourceWithName: An object containing the changed source code and function name.\n        \"\"\"\n        # implement it by calling conda.\n        # use temporary directory.\n        import tempfile\n        with tempfile.TemporaryDirectory() as tmpdir:  # str!\n            # tmpdir_name = tmpdir.name\n            data = SourceCodeExchange(\n                source_code=func_source_cleaned, keywords=keywords, processed=False\n            )\n            input_path = ExchangePaths.getInputPath(tmpdir)\n            output_path = ExchangePaths.getOutputPath(tmpdir)",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:205-232"
+    },
+    "2555": {
+        "file_id": 284,
+        "content": "This code defines a function that adds stepwise lines to a given function's source code. It takes the cleaned source code of the function and a set of keywords as arguments. If the source has been changed, it prints messages and returns an object containing the modified source and function name. Otherwise, it calls another function to implement the addition of stepwise lines using a temporary directory and file paths.",
+        "type": "comment"
+    },
+    "2556": {
+        "file_id": 284,
+        "content": "            with open(input_path, \"w+\") as f:\n                content = data.json()\n                f.write(content)\n            commandline = \"conda run -n base --no-capture-output --live-stream python {filename} -i '{input_path}'\".format(\n                filename=os.path.basename(__file__), input_path=input_path\n            )\n            print(\"EXCUTING: {}\".format(commandline))\n            os.system(commandline)\n            processed_data = SourceCodeExchange.parse_file(output_path)\n            return FuncSourceWithName(\n                changed_source=processed_data.source_code,\n                funcname=processed_data.funcname,\n            )\ndef overwrite_func(func, keywords: set):  # nameclash warning!\n    # def overwrite_func(func, c_globals, keywords: set):\n    \"\"\"\n    Overwrites a given function with a modified version that inserts \"yield\" after every line containing given keywords.\n    Args:\n        func: The function to be overwritten.\n        keywords (set): A set of keywords to be inserted after each line in the modified function.",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:233-255"
+    },
+    "2557": {
+        "file_id": 284,
+        "content": "This code snippet reads a function definition from a file, processes it, and returns a modified version of the function where \"yield\" is inserted after every line containing specific keywords. It first writes the original function to a temporary file, then executes a command in the terminal to run the Python script with the new function written to the file, and finally reads the output file to extract the processed function data. The code also handles an overwrite operation for the given function, inserting \"yield\" after specific keywords.",
+        "type": "comment"
+    },
+    "2558": {
+        "file_id": 284,
+        "content": "    Returns:\n        The modified function.\n    \"\"\"\n    # def overwrite_func(func, c_locals, c_globals, keywords: set):\n    import inspect\n    # import ast\n    import re\n    # get definition and return a new func.\n    # test: add \"yield\" after every line.\n    # func_ast = astor.code_to_ast(func)\n    # print(func_ast)\n    # deprecated?\n    c_globals = func.__globals__\n    # what is the name of the function?\n    func_source = inspect.getsource(func)\n    # return new_func\n    find_def = r\"^( +)(?:def|async)\"  # not async\n    FDRegex = re.compile(find_def, flags=re.MULTILINE)\n    strip_blanks = FDRegex.findall(func_source)[0]\n    blank_count = len(strip_blanks)\n    # print(\"BLANK COUNT:\", blank_count) # BLANK COUNT: 4\n    indent_replace = r\"^ \" + (\"{%d}\" % blank_count)\n    # print(repr(indent_replace))\n    IRRegex = re.compile(indent_replace, flags=re.MULTILINE)\n    func_source_cleaned = IRRegex.sub(\"\", func_source)\n    print(\"SOURCE CODE CLEANED\".center(70, \"=\"))\n    print(func_source_cleaned)\n    print()\n    changed_source, funcname = add_stepwise_lines_to_func_source(",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:257-290"
+    },
+    "2559": {
+        "file_id": 284,
+        "content": "This code defines a function `overwrite_func` that takes in a function, modifies its source code by inserting yield statements at the beginning of each line and returns the modified function. It uses regular expressions to find the definition of the original function and strip unnecessary blanks before replacing them with new lines containing yield. The cleaned source code is then printed for verification.",
+        "type": "comment"
+    },
+    "2560": {
+        "file_id": 284,
+        "content": "        func_source_cleaned, keywords\n    )\n    # exec(changed_source, globals=None, locals=None, /)\n    # exec(changed_source, c_globals,c_locals, /)\n    exec(changed_source, c_globals)\n    print(locals().keys())\n    new_func = eval(funcname)  # not in locals.\n    # new_func = locals()[funcname]\n    return new_func\nfrom types import MethodType\ndef add_locals_and_globals_inspectors_to_instance(c):\n    \"\"\"\n    Adds local and global inspectors to the given instance.\n    :param c: The instance to add the inspectors to.\n    \"\"\"\n    c.locals = MethodType(lambda self: locals(), c)\n    c.globals = MethodType(lambda self: globals(), c)\nif __name__ == \"__main__\":\n    # import docopt\n    # print(__doc__)\n    # arguments = docopt.docopt(__doc__, help=False, version='Stepwise Test Util 1.0')\n    import argparse\n    argparser = argparse.ArgumentParser()\n    argparser.add_argument(\"-t\", \"--test\", action=\"store_true\", default=False)\n    argparser.add_argument(\"-i\", \"--input\", type=str, default=None)\n    # print(arguments)\n    # breakpoint()",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:291-327"
+    },
+    "2561": {
+        "file_id": 284,
+        "content": "Function `add_locals_and_globals_inspectors_to_instance` adds local and global inspectors to the given instance. These inspectors allow access to the function's local and global variables, respectively. The code also includes argument parsing using `argparse` for executing tests or providing an input file.",
+        "type": "comment"
+    },
+    "2562": {
+        "file_id": 284,
+        "content": "    arguments = argparser.parse_args()\n    if arguments.test:\n        def dec(f):\n            \"\"\"\n            Decorator function that takes a function as input and returns the same function.\n            \"\"\"\n            \"\"\"\n            Decorator function that takes a function as input and returns the same function.\n            \"\"\"\n            return f\n        class MyClass:\n            val = 1\n            @staticmethod\n            def newfunc():\n                \"\"\"\n                A static method that returns the string \"a\".\n                \"\"\"\n                return \"a\"\n            def inspect_class(self):\n                \"\"\"\n                A method that inspects the current class and prints the keys of the local and global scope.\n                Parameters:\n                    self: The instance of the class.\n                Returns:\n                    None\n                \"\"\"\n                print(locals().keys())\n                print(globals().keys())\n            @dec\n            def myfunc(self):\n                \"\"\"",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:328-366"
+    },
+    "2563": {
+        "file_id": 284,
+        "content": "This code defines a decorator function and a class with methods. The decorator takes a function as input and returns the same function. The class has a static method that returns \"a\" and an instance method that prints the keys of local and global scopes.",
+        "type": "comment"
+    },
+    "2564": {
+        "file_id": 284,
+        "content": "                Decorated function that prints \"abc\", \"def\", and \"in range\" 20 times.\n                Raises an AssertionError with the message \"you cannot pass\".\n                Returns the string \"abc\".\n                \"\"\"\n                print(\"abc\")\n                print(\"def\")\n                # mycomment\n                # mycomment_has_keyword\n                for _ in range(20):\n                    print(\"in range\")\n                assert False, \"you cannot pass\"\n                print(\"hjk\")\n                # every comment shall be ignored.\n                # yield \"myflag\"  # you may yield flag.\n                return \"abc\"\n        c = MyClass()\n        # add_locals_and_globals_inspectors_to_instance(c)\n        # c_locals = c.locals()\n        # c_globals = c.globals()\n        # c_globals = c.myfunc.__globals__\n        # # c_globals = MyClass.__globals__\n        # # c_globals = c.__globals__\n        # # print(c_locals.keys())\n        # print(c_globals.keys())\n        keywords = {\"def\", \"has_keyword\"}\n        new_func = overwrite_func(c.myfunc, keywords)",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:367-396"
+    },
+    "2565": {
+        "file_id": 284,
+        "content": "This code defines a decorator function that replaces the original 'myfunc' method of class MyClass with a new version. The new version prints \"abc\", \"def\", and \"in range\" 20 times, then raises an AssertionError with the message \"you cannot pass\". Finally, it returns the string \"abc\". The code also attempts to print the keys in the global dictionary of MyClass.",
+        "type": "comment"
+    },
+    "2566": {
+        "file_id": 284,
+        "content": "        # new_func = overwrite_func(c.myfunc, c_globals, keywords)\n        # new_func = overwrite_func(c.myfunc, c_locals, c_globals, keywords)\n        c.myfunc = MethodType(new_func, c)\n        exec_result = c.myfunc()\n        print(type(exec_result))\n        # c.inspect_class()\n        # for flag in exec_result:\n        #     print(\"RECEVICED FLAG:\", flag)\n        # AssertionError: you cannot pass\n        def myiterator():\n            \"\"\"\n            A generator function that yields the value 2 and then returns 1.\n            \"\"\"\n            yield 2\n            return 1  # stopped iteration.\n            # if you want to \"return\", just don't insert any \"yield\" statements.\n        a = myiterator()  # generator.\n        print(a)\n        print()\n        for it in a:\n            print(it)\n    elif input_path := arguments.input:\n        print(\"INPUT FILE PATH:\", input_path)\n        data = SourceCodeExchange.parse_file(input_path)\n        output = add_stepwise_lines_to_func_source(\n            func_source_cleaned=data.source_code, keywords=data.keywords",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:397-426"
+    },
+    "2567": {
+        "file_id": 284,
+        "content": "This code defines a function that overwrites an existing function with new code and then executes the modified function. It also demonstrates generator functionality by creating an iterator that yields 2, returns 1, and prints the type of execution result. Additionally, it can parse input files and add stepwise lines to functions.",
+        "type": "comment"
+    },
+    "2568": {
+        "file_id": 284,
+        "content": "        )\n        with open(\n            output_path := ExchangePaths.getOutputPath(os.path.dirname(input_path)),\n            \"w+\",\n        ) as f:\n            print(\"WRITE TO:\", output_path)\n            output_data = SourceCodeExchange(\n                source_code=output.changed_source,\n                processed=True,\n                funcname=output.funcname,\n            )\n            content = output_data.json()\n            f.write(content)\n    else:\n        argparser.print_help()",
+        "type": "code",
+        "location": "/microgrid_base/test/runtime_override_stepwise.py:427-441"
+    },
+    "2569": {
+        "file_id": 284,
+        "content": "The code reads input from a file and checks if it needs to be overridden. If so, it writes the output data to a specified path in JSON format. If no override is needed, it prints help information.",
+        "type": "comment"
+    },
+    "2570": {
+        "file_id": 285,
+        "content": "/microgrid_base/test/test_common_fixtures.py",
+        "type": "filepath"
+    },
+    "2571": {
+        "file_id": 285,
+        "content": "This code defines a Python function that acts as a fixture, which is used in pytest framework for testing purposes. The fixture returns the string \"FIXTURE VAL\". It also demonstrates how to import fixtures from other places using \"autouse\" method.",
+        "type": "summary"
+    },
+    "2572": {
+        "file_id": 285,
+        "content": "# how to import fixtures from other places? \"autouse\"?\nimport pytest\n@pytest.fixture\ndef my_fixture():\n    \"\"\"\n    A fixture function that returns a string value.\n    Returns:\n        str: The string value \"FIXTURE VAL\".\n    \"\"\"\n    return \"FIXTURE VAL\"",
+        "type": "code",
+        "location": "/microgrid_base/test/test_common_fixtures.py:1-12"
+    },
+    "2573": {
+        "file_id": 285,
+        "content": "This code defines a Python function that acts as a fixture, which is used in pytest framework for testing purposes. The fixture returns the string \"FIXTURE VAL\". It also demonstrates how to import fixtures from other places using \"autouse\" method.",
+        "type": "comment"
+    },
+    "2574": {
+        "file_id": 286,
+        "content": "/microgrid_base/test/test_dict_fallback.py",
+        "type": "filepath"
+    },
+    "2575": {
+        "file_id": 286,
+        "content": "This code imports the defaultdict class from collections, creates an instance of it with a default value \"default\", and then prints the value associated with the key 'abc' and the entire dictionary.",
+        "type": "summary"
+    },
+    "2576": {
+        "file_id": 286,
+        "content": "# class DefaultDict\nfrom collections import defaultdict\nmDefaultDict = defaultdict(lambda: \"default\", a=1)\nprint(mDefaultDict[\"abc\"])\nprint(mDefaultDict)",
+        "type": "code",
+        "location": "/microgrid_base/test/test_dict_fallback.py:1-7"
+    },
+    "2577": {
+        "file_id": 286,
+        "content": "This code imports the defaultdict class from collections, creates an instance of it with a default value \"default\", and then prints the value associated with the key 'abc' and the entire dictionary.",
+        "type": "comment"
+    },
+    "2578": {
+        "file_id": 287,
+        "content": "/microgrid_base/test/test_export.py.j2",
+        "type": "filepath"
+    },
+    "2579": {
+        "file_id": 287,
+        "content": "The code iterates over a list of device names, creates a test function for each device, sets the fuel value to 1 for certain devices (like gas and diesel generators), registers constraints for the device, and exports simulation results and curve data using globally accessible variables.",
+        "type": "summary"
+    },
+    "2580": {
+        "file_id": 287,
+        "content": "from common_fixtures import *\nfrom export_format_validate import *\n{% for devInfoName in devNames %}\n    {% set devName = devInfoName.strip(\"信息\")%}\n    {% set testModel = \"测试{}模型\".format(devName) %}\ndef test_{{devName}}_export({{testModel}}):\n    timeParam = 10\n    {% if devName in [\"燃气发电机\", \"柴油发电\"] %}\n    {{testModel}}.燃料热值 = 1\n    {% endif %}\n    {{testModel}}.constraints_register()\n    for attrName in ['{{devName}}仿真结果', '{{devName}}出力曲线']:\n        if obj:=globals().get(attrName, None):\n            obj.export({{testModel}}, timeParam)\n{% endfor %}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_export.py.j2:1-17"
+    },
+    "2581": {
+        "file_id": 287,
+        "content": "The code iterates over a list of device names, creates a test function for each device, sets the fuel value to 1 for certain devices (like gas and diesel generators), registers constraints for the device, and exports simulation results and curve data using globally accessible variables.",
+        "type": "comment"
+    },
+    "2582": {
+        "file_id": 288,
+        "content": "/microgrid_base/test/test_failsafe.py",
+        "type": "filepath"
+    },
+    "2583": {
+        "file_id": 288,
+        "content": "This code tests failsafe methods in microgrid_base, creating a directory for logs, defining functions for infeasible power values, loading data from a JSON file, and saving an infeasible model. The test function runs for each failsafe method and parameter combination, storing results in a report.",
+        "type": "summary"
+    },
+    "2584": {
+        "file_id": 288,
+        "content": "# test if failsafe mechanism is working.\nimport os\nos.environ[\"FAILSAFE\"] = \"True\"\nfrom common_fixtures import *\n# import pytest\nif not os.path.exists(failsafe_logdir := \"failsafe_solver_logs\"):\n    os.mkdir(failsafe_logdir)\nfailsafe_logdir = os.path.abspath(failsafe_logdir)\nimport json\n# import pickle\nimport copy\ndef get_infeasible_mw():\n    input_params = copy.deepcopy(infeasible_input)\n    efg = EnergyFlowGraph.parse_obj(input_params)\n    mDictList = efg.dict()[\"mDictList\"]\n    calcParamList = mDictListToCalcParamList(mDictList)\n    firstParam_graphparam = calcParamList[0][2]\n    典型日 = firstParam_graphparam[\"典型日\"]\n    计算步长 = firstParam_graphparam[\"计算步长\"]\n    计算类型 = firstParam_graphparam[\"计算类型\"]\n    calcTarget = 计算目标 = firstParam_graphparam[\"计算目标\"]\n    mw = ModelWrapper()\n    ret = getCalcStruct(mw, calcParamList, 典型日, 计算步长, 计算类型)\n    obj_expr = ret.calcTargetLUT[calcTarget]\n    sense = minimize\n    OBJ = mw.Objective(expr=obj_expr, sense=sense)\n    return mw\ninfeasible_model_input_path = \"sample_data/input_abnormal.json\"",
+        "type": "code",
+        "location": "/microgrid_base/test/test_failsafe.py:1-41"
+    },
+    "2585": {
+        "file_id": 288,
+        "content": "This code tests the failsafe mechanism by setting a True value in the FAILSAFE environment variable. It creates a directory for failsafe solver logs, if it doesn't already exist, and defines functions to get infeasible power values and load data from a JSON file.",
+        "type": "comment"
+    },
+    "2586": {
+        "file_id": 288,
+        "content": "# infeasible_pickle = \"sample_data/infeasible_abnormal.pickle\"\n# if os.path.exists(infeasible_pickle):\n#     with open(infeasible_pickle, 'rb') as f:\n#         infeasible_model= pickle.load(f)\n# else:\nwith open(infeasible_model_input_path, \"r\") as f:\n    infeasible_input = json.load(f)\ninfeasible_mw = get_infeasible_mw()\ninfeasible_mw.model.write(\"infeasible_model.lp\")\n# infeasible_model = infeasible_mw.model\n# with open(infeasible_pickle, 'wb') as f:\n#     pickle.dump(infeasible_model, f)\n# @pytest.fixture\n# def infeasible_modelwrapper():\n#     return infeasible_mw\n#     # mw = ModelWrapper()\n#     # mw.model = infeasible_model\n#     # # mw.model = infeasible_mw.model.clone() # taking eternal.\n#     # return mw\n# sometimes these will stuck\n# but i think ipopt may always stuck.\nparams = [\n    # [feasopt_with_optimization, \"feasopt_with_optimization\"],\n    # [feasopt_only, \"feasopt_only\"],\n    [scip_minuc, \"scip_minuc\"],\n    # [ipopt_no_presolve, \"ipopt_no_presolve\"],\n    [random_value_assignment, \"random_value_assignment\"],",
+        "type": "code",
+        "location": "/microgrid_base/test/test_failsafe.py:42-72"
+    },
+    "2587": {
+        "file_id": 288,
+        "content": "This code is loading or creating an infeasible model and then saving it as \"infeasible_model.lp\". The code also defines multiple parameters for different solvers, some of which may get stuck during execution.",
+        "type": "comment"
+    },
+    "2588": {
+        "file_id": 288,
+        "content": "]\n# @pytest.mark.parametrize(\"failsafe_method, method_name\",params)\n# def test_failsafe_method(infeasible_modelwrapper,failsafe_method, method_name):\n#     _test_failsafe_method(infeasible_modelwrapper, failsafe_method, method_name)\ndef _test_failsafe_method(infeasible_modelwrapper, failsafe_method, method_name):\n    solved, logfile = failsafe_method(infeasible_modelwrapper, failsafe_logdir)\n    # breakpoint()\n    if not solved:\n        print(f\"failsafe method <{method_name}> has failed.\")\n    else:\n        print(f\"failsafe method <{method_name}> has succeeded.\")\n    return solved, logfile\nif __name__ == \"__main__\":\n    report = []\n    for failsafe_method, method_name in params:\n        print(\"running:\", method_name)\n        r, l = _test_failsafe_method(infeasible_mw, failsafe_method, method_name)\n        report.append((method_name, r, os.path.exists(l)))\n    for n, r, l_exists in report:\n        print(f\"{n}:\\t{r}\\t(logfile exists? {l_exists})\")",
+        "type": "code",
+        "location": "/microgrid_base/test/test_failsafe.py:73-97"
+    },
+    "2589": {
+        "file_id": 288,
+        "content": "This code defines a test function for failsafe methods in microgrid_base, which checks if the failsafe method can solve an infeasible model. It prints whether the failsafe method has succeeded or failed and returns the solution status and logfile existence. The code runs these tests for each failsafe method and parameter combination in 'params' list, storing results in a report for later display.",
+        "type": "comment"
+    },
+    "2590": {
+        "file_id": 289,
+        "content": "/microgrid_base/test/test_getter_setter_dynamic_property.py",
+        "type": "filepath"
+    },
+    "2591": {
+        "file_id": 289,
+        "content": "Class TestClass uses slots to optimize memory usage, and includes a getter/setter for 'prop'. An attempt is made to set an unrelated property 'p', which works but may lead to unexpected behavior.",
+        "type": "summary"
+    },
+    "2592": {
+        "file_id": 289,
+        "content": "from functools import partial\nclass TestClass:\n    __slots__ = ['prop']\n    def __init__(self):...\n    # there's no \"getter/setter\" factory method.\ntc = TestClass()\nprint(tc.prop) # unbound.\ntc.prop = 1\nprint(tc.prop)\ntc.p = 1 # great.",
+        "type": "code",
+        "location": "/microgrid_base/test/test_getter_setter_dynamic_property.py:1-11"
+    },
+    "2593": {
+        "file_id": 289,
+        "content": "Class TestClass uses slots to optimize memory usage, and includes a getter/setter for 'prop'. An attempt is made to set an unrelated property 'p', which works but may lead to unexpected behavior.",
+        "type": "comment"
+    },
+    "2594": {
+        "file_id": 290,
+        "content": "/microgrid_base/test/test_model.py.j2",
+        "type": "filepath"
+    },
+    "2595": {
+        "file_id": 290,
+        "content": "This code tests, optimizes and solves microgrid, solar, and wind power models, handles issues, verifies outputs, checks converter efficiency, and performs battery model testing with scenario application, constraints solving, and cost calculations.",
+        "type": "summary"
+    },
+    "2596": {
+        "file_id": 290,
+        "content": "from common_fixtures import *\nfrom typing import cast\ntry:\n    from typing import Protocol\nexcept:\n    from typing_extensions import Protocol\nfrom pyomo.environ import *\n# may you hook arith methods to check expression (poly degree) on the way.\n# render constraints as latex. use sigma notation.\n{# to define some \"adaptive\" decorators (like `pytest.fixture`) you may want `functools.partial` and recursion. #}\nEPS = 0.02\nSMALL_EPS = EPS*0.075\ndef check_solver_result(s_results):\n    assert s_results, \"no solver result.\"\n    TC = s_results.solver.termination_condition\n    SS = s_results.solver.status\n    normalSSs = [SolverStatus.ok, SolverStatus.warning]\n    normalTCs = [\n        TerminationCondition.globallyOptimal,\n        TerminationCondition.locallyOptimal,\n        TerminationCondition.feasible,\n        TerminationCondition.optimal,\n        # TerminationCondition.maxTimeLimit,\n    ]\n    error_msg = []\n    if TC not in normalTCs:\n        error_msg.append(f\"abnormal termination condition: {TC}\")\n    if SS not in normalSSs:",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:1-32"
+    },
+    "2597": {
+        "file_id": 290,
+        "content": "Import common functions, Protocol from typing if available or typing_extensions, and Pyomo environment. Define constants EPS and SMALL_EPS. Function check_solver_result takes solver results as input, checks for solver status and termination condition, and raises error if they are abnormal.",
+        "type": "comment"
+    },
+    "2598": {
+        "file_id": 290,
+        "content": "        error_msg.append(f\"abnormal solver status: {TC}\")\n    if error_msg:\n        raise Exception(\"\\n\".join(error_msg))\ndef test_convertMonthToDays():\n    assert convertMonthToDays(1) == sum(month_days[:1])\n    assert convertMonthToDays(2) == sum(month_days[:2])\n    assert convertMonthToDays(11) == sum(month_days[:11])\n{# def test_unitFactorCalculator():\n    ... #}\nimport pytest\n{# store shared objects. mainly \"testDeviceFixture\"#}\n{% set SO = namespace(TDF = \"\") %}\n{% set CTDF = \"测试设备模型\" %}\n{% set paramStringList = [] %}\n{% macro parametrize(mParamString) %}\n    {% do paramStringList.append(mParamString) %}\n@pytest.mark.parametrize({{repr(mParamString)}},{{caller()}})\n{% endmacro%}\n{% macro parametrizeTestHelper(testName,_params, autoRegister=true, autoSense=true) %}\n{# shall you ensure no parameter is undefined.#}\n    {% set isDevice = false%}\n    {% if _params == \"Device\"%}\n        {% set isDevice = true%}\n        {% set _params = \"model_wrapper: ModelWrapper, 测试{testName}模型: {testName}模型\".format(testName=testName) %}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:33-60"
+    },
+    "2599": {
+        "file_id": 290,
+        "content": "This code is for a testing framework, likely for a microgrid model. It defines test functions using pytest and uses parameterization to run tests with different inputs. The code also includes helper macros for defining and organizing the tests, as well as importing necessary modules.",
+        "type": "comment"
+    }
+}

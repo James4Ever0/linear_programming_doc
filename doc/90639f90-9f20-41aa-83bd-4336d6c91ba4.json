@@ -1,0 +1,10 @@
+{
+    "summary": "The code attempts to use the lp-analyzer tool on a .mps file, trying different approaches and expressing frustration due to potential compatibility issues or unexpected results.",
+    "details": [
+        {
+            "comment": "The code attempts to use the lp-analyzer tool on a .mps file, trying different approaches and expressing frustration due to potential compatibility issues or unexpected results.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/mps_analyze.cmd\":0-5",
+            "content": "@REM failed to parse.\n@REM lp-analyzer converted.mps -o converted_analyzed.txt\n@REM maybe it only accepts gurobi converted mps files?\n@REM lp-analyzer exported.mps -o exported_analyzed.txt\n@REM this is trash.\n@REM lp-analyzer exported_remove_comment.mps -o exported_analyzed.txt"
+        }
+    ]
+}

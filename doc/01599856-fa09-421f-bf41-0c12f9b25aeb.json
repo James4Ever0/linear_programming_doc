@@ -1,0 +1,10 @@
+{
+    "summary": "Installs Docker on Ubuntu by downloading the installation script and executing it using sudo. The \"--dry-run\" option can be used for a simulation without actual installation.",
+    "details": [
+        {
+            "comment": "Installs Docker on Ubuntu by downloading the installation script and executing it using sudo. The \"--dry-run\" option can be used for a simulation without actual installation.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/install_docker.sh\":0-3",
+            "content": "# for ubuntu: https://docs.docker.com/engine/install/ubuntu/\ncurl -fsSL https://get.docker.com -o get-docker.sh\nsudo sh ./get-docker.sh\n# sudo sh ./get-docker.sh --dry-run"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines dynamic facts for key-value pairs in a dictionary, provides predicates to add, remove, and look up values by key, uses the library(dicts) module, and demonstrates usage with example points A and B. The code also showcases the dicts_same_tag function to find common tag values between dictionaries.",
+    "details": [
+        {
+            "comment": "This code defines dynamic facts for key-value pairs in a dictionary, provides predicates to add, remove, and look up values by key, uses the library(dicts) module, and demonstrates usage with example points A and B. The code also showcases the dicts_same_tag function to find common tag values between dictionaries.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog_advanced.pro\":0-18",
+            "content": "% % use our dictionary.\n% % Define a dynamic fact to represent a key-value pair\n% :- dynamic pair/2.\n% % Define a predicate to add a key-value pair to the dictionary\n% add_pair(Key, Value) :-\n%    \\+ pair(Key, _), % Check if the key already exists\n%    assert(pair(Key, Value)).\n% % Define a predicate to remove a key-value pair from the dictionary\n% remove_pair(Key) :-\n%    retract(pair(Key, _)).\n% % Define a predicate to look up a value by key\n% get_value(Key, Value) :-\n%    pair(Key, Value).\n:- use_module(library(dicts)).\n:- A = point{a:1}, B = point{b:1}, print(A), print(B), dicts_same_tag([A, B], Tag), print(Tag), dicts_same_tag([A], Tag), print(Tag)."
+        }
+    ]
+}

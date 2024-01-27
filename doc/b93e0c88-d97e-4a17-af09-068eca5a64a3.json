@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports functions `task_fail` and `task_success` from the `task_queue` module, initializes an empty list `rlist`, and checks if there are any callbacks. It then assigns results of calling `task_fail()` and `task_success()` to variable `r`.",
+    "details": [
+        {
+            "comment": "Code imports functions `task_fail` and `task_success` from the `task_queue` module, initializes an empty list `rlist`, and checks if there are any callbacks. It then assigns results of calling `task_fail()` and `task_success()` to variable `r`.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_test.py\":0-6",
+            "content": "# rq huey taskiq tasktiger\nfrom task_queue import task_fail, task_success\nrlist = []\n# is there any callback?\nr = task_fail()\nr = task_success()"
+        }
+    ]
+}

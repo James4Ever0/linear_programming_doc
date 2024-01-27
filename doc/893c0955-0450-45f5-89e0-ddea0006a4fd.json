@@ -1,0 +1,10 @@
+{
+    "summary": "Code is using PrologMQI and PrologThread from swiplserver to query a Prolog program \"arithmatic_prolog.pro\". It queries the once(solve(X)) and once(solve_false(X)) predicates and prints the results, indicating whether the problem is solvable or not.",
+    "details": [
+        {
+            "comment": "Code is using PrologMQI and PrologThread from swiplserver to query a Prolog program \"arithmatic_prolog.pro\". It queries the once(solve(X)) and once(solve_false(X)) predicates and prints the results, indicating whether the problem is solvable or not.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_arithmatic_prolog.py\":0-15",
+            "content": "from swiplserver import PrologMQI, PrologThread\nprolog_file_path = \"arithmatic_prolog.pro\"\nimport rich\nwith PrologMQI() as mqi:\n    with mqi.create_thread() as prolog_thread:\n        prolog_thread.query(f'[\"{prolog_file_path}\"].')\n        # result = prolog_thread.query(f\"solve(X).\")\n        # check solveable?\n        result = prolog_thread.query(f\"once(solve(X)).\") # to quit early.\n        # result = prolog_thread.query(f\"solve(X).\")\n        # result_false = prolog_thread.query(f\"solve_false(X).\")\n        result_false = prolog_thread.query(f\"once(solve_false(X)).\") # still False.\n        rich.print(result)\n        rich.print(result_false) # nothing returned."
+        }
+    ]
+}

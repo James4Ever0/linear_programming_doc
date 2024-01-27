@@ -1,0 +1,15 @@
+{
+    "summary": "This code uses the finite difference method to simulate a pendulum system, storing and plotting \u03b8 and \u03c9 over time, with Matplotlib's `plt.show()` for display.",
+    "details": [
+        {
+            "comment": "Code implements a pendulum system using the finite difference method. It calculates and stores \u03b8 and \u03c9 for each time step, then plots them over time.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pendulum_finite_differentiate.py\":0-31",
+            "content": "import numpy as np\nimport matplotlib.pyplot as plt\nl = 1.0                             # length [m]\nm = 1.0                             # mass [kg]\ng = 9.81                            # gravitational acceleration [m/s\u00b2]\n\u03b80 = 0.01                          # initial angular deflection [rad]\n\u03c90 = 0.0                            # initial angular velocity [rad/s]\nt_span = (0.0, 10.0)                # time interval\ndt = 0.01                           # time step\nM = lambda t: 0.1*np.sin(t)         # external torque [Nm], function\n# initialize arrays to store results\nn = int((t_span[1] - t_span[0])/dt) + 1\n\u03b8 = np.zeros(n)\n\u03c9 = np.zeros(n)\nt = np.linspace(t_span[0], t_span[1], n)\n# set initial values\n\u03b8[0] = \u03b80\n\u03c9[0] = \u03c90\n# iterate over time steps and update values using finite difference method\nfor i in range(1, n):\n    \u03b8[i] = \u03b8[i-1] + dt*\u03c9[i-1]\n    \u03c9[i] = \u03c9[i-1] - 3*g/(2*l)*np.sin(\u03b8[i-1])*dt + 3/(m*l**2)*M(t[i-1])*dt\n# plot results\nplt.plot(t, \u03b8, label='\u03b8 [rad]')\nplt.plot(t, \u03c9, label='\u03c9 [rad/s]')\nplt.xlabel('t')\nplt.legend()"
+        },
+        {
+            "comment": "This code displays the current figure using Matplotlib's `plt.show()` function.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pendulum_finite_differentiate.py\":32-32",
+            "content": "plt.show()"
+        }
+    ]
+}

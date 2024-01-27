@@ -1,0 +1,10 @@
+{
+    "summary": "This code suggests displaying examples of converting LaTeX formulas to Python code from previous work, and then using an API to convert new ones. It also provides a link for text fragment highlighting.",
+    "details": [
+        {
+            "comment": "This code suggests displaying examples of converting LaTeX formulas to Python code from previous work, and then using an API to convert new ones. It also provides a link for text fragment highlighting.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/README.md\":0-6",
+            "content": "show some examples (from our previous work) on how to convert latex formulas to python code, then invoke api to convert new ones.\n[to highlight code](https://developer.mozilla.org/en-US/docs/Web/Text_fragments)\n```\nhttps://example.com#:~:text=[prefix-,]textStart[,textEnd][,-suffix]\n```"
+        }
+    ]
+}

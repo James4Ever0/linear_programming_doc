@@ -1,0 +1,10 @@
+{
+    "summary": "Main entry point for script. It parses and prints the solution from given XML files.",
+    "details": [
+        {
+            "comment": "Main entry point for script. It parses and prints the solution from given XML files.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/parse_scip_solution.py\":1-10",
+            "content": "if __name__ == \"__main__\":\n    for fname in [\"sol.xml\", \"relaxed_scip.sol\"]:\n        print(\"parsing:\", fname)\n        with open(fname,'r') as f:\n            content = f.read()\n            solved, solution = parse_scip_solution_content(content)\n            print(\"solved?\", solved)\n            if solved:\n                print('solution:', str(solution)[:100]+\"...\")\n            print(\"=\"*70)"
+        }
+    ]
+}

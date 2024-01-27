@@ -1,0 +1,10 @@
+{
+    "summary": "This code demonstrates how the type checker can be used to ensure function arguments are of expected types. It defines a function `int_or_str` that takes an argument of type `int | str` and uses a match statement to handle each case separately. The type checker throws an error when attempting to pass an unsupported type, and the function never_call_me is used to verify that all possible types are covered.",
+    "details": [
+        {
+            "comment": "This code demonstrates how the type checker can be used to ensure function arguments are of expected types. It defines a function `int_or_str` that takes an argument of type `int | str` and uses a match statement to handle each case separately. The type checker throws an error when attempting to pass an unsupported type, and the function never_call_me is used to verify that all possible types are covered.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/typecheck.py\":0-18",
+            "content": "# from typing import NoReturn\nfrom typing_extensions import Never\ndef never_call_me(arg: Never):\n    pass\n# do mypy check.\n# mypy --python-version <version> does not work for version higher than interpreter's.\ndef int_or_str(arg: int | str) -> None:\n    never_call_me(arg)  # type checker error\n    match arg:\n        case int():\n            print(\"It's an int\")\n        case str():\n            print(\"It's a str\")\n        case _:\n            never_call_me(arg)  # OK, arg is of type Never"
+        }
+    ]
+}

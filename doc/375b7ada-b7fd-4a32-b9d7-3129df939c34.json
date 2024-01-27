@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the logger_print function from log_utils module and initializes an empty string variable named redis_password.",
+    "details": [
+        {
+            "comment": "This code imports the logger_print function from log_utils module and initializes an empty string variable named redis_password.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/passwords_template.py\":0-2",
+            "content": "from log_utils import logger_print\nredis_password = \"\""
+        }
+    ]
+}

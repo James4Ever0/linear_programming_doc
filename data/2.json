@@ -1,0 +1,541 @@
+{
+    "200": {
+        "file_id": 26,
+        "content": "  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-origin' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36' \\\n  -H 'x-requested-with: XMLHttpRequest' >> {{output_path}}",
+        "type": "code",
+        "location": "/curl_simu_component_get.sh.j2:8-14"
+    },
+    "201": {
+        "file_id": 26,
+        "content": "This code sets HTTP headers for a curl command, including user-agent and x-requested-with headers, and redirects output to the specified output_path.",
+        "type": "comment"
+    },
+    "202": {
+        "file_id": 27,
+        "content": "/data_visualize_utils.py",
+        "type": "filepath"
+    },
+    "203": {
+        "file_id": 27,
+        "content": "The code is a data visualization utility module using matplotlib, requiring IntegratedEnergySystem class and prints model's decision variables, focusing on binary ones.",
+        "type": "summary"
+    },
+    "204": {
+        "file_id": 27,
+        "content": "\"\"\"\n数据显示模块\n\"\"\"\nfrom typing import Iterable, List\nimport matplotlib.pyplot as plt\nfrom integratedEnergySystemPrototypes import IntegratedEnergySystem, Model\nimport os\ndef plotSingle(\n    data: Iterable, title_content: str, save_directory: str = \"fig\"\n):  # 定义画图的规范 自动保存图片\n    \"\"\"\n    Plot a single graph with `data` as data and `title_content` as title\n    Args:\n        data (Iterable): a list of values to be plotted on the x axis\n        title_content (str): title to plot on the graph\n        save_directory (str): directory to save the images\n    \"\"\"\n    fig = plt.figure()\n    try:\n        if not os.path.exists(save_directory):\n            os.mkdir(save_directory)\n        plt.plot(data)\n        plt.xlabel(\"Time/h\")\n        plt.ylabel(\"Power/kW\")\n        plt.title(title_content)\n        plt.savefig(f\"{save_directory}/{title_content}.png\")\n    except:\n        print(\"ERROR WHILE SAVING PICTURE:\",title_content)\n    finally:\n        plt.close(fig=fig)\ndef printIntegratedEnergySystemDeviceCounts(\n    integratedEnergySystem_device: List[IntegratedEnergySystem], min_value: float = 1e-2",
+        "type": "code",
+        "location": "/data_visualize_utils.py:1-38"
+    },
+    "205": {
+        "file_id": 27,
+        "content": "The code is a data visualization utility module, containing functions to plot graphs and print integrated energy system device counts. It utilizes the matplotlib library for plotting and requires an IntegratedEnergySystem class from the integratedEnergySystemPrototypes package. The plotSingle function takes an iterable of values, a title, and an optional save directory, creating a figure with the data, setting labels, and saving it if the directory is specified. The printIntegratedEnergySystemDeviceCounts function prints the device counts for a list of IntegratedEnergySystem objects, considering only those devices with a power value above the minimum threshold provided.",
+        "type": "comment"
+    },
+    "206": {
+        "file_id": 27,
+        "content": "):\n    \"\"\"\n    Print all device counts in all kinds of `IntegratedEnergySystem` device sets.\n    Args:\n        integratedEnergySystem_device (List[IntegratedEnergySystem]): a list of `IntegratedEnergySystem` instances\n    \"\"\"\n    print(\"_________DEVICE_COUNT__________\")\n    for index, item in enumerate(integratedEnergySystem_device):\n        subitems = dir(item)\n        print(f\"device index: {index}\")\n        print(f\"device class: {type(item).__name__}\")\n        print()\n        print(\"device inputs:\", \" \".join(list(item.power_of_inputs.keys())))\n        print(\"device outputs:\", \" \".join(list(item.power_of_outputs.keys())))\n        print()\n        for subitem in subitems:\n            if \"device_count\" in subitem and not any(\n                [\n                    prohibited_keyword in subitem\n                    for prohibited_keyword in [\"device_count_max\", \"device_count_min\"]\n                ]\n            ):  # 打印每个类型机组里面的设备数量\n                val = item.__dict__[subitem]\n                try:\n                    value = float(val)",
+        "type": "code",
+        "location": "/data_visualize_utils.py:39-64"
+    },
+    "207": {
+        "file_id": 27,
+        "content": "This code prints the device counts of all IntegratedEnergySystem instances, including index, class, input and output types, and device count values. It filters out any device_count_max or device_count_min values to avoid redundancy.",
+        "type": "comment"
+    },
+    "208": {
+        "file_id": 27,
+        "content": "                    if value > min_value:\n                        print(\"value name:\", subitem)\n                        print(\"value:\", value)\n                    else:\n                        continue\n                    # breakpoint()\n                except:\n                    continue\n        print(\"_____\")\n    print(\"_________DEVICE_COUNT__________\")\ndef printDecisionVariablesFromSolution(model1: Model):\n    \"\"\"\n    Print all decision variables, including integer, float and binary variables.\n    Args:\n        model1 (Model): Model to print decision variables\n    \"\"\"\n    print()  # 打印整数可决策变量\n    print(\"___INTEGER DECISION VARIABLES___\")\n    for variable in model1.iter_integer_vars():\n        print(\"INT\", variable, \"=\", variable.solution_value)\n    print(\"___INTEGER DECISION VARIABLES___\")\n    print()\n    print()  # 打印实数可决策变量\n    print(\"___CONTINUOUS DECISION VARIABLES___\")\n    for variable in model1.iter_continuous_vars():\n        print(\"CONT\", variable, \"=\", variable.solution_value)\n    print(\"___CONTINUOUS DECISION VARIABLES___\")",
+        "type": "code",
+        "location": "/data_visualize_utils.py:65-96"
+    },
+    "209": {
+        "file_id": 27,
+        "content": "This code prints all decision variables from a model. It first iterates over and prints the integer decision variables, then continues to print the continuous (real-valued) decision variables. The output is organized with clear headings for each type of variable.",
+        "type": "comment"
+    },
+    "210": {
+        "file_id": 27,
+        "content": "    print()\n    print()  # 打印二进制可决策变量\n    print(\"___BINARY DECISION VARIABLES___\")\n    for variable in model1.iter_binary_vars():\n        print(\"BIN\", variable, \"=\", variable.solution_value)\n    print(\"___BINARY DECISION VARIABLES___\")\n    print()",
+        "type": "code",
+        "location": "/data_visualize_utils.py:97-104"
+    },
+    "211": {
+        "file_id": 27,
+        "content": "Prints binary decision variables of the model1 in a readable format.",
+        "type": "comment"
+    },
+    "212": {
+        "file_id": 28,
+        "content": "/demo_utils.py",
+        "type": "filepath"
+    },
+    "213": {
+        "file_id": 28,
+        "content": "This code sets up energy systems, registers constraints, initializes devices, and provides debugging options using NumPy for hourly load data retrieval.",
+        "type": "summary"
+    },
+    "214": {
+        "file_id": 28,
+        "content": "\"\"\"\n样例模块\n\"\"\"\nimport numpy as np\nimport os\nimport math\nclass LoadGet(object):\n    \"\"\"\n    获取逐小时冷、热、电、蒸汽负荷数据\n    \"\"\"\n    def get_cool_load(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        获取逐小时冷负荷数据\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数冷负荷数组 数组形状是`(num_hour,)` 元素全为`10000`\n        \"\"\"\n        cool_load = np.ones(num_hour, dtype=float) * 10000\n        return cool_load\n    def get_heat_load(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        获取逐小时热负荷数据\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数热负荷数组 数组形状是`(num_hour,)` 元素全为`10000`\n        \"\"\"\n        heat_load = np.ones(num_hour, dtype=float) * 10000\n        return heat_load\n    def get_power_load(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        获取逐小时电负荷数据\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数电负荷数组 数组形状是`(num_hour,)` 元素全为`10000`\n        \"\"\"\n        power_load = np.ones(num_hour, dtype=float) * 10000\n        return power_load\n    def get_steam_load(self, num_hour: int) -> np.ndarray:",
+        "type": "code",
+        "location": "/demo_utils.py:1-54"
+    },
+    "215": {
+        "file_id": 28,
+        "content": "The code defines a class named \"LoadGet\" with methods to obtain hourly load data for cooling, heating, power, and steam. The methods take the number of hours in a day as an argument and return constant arrays representing the loads. The values in these arrays are all set to 10000.",
+        "type": "comment"
+    },
+    "216": {
+        "file_id": 28,
+        "content": "        \"\"\"\n        获取逐小时蒸汽负荷数据\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数蒸汽负荷数组 数组形状是`(num_hour,)` 元素全为`10000`\n        \"\"\"\n        steam_load = np.ones(num_hour, dtype=float) * 10000\n        return steam_load\nclass ResourceGet(object):\n    \"\"\"\n    获取光照资源、电价、燃气价格、蒸汽价格\n    \"\"\"\n    # 光照资源,超过一年的,将一年数据进行重复\n    # light intensity ranging from 0 to 1? not even reaching 0.3\n    def get_radiation(self, path: str, num_hour: int) -> np.ndarray:\n        \"\"\"\n        从numpy二维数列文件加载每小时光照资源,如果需要超过一年光照资源数据,将第一年数据进行重复堆叠\n        Args:\n            path (str): 用于给出完整的文件路径\n            num_hour (int): 一天小时数\n        Return:\n            intensityOfIllumination (np.array): 逐小时光照强度数据,数组形状为`(num_hour,)`\n        \"\"\"\n        if os.path.exists(path):\n            raw_file = np.loadtxt(path, dtype=float)\n            radiation = raw_file[:, 0]\n            intensityOfIllumination1 = radiation\n            for loop in range(\n                1, math.ceil(num_hour / 8760)\n            ):  # if num_hour=24, then this is 1/365, we are not undergoing this process.",
+        "type": "code",
+        "location": "/demo_utils.py:55-92"
+    },
+    "217": {
+        "file_id": 28,
+        "content": "This code defines a function for getting hourly steam load data and a class for retrieving radiation, electricity prices, natural gas prices, and steam prices. The radiation function loads daily hourly light intensity data from a file and repeats the first year's data if needed.",
+        "type": "comment"
+    },
+    "218": {
+        "file_id": 28,
+        "content": "                intensityOfIllumination1 = np.concatenate(  # repeating the intensity of illumination if num_hour is longer than 8760\n                    (intensityOfIllumination1, radiation), axis=0\n                )\n            intensityOfIllumination2 = (\n                intensityOfIllumination1[0:num_hour] / 1000\n            )  # 转化为kW, divide by one thousand\n            # also strip redundant data.\n            return intensityOfIllumination2  # shape: 1d array.\n        else:\n            raise Exception(\"File not extists.\")\n    def get_electricity_price(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        一天不同小时的电价\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数电价数组 数组形状是`(num_hour,)` 元素全为`0.5`\n        \"\"\"\n        electricity_price = np.ones(num_hour, dtype=float) * 0.5\n        return electricity_price\n    def get_gas_price(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        一天不同小时的燃气价格\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数燃气价格数组 数组形状是`(num_hour,)` 元 元素全为`2.77`",
+        "type": "code",
+        "location": "/demo_utils.py:93-126"
+    },
+    "219": {
+        "file_id": 28,
+        "content": "This code snippet defines functions for retrieving electricity and gas prices based on the number of hours in a day. It includes functions to get intensity of illumination, daily electricity price, and daily gas price. The code uses NumPy for array operations and handles exceptions when files do not exist.",
+        "type": "comment"
+    },
+    "220": {
+        "file_id": 28,
+        "content": "        \"\"\"\n        gas_price = np.ones(num_hour, dtype=float) * 2.77\n        return gas_price\n    def get_municipalHotWater_price(self, num_hour: int) -> np.ndarray:\n        \"\"\"\n        一天不同小时的热水价格\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数热水价格数组 数组形状是`(num_hour,)` 元素全为`0.3`\n        \"\"\"\n        municipalHotWater_price = np.ones(num_hour, dtype=float) * 0.3\n        return municipalHotWater_price\n    def get_municipalSteam_price(self, num_h: int) -> np.ndarray:\n        \"\"\"\n        一天不同小时的蒸汽价格\n        Args:\n            num_hour (int): 一天小时数\n        Return:\n            常数蒸气价格数组 数组形状是`(num_hour,)` 元素全为`0.3`\n        \"\"\"\n        municipalSteam = np.ones(num_h, dtype=float) * 0.3\n        return municipalSteam\ndef getPowerCoolHeatSteamLoads(num_hour: int):\n    \"\"\"\n    获取电力、供冷、供热、蒸汽负荷数据\n    Args:\n        num_hour (int): 一天小时数\n    Return:\n        电力、供冷、供热、蒸汽负荷数据\n    \"\"\"\n    load = LoadGet()\n    power_load = load.get_power_load(num_hour)\n    cool_load = load.get_power_load(num_hour)\n    heat_load = load.get_power_load(num_hour)",
+        "type": "code",
+        "location": "/demo_utils.py:127-171"
+    },
+    "221": {
+        "file_id": 28,
+        "content": "This code defines three methods for getting constant hourly prices for gas, municipal hot water, and municipal steam. It also includes a function for retrieving power, cooling, heating, and steam loads over time. These functions utilize numpy to create arrays of constant values.",
+        "type": "comment"
+    },
+    "222": {
+        "file_id": 28,
+        "content": "    steam_load = load.get_power_load(num_hour)\n    return power_load, cool_load, heat_load, steam_load\nfrom typing import Union, List\ndef getResourceData(num_hour: int):\n    \"\"\"\n    获取光照、能源价格\n    Args:\n        num_hour (int): 一天小时数\n    Return:\n        光照、能源价格\n    \"\"\"\n    resource = ResourceGet()\n    # model_input\n    intensityOfIllumination: Union[np.ndarray, List] = resource.get_radiation(\n        \"jinan_changqing-hour.dat\", num_hour  # 光照、风速\n    )\n    # what is the output? break here.\n    electricity_price0 = resource.get_electricity_price(num_hour)\n    gas_price0 = resource.get_gas_price(num_hour)\n    # TODO: 按面积、人数计价热水消耗\n    municipalHotWater_price0 = resource.get_municipalHotWater_price(num_hour)\n    municipalSteam_price0 = resource.get_municipalSteam_price(num_hour)\n    return (\n        intensityOfIllumination,\n        electricity_price0,\n        gas_price0,\n        municipalHotWater_price0,\n        municipalSteam_price0,\n    )\nfrom integratedEnergySystemPrototypes import (\n    # IntegratedEnergySystem,\n    PhotoVoltaic,",
+        "type": "code",
+        "location": "/demo_utils.py:172-212"
+    },
+    "223": {
+        "file_id": 28,
+        "content": "The code retrieves intensity of illumination and resource prices for a given number of hours. It uses the ResourceGet class to get radiation data from a file, as well as electricity, gas, municipal hot water, and steam prices for the same number of hours. The results are returned as a tuple with five elements.",
+        "type": "comment"
+    },
+    "224": {
+        "file_id": 28,
+        "content": "    LiBrRefrigeration,\n    DieselEngine,\n    EnergyStorageSystem,\n    # EnergyStorageSystemVariable,\n    TroughPhotoThermal,\n    CombinedHeatAndPower,\n    GasBoiler,\n    ElectricBoiler,\n    Exchanger,\n    # AirHeatPump,\n    WaterHeatPump,\n    WaterCoolingSpiral,\n    DoubleWorkingConditionUnit,\n    TripleWorkingConditionUnit,\n    GeothermalHeatPump,\n    WaterEnergyStorage,\n    ElectricSteamGenerator,\n    # Linear_absolute,\n    CitySupply,\n    GridNet,\n    Linearization,\n)\nfrom docplex.mp.model import Model\ndef electricSystemRegistration(\n    model: Model,\n    num_hour: int,\n    intensityOfIllumination: np.ndarray,\n    day_node: int,\n    debug: bool = False,\n):\n    \"\"\" \"\"\"\n    # 柴油发电机\n    dieselEngine = DieselEngine(\n        num_hour,\n        model,\n        device_count_max=320,\n        device_price=750,\n        running_price=2,\n        debug=debug,\n    )\n    dieselEngine.constraints_register()\n    # 光伏\n    photoVoltaic = PhotoVoltaic(\n        num_hour,\n        model,\n        device_count_max=5000,\n        device_price=4500,\n        intensityOfIllumination=intensityOfIllumination,",
+        "type": "code",
+        "location": "/demo_utils.py:213-265"
+    },
+    "225": {
+        "file_id": 28,
+        "content": "This code defines a function called \"electricSystemRegistration\" that registers devices for an electric system. It takes in parameters such as the number of hours, intensity of illumination, and a debug flag, and uses them to create instances of DieselEngine and PhotoVoltaic devices, registering their constraints. The code also imports Model from docplex.mp.model.",
+        "type": "comment"
+    },
+    "226": {
+        "file_id": 28,
+        "content": "        efficiency=0.8,\n        device_name=\"PhotoVoltaic\",\n        debug=debug,\n        output_type=\"electricity\",\n    )\n    photoVoltaic.constraints_register()\n    # 电池储能\n    batteryEnergyStorageSystem = EnergyStorageSystem(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=1800,\n        device_price_powerConversionSystem=250,\n        conversion_rate_max=2,\n        efficiency=0.9,\n        energy_init=1,\n        stateOfCharge_min=0,  # state of charge\n        stateOfCharge_max=1,\n        device_name=\"batteryEnergyStorageSystem\",\n        debug=debug,\n        input_type=\"electricity\",\n        output_type=\"electricity\",\n    )\n    # original: battery\n    batteryEnergyStorageSystem.constraints_register(\n        register_period_constraints=1, day_node=day_node\n    )\n    return dieselEngine, photoVoltaic, batteryEnergyStorageSystem\ndef steamSourcesRegistration(\n    model: Model,\n    num_hour: int,\n    intensityOfIllumination: np.ndarray,\n    # day_node: int,\n    electricity_price0: np.ndarray,",
+        "type": "code",
+        "location": "/demo_utils.py:266-302"
+    },
+    "227": {
+        "file_id": 28,
+        "content": "This code sets up three devices: a diesel engine, a photovoltaic system, and a battery energy storage system. The battery energy storage system is used for energy storage and has constraints registered for it. Finally, the function returns these three devices.",
+        "type": "comment"
+    },
+    "228": {
+        "file_id": 28,
+        "content": "    gas_price0: np.ndarray,\n    debug: bool = False,\n):\n    \"\"\" \"\"\"\n    # 槽式光热设备\n    troughPhotoThermal = TroughPhotoThermal(\n        num_hour,\n        model,\n        device_count_max=5000,\n        device_price=2000,\n        device_price_solidHeatStorage=1000,\n        intensityOfIllumination=intensityOfIllumination,\n        efficiency=0.8,\n        debug=debug,\n    )\n    troughPhotoThermal.constraints_register()\n    # 电用蒸汽发生器\n    electricSteamGenerator = ElectricSteamGenerator(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=200,\n        device_price_solidHeatStorage=200,  # gtxr? SolidHeatStorage？\n        electricity_price=electricity_price0*0, # use gridnet?\n        efficiency=0.9,\n        debug=debug,\n    )\n    electricSteamGenerator.constraints_register()\n    # 热电联产机组\n    combinedHeatAndPower = CombinedHeatAndPower(\n        num_hour,\n        model,\n        device_count_max=5,\n        device_price=2000,\n        gas_price=gas_price0,\n        rated_power=2000,\n        electricity_to_heat_ratio=1.2,  # dr? 电热?",
+        "type": "code",
+        "location": "/demo_utils.py:303-342"
+    },
+    "229": {
+        "file_id": 28,
+        "content": "This code initializes and registers three device types: TroughPhotoThermal, ElectricSteamGenerator, and CombinedHeatAndPower. Each device has specific parameters such as device count max, device price, efficiency, and constraints. The code ensures the devices are properly initialized and registered for use.",
+        "type": "comment"
+    },
+    "230": {
+        "file_id": 28,
+        "content": "        debug=debug,\n    )\n    combinedHeatAndPower.constraints_register()\n    # 燃气锅炉\n    gasBoiler = GasBoiler(\n        num_hour,\n        model,\n        device_count_max=5000,\n        device_price=200,\n        gas_price=gas_price0,\n        efficiency=0.9,\n        debug=debug,\n        output_type=\"steam\",\n    )\n    gasBoiler.constraints_register()\n    # 市政蒸汽\n    municipalSteam = CitySupply(\n        num_hour,\n        model,\n        device_count_max=5000,\n        device_price=3000,\n        running_price=0.3 * np.ones(num_hour),\n        efficiency=0.9,\n        device_name=\"municipalSteam\",\n        debug=debug,\n        output_type=\"steam\",\n    )\n    municipalSteam.constraints_register()\n    return (\n        troughPhotoThermal,\n        electricSteamGenerator,\n        combinedHeatAndPower,\n        gasBoiler,\n        municipalSteam,\n    )\ndef hotWaterSourcesRegistration(\n    model: Model,\n    num_hour: int,\n    intensityOfIllumination: np.ndarray,\n    day_node: int,\n    electricity_price0: np.ndarray,\n    municipalHotWater_price0: np.ndarray,",
+        "type": "code",
+        "location": "/demo_utils.py:343-388"
+    },
+    "231": {
+        "file_id": 28,
+        "content": "This code defines several types of steam generators and heat sources for a model, registers their constraints, and returns them. It includes troughPhotoThermal, electricSteamGenerator, combinedHeatAndPower, gasBoiler, and municipalSteam as hot water sources. The model, number of hours, intensity of illumination, day node, electricity price, and municipal hot water price are inputs for the function.",
+        "type": "comment"
+    },
+    "232": {
+        "file_id": 28,
+        "content": "    gas_price0: np.ndarray,\n    debug: bool = False,\n):\n    \"\"\"\"\"\"\n    # 平板光热\n    platePhotothermal = PhotoVoltaic(\n        num_hour,\n        model,\n        device_count_max=10000,\n        device_price=500,\n        intensityOfIllumination=intensityOfIllumination,\n        efficiency=0.8,\n        device_name=\"platePhotothermal\",\n        debug=debug,\n        output_type=\"hot_water\",\n    )  # platePhotothermal\n    platePhotothermal.constraints_register()\n    # 相变蓄热\n    phaseChangeHotWaterStorage = EnergyStorageSystem(\n        num_hour,\n        model,\n        device_count_max=10000,\n        device_price=350,\n        device_price_powerConversionSystem=1000,  # free conversion?\n        conversion_rate_max=0.5,\n        efficiency=0.9,\n        energy_init=0,\n        stateOfCharge_min=0,\n        stateOfCharge_max=1,\n        device_name=\"phaseChangeHotWaterStorage\",\n        debug=debug,\n        input_type=\"hot_water\",\n        output_type=\"hot_water\",\n    )\n    phaseChangeHotWaterStorage.constraints_register()\n    # 市政热水\n    municipalHotWater = CitySupply(",
+        "type": "code",
+        "location": "/demo_utils.py:389-428"
+    },
+    "233": {
+        "file_id": 28,
+        "content": "This code initializes and registers three energy storage devices: a photovoltaic system for generating heat, a phase change hot water storage system for storing heat, and a municipal hot water supply. The systems are set up with specified parameters and the debug option is used to enable or disable debugging information.",
+        "type": "comment"
+    },
+    "234": {
+        "file_id": 28,
+        "content": "        num_hour,\n        model,\n        device_count_max=10000,\n        device_price=3000,\n        running_price=municipalHotWater_price0,\n        efficiency=0.9,\n        device_name=\"municipalHotWater\",\n        debug=debug,\n        output_type=\"hot_water\",\n    )\n    municipalHotWater.constraints_register()\n    # 热水电锅炉\n    hotWaterElectricBoiler = ElectricBoiler(  # connect to our powergrid.\n        num_hour,\n        model,\n        device_count_max=10000,\n        device_price=200,\n        electricity_price=electricity_price0 * 0,\n        efficiency=0.9,\n        device_name=\"hotWaterElectricBoiler\",\n        debug=debug,\n        output_type=\"hot_water\",\n    )\n    hotWaterElectricBoiler.constraints_register()\n    # 燃气热水器\n    gasBoiler_hotWater = GasBoiler(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=200,\n        gas_price=gas_price0,\n        efficiency=0.9,\n        device_name=\"gasBoiler_hotWater\",\n        debug=debug,\n        output_type=\"hot_water\",\n    )\n    gasBoiler_hotWater.constraints_register()",
+        "type": "code",
+        "location": "/demo_utils.py:429-467"
+    },
+    "235": {
+        "file_id": 28,
+        "content": "This code initializes three hot water devices: municipalHotWater, hotWaterElectricBoiler, and gasBoiler_hotWater. It creates instances of ElectricBoiler and GasBoiler classes using similar parameters, registers constraints for each device, and assigns them to the respective variables.",
+        "type": "comment"
+    },
+    "236": {
+        "file_id": 28,
+        "content": "    # 水储能罐\n    waterStorageTank = WaterEnergyStorage(\n        num_hour,\n        model,\n        volume_max=10000,\n        volume_price=300,\n        device_price_powerConversionSystem=1,\n        conversion_rate_max=0.5,\n        efficiency=0.9,\n        energy_init=1,\n        stateOfCharge_min=0,\n        stateOfCharge_max=1,\n        ratio_cold_water=10,\n        ratio_warm_water=10,\n        ratio_hot_water=20,\n        device_name=\"waterStorageTank\",\n        debug=debug,\n    )\n    waterStorageTank.constraints_register(\n        register_period_constraints=1, day_node=day_node\n    )\n    return (\n        platePhotothermal,\n        waterStorageTank,\n        municipalHotWater,\n        gasBoiler_hotWater,\n        phaseChangeHotWaterStorage,\n        hotWaterElectricBoiler,\n    )\ndef cooletIceHeatDevicesRegistration(\n    model: Model,\n    num_hour: int,\n    # intensityOfIllumination: np.ndarray,\n    # day_node: int,\n    electricity_price0: np.ndarray,\n    # municipalHotWater_price0: np.ndarray,\n    # gas_price0: np.ndarray,\n    debug: bool = False,",
+        "type": "code",
+        "location": "/demo_utils.py:469-509"
+    },
+    "237": {
+        "file_id": 28,
+        "content": "The code is initializing a water storage tank for energy management. It registers constraints and returns several heat devices including plate photothermal, waterStorageTank, municipalHotWater, gasBoiler_hotWater, phaseChangeHotWaterStorage, hotWaterElectricBoiler. This is part of the cooletIceHeatDevicesRegistration function which takes in a model, number of hours, electricity price, and debug flag as parameters.",
+        "type": "comment"
+    },
+    "238": {
+        "file_id": 28,
+        "content": "):\n    \"\"\"\"\"\"\n    # 热泵\n    heatPump = WaterHeatPump(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=1000,\n        electricity_price=electricity_price0*0,\n        case_ratio=np.array([1, 1, 1, 1]),  # total four cases?\n        device_name=\"heatPump\",\n        debug=debug,\n    )\n    heatPump.constraints_register()\n    # 水源热泵\n    waterSourceHeatPump = WaterHeatPump(\n        num_hour,\n        model,\n        device_count_max=2000,\n        device_price=3000,\n        electricity_price=electricity_price0*0,\n        case_ratio=np.ones(4),\n        device_name=\"waterSourceHeatPump\",\n        debug=debug,\n    )\n    waterSourceHeatPump.constraints_register()\n    # 水冷螺旋机\n    waterCoolingSpiralMachine = WaterCoolingSpiral(\n        num_hour,\n        model,\n        device_count_max=2000,\n        device_price=1000,\n        electricity_price=electricity_price0*0,\n        case_ratio=np.array([1, 0.8]),\n        debug=debug,\n    )\n    waterCoolingSpiralMachine.constraints_register()\n    # 三工况机组\n    tripleWorkingConditionUnit = TripleWorkingConditionUnit(",
+        "type": "code",
+        "location": "/demo_utils.py:510-552"
+    },
+    "239": {
+        "file_id": 28,
+        "content": "This code defines and initializes multiple HVAC (Heating, Ventilation, and Air Conditioning) devices such as heat pumps, water source heat pumps, and water cooling spiral machines. These devices are created with specific parameters like maximum device count, price, electricity price, case ratios, and names. The code then registers the constraints for each device using the `constraints_register()` method.",
+        "type": "comment"
+    },
+    "240": {
+        "file_id": 28,
+        "content": "        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=1000,\n        electricity_price=electricity_price0*0,\n        case_ratio=[1, 0.8, 0.8],\n        debug=debug,\n    )\n    tripleWorkingConditionUnit.constraints_register()\n    # 双工况机组\n    doubleWorkingConditionUnit = DoubleWorkingConditionUnit(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=1000,\n        electricity_price=electricity_price0*0,\n        case_ratio=[1, 0.8],\n        debug=debug,\n    )\n    doubleWorkingConditionUnit.constraints_register()\n    # 地源热泵\n    groundSourceHeatPump = GeothermalHeatPump(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=40000,\n        electricity_price=electricity_price0*0,\n        debug=debug,\n    )\n    groundSourceHeatPump.constraints_register()\n    # 电池？保鲜？相变？冰蓄能？\n    iceStorage = EnergyStorageSystem(  # what is this?\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=300,\n        device_price_powerConversionSystem=1,",
+        "type": "code",
+        "location": "/demo_utils.py:553-592"
+    },
+    "241": {
+        "file_id": 28,
+        "content": "Code creates different energy devices:\n1. TripleWorkingConditionUnit,\n2. DoubleWorkingConditionUnit,\n3. GroundSourceHeatPump, and\n4. IceStorage - EnergyStorageSystem.\nAll devices have specified attributes like num_hour, model, device_count_max, device_price, electricity_price (some with default 0), case_ratio, and debug. Each device registers its constraints after being created.",
+        "type": "comment"
+    },
+    "242": {
+        "file_id": 28,
+        "content": "        conversion_rate_max=0.5,\n        efficiency=0.9,\n        energy_init=1,\n        stateOfCharge_min=0,\n        stateOfCharge_max=1,\n        device_name=\"iceStorage\",\n        debug=debug,\n        input_type=\"ice\",\n        output_type=\"cold_water\",\n    )\n    iceStorage.constraints_register()\n    # 相变蓄冷\n    phaseChangeColdWaterStorage = EnergyStorageSystem(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=500,\n        device_price_powerConversionSystem=1,\n        conversion_rate_max=0.5,\n        efficiency=0.9,\n        energy_init=1,\n        stateOfCharge_min=0,\n        stateOfCharge_max=1,\n        device_name=\"phaseChangeColdWaterStorage\",\n        debug=debug,\n        input_type=\"cold_water_storage\",\n        output_type=\"cold_water\",\n    )\n    phaseChangeColdWaterStorage.constraints_register()\n    # TODO: 修改为：低温水 相变蓄热\n    phaseChangeWarmWaterStorage = EnergyStorageSystem(\n        num_hour,\n        model,\n        device_count_max=20000,\n        device_price=300,\n        device_price_powerConversionSystem=1,",
+        "type": "code",
+        "location": "/demo_utils.py:593-630"
+    },
+    "243": {
+        "file_id": 28,
+        "content": "Code creates instances of EnergyStorageSystem for iceStorage, phaseChangeColdWaterStorage, and phaseChangeWarmWaterStorage devices. These devices are initialized with specified parameters like conversion rate, efficiency, energy, state of charge, device name, and input/output types. The constraints for each device are registered using the constraints_register() method. The code also includes a TODO comment to modify one instance to low-temperature water phase change storage.",
+        "type": "comment"
+    },
+    "244": {
+        "file_id": 28,
+        "content": "        conversion_rate_max=0.5,\n        efficiency=0.9,\n        energy_init=1,\n        stateOfCharge_min=0,\n        stateOfCharge_max=1,\n        device_name=\"phaseChangeWarmWaterStorage\",\n        debug=debug,\n        input_type=\"warm_water_storage\",\n        output_type=\"warm_water\",\n    )\n    phaseChangeWarmWaterStorage.constraints_register()\n    return (\n        heatPump,\n        waterSourceHeatPump,\n        waterCoolingSpiralMachine,\n        tripleWorkingConditionUnit,\n        doubleWorkingConditionUnit,\n        groundSourceHeatPump,\n        iceStorage,\n        phaseChangeColdWaterStorage,\n        phaseChangeWarmWaterStorage,\n    )",
+        "type": "code",
+        "location": "/demo_utils.py:631-653"
+    },
+    "245": {
+        "file_id": 28,
+        "content": "The code creates an instance of a phase change warm water storage device with specific parameters, registers its constraints, and returns other devices as part of a system.",
+        "type": "comment"
+    },
+    "246": {
+        "file_id": 29,
+        "content": "/docplex_test.py",
+        "type": "filepath"
+    },
+    "247": {
+        "file_id": 29,
+        "content": "The code imports the 'docplex.mp.model' module and creates a new instance of the Model class with the name \"MIP model\". This will be used to define and solve a Mixed Integer Programming (MIP) problem using Docplex library.",
+        "type": "summary"
+    },
+    "248": {
+        "file_id": 29,
+        "content": "# https://blog.csdn.net/VickyVivan/article/details/116429954\nimport docplex.mp.model as Model1\nopt_model = Model1.Model(name=\"MIP model\")",
+        "type": "code",
+        "location": "/docplex_test.py:1-5"
+    },
+    "249": {
+        "file_id": 29,
+        "content": "The code imports the 'docplex.mp.model' module and creates a new instance of the Model class with the name \"MIP model\". This will be used to define and solve a Mixed Integer Programming (MIP) problem using Docplex library.",
+        "type": "comment"
+    },
+    "250": {
+        "file_id": 30,
+        "content": "/draw_sankey_diagram.py",
+        "type": "filepath"
+    },
+    "251": {
+        "file_id": 30,
+        "content": "The code creates a Sankey diagram using PyECharts, displaying university and workplace relationships with flow relations and visual properties. It supports two depth levels and can be saved as \"sankey.png\".",
+        "type": "summary"
+    },
+    "252": {
+        "file_id": 30,
+        "content": "# no weights. deprecated.\n# import matplotlib.pyplot as plt\n# import pandas as pd\n# from pysankey2.datasets import load_fruits\n# from pysankey2 import Sankey\n# df = load_fruits()\n# sky = Sankey(df,colorMode=\"global\")\n# fig,ax = sky.plot()\nfrom pyecharts.charts import Sankey\nfrom pyecharts import options as opts\n# 构建能流桑基图\n# sankey = Sankey()\n# 添加节点\nsankey = Sankey().add(\n    series_name=\"毕业生流向\",  ###给个桑基宝宝取个名字\n    nodes=[\n        {\"name\": \"北京\"},\n        {\"name\": \"湖南\"},\n        {\"name\": \"清华\"},\n        {\"name\": \"北大\"},\n        {\"name\": \"人大\"},\n        {\"name\": \"浙大\"},\n        {\"name\": \"复旦\"},\n        {\"name\": \"中山\"},\n        {\"name\": \"厦大\"},\n        {\"name\": \"武大\"},\n        {\"name\": \"川大\"},\n        {\"name\": \"工作1\"},\n        {\"name\": \"工作2\"},\n        {\"name\": \"工作3\"},\n        {\"name\": \"工作4\"},\n    ],  ##配置有多少个节点\n    links=[\n        {\"source\": \"北京\", \"target\": \"清华\", \"value\": 50},\n        {\"source\": \"北京\", \"target\": \"北大\", \"value\": 60},\n        {\"source\": \"北京\", \"target\": \"人大\", \"value\": 40},\n        {\"source\": \"北京\", \"target\": \"复旦\", \"value\": 60},",
+        "type": "code",
+        "location": "/draw_sankey_diagram.py:1-42"
+    },
+    "253": {
+        "file_id": 30,
+        "content": "Code imports necessary libraries and creates a Sankey diagram. It constructs a Sankey object, adds nodes with names, and defines links between them with corresponding weights.",
+        "type": "comment"
+    },
+    "254": {
+        "file_id": 30,
+        "content": "        {\"source\": \"北京\", \"target\": \"中山\", \"value\": 30},\n        {\"source\": \"北京\", \"target\": \"浙大\", \"value\": 33},\n        {\"source\": \"北京\", \"target\": \"厦大\", \"value\": 22},\n        {\"source\": \"北京\", \"target\": \"武大\", \"value\": 5},\n        {\"source\": \"北京\", \"target\": \"川大\", \"value\": 12},\n        {\"source\": \"湖南\", \"target\": \"清华\", \"value\": 30},\n        {\"source\": \"湖南\", \"target\": \"北大\", \"value\": 40},\n        {\"source\": \"湖南\", \"target\": \"人大\", \"value\": 20},\n        {\"source\": \"湖南\", \"target\": \"复旦\", \"value\": 40},\n        {\"source\": \"湖南\", \"target\": \"中山\", \"value\": 10},\n        {\"source\": \"湖南\", \"target\": \"浙大\", \"value\": 13},\n        {\"source\": \"湖南\", \"target\": \"厦大\", \"value\": 9},\n        {\"source\": \"湖南\", \"target\": \"武大\", \"value\": 30},\n        {\"source\": \"湖南\", \"target\": \"川大\", \"value\": 25},\n        {\"source\": \"清华\", \"target\": \"工作1\", \"value\": 80},\n        {\"source\": \"北大\", \"target\": \"工作3\", \"value\": 100},\n        {\"source\": \"人大\", \"target\": \"工作2\", \"value\": 60},\n        {\"source\": \"复旦\", \"target\": \"工作2\", \"value\": 100},\n        {\"source\": \"中山\", \"target\": \"工作4\", \"value\": 40},",
+        "type": "code",
+        "location": "/draw_sankey_diagram.py:43-61"
+    },
+    "255": {
+        "file_id": 30,
+        "content": "The code defines a list of dictionaries representing connections between locations (cities) and universities, along with the values representing some metric. These connections include relationships with workplaces as well.",
+        "type": "comment"
+    },
+    "256": {
+        "file_id": 30,
+        "content": "        {\"source\": \"浙大\", \"target\": \"工作3\", \"value\": 46},\n        {\"source\": \"厦大\", \"target\": \"工作4\", \"value\": 31},\n        {\"source\": \"武大\", \"target\": \"工作3\", \"value\": 35},\n        {\"source\": \"川大\", \"target\": \"工作2\", \"value\": 37},\n    ],  ###配置节点之间的信息流关系\n    linestyle_opt=opts.LineStyleOpts(\n        opacity=0.2,  ###透明度设置\n        curve=0.5,  ###信息流的曲线弯曲度设置\n        color=\"source\",  ##颜色设置，source表示使用节点的颜色\n    ),  ##线条格式 ,设置所有线条的格式\n    label_opts=opts.LabelOpts(\n        font_size=16, position=\"left\"\n    ),  ##标签配置，具体参数详见opts.LabelOpts()\n    levels=[\n        opts.SankeyLevelsOpts(\n            depth=0,  ##第一层的配置\n            itemstyle_opts=opts.ItemStyleOpts(color=\"#fbb4ae\"),  ##节点格式的配置\n            linestyle_opts=opts.LineStyleOpts(color=\"source\", opacity=0.2, curve=0.5),\n        ),  ##信息流的配置\n        opts.SankeyLevelsOpts(\n            depth=1,  ##第二层的配置\n            itemstyle_opts=opts.ItemStyleOpts(color=\"#b3cde3\"),  ##节点格式的配置\n            linestyle_opts=opts.LineStyleOpts(color=\"source\", opacity=0.2, curve=0.5),\n        ),  ##信息的配置",
+        "type": "code",
+        "location": "/draw_sankey_diagram.py:62-85"
+    },
+    "257": {
+        "file_id": 30,
+        "content": "This code configures a Sankey diagram with nodes representing universities (e.g., \"浙大\") and work types (e.g., \"工作3\"). It sets the flow relation between nodes, line styles like opacity, curve, and color, as well as label font size and positioning. The configuration includes two levels of depth for node representation with specific colors for each level.",
+        "type": "comment"
+    },
+    "258": {
+        "file_id": 30,
+        "content": "        opts.SankeyLevelsOpts(\n            depth=2,  ##第三层的配置\n            itemstyle_opts=opts.ItemStyleOpts(color=\"#ccebc5\"),  ##节点格式的配置\n            linestyle_opts=opts.LineStyleOpts(color=\"source\", opacity=0.2, curve=0.5),\n        ),  ##信息的配置\n    ],  # 桑基图每一层的设置。可以逐层设置\n)\n# 绘制能流桑基图\n# sankey.render(\"energy_flow_sankey.html\")\nfrom snapshot_phantomjs import snapshot as driver\nfrom pyecharts.render import make_snapshot\nmake_snapshot(driver, sankey.render(), \"sankey.png\")",
+        "type": "code",
+        "location": "/draw_sankey_diagram.py:86-99"
+    },
+    "259": {
+        "file_id": 30,
+        "content": "The code sets the configuration for a Sankey diagram with three layers, specifying item style and line style options. It then renders the diagram using PyECharts and saves it as \"sankey.png\".",
+        "type": "comment"
+    },
+    "260": {
+        "file_id": 31,
+        "content": "/dump_pydantic_to_json.py",
+        "type": "filepath"
+    },
+    "261": {
+        "file_id": 31,
+        "content": "The code imports necessary libraries, defines a Pydantic class 'Item' with attributes name, description, price, and tax. An instance of 'Item' is created with given values, then converted to JSON string using 'json.dumps()', and printed to the console.",
+        "type": "summary"
+    },
+    "262": {
+        "file_id": 31,
+        "content": "import json\nfrom pydantic import BaseModel\nclass Item(BaseModel):\n    name: str\n    description: str = None\n    price: float\n    tax: float = None\nitem = Item(name='test', price=9.99)\njson_str = json.dumps(item.dict()) # working.\nprint(json_str)",
+        "type": "code",
+        "location": "/dump_pydantic_to_json.py:1-10"
+    },
+    "263": {
+        "file_id": 31,
+        "content": "The code imports necessary libraries, defines a Pydantic class 'Item' with attributes name, description, price, and tax. An instance of 'Item' is created with given values, then converted to JSON string using 'json.dumps()', and printed to the console.",
+        "type": "comment"
+    },
+    "264": {
+        "file_id": 32,
+        "content": "/example.py",
+        "type": "filepath"
+    },
+    "265": {
+        "file_id": 32,
+        "content": "The text describes a problem parameter definition and optimization process using CPLEX, printing objective values or error messages.",
+        "type": "summary"
+    },
+    "266": {
+        "file_id": 32,
+        "content": "# The MIP problem solved in this example is:\n#\n#   Maximize  x1 + 2 x2 + 3 x3 + x4\n#   Subject to\n#      - x1 +   x2 + x3 + 10 x4 <= 20\n#        x1 - 3 x2 + x3         <= 30\n#               x2      - 3.5x4  = 0\n#   Bounds\n#        0 <= x1 <= 40\n#        0 <= x2\n#        0 <= x3\n#        2 <= x4 <= 3\n#   Integers\n#       x4\nimport cplex\nfrom cplex.exceptions import CplexError\n# 首先实现定义各参数，包括变量和变量约束等\n# 用来在之后方便地添加到优化器里面\n# obj 指的是objective 意为目标，\n# 也就是要优化的目标（函数x1 + 2 * x2 + 3 * x3 + x4 的最小值）的系数\nmy_obj = [1.0, 2.0, 3.0, 1.0]\n# ub Upper Bound，上界，分别表示x1,x2,x3,x4的上界，infinity就是无穷大\n# （计算机类无穷大是有穷的，所以这个数可以事先修改为一个很大的数如 cplex.infinity = 2147483647\nmy_ub = [40.0, cplex.infinity, cplex.infinity, 3.0]\n# lb Lower Bound，下界，同上理\nmy_lb = [0.0, 0.0, 0.0, 2.0]\n# 变量类型，详见https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/refpythoncplex/html/cplex._internal._subinterfaces.VarTypes-class.html\n# ctrlF搜索Class Variables即可\n# 分别表示4各变量的变量类型，C表示Continuous 连续值（浮点数），I表示Integer\nmy_ctype = \"CCCI\"\n# 给4个变量起个名字\nmy_colnames = [\"x1\", \"x2\", \"x3\", \"x4\"]",
+        "type": "code",
+        "location": "/example.py:1-39"
+    },
+    "267": {
+        "file_id": 32,
+        "content": "Defines problem parameters, including variables and constraints, to be added later into the optimizer. my_obj: objective function coefficients; my_ub: upper bounds for each variable; my_lb: lower bounds for each variable; my_ctype: variable types (CCCI); my_colnames: variable names.",
+        "type": "comment"
+    },
+    "268": {
+        "file_id": 32,
+        "content": "# 约束规则\n# rows是约束集的左值，数组类型\n# 每一个元素为一条约束规则，也为一个数组类型，包含2个元素，前者为约束变量的名称列表，后者为系数关系\nmy_rows = [\n    [[\"x1\", \"x2\", \"x3\", \"x4\"], [-1.0, 1.0, 1.0, 10.0]],\n    [[\"x1\", \"x2\", \"x3\"], [1.0, -3.0, 1.0]],\n    [[\"x2\", \"x4\"], [1.0, -3.5]],\n]\n# rhs是约束规则集的右值\nmy_rhs = [20.0, 30.0, 0.0]\n# 约束规则集的左右值关系，详见https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/refcallablelibrary/cpxapi/getsense.html\n# L表示小于等于，E表示等于\nmy_sense = \"LLE\"\n# 给各条约束规则起名字\nmy_rownames = [\"r1\", \"r2\", \"r3\"]\ntry:\n    # 实例化一个cplex优化器\n    prob = cplex.Cplex()\n    # 求解的目标为目标函数的最小值\n    prob.objective.set_sense(prob.objective.sense.maximize)\n    # 添加变量：变量在目标函数里的系数，变量的上下界，变量类型，名称\n    prob.variables.add(\n        obj=my_obj, lb=my_lb, ub=my_ub, types=my_ctype, names=my_colnames\n    )\n    # 添加约束：约束左值，等式/不等式符号，右值，名称\n    prob.linear_constraints.add(\n        lin_expr=my_rows, senses=my_sense, rhs=my_rhs, names=my_rownames\n    )\n    # 求解\n    prob.solve()\n    # 显示最优情况下的变量值\n    x = prob.solution.get_values()\n    print(x)\n    # 显示最优情况下的目标值\n    objective_value = prob.solution.get_objective_value()",
+        "type": "code",
+        "location": "/example.py:41-85"
+    },
+    "269": {
+        "file_id": 32,
+        "content": "Code initializes a CPLEX optimizer, adds objective function and variables, sets bounds and types, defines constraints, solves the problem, and displays optimal variable values and objective value.",
+        "type": "comment"
+    },
+    "270": {
+        "file_id": 32,
+        "content": "    print(objective_value)\nexcept CplexError as exc:\n    print(exc)",
+        "type": "code",
+        "location": "/example.py:86-90"
+    },
+    "271": {
+        "file_id": 32,
+        "content": "This code segment prints the objective value if no error occurs during execution, and in case of a CplexError, it catches the exception and prints the error message.",
+        "type": "comment"
+    },
+    "272": {
+        "file_id": 33,
+        "content": "/example_docstring.py",
+        "type": "filepath"
+    },
+    "273": {
+        "file_id": 33,
+        "content": "The code defines a class `Dog` and a function `some_random_method`. It also includes global variables `global_var2` and `global_var` and notes on pdoc. The script sets var_1 and var_2, then prints \"finished\" upon completion.",
+        "type": "summary"
+    },
+    "274": {
+        "file_id": 33,
+        "content": "\"\"\"\na 狗 that will bark.\n\"\"\"\nfrom typing import List\n# pdoc is different than pdoc3.\n# where's the search box?\nglobal_var2 = None\n\"\"\"\nsome other global variable\n\"\"\"\nglobal_var = None\n\"\"\"\nsome global variable2 _Default to None_\n\"\"\"\ndef some_random_method(param_1:str,param_2, kw_param_1=None) -> None:\n    #: Documentation comment for class_variable\n    #: spanning over three lines.\n    \"\"\"_just a random method_\n    Args:\n        param_1 (str): _parameter at position 1_\n        param_2 (str): _parameter at position 2_\n        kw_param_1 (Any, optional): _keyword parameter 1_.  NO LATEX SUPPORT?\n    Return:\n        Nothing returned.\n    Note:\n        Extra Notes?\n        ```\n        import os\n        os.system(\"ls -lth\")\n        ```\n    \"\"\"\nclass Dog:\n    \"\"\"dog class\"\"\"\n    name: str\n    \"\"\"The name of our dog.\"\"\"\n    friends: List[\"Dog\"]\n    \"\"\"The friends of our dog.\"\"\"\n    def __init__(self, name: str):\n        \"\"\"Make a Dog without any friends (yet).\"\"\"\n        self.name = name\n        self.friends = []\n    def bark(self, loud: bool = True):",
+        "type": "code",
+        "location": "/example_docstring.py:1-52"
+    },
+    "275": {
+        "file_id": 33,
+        "content": "The code defines a class `Dog` and a function `some_random_method`. The `Dog` class has attributes `name` and `friends`, and a method `bark` that can be called with an optional `loud` parameter. The `some_random_method` takes three parameters, one required and two optional, and does not return anything. Global variables `global_var2` and `global_var` are defined outside the function scope. The code also includes a comment mentioning pdoc and its differences from pdoc3, as well as some formatted text indicating possible notes in the docstring.",
+        "type": "comment"
+    },
+    "276": {
+        "file_id": 33,
+        "content": "        \"\"\"*woof*\"\"\"\nif __name__ == \"__main__\":\n    \"\"\"main job goes here\"\"\"\n    var_1 = None\n    \"\"\"variable 1 set to None\"\"\"\n    var_2 = 1\n    \"\"\"var 2 set to 1\"\"\"\n    print(\"finished\")\n    \"\"\"denote we are finished\"\"\"",
+        "type": "code",
+        "location": "/example_docstring.py:53-62"
+    },
+    "277": {
+        "file_id": 33,
+        "content": "This code snippet appears to be a placeholder or skeleton for a Python script. It starts by providing a docstring, marked with triple quotes (\"*woof*\"), which can be used to describe the purpose of the script. The main functionality is defined within the if __name__ == \"__main__\": block. Inside this block, two variables are set: var_1 to None and var_2 to 1. Finally, when the program finishes executing, it prints \"finished\" as an indicator that the execution is complete.",
+        "type": "comment"
+    },
+    "278": {
+        "file_id": 34,
+        "content": "/export_pdf_word_pdoc.ps1",
+        "type": "filepath"
+    },
+    "279": {
+        "file_id": 34,
+        "content": "The code sets the Python encoding to UTF-16 and then generates a PDF from a Python script with docstrings using pdoc, while also saving the output as an MD file in the specified folder. This could be useful for generating formatted documentation or technical specifications.",
+        "type": "summary"
+    },
+    "280": {
+        "file_id": 34,
+        "content": "$Env:PYTHONIOENCODING=\"utf-16\" # useful. really?\npdoc --pdf .\\example_docstring.py | tee .\\output_pdf\\example_docstring.md",
+        "type": "code",
+        "location": "/export_pdf_word_pdoc.ps1:1-2"
+    },
+    "281": {
+        "file_id": 34,
+        "content": "The code sets the Python encoding to UTF-16 and then generates a PDF from a Python script with docstrings using pdoc, while also saving the output as an MD file in the specified folder. This could be useful for generating formatted documentation or technical specifications.",
+        "type": "comment"
+    },
+    "282": {
+        "file_id": 35,
+        "content": "/fastapi_celery_client_test.py",
+        "type": "filepath"
+    },
+    "283": {
+        "file_id": 35,
+        "content": "The code sends POST requests, retrieves calculation IDs, checks states using GET requests, and revokes calculations. It uses requests library for HTTP communication and time module for sleep function. The purpose is to check if the task was cancelled between two GET requests.",
+        "type": "summary"
+    },
+    "284": {
+        "file_id": 35,
+        "content": "import json\nimport requests\nLOOP_COUNT = 20\nbase_url = \"http://localhost:9870\"\nurl = f\"{base_url}/calculate_async\"\nwith open(\"test_graph_data.json\", \"r\") as f:\n    test_graph = json.loads(f.read())\nr = requests.post(url, json=test_graph)\ndata = r.json()\nprint(\"DATA\", data)\ncalculation_id = data[\"calculation_id\"]\nr2 = requests.get(f\"{base_url}/calculation_async\")\ndata2 = r2.json()\ncalculation_id2 = data2[\"calculation_id\"]\nurl_new = f\"{base_url}/get_calculation_state\"\nimport time\n# import celery.states as S\n# PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED,\n# how to limit the task threads?\nfor i in range(LOOP_COUNT):\n    print(i)\n    r2 = requests.get(url_new, params=dict(calculation_id=calculation_id))\n    data2 = r2.json()\n    print(\"DATA2\", data2)  # STARTED.\n    # till: SUCCESS.\n    r3 = requests.get(url_new, params=dict(calculation_id=calculation_id))\n    data3 = r3.json()\n    print(\"DATA3\", data3)\n    # how many status indicators can it have?\n    time.sleep(1)\nurl_revoke = f\"{base_url}/revoke_calculation\"",
+        "type": "code",
+        "location": "/fastapi_celery_client_test.py:1-41"
+    },
+    "285": {
+        "file_id": 35,
+        "content": "The code sends a POST request to a base URL with JSON data, then retrieves the calculation ID and checks its state by repeatedly sending GET requests to the same base URL. It also has the option to revoke the calculation. The code uses requests library for HTTP communication and imports time module for sleep function.",
+        "type": "comment"
+    },
+    "286": {
+        "file_id": 35,
+        "content": "r3 = requests.get(url_revoke, params=dict(calculation_id=calculation_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\nr3 = requests.get(url_revoke, params=dict(calculation_id=calculation_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\ntime.sleep(1)\nr2 = requests.get(url_new, params=dict(calculation_id=calculation_id))\ndata2 = r2.json()\nprint(\n    \"DATA2\", data2\n)  # SUCCESS if revoke after SUCCESS. but if revoke before SUCCESS it is REVOKED.",
+        "type": "code",
+        "location": "/fastapi_celery_client_test.py:43-55"
+    },
+    "287": {
+        "file_id": 35,
+        "content": "This code performs two GET requests to the same URL with a calculation ID parameter, prints the response data after each request, and pauses for 1 second between the requests. The purpose seems to be checking if the second request returns \"SUCCESS\" only if the first request had returned \"REVOKED\", indicating that the task was cancelled in between the two requests.",
+        "type": "comment"
+    },
+    "288": {
+        "file_id": 36,
+        "content": "/fastapi_celery_server.py",
+        "type": "filepath"
+    },
+    "289": {
+        "file_id": 36,
+        "content": "This code imports libraries, defines a Celery application for task queuing, includes functions from the \"microgrid_base\" module, and performs energy flow graph calculations. It initializes worker configuration limits, creates `CalculationResult` objects, and starts the Celery worker.",
+        "type": "summary"
+    },
+    "290": {
+        "file_id": 36,
+        "content": "from celery import Celery\nfrom passwords import redis_password\nfrom typing import Union\nMAIN_NAME = \"fastapi_celery\"\napp = Celery(\n    MAIN_NAME,\n    broker=\"amqp://guest@localhost:5672//\",\n    backend=f\"redis://:{redis_password}@localhost:6379\",\n)\n# you'd better import models from other datamodel only file\n# you had not to pass anything like pydantic data model as parameter.\nfrom microgrid_base.solve_model import (\n    solveModelFromCalcParamList,\n    mDictListToCalcParamList,\n)\nfrom fastapi_datamodel_template import CalculationResult\n# from microgrid_base.ies_optim import EnergyFlowGraph\n@app.task(bind=True)  # parse it elsewhere.\ndef calculate_energyflow_graph(self, energyflow_graph: dict) -> Union[None, dict]:\n    \"\"\"\n    能源系统仿真优化计算方法\n    Args:\n        energyflow_graph (dict): 能流拓扑图和计算所需信息\n    Returns:\n        calculation_result (dict): 计算结果\n    \"\"\"\n    mDictList = energyflow_graph[\"mDictList\"]\n    calcParamList = mDictListToCalcParamList(mDictList)\n    resultList = []\n    error_log = \"\"\n    success = False\n    try:",
+        "type": "code",
+        "location": "/fastapi_celery_server.py:1-40"
+    },
+    "291": {
+        "file_id": 36,
+        "content": "This code imports the necessary libraries and defines a Celery application for task queuing. It also includes two functions from the \"microgrid_base\" module, which are used within the main function. The main function is decorated as a task to be executed by Celery. It accepts an energy flow graph as input and returns a calculation result. The code tries to perform calculations on the graph and stores the result in a list. If no errors occur during the process, it sets success to True.",
+        "type": "comment"
+    },
+    "292": {
+        "file_id": 36,
+        "content": "        resultList = solveModelFromCalcParamList(calcParamList)\n    except:\n        import traceback\n        error_log = traceback.format_exc()\n        print(\"************CELERY ERROR************\")\n        print(error_log)\n    if resultList != []:\n        success = True\n        calculation_result = CalculationResult(\n            resultList=resultList, success=success, error_log=error_log\n        ).dict()\n        return calculation_result\n    else:\n        self.update_state(state=\"FAILURE\")\napp.conf.update(task_track_started=True)\napp.conf.update(worker_send_task_events=True)\nconcurrent_tasks = 3\napp.conf.update(worker_concurrency=concurrent_tasks)\nmemory_limit = 20_000_000  # kB\napp.conf.update(worker_max_memory_per_child=memory_limit)\ntime_limit = 60 * 10  # sec\napp.conf.update(worker_time_limit=time_limit)\n# limits on ram usage, concurrency, execution time\nif __name__ == \"__main__\":\n    worker = app.Worker()\n    worker.start()",
+        "type": "code",
+        "location": "/fastapi_celery_server.py:41-71"
+    },
+    "293": {
+        "file_id": 36,
+        "content": "This code initializes a Celery application, sets worker configuration limits for memory, concurrency, and execution time. If the `solveModelFromCalcParamList` function does not return an empty list, it creates a `CalculationResult` object with the result, success status, and error log. Otherwise, it updates the state to \"FAILURE\" before configuring the worker settings. The main part of the code starts the Celery worker.",
+        "type": "comment"
+    },
+    "294": {
+        "file_id": 37,
+        "content": "/fastapi_client_generated_test.py",
+        "type": "filepath"
+    },
+    "295": {
+        "file_id": 37,
+        "content": "This code generates a Python file for Chimichang-App client with FastAPI and sends POST requests, utilizing subprocess module to run the script.",
+        "type": "summary"
+    },
+    "296": {
+        "file_id": 37,
+        "content": "from fastapi_server_with_doc import port # 9982?\nclient_location = 'D:/project/xianxing/chimichang-app-client'\nCODE = f\"\"\"\nport = {port}\nimport sys\nclient_location =\"{client_location}\"\nsys.path.append(client_location)\n# where's the path?\nimport chimichang_app_client as CA\n# import chimichang_app_client.api.default.post_item_api_name_items_post as POST\nfrom chimichang_app_client.api.default import * # in a hurry?\nimport chimichang_app_client.api.users as USERS\nimport chimichang_app_client.models as M\nclient = CA.Client(base_url=f\"http://localhost:{{port}}\", verify_ssl=False, raise_on_unexpected_status=True, timeout=5)\nsomeRandomDict=M.ItemMydict.from_dict(dict(a = 1))# strange it is\nmyItem = M.Item(name='myName', price=20,is_offer=True, my_dict = someRandomDict)\ndata = post_item_api_name_items_post.sync(client=client,json_body=myItem)\n# breakpoint()\nprint(\"RESPONSE:\", data)\n\"\"\"\nimport os\nfilepath = os.path.join(client_location,os.path.basename(__file__))\nwith open(filepath,'w+',encoding='utf-8') as f:\n    f.write(CODE)",
+        "type": "code",
+        "location": "/fastapi_client_generated_test.py:2-37"
+    },
+    "297": {
+        "file_id": 37,
+        "content": "This code dynamically generates a Python file that imports the Chimichang-App client and sets up a FastAPI client for a locally running server. The generated file includes import statements for various API endpoints and models, creates an instance of the client with specified settings, and uses it to send a POST request. The result is printed as the response.",
+        "type": "comment"
+    },
+    "298": {
+        "file_id": 37,
+        "content": "import subprocess\nsubprocess.run(['python', filepath],cwd=client_location)",
+        "type": "code",
+        "location": "/fastapi_client_generated_test.py:39-41"
+    },
+    "299": {
+        "file_id": 37,
+        "content": "Running a Python script in the given directory with subprocess module.",
+        "type": "comment"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports logger_print from log_utils, then imports paramWithUnits from export_format_validate.py and creates a class for each device name with parameters and units as attributes using a loop.",
+    "details": [
+        {
+            "comment": "This code imports logger_print from log_utils, then imports paramWithUnits from export_format_validate.py and creates a class for each device name with parameters and units as attributes using a loop.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/export_format_units.py.j2\":0-9",
+            "content": "from log_utils import logger_print\n{% from \"export_format_validate.py.j2\" import paramWithUnits with context%}\n{% for devName, paramNameAndUnitList in paramWithUnits.items() %}\nclass {{devName}}\u4eff\u771f\u7ed3\u679c\u5bfc\u51fa\u5355\u4f4d:\n    {% for PN, unit in paramNameAndUnitList %}\n    {{PN}} = {{repr(unit)}}\n    {% endfor %}\n{% endfor %}"
+        }
+    ]
+}

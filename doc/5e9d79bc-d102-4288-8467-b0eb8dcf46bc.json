@@ -1,0 +1,10 @@
+{
+    "summary": "The code sets the PATH environment variable to include a directory and uses Pandoc to convert a markdown file into a PDF document, specifying metadata such as title, font, and table of content depth.",
+    "details": [
+        {
+            "comment": "The code sets the PATH environment variable to include a directory and uses Pandoc to convert a markdown file into a PDF document, specifying metadata such as title, font, and table of content depth.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/export_pdf.ps1\":0-4",
+            "content": "$env:PATH=\"$env:PATH;C:/Users/ss/scoop/apps/miktex/current/texmfs/install/miktex/bin/x64/\"\npandoc --metadata=title:\"MyProject Documentation\"  --from=markdown+abbreviations+tex_math_single_backslash  --pdf-engine=xelatex --variable=mainfont:\"DejaVu Sans\"   --toc --toc-depth=4 --output=example_docstring.pdf  example_docstring_utf8.md\n# pandoc -s -o example_docstring.docx example_docstring.md"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code generates a report template for microgrid calculations. It includes sections for system diagrams, results visualization, input data, and output data. The report is dynamically generated based on the provided topo_graph_list, data_dict_list, input_data, and output_data.",
+    "details": [
+        {
+            "comment": "This code generates a report template for microgrid calculations. It includes sections for system diagrams, results visualization, input data, and output data. The report is dynamically generated based on the provided topo_graph_list, data_dict_list, input_data, and output_data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/report_template.md.j2\":0-34",
+            "content": "# \u8ba1\u7b97\u62a5\u544a\n## \u7cfb\u7edf\u56fe\n{% for i, topo_graph in enumerate(topo_graph_list) %}\n### \u62d3\u6251\u56fe{{i}}\n<iframe src='{{topo_graph}}'></iframe>\n{% endfor %}\n## \u7ed3\u679c\u53ef\u89c6\u5316\n{% for i, data_dict in enumerate(data_dict_list) %}\n### \u7ed3\u679c{{i}}\n    {% for k, v in data_dict.items() %}\n#### {{k}}\n{{v}}\n    {% endfor %}\n{% endfor %}\n## \u8f93\u5165\u6570\u636e\n```json\n{{input_data}}\n```\n## \u8f93\u51fa\u6570\u636e\n```json\n{{output_data}}\n```"
+        }
+    ]
+}

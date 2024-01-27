@@ -1,0 +1,9 @@
+
+{% macro mtest(a, b, c) %}
+happy song
+{% set s = [] %}
+{% do s.append(a) %}
+{{ s }}
+{% endmacro %}
+
+{{ mtest() }}

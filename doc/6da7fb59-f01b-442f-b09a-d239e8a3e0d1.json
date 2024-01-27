@@ -1,0 +1,15 @@
+{
+    "summary": "The code imports Pint, creates a UnitRegistry with default and custom units, saves them, and checks compatibility. It then prints two sets of units for testing or configuration purposes.",
+    "details": [
+        {
+            "comment": "The code imports the Pint module and creates a UnitRegistry with default unit definitions. It then adds additional custom unit definitions, saves them to a file, and checks for compatible units using the created UnitRegistry.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pint_merge_units.py\":0-51",
+            "content": "additionalUnitDefinitions = \"\"\"\n\u5143 = [currency]\n\u4e07\u5143 = 10000 \u5143\n\u5e74 = year\n\u5929 = day\n\u5c0f\u65f6 = hour\n\u5206\u949f = minute\n\u79d2 = second\nm2 = meter ** 2\nm3 = meter ** 3\n\u53f0 = [quantity_1]\none = [quantity_2]\npercent = 0.01 one\np_u_ = [quantity_3]\n\"\"\"\n# by not using prefixes, you have all the units.\noutput_path = \"merged_units.txt\"\nimport pint\nimport os\ndirectory_path = os.path.dirname(pint.__file__)\ndefault_unit_file = os.path.join(\n    directory_path, \"default_en.txt\"\n)  # there are some file we must have.\nconstant_file = \"constants_en.txt\"\nimport shutil\nshutil.copy(os.path.join(directory_path, constant_file), constant_file)\nwith open(default_unit_file, \"r\") as f0:\n    default_units_definitions = f0.read()\nwith open(output_path, \"w+\", encoding=\"utf-8\") as f:\n    f.write(default_units_definitions)\n    f.write(additionalUnitDefinitions)\n# we are going to check this.\nureg = pint.UnitRegistry(output_path)\ncompat_units_0 = ureg.get_compatible_units(ureg.\u4e07\u5143)\ncompat_units_1 = ureg.get_compatible_units(ureg.\u5143) # there are no base units?\n# it will be converted to base units?"
+        },
+        {
+            "comment": "The code snippet is printing two sets of units: compat_units_0 and compat_units_1, separated by a horizontal line. It then defines standard units using frozenset and calls the unitFactorCalculator function with arguments. This seems to be for unit conversion testing or configuration purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pint_merge_units.py\":53-63",
+            "content": "print(compat_units_0)\nprint(\"_\" * 20)\nprint(compat_units_1)  # frozen set.\n# breakpoint()\n# print(list(compat_units_0))\nfrom pint_convert_units import unitFactorCalculator\nstandard_units = frozenset([ureg.\u4e07\u5143, ureg.kWh])\nunitFactorCalculator(ureg, standard_units, old_unit_name=\"\u5143/kWh\")  # just a test.\n# breakpoint()"
+        }
+    ]
+}

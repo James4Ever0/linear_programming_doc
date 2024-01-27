@@ -1,0 +1,15 @@
+{
+    "summary": "This code imports libraries, defines paths and parameters for Prolog code generation, utilizes Jinja templates to generate Prolog code from topology information, adds constraints, and outputs the generated Prolog code. It defines a dictionary of ports for an energy system and calls a function from jinja_utils module to generate Prolog dynamic verification code.",
+    "details": [
+        {
+            "comment": "This code imports necessary libraries, defines paths and parameters for rendering Prolog code. It then utilizes Jinja templates to generate Prolog code from topology information, adds constraints to the model, and outputs the generated Prolog code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py\":0-27",
+            "content": "import sys\n# frontend topo code -> generate names & render params & user defined disjunctive constraints -> render prolog code -> execute and verify -> get possible states -> add constraints to model\nsys.path.append(\"../\")\nimport jinja_utils\ntemplate_path = \"prolog_gen.pro.j2\"\noutput_path = \"prolog_gen.pro\"\n# portList = [{'name':..., 'possible_states': [...]]\n# render_params = dict(portList = [], deviceTypes = [], deviceNameToDeviceType = {}, deviceNameToPorts = {}, energyTypes = [], portNameToPortEnergyTypes = {}, adderNameToAdderPortNames = {})\nrender_params = dict(\n    portNameToPortPossibleStates={\n        \"bat_port1\": [\"idle\", \"input\", \"output\"],\n        \"generator_port1\": [\"idle\", \"output\"],\n        \"load_port1\": [\"idle\", \"input\"],\n    },\n    deviceTypes=[\"battery\", \"load\", \"generator\"],\n    deviceTypeToDeviceNames={\n        \"battery\": [\"battery1\"],\n        \"load\": [\"load1\"],\n        \"generator\": [\"generator1\"],\n    },\n    deviceNameToPortNames={\n        \"battery1\": [\"bat_port1\"],\n        \"generator1\": [\"generator_port1\"],"
+        },
+        {
+            "comment": "The code defines a dictionary of ports for an energy system, with \"electricity\" as the only energy type. It also sets the energyTypeToPortNames and adderNameToAdderPortNames dictionaries to map adder names to their respective port names. Finally, it calls load_render_and_format function from jinja_utils module to generate Prolog dynamic verification code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/prolog_gen.py\":28-45",
+            "content": "        \"load1\": [\"load_port1\"],\n    },\n    energyTypes=[\"electricity\"],\n    energyTypeToPortNames={\n        \"electricity\": [\"bat_port1\", \"load_port1\", \"generator_port1\"]\n    },\n    adderNameToAdderPortNames={\n        \"adder1\": [\"bat_port1\", \"generator_port1\", \"load_port1\"]\n    },\n)\njinja_utils.load_render_and_format(\n    template_path,\n    output_path,\n    render_params=render_params,\n    banner=\"Generating Prolog Dynamic Verification Code\",\n    needFormat=False,\n)"
+        }
+    ]
+}

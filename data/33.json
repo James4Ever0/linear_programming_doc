@@ -1,0 +1,140 @@
+{
+    "3300": {
+        "file_id": 376,
+        "content": "import threading\nLOCK = threading.Lock()\ndef add_one_task():\n    global GLOBAL_TASK_COUNT, LOCK, MAX_TASK_COUNT\n    with LOCK:\n        if GLOBAL_TASK_COUNT < MAX_TASK_COUNT:\n            GLOBAL_TASK_COUNT += 1\n            return True\n    return False\ndef remove_one_task():\n    global GLOBAL_TASK_COUNT, LOCK\n    with LOCK:\n        if GLOBAL_TASK_COUNT >= 0 and GLOBAL_TASK_COUNT <= MAX_TASK_COUNT:\n            GLOBAL_TASK_COUNT -= 1\n            return True\n    return False\ndef trick_or_treat(data: DataModel):\n    global server_error_code\n    if add_one_task():\n        result = mock_calculation(data)  # you should put error code here. no exception?\n        remove_one_task()\n        return result\n    return server_error_code.MAX_TASK_LIMIT\n# import json\n@app.post(f\"/{endpoint_suffix.UPLOAD_GRAPH}\")\ndef run_sync(info: dict):\n    print(\"INFO:\",info)\n    # data = json.loads(info.data)\n    data = DataModel(**info)\n    return trick_or_treat(data) # need a dictionary.\nRESULT_DICT = {}\nTASK_LIST = []\nimport uuid\ndef execute_and_append_result_to_dict(unique_id: str, data: DataModel):",
+        "type": "code",
+        "location": "/test_server.py:42-91"
+    },
+    "3301": {
+        "file_id": 376,
+        "content": "The code defines a lock for thread synchronization, functions to add or remove a task and limit the maximum number of tasks. The `trick_or_treat` function adds and removes tasks, performs a calculation using mock data, and returns the result. A POST endpoint handles requests to upload graphs. The `execute_and_append_result_to_dict` function executes tasks, appends results to a dictionary, and generates unique IDs for tasks.",
+        "type": "comment"
+    },
+    "3302": {
+        "file_id": 376,
+        "content": "    global RESULT_DICT, TASK_LIST\n    print(f\"ASYNC TASK ASSIGNED: {unique_id}\")\n    result = mock_calculation(data)\n    RESULT_DICT.update({unique_id: result})\n    TASK_LIST.remove(unique_id)\n@app.post(f\"/{endpoint_suffix.UPLOAD_GRAPH_ASYNC}\")\ndef run_async(info: dict):  # how do you do it async? redis cache?\n    # data = info\n    # data = json.loads(info.data)\n    data = DataModel(**info)\n    # cause DataModel as type hint won't get you a full dict.\n    # you have to do parsing later.\n    if add_one_task():\n        unique_id = str(uuid.uuid4())\n        TASK_LIST.append(unique_id)\n        threading.Thread(\n            target=execute_and_append_result_to_dict, args=(unique_id, data)\n        ).start()  # not \"run\"\n        return unique_id\n    return server_error_code.MAX_TASK_LIMIT\n@app.get(f\"/{endpoint_suffix.CHECK_RESULT_ASYNC}\")\ndef get_result_async(unique_id: str):\n    print(\"GETTING RESULT:\", unique_id)\n    print(\"RESULT_DICT:\", RESULT_DICT)\n    print(\"TASK_LIST:\", TASK_LIST)\n    return RESULT_DICT.get(\n        unique_id,",
+        "type": "code",
+        "location": "/test_server.py:92-122"
+    },
+    "3303": {
+        "file_id": 376,
+        "content": "This code defines API endpoints for asynchronous task assignment and result retrieval. It utilizes a global `RESULT_DICT` to store task results and a `TASK_LIST` to keep track of pending tasks. Tasks are executed in separate threads, and the API returns unique IDs or error codes accordingly.",
+        "type": "comment"
+    },
+    "3304": {
+        "file_id": 376,
+        "content": "        server_error_code.PENDING\n        if unique_id in TASK_LIST\n        else server_error_code.NOTHING,\n    )\nimport uvicorn\nuvicorn.run(app, port=port)",
+        "type": "code",
+        "location": "/test_server.py:123-131"
+    },
+    "3305": {
+        "file_id": 376,
+        "content": "This code checks if a unique ID exists in the TASK_LIST. If it does, it returns server_error_code.PENDING. Otherwise, it returns server_error_code.NOTHING, and then runs the uvicorn web application on the specified port.",
+        "type": "comment"
+    },
+    "3306": {
+        "file_id": 377,
+        "content": "/test_server_client_configs.py",
+        "type": "filepath"
+    },
+    "3307": {
+        "file_id": 377,
+        "content": "The code sets up a server URL base, defines endpoints for uploading graphs synchronously and asynchronously, and a URL to check result asynchronously. The server has a maximum task limit of 3, so it will refuse connections if the current task count is above that limit.",
+        "type": "summary"
+    },
+    "3308": {
+        "file_id": 377,
+        "content": "port = 3398\nMAX_TASK_COUNT = 3\nTEST_GRAPH_CONFIG_PATH = \"test_graph_data.json\"\nclass endpoint_suffix:\n    UPLOAD_GRAPH_ASYNC: str = \"upload_graph_async\"\n    UPLOAD_GRAPH: str = \"upload_graph\"\n    CHECK_RESULT_ASYNC: str = \"check_result_async\"\nclass server_error_code:\n    MAX_TASK_LIMIT: str = \"MAX_TASK_LIMIT\"\n    NOTHING: str = \"NOTHING\"\n    PENDING: str = \"PENDING\"\nurl_base = f\"http://localhost:{port}\"\nget_url = lambda suffix: f\"{url_base}/{suffix}\"\n# will refuse connection if current task count is above 3.\nupload_url = get_url(endpoint_suffix.UPLOAD_GRAPH)\nasync_url = get_url(endpoint_suffix.UPLOAD_GRAPH_ASYNC)\ncheck_result_async = get_url(endpoint_suffix.CHECK_RESULT_ASYNC)",
+        "type": "code",
+        "location": "/test_server_client_configs.py:1-27"
+    },
+    "3309": {
+        "file_id": 377,
+        "content": "The code sets up a server URL base, defines endpoints for uploading graphs synchronously and asynchronously, and a URL to check result asynchronously. The server has a maximum task limit of 3, so it will refuse connections if the current task count is above that limit.",
+        "type": "comment"
+    },
+    "3310": {
+        "file_id": 378,
+        "content": "/test_timedelta.py",
+        "type": "filepath"
+    },
+    "3311": {
+        "file_id": 378,
+        "content": "This code imports the datetime module, creates two date objects (a and b), calculates the time difference between them using timedelta function, and then prints the result. The purpose is to determine the number of days between the given dates.",
+        "type": "summary"
+    },
+    "3312": {
+        "file_id": 378,
+        "content": "import datetime\na=datetime.datetime(year=2023,month=3,day=21)\nb=datetime.datetime(year=2023,month=4,day=23)\ntimedelta=b-a\nprint(timedelta)\nbreakpoint()",
+        "type": "code",
+        "location": "/test_timedelta.py:1-8"
+    },
+    "3313": {
+        "file_id": 378,
+        "content": "This code imports the datetime module, creates two date objects (a and b), calculates the time difference between them using timedelta function, and then prints the result. The purpose is to determine the number of days between the given dates.",
+        "type": "comment"
+    },
+    "3314": {
+        "file_id": 379,
+        "content": "/test_undefined.py",
+        "type": "filepath"
+    },
+    "3315": {
+        "file_id": 379,
+        "content": "Code snippet assigns value of variable 'b' to variable 'a'.",
+        "type": "summary"
+    },
+    "3316": {
+        "file_id": 379,
+        "content": "a = b",
+        "type": "code",
+        "location": "/test_undefined.py:1-1"
+    },
+    "3317": {
+        "file_id": 379,
+        "content": "Code snippet assigns value of variable 'b' to variable 'a'.",
+        "type": "comment"
+    },
+    "3318": {
+        "file_id": 380,
+        "content": "/topology_conversion.py",
+        "type": "filepath"
+    },
+    "3319": {
+        "file_id": 380,
+        "content": "The code replaces the original topology with a new one, adds nodes and edges to the graph, converts the graph, and prints the serialized data.",
+        "type": "summary"
+    },
+    "3320": {
+        "file_id": 380,
+        "content": "# replace the original topology with other stuff.\nimport networkx\nG = networkx.Graph(attr_0=1)\na = G.add_node(\"a\", node_type=\"device\")\nb = G.add_node(\"b\", node_type=\"device\")\nc = G.add_node(\"c\", node_type=\"device\")\nG.add_edge(\"a\", \"b\")\nG.add_edge(\"b\", \"c\")\nG.add_edge(\"c\", \"a\")\n# convert the graph.\n#                        b\n#                        |\n#   b                 [io_2]\n#  / \\              /        \\\n# a - c  =>   a - [io_0] - [io_1] - c\n#\n# ###########################\n# is that necessary?\nfrom networkx.readwrite import json_graph\nserialized = json_graph.adjacency_data(G)\nimport rich\nrich.print(serialized)",
+        "type": "code",
+        "location": "/topology_conversion.py:1-28"
+    },
+    "3321": {
+        "file_id": 380,
+        "content": "The code replaces the original topology with a new one, adds nodes and edges to the graph, converts the graph, and prints the serialized data.",
+        "type": "comment"
+    },
+    "3322": {
+        "file_id": 381,
+        "content": "/validity_check.py",
+        "type": "filepath"
+    },
+    "3323": {
+        "file_id": 381,
+        "content": "The code defines a function \"someFunction\" with optional parameter 'param3' and creates dictionaries as arguments. It then iterates through the list of arguments, calling the function with each one using dictionary unpacking. If the function call succeeds, it prints \"SUCCEED WITH ARGx\", where x is the index of the argument; if it fails, it prints \"FAILED WITH ARGx\". The code also defines a class 'A' with a class variable and constructor incrementing and printing its value.",
+        "type": "summary"
+    },
+    "3324": {
+        "file_id": 381,
+        "content": "def someFunction(param1, param2, param3=3):\n    ...\narg_0 = {\"param1\": 1}\narg_1 = {\"param1\": 1, \"param2\": 2}\narg_2 = {\"param1\": 1, \"param3\": 3}\narg_3 = {\"param1\": 1, \"param2\": 2, \"param3\": 3}\nargs = [arg_0, arg_1, arg_2, arg_3]\nfor i, arg in enumerate(args):\n    try:\n        someFunction(**arg)\n        print(f\"SUCCEED WITH ARG{i}\")\n    except:\n        print(f\"FAILED WITH ARG{i}\")\nclass A:\n    val = 1\n    def __init__(self):\n        self.__class__.val+=1\n        print(\"VALUE?\",self.__class__.val)\nA()\nA()",
+        "type": "code",
+        "location": "/validity_check.py:1-27"
+    },
+    "3325": {
+        "file_id": 381,
+        "content": "The code defines a function \"someFunction\" with optional parameter 'param3' and creates dictionaries as arguments. It then iterates through the list of arguments, calling the function with each one using dictionary unpacking. If the function call succeeds, it prints \"SUCCEED WITH ARGx\", where x is the index of the argument; if it fails, it prints \"FAILED WITH ARGx\". The code also defines a class 'A' with a class variable and constructor incrementing and printing its value.",
+        "type": "comment"
+    }
+}

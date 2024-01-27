@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines load format for workdays and holidays, calculates seasonal days, generates day lists and checks for overlap between weekday and holiday sets. It also stores day-wise data in a dictionary with day indices as keys and their main categories as values.",
+    "details": [
+        {
+            "comment": "Code defines load format for workdays and holidays, initializes a list of these formats, and calculates the number of days in each season. It then generates lists of days for each season using cumulative sum of month lengths and checks if the day is in any of the defined holiday sets. The code also defines a dictionary for storing day-wise data with keys as day indices and values as their main categories.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/typical_day_calc.py\":0-40",
+            "content": "from log_utils import logger_print\nimport numpy\nimport scipy  # for KNN\nfrom pydantic import BaseModel, validator, Field\nload_format = {\"workday\": [0, 1, 2, 3, 4], \"hoilday\": [5, 6]}\nload_format1 = {\"workday\": [1, 2, 3, 4, 5], \"hoilday\": [0, 6]}\nlfs = [load_format, load_format1]\n# assert day in range(7)\n# \u6e29\u5ea6\u805a\u7c7b -> 9 sets -> avg wind/solar\n# shape: 1x365\n# \u6625\u5b63\u662f3\u6708\u52305\u6708\uff0c\u590f\u5b63\u662f6\u6708\u52308\u6708\uff0c\u79cb\u5b63\u662f9\u6708\u523011\u6708\uff0c\u51ac\u5b63\u662f12\u6708\u52302\u6708\n# \u5e73\u5e74\u76842\u6708\u662f28\u5929\uff0c\u95f0\u5e742\u6708\u662f29\u5929\u3002\n# 4\u6708\u30016\u6708\u30019\u6708\u300111\u6708\u5404\u662f30\u5929\u3002\n# 1\u6708\u30013\u6708\u30015\u6708\u30017\u6708\u30018\u6708\u300110\u6708\u300112\u6708\u5404\u662f31\u5929\u3002\nmonth_days = [31] * 12\nmonth_days[1] = 28\nmonth_days[4 - 1] = month_days[6 - 1] = month_days[9 - 1] = month_days[11 - 1] = 30\nmdr = numpy.cumsum(month_days)\nlogger_print(mdr)\nspring_days = [d for d in range(mdr[1], mdr[4])]\nsummer_days = [d for d in range(mdr[4], mdr[7])]\nautumn_days = [d for d in range(mdr[7], mdr[10])]\nwinter_days = [\n    d for d in range(365) if d not in spring_days + summer_days + autumn_days\n]\n# {day_index: {\"main\": main_category, \"\"}}\n# append by keys.\n# {data_key: [index, ...]}\nfor lf in lfs:\n    wd, hd = set(lf[\"workday\"]), set(lf[\"hoilday\"])"
+        },
+        {
+            "comment": "The code checks if the intersection of weekday (wd) and holiday (hd) sets is empty, indicating no overlap between them. It also confirms that the union of both sets covers all days from 0 to 6 (representing a typical day in a week).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/typical_day_calc.py\":41-42",
+            "content": "    assert wd.intersection(hd) == set()\n    assert wd.union(hd) == set(range(7))"
+        }
+    ]
+}

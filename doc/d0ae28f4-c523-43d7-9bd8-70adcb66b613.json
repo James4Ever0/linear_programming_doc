@@ -1,0 +1,10 @@
+{
+    "summary": "This command is using 7z (a compression tool) to add multiple Python files (integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py) into a single compressed archive named \"integratedEnergySystemPrototypes.py\". The REM keyword indicates a comment in batch scripting, suggesting there will be more commands added later to this script.",
+    "details": [
+        {
+            "comment": "This command is using 7z (a compression tool) to add multiple Python files (integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py) into a single compressed archive named \"integratedEnergySystemPrototypes.py\". The REM keyword indicates a comment in batch scripting, suggesting there will be more commands added later to this script.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/network_visualize_packup.cmd\":0-1",
+            "content": "7z a integratedEnergySystemPrototypes.py demo_utils.py cpExample.py\nREM more to come!"
+        }
+    ]
+}

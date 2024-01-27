@@ -1,0 +1,10 @@
+{
+    "summary": "The code iterates over a list of device names, creates a test function for each device, sets the fuel value to 1 for certain devices (like gas and diesel generators), registers constraints for the device, and exports simulation results and curve data using globally accessible variables.",
+    "details": [
+        {
+            "comment": "The code iterates over a list of device names, creates a test function for each device, sets the fuel value to 1 for certain devices (like gas and diesel generators), registers constraints for the device, and exports simulation results and curve data using globally accessible variables.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_export.py.j2\":0-16",
+            "content": "from common_fixtures import *\nfrom export_format_validate import *\n{% for devInfoName in devNames %}\n    {% set devName = devInfoName.strip(\"\u4fe1\u606f\")%}\n    {% set testModel = \"\u6d4b\u8bd5{}\u6a21\u578b\".format(devName) %}\ndef test_{{devName}}_export({{testModel}}):\n    timeParam = 10\n    {% if devName in [\"\u71c3\u6c14\u53d1\u7535\u673a\", \"\u67f4\u6cb9\u53d1\u7535\"] %}\n    {{testModel}}.\u71c3\u6599\u70ed\u503c = 1\n    {% endif %}\n    {{testModel}}.constraints_register()\n    for attrName in ['{{devName}}\u4eff\u771f\u7ed3\u679c', '{{devName}}\u51fa\u529b\u66f2\u7ebf']:\n        if obj:=globals().get(attrName, None):\n            obj.export({{testModel}}, timeParam)\n{% endfor %}"
+        }
+    ]
+}

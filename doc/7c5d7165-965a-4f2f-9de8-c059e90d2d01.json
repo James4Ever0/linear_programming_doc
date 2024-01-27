@@ -1,0 +1,10 @@
+{
+    "summary": "Setting PATH variable to include CPLEX bin directory and enabling better exceptions for running Python script test_topo_check.py with additional flag -f. Alternative PyPI mirror site options provided.",
+    "details": [
+        {
+            "comment": "Setting PATH variable to include CPLEX bin directory and enabling better exceptions for running Python script test_topo_check.py with additional flag -f. Alternative PyPI mirror site options provided.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_test.sh\":0-2",
+            "content": "env PATH=\"$PATH:/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx/\" BETTER_EXCEPTIONS=1 python3 test_topo_check.py -f\n# alternative pypi mirrow sites:\n# - https://pypi.douban.com/simple"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports pstats module, creates a Stats object from 'profile.bin' file, filters and sorts the stats, then prints the resulting statistics.",
+    "details": [
+        {
+            "comment": "This code imports pstats module, creates a Stats object from 'profile.bin' file, filters and sorts the stats, then prints the resulting statistics.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/print_profile.py\":0-4",
+            "content": "import pstats\n# from pstats import SortKey\np = pstats.Stats('profile.bin')\nstats = p.strip_dirs().sort_stats(2)\nstats.print_stats()"
+        }
+    ]
+}

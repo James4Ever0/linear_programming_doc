@@ -1,0 +1,15 @@
+{
+    "summary": "The code sends POST requests, retrieves calculation IDs, checks states using GET requests, and revokes calculations. It uses requests library for HTTP communication and time module for sleep function. The purpose is to check if the task was cancelled between two GET requests.",
+    "details": [
+        {
+            "comment": "The code sends a POST request to a base URL with JSON data, then retrieves the calculation ID and checks its state by repeatedly sending GET requests to the same base URL. It also has the option to revoke the calculation. The code uses requests library for HTTP communication and imports time module for sleep function.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_celery_client_test.py\":0-40",
+            "content": "import json\nimport requests\nLOOP_COUNT = 20\nbase_url = \"http://localhost:9870\"\nurl = f\"{base_url}/calculate_async\"\nwith open(\"test_graph_data.json\", \"r\") as f:\n    test_graph = json.loads(f.read())\nr = requests.post(url, json=test_graph)\ndata = r.json()\nprint(\"DATA\", data)\ncalculation_id = data[\"calculation_id\"]\nr2 = requests.get(f\"{base_url}/calculation_async\")\ndata2 = r2.json()\ncalculation_id2 = data2[\"calculation_id\"]\nurl_new = f\"{base_url}/get_calculation_state\"\nimport time\n# import celery.states as S\n# PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED,\n# how to limit the task threads?\nfor i in range(LOOP_COUNT):\n    print(i)\n    r2 = requests.get(url_new, params=dict(calculation_id=calculation_id))\n    data2 = r2.json()\n    print(\"DATA2\", data2)  # STARTED.\n    # till: SUCCESS.\n    r3 = requests.get(url_new, params=dict(calculation_id=calculation_id))\n    data3 = r3.json()\n    print(\"DATA3\", data3)\n    # how many status indicators can it have?\n    time.sleep(1)\nurl_revoke = f\"{base_url}/revoke_calculation\""
+        },
+        {
+            "comment": "This code performs two GET requests to the same URL with a calculation ID parameter, prints the response data after each request, and pauses for 1 second between the requests. The purpose seems to be checking if the second request returns \"SUCCESS\" only if the first request had returned \"REVOKED\", indicating that the task was cancelled in between the two requests.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/fastapi_celery_client_test.py\":42-54",
+            "content": "r3 = requests.get(url_revoke, params=dict(calculation_id=calculation_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\nr3 = requests.get(url_revoke, params=dict(calculation_id=calculation_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\ntime.sleep(1)\nr2 = requests.get(url_new, params=dict(calculation_id=calculation_id))\ndata2 = r2.json()\nprint(\n    \"DATA2\", data2\n)  # SUCCESS if revoke after SUCCESS. but if revoke before SUCCESS it is REVOKED."
+        }
+    ]
+}

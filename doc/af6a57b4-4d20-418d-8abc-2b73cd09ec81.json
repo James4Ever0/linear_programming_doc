@@ -1,0 +1,10 @@
+{
+    "summary": "This Makefile defines the test target and sets environment variables for executing the tests. It uses pytest to run unittests on Python files, with specific options such as --lf, --lfnf=all, and --capture=tee-sys. The PYTHON variable is set based on the operating system (OS_TYPE), and it calls generate_code.py to generate functional_base.py from functional_base.py.j2.",
+    "details": [
+        {
+            "comment": "This Makefile defines the test target and sets environment variables for executing the tests. It uses pytest to run unittests on Python files, with specific options such as --lf, --lfnf=all, and --capture=tee-sys. The PYTHON variable is set based on the operating system (OS_TYPE), and it calls generate_code.py to generate functional_base.py from functional_base.py.j2.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/Makefile\":1-33",
+            "content": "# pass environment variables by higher level make invocation.\n.PHONY: test\n# PLATFORM := $(shell python -c \"import os; print(os.name)\")\n# ifeq (${PLATFORM}, )\n# PLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\n# endif\n# ifeq (${PLATFORM}, nt)\n# OS_TYPE = windows\n# else\n# OS_TYPE = macos\n# endif\n# PYTHON_ENV = -X utf8=1\n# ifeq (${OS_TYPE}, macos)\n# CONDA_ENV = rosetta\n# PYTHON = /usr/bin/python3\n# else\n# CONDA_ENV = cplex\n# PYTHON = python ${PYTHON_ENV}\n# endif\n# not unittest!\ntest:\n\tcd test && ${PYTHON} -m pytest --lf --lfnf=all --capture=tee-sys test_dsl.py\n\t# ${PYTHON} textx_syntax.py\nfunctional_base.py: functional_base.py.j2 generate_code.py\n\t${PYTHON} generate_code.py"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports BeautifulSoup to read and parse a feasopt.sol file, extracts variable values, stores them in a dictionary, writes the data as a JSON file with indentation, and prints the output path.",
+    "details": [
+        {
+            "comment": "Code imports BeautifulSoup to read and parse a feasopt.sol file, extracts variable values, stores them in a dictionary, writes the data as a JSON file with indentation, and prints the output path.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/load_feasopt_sol.py\":0-24",
+            "content": "# write a custom loader instead.\n# or use pyomo?\n# import lxml\nfrom bs4 import BeautifulSoup\n# sol_file = \"feasopt.xml\"\nsol_file = \"feasopt.sol\"\nwith open(sol_file, \"r\") as f:\n    file = f.read()\n# 'xml' is the parser used. For html files, which BeautifulSoup is typically used for, it would be 'html.parser'.\nsoup = BeautifulSoup(file, \"xml\")\n# breakpoint()\ndata = {}\nfor var in soup.find_all(\"variable\"):\n    name = var[\"name\"]\n    value = float(var[\"value\"])\n    data[name] = value\n    print(f\"%s: %s\" % (name, value))\nimport json\nwith open(output_path:=\"feasopt.json\", \"w+\") as f:\n    f.write(json.dumps(data, indent=4, ensure_ascii=False))\nprint(\"write to: %s\" % output_path)"
+        }
+    ]
+}

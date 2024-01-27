@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the defaultdict class from collections, creates an instance of it with a default value \"default\", and then prints the value associated with the key 'abc' and the entire dictionary.",
+    "details": [
+        {
+            "comment": "This code imports the defaultdict class from collections, creates an instance of it with a default value \"default\", and then prints the value associated with the key 'abc' and the entire dictionary.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_dict_fallback.py\":0-6",
+            "content": "# class DefaultDict\nfrom collections import defaultdict\nmDefaultDict = defaultdict(lambda: \"default\", a=1)\nprint(mDefaultDict[\"abc\"])\nprint(mDefaultDict)"
+        }
+    ]
+}

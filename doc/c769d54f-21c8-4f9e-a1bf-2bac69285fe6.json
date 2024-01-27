@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the CyClpSimplex class from the cylp.cy module, which is likely used for optimization and linear programming tasks within the microgrid_base project.",
+    "details": [
+        {
+            "comment": "This code imports the CyClpSimplex class from the cylp.cy module, which is likely used for optimization and linear programming tasks within the microgrid_base project.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/cbc_persistent.py\":0-0",
+            "content": "from cylp.cy import CyClpSimplex"
+        }
+    ]
+}

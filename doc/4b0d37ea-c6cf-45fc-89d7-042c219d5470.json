@@ -1,0 +1,10 @@
+{
+    "summary": "The code defines a function \"someFunction\" with optional parameter 'param3' and creates dictionaries as arguments. It then iterates through the list of arguments, calling the function with each one using dictionary unpacking. If the function call succeeds, it prints \"SUCCEED WITH ARGx\", where x is the index of the argument; if it fails, it prints \"FAILED WITH ARGx\". The code also defines a class 'A' with a class variable and constructor incrementing and printing its value.",
+    "details": [
+        {
+            "comment": "The code defines a function \"someFunction\" with optional parameter 'param3' and creates dictionaries as arguments. It then iterates through the list of arguments, calling the function with each one using dictionary unpacking. If the function call succeeds, it prints \"SUCCEED WITH ARGx\", where x is the index of the argument; if it fails, it prints \"FAILED WITH ARGx\". The code also defines a class 'A' with a class variable and constructor incrementing and printing its value.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/validity_check.py\":0-26",
+            "content": "def someFunction(param1, param2, param3=3):\n    ...\narg_0 = {\"param1\": 1}\narg_1 = {\"param1\": 1, \"param2\": 2}\narg_2 = {\"param1\": 1, \"param3\": 3}\narg_3 = {\"param1\": 1, \"param2\": 2, \"param3\": 3}\nargs = [arg_0, arg_1, arg_2, arg_3]\nfor i, arg in enumerate(args):\n    try:\n        someFunction(**arg)\n        print(f\"SUCCEED WITH ARG{i}\")\n    except:\n        print(f\"FAILED WITH ARG{i}\")\nclass A:\n    val = 1\n    def __init__(self):\n        self.__class__.val+=1\n        print(\"VALUE?\",self.__class__.val)\nA()\nA()"
+        }
+    ]
+}

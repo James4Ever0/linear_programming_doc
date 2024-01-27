@@ -1,0 +1,10 @@
+{
+    "summary": "This code generates a call graph of Python files using the pyan3 tool and saves it in DOT format. It iterates through each filepath, creates a command to execute pyan3 on each file with specific options, and executes the commands using os.system(). The resulting call graphs are saved as myuses_ followed by the file's base name without its extension.",
+    "details": [
+        {
+            "comment": "This code generates a call graph of Python files using the pyan3 tool and saves it in DOT format. It iterates through each filepath, creates a command to execute pyan3 on each file with specific options, and executes the commands using os.system(). The resulting call graphs are saved as myuses_ followed by the file's base name without its extension.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/generate_call_graph.cmd\":0-6",
+            "content": "@REM filepaths= [\"cpExample.py data_visualize_utils.py\", \"integratedEnergySystemPrototypes.py\", \"config.py\"] \n@REM import os\n@REM for filepath in filepaths:\n@REM     command = f\"pyan3 {filepath} --uses --no-defines --colored --grouped --annotated --dot > myuses_{filepath.split('.')[0]}.dot\"\n@REM     os.system(command)\n@REM pycallgraph graphviz -- cpExample.py\ncode2flow cpExample.py data_visualize_utils.py integratedEnergySystemPrototypes.py config.py"
+        }
+    ]
+}

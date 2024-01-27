@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary functions and libraries, creates a task using the Celery app, and continuously prints the status of that task indefinitely. It is likely used for monitoring task execution progress or status.",
+    "details": [
+        {
+            "comment": "This code imports necessary functions and libraries, creates a task using the Celery app, and continuously prints the status of that task indefinitely. It is likely used for monitoring task execution progress or status.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_wrapper_celery.py\":0-17",
+            "content": "from log_utils import logger_print\nfrom test_wrapper import MAIN_NAME, app\nfunction_id = f\"{MAIN_NAME}.mfunc\"\n# from celery.result import AsyncResult\ntask = app.send_task(function_id)\n# installed stub: pip install celery-types\n# task:AsyncResult = app.send_task(function_id)\nimport time\nimport rich\nwhile True:\n    time.sleep(1)\n    logger_print(\"STATUS?\", task.status)\n    # logger_print(dir(task), type(task))\n    logger_print(task.__dict__)"
+        }
+    ]
+}

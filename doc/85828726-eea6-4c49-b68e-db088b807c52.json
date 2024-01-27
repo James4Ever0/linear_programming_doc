@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports and tests a fixture named \"my_fixture\" from the \"test_common_fixtures\" module, and prints its value.",
+    "details": [
+        {
+            "comment": "This code imports and tests a fixture named \"my_fixture\" from the \"test_common_fixtures\" module, and prints its value.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_use_fixture.py\":0-4",
+            "content": "from test_common_fixtures import my_fixture\ndef test_use_fixture(my_fixture:str):\n    print(\"GETTING FIXTURE:\")\n    print(my_fixture)"
+        }
+    ]
+}

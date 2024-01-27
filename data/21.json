@@ -1,0 +1,538 @@
+{
+    "2100": {
+        "file_id": 235,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/Makefile.j2",
+        "type": "filepath"
+    },
+    "2101": {
+        "file_id": 235,
+        "content": "This code is a Jinja template for a Makefile, suggesting that it reduces boilerplate without using Ninja and may involve special variables to simplify the learning process.",
+        "type": "summary"
+    },
+    "2102": {
+        "file_id": 235,
+        "content": "{# without ninja, you need macro to reduce boilerplate.#}\n{# or learning special variables? #}",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/Makefile.j2:1-2"
+    },
+    "2103": {
+        "file_id": 235,
+        "content": "This code is a Jinja template for a Makefile, suggesting that it reduces boilerplate without using Ninja and may involve special variables to simplify the learning process.",
+        "type": "comment"
+    },
+    "2104": {
+        "file_id": 236,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/construct_ninja_file.py",
+        "type": "filepath"
+    },
+    "2105": {
+        "file_id": 236,
+        "content": "This code imports the necessary syntax from ninja and creates a new Ninja file named 'test.ninja'. The Writer class is used to write comment text into the file, which may be utilized for documentation or other purposes within the build system.",
+        "type": "summary"
+    },
+    "2106": {
+        "file_id": 236,
+        "content": "import ninja.ninja_syntax as NS\noutput_path = \"test.ninja\"\nwith open(output_path, 'w+') as f:\n    wt = NS.Writer(f)\n    wt.comment('comment text')\n    # wt.close()",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/construct_ninja_file.py:1-7"
+    },
+    "2107": {
+        "file_id": 236,
+        "content": "This code imports the necessary syntax from ninja and creates a new Ninja file named 'test.ninja'. The Writer class is used to write comment text into the file, which may be utilized for documentation or other purposes within the build system.",
+        "type": "comment"
+    },
+    "2108": {
+        "file_id": 237,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/dodo.py",
+        "type": "filepath"
+    },
+    "2109": {
+        "file_id": 237,
+        "content": "This function, 'task_random', seems to define a task for the purpose of executing some random operation or actions. Further details are missing in the provided code snippet, so it is unclear what exactly this task does or how it interacts with other parts of the program.",
+        "type": "summary"
+    },
+    "2110": {
+        "file_id": 237,
+        "content": "# for doit.\ndef task_random():\n    ...",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/dodo.py:1-4"
+    },
+    "2111": {
+        "file_id": 237,
+        "content": "This function, 'task_random', seems to define a task for the purpose of executing some random operation or actions. Further details are missing in the provided code snippet, so it is unclear what exactly this task does or how it interacts with other parts of the program.",
+        "type": "comment"
+    },
+    "2112": {
+        "file_id": 238,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/generic.py",
+        "type": "filepath"
+    },
+    "2113": {
+        "file_id": 238,
+        "content": "The code imports the \"Any\" type from the typing module, initializes a variable 'a' with type Any and assigns it a value of 1. It can also be assigned the string '1' as an alternative. This allows for flexible data types in this context.",
+        "type": "summary"
+    },
+    "2114": {
+        "file_id": 238,
+        "content": "from typing import Any\na :Any= 1\n# a = '1'",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/generic.py:1-3"
+    },
+    "2115": {
+        "file_id": 238,
+        "content": "The code imports the \"Any\" type from the typing module, initializes a variable 'a' with type Any and assigns it a value of 1. It can also be assigned the string '1' as an alternative. This allows for flexible data types in this context.",
+        "type": "comment"
+    },
+    "2116": {
+        "file_id": 239,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/lfnf.py",
+        "type": "filepath"
+    },
+    "2117": {
+        "file_id": 239,
+        "content": "This code defines two test functions, `test_a` and `test_b`, where `test_a` asserts that 1 is equal to 1 and `test_b` asserts that 2 is equal to 1. The uncommented assertion in `test_b` will fail.",
+        "type": "summary"
+    },
+    "2118": {
+        "file_id": 239,
+        "content": "def test_a():\n    print(\"RUNNING A\")\n    assert 1 == 1\ndef test_b():\n    print(\"RUNNING B\")\n    # assert 1 == 1\n    assert 2 == 1",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/lfnf.py:1-8"
+    },
+    "2119": {
+        "file_id": 239,
+        "content": "This code defines two test functions, `test_a` and `test_b`, where `test_a` asserts that 1 is equal to 1 and `test_b` asserts that 2 is equal to 1. The uncommented assertion in `test_b` will fail.",
+        "type": "comment"
+    },
+    "2120": {
+        "file_id": 240,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/mytest.py",
+        "type": "filepath"
+    },
+    "2121": {
+        "file_id": 240,
+        "content": "Code snippet demonstrates the usage of pytest framework, Protocol class from typing module, and defines various variables and functions. It also explains how to invoke multiple persistent pytest sessions using ninja and the concept of fixtures in pytest.",
+        "type": "summary"
+    },
+    "2122": {
+        "file_id": 240,
+        "content": "import pytest\nfrom typing import Sequence, TypeVar, Optional, Protocol\nChooseable = TypeVar(\"Chooseable\") # can limit the choice of vars.\n# pytest -s to print to stdout without collecting\n# pytest --capture=tee-sys\nclass mProto(Protocol):\n    mattr:...\n    def mfunc(self, *args, **kwargs): ...\na :mProto\na = 1 # type error\nc = \"abc\"\nc:str\nc:int\nfor b in [1,2,3]:\n    b: mProto\n# ninja -> invoke multiple pytest \"persistant\" sessions, not cleaning cache and not rerunning the test if passed test -> clean cache only by passing target \"clean\" to ninja\ndef demo(mtest: Optional[int] = ...):\n    ...\n@pytest.fixture\ndef mfixture():\n    print(\"fixture running\")\n    return 42\n# seems fixture is to be called every time invoked.\ndef test_request_cache(request):\n    val = request.config.cache.get(\"val\", None)\n    print(f\"Value? {repr(val)}\")\ndef test_fixture(mfixture):\n    print(\"FIXTURE VAL?\", mfixture)\n    assert mfixture == 43\ndef test_fixture2(mfixture):\n    print(\"VAL2?\", mfixture)\n    assert mfixture == 43",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/mytest.py:1-47"
+    },
+    "2123": {
+        "file_id": 240,
+        "content": "Code snippet demonstrates the usage of pytest framework, Protocol class from typing module, and defines various variables and functions. It also explains how to invoke multiple persistent pytest sessions using ninja and the concept of fixtures in pytest.",
+        "type": "comment"
+    },
+    "2124": {
+        "file_id": 241,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/Makefile",
+        "type": "filepath"
+    },
+    "2125": {
+        "file_id": 241,
+        "content": "This code detects the platform by executing a Python script that prints the operating system name. If the result is empty, it tries with Python 3 on macOS, and finally assigns the value to PLATFORM variable. The main target echoes the platform value for testing purposes.",
+        "type": "summary"
+    },
+    "2126": {
+        "file_id": 241,
+        "content": "PLATFORM := $(shell python -c \"import os; print(os.name)\")\nifeq (${PLATFORM}, )\nPLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\nendif\n# macos: posix.\nmain:\n\techo ${PLATFORM}",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/platform_detect_makefile/Makefile:1-8"
+    },
+    "2127": {
+        "file_id": 241,
+        "content": "This code detects the platform by executing a Python script that prints the operating system name. If the result is empty, it tries with Python 3 on macOS, and finally assigns the value to PLATFORM variable. The main target echoes the platform value for testing purposes.",
+        "type": "comment"
+    },
+    "2128": {
+        "file_id": 242,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/test_buffer.py",
+        "type": "filepath"
+    },
+    "2129": {
+        "file_id": 242,
+        "content": "Infinite loop, continuously printing \"OUTPUT\" every second using the time module.",
+        "type": "summary"
+    },
+    "2130": {
+        "file_id": 242,
+        "content": "import time\nwhile True:\n    time.sleep(1)\n    print(\"OUTPUT\")",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/test_buffer.py:1-5"
+    },
+    "2131": {
+        "file_id": 242,
+        "content": "Infinite loop, continuously printing \"OUTPUT\" every second using the time module.",
+        "type": "comment"
+    },
+    "2132": {
+        "file_id": 243,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py",
+        "type": "filepath"
+    },
+    "2133": {
+        "file_id": 243,
+        "content": "This code uses NewType and namedtuple to ensure type usage, implements protocols for arithmetic operations and subscription access, includes a list length function mfunc, and a type-checking myfun.",
+        "type": "summary"
+    },
+    "2134": {
+        "file_id": 243,
+        "content": "from typing import (\n    Any,\n    Generic,\n    Protocol,\n    TypeVar,\n    cast,\n    overload,\n    runtime_checkable,\n    NewType,\n)\nfrom typing_extensions import Never\nfrom collections import namedtuple\n# from typing import NamedTuple\nfrom typing_extensions import TypeGuard, Concatenate, assert_type, assert_never, SupportsIndex, reveal_type\nv = 1\nif type(v) == float:\n    assert False # will it raise error?\n# myList:SupportsIndex = dict()\n# concatenate is for decorators.\nval: int = 0\nassert_type(val, int)  # only for type checker.\nassert_type(val, str)\nif False:\n    assert_never(val)\n    # assert False\nmNewStr = NewType(\"mNewStr\", str)  # you can configure to ignore it.\n# mNewStr = NewType(\"mStr\", str) # ignore: [misc]\n# class Point(NamedTuple):\n#     a: int\n#     b: int\n# s = Point(a=1, b='')\n# s.b\nnt = namedtuple(\"nt\", \"a b c d\")\ninstNt = nt(a=1, b=2, c=1, d=2)\ninstNt.a\nfrom typing import List\ndef get_list() -> List[str]:\n    lst = [\"PyCon\"]\n    lst.append(2019)\n    return [str(x) for x in lst]\nT = TypeVar(\"T\")\na = []  # type: list",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py:1-52"
+    },
+    "2135": {
+        "file_id": 243,
+        "content": "This code snippet imports various typing modules and functions, performs type assertions and checks, defines a custom data type using NewType, and demonstrates usage of namedtuple and TypeVar. It also includes a function that returns a list of strings.",
+        "type": "comment"
+    },
+    "2136": {
+        "file_id": 243,
+        "content": "# a = 1 # type: list\n# how to make some traits of protocol to ensure that term will not implement?\n# class NotList(Protocol):\n#     def __getitem__(*args:Never,**kwargs:Never ) -> Never:...\n# numA:NotList = 1\nclass ArithmaticType(Protocol):\n    \"\"\"\n    Protocol of which able to do arithmatic operations.\n    \"\"\"\n    def __add__(self, v, /) -> Any:\n        ...\n    def __sub__(self, v, /) -> Any:\n        ...\n    def __mul__(self, v, /) -> Any:\n        ...\n    def __div__(self, v, /) -> Any:\n        ...\n    def __eq__(self, v, /) -> Any:\n        ...\n    def __ne__(self, v, /) -> Any:\n        ...\n    def __le__(self, v, /) -> Any:\n        ...\n    def __ge__(self, v, /) -> Any:\n        ...\nclass ReadableBySubscription(Protocol):\n    def __getitem__(self, index: int, /) -> Any:\n        ...\nclass Subscripable(ReadableBySubscription, Protocol):\n    def __setitem__(self, index: int, /) -> Any:\n        ...\n@runtime_checkable\nclass AddAndLength(Protocol):\n    def __add__(self, v, /) -> Any:\n        ...\n    def __len__(self) -> Any:\n        ...",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py:53-108"
+    },
+    "2137": {
+        "file_id": 243,
+        "content": "This code defines protocol classes for arithmetic operations, subscription-based read and write access, and addition with length calculation. The purpose is to ensure that certain types can be used in specific contexts.",
+        "type": "comment"
+    },
+    "2138": {
+        "file_id": 243,
+        "content": "def mfunc(param: AddAndLength) -> int:\n    print(\"You don't care what I do\")\n    length = len(param)\n    print(\"LEN:\", length)\n    return length\n# mfunc(123)\nmfunc([\"i am list\"])\n# a: AddAndLength\na = []\n# a = 123\n# skip pyomo library stub?\nfrom pyomo.environ import ConcreteModel, Var  # type: ignore\nmodel = ConcreteModel()\nmodel.x = cast(ReadableBySubscription, Var([0, 1, 2]))\n# model.x = cast(ReadableBySubscription, Var([0, 1, 2]))\nmodel.x[1]\nmodel.v = cast(ArithmaticType, Var())\nval = model.v * 1\n@overload\ndef myfun(val: int) -> float:\n    ...\n@overload\ndef myfun(val: float) -> int:\n    ...\ndef myfun(val):\n    if type(val) == float:\n        return int(val)\n    elif type(val) == int:\n        return float(val)\n    else:\n        raise Exception(\"Unacceptable type:\", type(val))\nval = myfun(1)\n# from runtype import Dispatch\n# dp = Dispatch()\n# @dp\n# def mf(a: int) -> float:\n#     print(\"RUNNING A\")\n#     return float(a)\n# @dp\n# def mf(a: float) -> int:\n#     print(\"RUNNING B\")\n#     return int(a)\n# unable to statically typecheck",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/type_check.py:111-175"
+    },
+    "2139": {
+        "file_id": 243,
+        "content": "Function mfunc takes a list as input, calculates and returns the length of the list.\n\nType-checking function myfun converts int to float or vice versa based on input type.",
+        "type": "comment"
+    },
+    "2140": {
+        "file_id": 244,
+        "content": "/microgrid_base/makefile_ninja_pytest_incremental_test/typecheck.py",
+        "type": "filepath"
+    },
+    "2141": {
+        "file_id": 244,
+        "content": "This code demonstrates how the type checker can be used to ensure function arguments are of expected types. It defines a function `int_or_str` that takes an argument of type `int | str` and uses a match statement to handle each case separately. The type checker throws an error when attempting to pass an unsupported type, and the function never_call_me is used to verify that all possible types are covered.",
+        "type": "summary"
+    },
+    "2142": {
+        "file_id": 244,
+        "content": "# from typing import NoReturn\nfrom typing_extensions import Never\ndef never_call_me(arg: Never):\n    pass\n# do mypy check.\n# mypy --python-version <version> does not work for version higher than interpreter's.\ndef int_or_str(arg: int | str) -> None:\n    never_call_me(arg)  # type checker error\n    match arg:\n        case int():\n            print(\"It's an int\")\n        case str():\n            print(\"It's a str\")\n        case _:\n            never_call_me(arg)  # OK, arg is of type Never",
+        "type": "code",
+        "location": "/microgrid_base/makefile_ninja_pytest_incremental_test/typecheck.py:1-19"
+    },
+    "2143": {
+        "file_id": 244,
+        "content": "This code demonstrates how the type checker can be used to ensure function arguments are of expected types. It defines a function `int_or_str` that takes an argument of type `int | str` and uses a match statement to handle each case separately. The type checker throws an error when attempting to pass an unsupported type, and the function never_call_me is used to verify that all possible types are covered.",
+        "type": "comment"
+    },
+    "2144": {
+        "file_id": 245,
+        "content": "/microgrid_base/metaclass_field_verification.py",
+        "type": "filepath"
+    },
+    "2145": {
+        "file_id": 245,
+        "content": "The code defines a metaclass for abstract methods, creates custom types, and implements a metaclass-based approach for multiplication operations in MyKlass class. It also initializes objects, uses Template class, and logs results using logger_print function.",
+        "type": "summary"
+    },
+    "2146": {
+        "file_id": 245,
+        "content": "from log_utils import logger_print\n# def mproperty(ptype:type, doc:str):\n# def fget(self):\n#     return\n# def fset(self, val):\n#     self. = val\n# def fdel(self):\n#     del self.\n# return property(fget, fset,fdel,doc)\n# class mymetaclass(type):\n#     def __new__(cls, ):\n#         ...\n#     def __init__(cls, name, bases, dict):\n#         ...\n# class MyClass(metaclass=mymetaclass):\n#     def __init__(self, ):\n#         ...\nimport abc\nclass MyABC(metaclass=abc.ABCMeta):\n    # class MyABC(abc.ABC):\n    @abc.abstractmethod\n    def myfunc(self) -> int:  # this alone does not ensure it has the function.\n        ...\nMyABC.register(dict)\nlogger_print(issubclass(MyABC, dict))\nlogger_print(issubclass(dict, MyABC))  # True\nclass mclass(MyABC):\n    def __init__(self):\n        ...\n    # must implement myfunc.\n    # checked by type checker.\n    def myfunc(self):\n        return 1.0\na = mclass()\n# may be useless to typechecker?\n# b:MyABC = {}\nfrom typing import Any\n# b: Any = lambda x: x+1\nfrom typing_extensions import TypeGuard, reveal_type",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:1-58"
+    },
+    "2147": {
+        "file_id": 245,
+        "content": "Code defines a metaclass that ensures classes implementing an abstract method, implemented using the abc module. The code also includes type checking and logging functionality.",
+        "type": "comment"
+    },
+    "2148": {
+        "file_id": 245,
+        "content": "from typing import TypeVar, NewType, overload\n# typed code better generate with jinja2\np_int = NewType(\"p_int\", int)\np_float = NewType(\"p_float\", float)\nT = TypeVar(\"T\", p_int, p_float)\nT0 = TypeVar(\"T0\", int, float)\n@overload\ndef is_positive(x: int) -> TypeGuard[p_int]:\n    ...\n@overload\ndef is_positive(x: float) -> TypeGuard[p_float]:\n    ...\ndef is_positive(x):  # type: ignore\n    # def is_positive(x: T0) -> TypeGuard[T]:\n    return isinstance(x, (float, int)) and x > 0\na0 = -1\n# is_positive(a0) and a0-1\nif is_positive(a0):\n    logger_print(a0)  # positive now.\nis_positive(False)\n# mypy --disallow-untyped-defs --disallow-any-expr --disallow-any-generics --disallow-any-explicit --disallow-any-unimported --disallow-any-decorated --disallow-subclassing-any --disallow-subclassing-any --disallow-untyped-globals --disallow-untyped-calls\n# lambda types shall be inferred in typed function parameters\nfrom typing import Protocol\nclass mproto:\n    a: int\nmproto_processed = NewType(\"mproto_processed\", mproto)\nfrom typing import Union, Generic",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:59-102"
+    },
+    "2149": {
+        "file_id": 245,
+        "content": "Defines `is_positive` function, which returns a type guard for either `p_int` or `p_float` based on the input value. Uses `NewType` and `TypeVar` to define custom types and overload the `is_positive` function to handle both `int` and `float` inputs.",
+        "type": "comment"
+    },
+    "2150": {
+        "file_id": 245,
+        "content": "from typing_extensions import TypeVarTuple, Unpack\nT1 = TypeVar(\"T1\")\nT2 = TypeVar(\"T2\")\nT3 = TypeVar(\"T3\")\nT4 = TypeVar(\"T4\")\nTs = TypeVarTuple(\"Ts\")\ndef mymul(a: T1, b: T2) -> Union[T1, T2]:\n    return a * b  # type: ignore\nfrom typing_extensions import TypeAlias, Self, assert_never\nclass mybase(Generic[T3], mproto):\n    processed = False\n    mybase_proc = NewType(\"mybase_proc\", int)\n    def __init__(self, val: T3):\n        self.val = val\n    @classmethod\n    def create(cls, val: T3):\n        return cls(getattr(val, \"val\", val))\n    def __mul__(self, other: T4):  # type:ignore\n        # if not isinstance(other, mproto): assert_never(other)\n        val = mymul(getattr(self, \"val\", self), getattr(other, \"val\", other))\n        return val\n    # def __mul__(self: Self, other: T2) -> Union[Self, T2]:\n    #     assert_type(other, mybase)\n    #     return self * other\nclass mybase_proc(mybase):\n    ...\nfrom typing import cast, Type, List\nMInt: Type = NewType(\"MInt\", int)\nNewInt: TypeAlias = cast(MInt, mybase)\nb: mybase[int] = mybase(1)",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:103-148"
+    },
+    "2151": {
+        "file_id": 245,
+        "content": "Code defines a class `mybase` with type genericity and implements the `__mul__` method for multiplication. It also introduces `mybase_proc` as a subclass of `mybase`. The code further defines `MInt` and `NewInt` as types using `NewType` for integer values, and instantiates an object `b` of class `mybase` with type parameter `int`.",
+        "type": "comment"
+    },
+    "2152": {
+        "file_id": 245,
+        "content": "c = b.__mul__(1.2)\nfrom typing_extensions import assert_type\nassert_type(b, mproto_processed)\nd = mybase.create(NewInt(1))\n# d: mybase[int] = mybase()\nE: mybase[str] = mybase(\"1\")\nd = d * E\nf: mybase[List[int]] = mybase([1])\ng = f * 1\n# g = mymul(E , f)\n# g = E.__mul__(f)\nh = g * 2\nlogger_print(h)\n# assert_type(h, mybase[str])\nimport time\nclass MyMeta(type):\n    def __new__(cls, name, bases, dct):\n        logger_print(\"-----------------------------------\")\n        logger_print(\"Allocating memory for class\", name)\n        logger_print(cls)\n        logger_print(bases)\n        dct[\"new_var\"] = \"new\"\n        logger_print(dct)\n        s = super(MyMeta, cls)\n        logger_print(s)\n        logger_print()\n        return s.__new__(cls, name, bases, dct)\n    def __init__(cls, name, bases, dct):\n        s = super(MyMeta, cls)\n        logger_print(s)\n        logger_print()\n        s.__init__(name, bases, dct)  # not working. maybe it is on \"bases\" or \"name\"\n        logger_print(\"-----------------------------------\")\n        logger_print(\"Initializing class\", name)",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:149-189"
+    },
+    "2153": {
+        "file_id": 245,
+        "content": "This code defines a metaclass called MyMeta, which has two methods: `__new__` and `__init__`. The `__new__` method is used to allocate memory for a class and adds a new variable 'new_var' to its dictionary. The `__init__` method initializes the class by calling the superclass's `__init__` method. The code also prints log messages for different stages of the process, uses the logging module, and performs multiplication operations using a metaclass-based approach.",
+        "type": "comment"
+    },
+    "2154": {
+        "file_id": 245,
+        "content": "        logger_print(cls)\n        logger_print(bases)\n        cls.init_var = f\"init{time.time()}\"  # no?\n        logger_print(dct)\n    def __call__(cls, *args, **kwds):\n        logger_print(\"__call__ of \", str(cls))\n        logger_print(\"__call__ *args=\", str(args))\n        logger_print(\"__call__ **kargs=\", str(kwds))\n        logger_print()\n        # return cls( *args, **kwds)\n        return type.__call__(cls, *args, **kwds)\n# class MyKlass(object):\n#     __metaclass__ = MyMeta\nclass MyKlass(metaclass=MyMeta):\n    # def __new__(cls, a):\n    #     logger_print(\"myklass new\")\n    #     logger_print(dir(cls))\n    #     super(MyKlass, cls).__new__(cls)\n    #     logger_print()\n    init_var: str\n    def __init__(self, a):\n        self.a = a\n        logger_print(\"class non-meta init\")\n        logger_print(dir(self))\n        logger_print()\n    def foo(self, param):\n        pass\n    barattr = 2\nmk = MyKlass(a=1)\nlogger_print(\"*\" * 50)\nmk2 = MyKlass(a=9)\ndir(mk2)\nlogger_print(mk.init_var)\nlogger_print(mk2.init_var)\n# logger_print(MyMeta.init_var)",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:190-234"
+    },
+    "2155": {
+        "file_id": 245,
+        "content": "Code defines a metaclass \"MyMeta\" for class \"MyKlass\". The metaclass overrides the __call__ method, and initializes the \"init_var\" attribute with a timestamp. Class \"MyKlass\" has an instance method \"foo\", non-meta class init function, and two objects \"mk\" and \"mk2\" are created. \"MyMeta\" initializes the \"init_var\" attribute in its __call__ method. The code also performs some logging operations.",
+        "type": "comment"
+    },
+    "2156": {
+        "file_id": 245,
+        "content": "from string import Template\nt = Template(\"$arr value $arr2\").substitute(arr=[\"a\", \"b\"], arr2=[\"c\", \"d\"])\nlogger_print(t)",
+        "type": "code",
+        "location": "/microgrid_base/metaclass_field_verification.py:236-239"
+    },
+    "2157": {
+        "file_id": 245,
+        "content": "This code snippet is using the Template class from Python's string module to create a template with placeholders for arrays \"arr\" and \"arr2\". It then substitutes the actual array values [\"a\", \"b\"] and [\"c\", \"d\"] into the template, resulting in a new string. Finally, it logs this resulting string using logger_print function.",
+        "type": "comment"
+    },
+    "2158": {
+        "file_id": 246,
+        "content": "/microgrid_base/microgrid_topo_check.py",
+        "type": "filepath"
+    },
+    "2159": {
+        "file_id": 246,
+        "content": "The code prepares the environment, creates power generation objects, defines microgrid topology, initializes electrolyzers, optimizes parameters, calculates energy flow with error handling, saves graph configuration as JSON files, and provides logging functionality.",
+        "type": "summary"
+    },
+    "2160": {
+        "file_id": 246,
+        "content": "import os\nos.environ[\"SKIP_ARGENV\"] = \"True\"\nos.environ[\"DOTENV\"] = \".test_microgrid_topo_env\"\n# os.environ[\"DOTENV\"] = \".test_topo_env\"\ndata_fpath = \"./heatpump_code_reference/windspeed_and_illumination_8760.dat\"\nwindspeed = []  # m/s\nillumination = []  # W/m2 -> kW/m2\n# NO_BATTERY = True\nNO_BATTERY = False\n# NO_ELEC_LOAD=True\nNO_ELEC_LOAD = False\n# NO_RENEWABLE=True\nNO_RENEWABLE = False\nDEBUG = True\n# DEBUG = False\nwith open(data_fpath, \"r\") as f:\n    for line in f.readlines():\n        line = line.strip()\n        if line.startswith(\"#\"):\n            continue\n        dat = line.split()\n        if len(dat) == 4:\n            num_dat = [float(e) for e in dat]\n            windspeed.append(num_dat[3] + 4)\n            illumination.append(num_dat[1] / 1000)\nfrom log_utils import logger_print\nfrom config import *\n# ies_env.VAR_INIT_AS_ZERO = \"1\"\n# os.environ[\n#     \"PERCENT_WARNING_THRESHOLD\"\n# ] = \"1\"  # percent value less or equal than this value shal be warned\nimport json\nfrom topo_check import *\n# import rich\nif DEBUG:\n    datalen = 24",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:1-47"
+    },
+    "2161": {
+        "file_id": 246,
+        "content": "This code sets up the environment for microgrid topology checking. It defines constants such as NO_BATTERY, NO_ELEC_LOAD, and NO_RENEWABLE. It also checks a windspeed and illumination data file line by line, appending the processed data to the respective lists. The code then imports necessary modules for logging, configuration, and topology checking. Additionally, it sets up DEBUG mode if needed, and specifies additional environment variables as required.",
+        "type": "comment"
+    },
+    "2162": {
+        "file_id": 246,
+        "content": "else:\n    datalen = 8760\n####################\n# build from code. #\n####################\n# FIXED: 加法器没有\"output\"\ndef print_with_banner(data, banner: str):\n    logger_print()\n    logger_print(\"=\" * 40 + f\"[{banner}]\")\n    logger_print(data)\n    logger_print()\n# you may need pydantic here. verify then import to compute graph.\nfrom ies_optim import *\nfrom export_format_validate import *\n# import numpy as np\n# a = abs(np.random.random((24,))).tolist()\na = [100] * datalen  # this is not random.\n# a = abs(np.random.random((datalen,))).tolist()\n# algoParam = 计算参数(计算步长=\"小时\", 典型日=False, 计算类型=\"仿真模拟\", 风速=a, 光照=a, 气温=a, 年利率=0.1).dict()\nif DEBUG:\n    extraParams = dict(\n        典型日代表的日期=[1],\n        典型日=True,\n    )\nelse:\n    extraParams = dict(\n        典型日=False,\n    )\nalgoParam = 计算参数(\n    计算目标=\"经济\",\n    # 计算目标=\"经济_环保\",\n    # 计算目标=\"环保\",\n    计算步长=\"小时\",\n    # 典型日代表的日期=[1, 2],\n    计算类型=\"设计规划\",\n    # 风速=windspeed,\n    # 光照=illumination,\n    风速=windspeed[:datalen],\n    光照=illumination[:datalen],\n    气温=a,\n    贴现率=9,\n    # 贴现率=0.1,\n    # 年利率=0.1,\n    **extraParams,",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:48-99"
+    },
+    "2163": {
+        "file_id": 246,
+        "content": "This code defines a function `print_with_banner` for printing data with a banner, imports necessary libraries, creates a list 'a' of length 8760 (representing hours in a year), and sets up computation parameters 'algoParam' based on DEBUG mode and extraParams. It uses different parameter settings depending on whether in debugging or non-debugging mode. The parameters include the calculation goal, time step, type, wind speed, illumination, and discount rate.",
+        "type": "comment"
+    },
+    "2164": {
+        "file_id": 246,
+        "content": ").dict()\n# topo = 拓扑图()  # with structure?\ntopo = 拓扑图(**algoParam)  # with structure?\ndevParam = dict(生产厂商=\"Any\", 设备型号=\"Any\")\n# devParam = dict(生产厂商=\"Any\", 设备型号=\"Any\", 设备名称=\"Any\")\nP1 = 光伏发电信息(\n    **devParam,\n    设备名称=\"光伏1\",\n    Area=2.59,\n    RenewableEnergyConsumptionConstraint=新能源消纳约束.限制消纳率,\n    RenewableEnergyConsumptionRate=95,\n    # too low for percentage\n    PowerConversionEfficiency=90,\n    # PowerConversionEfficiency=0.9,\n    MaxPower=0.6,\n    PowerDeltaLimit=10,\n    CostPerKilowatt=0.14,\n    CostPerYearPerKilowatt=0.002,\n    VariationalCostPerWork=0,\n    Life=25,\n    BuildCostPerKilowatt=0.14,\n    BuildBaseCost=0,\n    MaxInstallArea=4300,\n    MinInstallArea=4300,\n    DeviceCount=4300,\n).dict()\n光伏发电1 = 光伏发电(topo, param=P1)  # 这种是增加新的光伏发电\nWT_P1 = 风力发电信息(\n    **devParam,\n    设备名称=\"风力1\",\n    RenewableEnergyConsumptionConstraint=新能源消纳约束.限制消纳率,\n    RenewableEnergyConsumptionRate=95,\n    CutoutPower=2350,\n    RatedPower=2500,\n    RatedWindSpeed=9,\n    MinWindSpeed=3,\n    MaxWindSpeed=20,\n    PowerDeltaLimit=10,\n    CostPerKilowatt=0.4,",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:100-143"
+    },
+    "2165": {
+        "file_id": 246,
+        "content": "This code is creating solar and wind power generation information objects with specified parameters and adding them to a topology.",
+        "type": "comment"
+    },
+    "2166": {
+        "file_id": 246,
+        "content": "    CostPerYearPerKilowatt=0.005,\n    VariationalCostPerWork=0,\n    Life=25,\n    BuildCostPerKilowatt=0.2,\n    BuildBaseCost=0,\n    MaxDeviceCount=12,\n    MinDeviceCount=12,\n    DeviceCount=12,\n).dict()\n风力发电1 = 风力发电(topo, param=WT_P1)\n柴油1 = 柴油(\n    topo,\n    param=柴油信息(\n        设备名称=\"Any\",\n        Price=(9.2, \"元/L\"),\n        热值=(9.1667, \"kWh/L\"),\n        CO2=(2.583, \"kg/L\"),\n        NOX=(0.01, \"kg/L\"),\n        SO2=(0.01, \"kg/L\"),\n    ).dict(),\n    # param=柴油信息(设备名称=\"Any\", Price=(10, \"L/元\"), 热值=(10, \"MJ/L\"), CO2=(10, \"kg/L\")).dict(),\n)\np1 = 柴油发电信息(\n    **devParam,\n    设备名称=\"柴油发电1\",\n    RatedPower=1e4,\n    PowerDeltaLimit=0.3,\n    PowerStartupLimit=0.0001,\n    CostPerMachine=6,\n    CostPerYearPerMachine=0.1,\n    VariationalCostPerWork=0.1,\n    Life=15,\n    BuildCostPerMachine=0.2,\n    BuildBaseCost=0,\n    DieselToPower_Load=[\n        (\n            0.13,\n            29,\n        ),\n        (\n            0.145,\n            36,\n        ),\n        (\n            0.164,\n            43,\n        ),\n        (\n            0.18,\n            50,\n        ),",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:144-198"
+    },
+    "2167": {
+        "file_id": 246,
+        "content": "Creating wind and diesel power objects with given parameters. Wind turbine (WT_P1) and diesel generator (Diesel info, tsuru-miku) are instantiated with specific attributes like RatedPower, PowerDeltaLimit, etc., for a microgrid topology check.",
+        "type": "comment"
+    },
+    "2168": {
+        "file_id": 246,
+        "content": "        (\n            0.19,\n            57,\n        ),\n        (\n            0.21,\n            64,\n        ),\n        (\n            0.224,\n            71,\n        ),\n        (\n            0.238,\n            79,\n        ),\n        (\n            0.26,\n            86,\n        ),\n        (\n            0.294,\n            93,\n        ),\n        (\n            0.365,\n            100,\n        ),\n    ],\n    DeviceCount=20,\n    MaxDeviceCount=20,\n    MinDeviceCount=20,\n).dict()\n# breakpoint()\n柴油发电1 = 柴油发电(\n    topo,\n    param=p1,\n)\n# breakpoint()\ndef 变流器工厂(index, dc: int, rp: float):\n    ret = 变流器(\n        topo,\n        param=变流器信息(\n            **devParam,\n            设备名称=f\"变流器{index}\",\n            RatedPower=rp,\n            CostPerKilowatt=0.023,\n            CostPerYearPerKilowatt=0.00023,\n            VariationalCostPerWork=0,\n            Life=20,\n            Efficiency=99,\n            BuildCostPerKilowatt=0,\n            BuildBaseCost=0,\n            DeviceCount=dc,\n            MaxDeviceCount=dc,\n            MinDeviceCount=dc,\n        ).dict(),\n    )\n    return ret",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:199-260"
+    },
+    "2169": {
+        "file_id": 246,
+        "content": "This code defines a microgrid topology, including generators and transformers, with specific parameters. The code creates a generator using the defined parameters and a transformer factory function to create transformers based on their index, DC rating, and power rating. The breakpoint() is used for debugging purposes.",
+        "type": "comment"
+    },
+    "2170": {
+        "file_id": 246,
+        "content": "变流器1 = 变流器工厂(1, 35, 1000)  # 风机\n变流器2 = 变流器工厂(2, 12, 1000)  # 光伏\n变流器3 = 变流器工厂(3, 7, 5000)\n变流器4 = 变流器工厂(4, 3, 5000)\n# import random\nLOAD_H = 氢负荷(\n    topo,\n    param=氢负荷信息(\n        **devParam,\n        设备名称=\"氢负荷1\",\n        # LoadType=负荷类型.Normal,\n        LoadType=负荷类型.Flexible,\n        # Pmin=0,\n        Pmin=100,\n        Pmax=1500,\n        EnergyConsumption=[1500] * len(a),\n        PriceModel=常数氢价(Price=18),\n    ).dict(),\n)\nif not NO_ELEC_LOAD:\n    LOAD_E = 电负荷(\n        topo,\n        param=电负荷信息(\n            **devParam,\n            设备名称=\"电负荷1\",\n            LoadType=负荷类型.Flexible,\n            Pmin=100,\n            Pmax=500,\n            EnergyConsumption=[400] * len(a),  # TODO: fix data retrieval bug\n            PriceModel=常数电价(Price=1),\n        ).dict(),\n    )\nif not NO_BATTERY:\n    锂电池1 = 锂电池(\n        topo,\n        param=锂电池信息(\n            **devParam,\n            设备名称=\"锂电池1\",\n            循环边界条件=\"日间连接\",\n            RatedCapacity=1000,\n            CostPerCapacity=0.06,\n            CostPerYearPerCapacity=0,\n            VariationalCostPerWork=0.05,",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:263-309"
+    },
+    "2171": {
+        "file_id": 246,
+        "content": "Creating transformers for wind and solar power, initializing loads with flexible types, setting minimum and maximum energy consumption values, and defining prices for hydrogen and electrical loads.",
+        "type": "comment"
+    },
+    "2172": {
+        "file_id": 246,
+        "content": "            Life=15,\n            BatteryDeltaLimit=0.5,\n            ChargeEfficiency=92,\n            DischargeEfficiency=92,\n            BuildCostPerCapacity=0.03,\n            BuildBaseCost=0,\n            InitSOC=50,\n            BatteryStorageDecay=0,\n            # BatteryStorageDecay=0.5,\n            BatteryLife=10,\n            LifetimeCycleCount=6000,\n            # TotalDischargeCapacity=1000,\n            MaxSOC=100,\n            MinSOC=15,\n            TotalCapacity=20000,\n            MaxTotalCapacity=20000,\n            MinTotalCapacity=1000,\n        ).dict(),\n    )\n    双向变流器1 = 双向变流器(\n        topo,\n        param=双向变流器信息(\n            **devParam,\n            设备名称=\"双向变流器1\",\n            RatedPower=1250,\n            Efficiency=100,\n            CostPerKilowatt=0,\n            # CostPerKilowatt=0.014,\n            CostPerYearPerKilowatt=0,\n            VariationalCostPerWork=0,\n            Life=20,\n            BuildCostPerKilowatt=0,\n            BuildBaseCost=0,\n            MaxDeviceCount=40,\n            MinDeviceCount=10,\n            DeviceCount=40,",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:310-346"
+    },
+    "2173": {
+        "file_id": 246,
+        "content": "This code defines a battery and a bidirectional converter for a microgrid. The battery has parameters such as capacity, lifetime, efficiency, and decay rate. The converter has parameters including rated power, efficiency, cost per kilowatt, and device count range. The code creates instances of these devices based on the specified parameters.",
+        "type": "comment"
+    },
+    "2174": {
+        "file_id": 246,
+        "content": "        ).dict(),\n    )\n电解槽1 = 电解槽(\n    topo,\n    param=电解槽信息(\n        **devParam,\n        设备名称=f\"电解槽1\",\n        RatedInputPower=1e5,\n        HydrogenGenerationStartupRate=0.001,\n        HydrogenGenerationEfficiency=100,\n        DeltaLimit=3.4,\n        HeatRecycleEfficiency=100,\n        CostPerMachine=900,\n        CostPerYearPerMachine=5,\n        VariationalCostPerWork=0.01,\n        Life=15,\n        BuildCostPerMachine=20,\n        BuildBaseCost=0,\n        MaxDeviceCount=6,\n        MinDeviceCount=6,\n        DeviceCount=6,\n    ).dict(),\n)\n# 电解槽2 = 电解槽(\n#     topo,\n#     param=电解槽信息(\n#         **devParam,\n#         设备名称=f\"电解槽2\",\n#         RatedInputPower=1000,\n#         HydrogenGenerationStartupRate=5,\n#         HydrogenGenerationEfficiency=60,\n#         DeltaLimit=50,\n#         HeatRecycleEfficiency=70,\n#         CostPerMachine=800,\n#         CostPerYearPerMachine=5,\n#         VariationalCostPerWork=0.01,\n#         Life=15,\n#         BuildCostPerMachine=20,\n#         BuildBaseCost=0,\n#         MaxDeviceCount=6,\n#         MinDeviceCount=1,",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:347-390"
+    },
+    "2175": {
+        "file_id": 246,
+        "content": "This code creates an electrolyzer device named \"电解槽1\" with given parameters and adds it to the topology. It utilizes a class called \"电解槽\" and passes the topology and device parameters to initialize the electrolyzer object. The parameters include rated input power, hydrogen generation efficiency, cost per machine, etc.",
+        "type": "comment"
+    },
+    "2176": {
+        "file_id": 246,
+        "content": "#         DeviceCount=6,\n#     ).dict(),\n# )\n传输线1 = 传输线(\n    topo,\n    param=传输线信息(\n        **devParam,\n        设备名称=\"传输线1\",\n        Optimize=True,\n        U=10000,\n        Rho=2.94e-8,\n        GivenAveragePower=10000,\n        GivenMaxPower=10000,\n        Pwire_Asec_Pr=[\n            (7200, 95, 3.3),\n            (7800, 120, 3.7),\n            (9000, 150, 4.2),\n            (10500, 185, 4.7),\n            (11200, 210, 5.1),\n            (12200, 240, 5.5),\n            (13100, 300, 6.2),\n            (16000, 400, 7.4),\n            (26000, 600, 12.4),\n            (39000, 900, 19.2),\n            (109000, 900, 19.2),\n        ],\n        PowerTransferDecay=0,\n        CostPerKilometer=0,\n        CostPerYearPerKilometer=0,\n        Life=20,\n        BuildCostPerKilometer=0,\n        BuildBaseCost=0,\n        Length=20,\n    ).dict(),\n)\nif not NO_RENEWABLE:\n    母线1 = 母线(topo, \"可连接母线\")\n    母线2 = 母线(topo, \"可连接母线\")\n母线3 = 母线(topo, \"可连接母线\")\n# 母线4 = 母线(topo, \"可连接母线\")\n# 母线5 = 母线(topo, \"可连接母线\")\ndef 创建连接线(left, right):\n    连接线(topo, \"不可连接母线\", left, right)\nif not NO_RENEWABLE:",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:391-440"
+    },
+    "2177": {
+        "file_id": 246,
+        "content": "This code creates a transmission line and three connection lines in the microgrid topology. It also includes an optional function to create additional connection lines if renewable energy sources are enabled. The transmission line is optimized with specific parameters and the connection lines cannot be connected directly to each other.",
+        "type": "comment"
+    },
+    "2178": {
+        "file_id": 246,
+        "content": "    创建连接线(风力发电1.电接口, 变流器1.电输入)\n    创建连接线(光伏发电1.电接口, 变流器2.电输入)\n    创建连接线(变流器1.电输出, 母线1.id)\n    创建连接线(变流器2.电输出, 母线2.id)\n    创建连接线(母线1.id, 变流器3.电输入)\n    创建连接线(母线2.id, 变流器4.电输入)\n创建连接线(柴油1.燃料接口, 柴油发电1.燃料接口)\n创建连接线(柴油发电1.电接口, 母线3.id)\n# 创建连接线(变流器3.电输出, 母线3.id)\n# 创建连接线(变流器4.电输出, 母线3.id)\n创建连接线(母线3.id, 电解槽1.电接口)\nif not NO_BATTERY:\n    # 创建连接线(锂电池1.电接口, 母线3.id)\n    创建连接线(锂电池1.电接口, 双向变流器1.储能端)\n    创建连接线(传输线1.电输入, 母线3.id)\n    创建连接线(传输线1.电输出, 双向变流器1.线路端)\n    # 创建连接线(双向变流器1.线路端, 母线3.id)\n# 创建连接线(母线3.id, 传输线1.电输入)\n# 创建连接线(传输线1.电输出, 母线4.id)\n# if not NO_BATTERY:\n#     创建连接线(锂电池1.电接口, 双向变流器1.储能端)\n#     创建连接线(双向变流器1.线路端, 母线4.id)\n# 创建连接线(传输线1.电输出, 电解槽1.电接口)\n# # 创建连接线(母线4.id, 电解槽1.电接口)\n# # 创建连接线(母线4.id, 电解槽2.电接口)\n# if not NO_ELEC_LOAD:\n#     创建连接线(母线4.id, LOAD_E.电接口)\n创建连接线(电解槽1.制氢接口, LOAD_H.氢气接口)\n# 创建连接线(电解槽2.制氢接口, 母线5.id)\n# 创建连接线(母线5.id, LOAD_H.氢气接口)\n# 创建连接线(母线5.id, LOAD_H.氢气接口)\n# L1 = 母线(graph)\n# # walk over all connections.\n# conn = 连接线(graph, PV.ports[\"电接口\"], LOAD.ports[\"电接口\"])\n# conn_merge = 合并线(L0, L1)  # what do you do?\n# we will do it later.",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:441-492"
+    },
+    "2179": {
+        "file_id": 246,
+        "content": "Creates connections between components in a microgrid setup: connects wind and solar energy sources to transformers, mother lines to transformers and battery if applicable, battery to bidirectional converter, transmission line to bidirectional converter and mother line, electrolyzer to hydrogen load, and additional connections related to hydrogen load and mother line 5.",
+        "type": "comment"
+    },
+    "2180": {
+        "file_id": 246,
+        "content": "# try:\n#     topo.check_consistency()\n# except Exception as e:\n#     # raise e\n#     pass\n# shall raise error.\n# methods for computing.\nfrom fastapi_celery_functions import calculate_energyflow_graph_base\n# TODO: add test of celery app\nfrom fastapi_datamodel_template import EnergyFlowGraph\nimport os\nmdict = topo.to_json()\nimport json\nmdictList = [mdict]\n# breakpoint()  # error while reloading params\nEFG = EnergyFlowGraph(mDictList=mdictList, residualEquipmentLife=2)  # override default.\njson_dump_params = dict(ensure_ascii=False, indent=4)\nwith open(\"microgrid_topo_check_test_input.json\", \"w+\") as f:\n    json.dump(EFG.dict(), f, **json_dump_params)\nret = calculate_energyflow_graph_base(EFG.dict())\nlogger_print(ret)\nif ret:\n    with open(saved_path := \"microgrid_test_output_full.json\", \"w+\") as f:\n        f.write(json.dumps(ret, **json_dump_params))\n    logger_print(f\"dumped to: {saved_path}\")",
+        "type": "code",
+        "location": "/microgrid_base/microgrid_topo_check.py:493-526"
+    },
+    "2181": {
+        "file_id": 246,
+        "content": "This code is creating an EnergyFlowGraph object using a microgrid topology dictionary and overriding the default equipment life to 2 years. It then saves the graph configuration as a JSON file, calculates energy flow based on the configuration using `calculate_energyflow_graph_base` function, logs the result, and if there's a successful calculation, it saves the output JSON as well. The code also includes error handling for any exceptions during consistency check of the microgrid topology.",
+        "type": "comment"
+    },
+    "2182": {
+        "file_id": 247,
+        "content": "/microgrid_base/mock_data_test.py",
+        "type": "filepath"
+    },
+    "2183": {
+        "file_id": 247,
+        "content": "The code uses DataclassFactory to generate instances, builds EnergyFlowGraphs from JSON files, generates random data, and logs instances for testing. It iterates over nodes, creates device power curves, generates planning and simulation results, logs CalculationResult objects, and manipulates number data.",
+        "type": "summary"
+    },
+    "2184": {
+        "file_id": 247,
+        "content": "from log_utils import logger_print\n# import os\n# import random\n# def urandom_deterministic(__size:int):\n#     return random.randbytes(__size)\n# # override system rng.\n# os.urandom = urandom_deterministic\nfrom datetime import date, datetime\nfrom typing import List, Union\nfrom pydantic import BaseModel, UUID4\nfrom pydantic_factories import ModelFactory\nclass Person(BaseModel):\n    id: UUID4\n    name: str\n    hobbies: List[str]\n    age: Union[float, int]\n    birthday: Union[datetime, date]\nclass PersonFactory(ModelFactory):\n    __model__ = Person\n    # not working!\n    # __random_seed__ = 100\n# not working.\n# import random\n# random.seed(100)\nPersonFactory.seed_random(100)  # working again!\nresult = PersonFactory.build()\nlogger_print(result)\n# exit()\n# random.seed(100)\n# result = PersonFactory.build()\n# logger_print(result)\n##############################################################\nfrom dataclasses import dataclass\n# from random import Random\nfrom polyfactory.factories import DataclassFactory\n@dataclass\nclass Person:\n    name: str",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:1-59"
+    },
+    "2185": {
+        "file_id": 247,
+        "content": "Importing necessary modules and defining a Person class with attributes such as ID, name, hobbies, age, and birthday. Creating a PersonFactory to generate instances of the Person class using pydantic_factories. Seeding random number generator for consistent results. Building a Person instance using the factory and logging the result.",
+        "type": "comment"
+    },
+    "2186": {
+        "file_id": 247,
+        "content": "    age: float\n    height: float\n    weight: float\nclass PersonFactory(DataclassFactory[Person]):\n    __model__ = Person\n    # __random__ = Random(\n    #     10\n    # )  # this is not really deterministic, unless you manually specify sampling logic\n    # @classmethod\n    # def name(cls) -> str:\n    #     return cls.__random__.choice([\"John\", \"Alice\", \"George\"])\nPersonFactory.seed_random(b\"\\x00\\x01\")\n# PersonFactory.seed_random(100) # working!\np = PersonFactory.build()\nlogger_print(p)\np = PersonFactory.build()\nlogger_print(p)\n# exit()\n# def test_setting_random() -> None:\n#     # the outcome of 'factory.__random__.choice' is deterministic, because Random is configured with a set value.\n#     assert PersonFactory.build().name == \"George\"\n#     assert PersonFactory.build().name == \"John\"\n#     assert PersonFactory.build().name == \"Alice\"\nfrom fastapi_datamodel_template import (\n    单次计算结果,\n    CalculationResult,\n    ObjectiveResult,\n    规划结果详情_翻译,\n    规划方案概览_翻译,\n    设备出力曲线,\n    仿真结果,\n    出力曲线,\n    曲线,\n    mDict,\n)\n# not working. but we can do this later.",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:60-104"
+    },
+    "2187": {
+        "file_id": 247,
+        "content": "This code defines a PersonFactory class using the DataclassFactory to create instances of the Person class. The seed_random method is used to ensure deterministic randomness in generating person attributes. The logger_print function prints the created person instance, and the code includes functionality for testing randomization but it's commented out. It also imports various classes and dictionaries from a different module.",
+        "type": "comment"
+    },
+    "2188": {
+        "file_id": 247,
+        "content": "# class 单次计算结果工厂(ModelFactory):\n#     __model__ = 单次计算结果\n# cr = 单次计算结果工厂.build()\n# logger_print(cr)\n# create output based on input.\nfrom ies_optim import EnergyFlowGraph\n# class EnergyFlowGraphFactory(ModelFactory):\n#     __model__ = EnergyFlowGraph\n# input_data = EnergyFlowGraphFactory.build()\n# logger_print(input_data)\n# with open(mock_input:='mock_data_energy_flow_graph.json', 'w+') as f:\n#     f.write(input_data.json())\n# logger_print('write to:', mock_input)\nmock_input = \"mock_data_energy_flow_graph.json\"\ninput_data = EnergyFlowGraph.parse_file(mock_input)\nlogger_print(input_data)\n# seed input\nimport random\nfrom config import ies_env\nfirstMDict: mDict = input_data.mDictList[0]\ncalcTarget = firstMDict.graph.计算目标\ncalcStepSize = firstMDict.graph.计算步长\nif calcStepSize == \"小时\":\n    curve_elemsize = 8760\n    curve_x_unit = \"时\"\nelif calcStepSize == \"秒\":\n    curve_elemsize = 7200\n    curve_x_unit = \"秒\"\nelse:\n    raise Exception(\"Unknown calculation step size: %s\" % calcStepSize)\nif calcTarget == \"经济_环保\":\n    mDictCount = 9",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:105-149"
+    },
+    "2189": {
+        "file_id": 247,
+        "content": "This code is defining two factories, 单次计算结果工厂 and EnergyFlowGraphFactory, which create instances of 单次计算结果 and EnergyFlowGraph models respectively. It then builds an instance of the EnergyFlowGraph model using input data from a JSON file, \"mock_data_energy_flow_graph.json\". The code checks the calculation step size (小时 or 秒) and calculates the curve element size and x-unit accordingly. If the calculation target is \"经济_环保\", it sets mDictCount to 9.",
+        "type": "comment"
+    },
+    "2190": {
+        "file_id": 247,
+        "content": "elif calcTarget in [\"经济\", \"环保\"]:\n    mDictCount = 1\nelse:\n    raise Exception(\"Unknown calculation target: %s\" % calcTarget)\nfrom solve_model import targetTypeAsTargetName\nplanType = targetTypeAsTargetName(calcTarget)\nresultList = []\n# class 规划方案概览_翻译_工厂(DataclassFactory[规划方案概览_翻译]):\nclass 规划方案概览_翻译_工厂(ModelFactory):\n    __model__ = 规划方案概览_翻译\n# class 规划结果详情_翻译_工厂(DataclassFactory[规划结果详情_翻译]):\nclass 规划结果详情_翻译_工厂(ModelFactory):\n    __model__ = 规划结果详情_翻译\n# class 仿真结果工厂(DataclassFactory[仿真结果]):\nclass 仿真结果工厂(ModelFactory):\n    __model__ = 仿真结果\nif ies_env.DETERMINISTIC_MOCK:\n    import hashlib\n    input_bytes = input_data.json().encode(\"utf-8\")\n    input_hash = hashlib.sha1(input_bytes).digest()\n    random.seed(input_hash)\n    规划方案概览_翻译_工厂.seed_random(input_hash)\n    规划结果详情_翻译_工厂.seed_random(input_hash)\n    仿真结果工厂.seed_random(input_hash)\nfor _ in range(mDictCount):\n    obj_r = ObjectiveResult(\n        financialObjective=random.uniform(10, 1000),\n        environmentalObjective=random.uniform(10, 1000),\n    )\n    prt = []\n    ps = 规划方案概览_翻译_工厂.build()",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:150-191"
+    },
+    "2191": {
+        "file_id": 247,
+        "content": "This code is part of a larger program, and it appears to be generating random results for objective functions based on the \"calculation target\" input. If the calculation target is either \"经济\" or \"环保\", the code generates one result; otherwise, an exception is raised. The code creates factories (classes) for translating planning summaries, planning detail results, and simulation results. If the environment variable DETERMINISTIC_MOCK is set, it seeds random number generators based on input data hash to ensure deterministic mocking. The code then generates a specified number of objective result objects with random financial and environmental objectives.",
+        "type": "comment"
+    },
+    "2192": {
+        "file_id": 247,
+        "content": "    ps.planType = planType\n    pdl = []\n    srt = []\n    for elem in firstMDict.nodes:\n        if getattr(elem, \"type\") == \"设备\":\n            subtype = getattr(elem, \"subtype\")\n            param = getattr(elem, \"param\")\n            设备名称, 生产厂商, 设备型号 = (\n                getattr(param, \"设备名称\", \"未知\"),\n                getattr(param, \"生产厂商\", \"未知\"),\n                getattr(param, \"设备型号\", \"未知\"),\n            )\n            px = [f\"{i}{curve_x_unit}\" for i in range(curve_elemsize)]\n            py = [random.uniform(-10, 10) for _ in range(curve_elemsize)]\n            pcurve = 曲线(x=px, y=py)\n            abbr = \"功率\"\n            # abbr = ...\n            pl = [出力曲线(name=f\"{subtype}{abbr}曲线\", abbr=abbr, data=pcurve)]\n            pr = 规划结果详情_翻译_工厂.build()\n            pr.deviceName = 设备名称\n            pr.deviceModel = 设备型号\n            pd = 设备出力曲线(name=设备名称, plot_list=pl)\n            sr = 仿真结果工厂.build()\n            sr.name = 设备名称\n            sr.type = 设备型号\n            prt.append(pr)\n            pdl.append(pd)\n            srt.append(sr)",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:192-220"
+    },
+    "2193": {
+        "file_id": 247,
+        "content": "This code iterates over the \"firstMDict.nodes\" and creates a device power curve for each device with type \"设备\". It extracts the device name, manufacturer, and model from parameters, then generates random data for the power curve. It also builds planning result and simulation results for each device, and appends them to their respective lists.",
+        "type": "comment"
+    },
+    "2194": {
+        "file_id": 247,
+        "content": "            result = 单次计算结果(\n                objectiveResult=obj_r,\n                planningResultTable=prt,\n                planningSummary=ps,\n                performanceDataList=pdl,\n                simulationResultTable=srt,\n            )\n            resultList.append(result)\ncr = CalculationResult(\n    resultList=resultList,\n    residualEquipmentAnnualFactor=random.uniform(0, 5),\n    success=True,\n    error_log=\"\",\n)\n# finally, pass to the number manipulation routines.\nfrom reduce_demo_data_size import modifyValueIfNumber, modifyIfIsDeviceCount\nfrom json_utils import jsonApply\nprocessed_cr = jsonApply(cr.dict(), modifyValueIfNumber, modifyIfIsDeviceCount)\npcr_obj = CalculationResult.parse_obj(processed_cr)\nlogger_print(pcr_obj)",
+        "type": "code",
+        "location": "/microgrid_base/mock_data_test.py:222-245"
+    },
+    "2195": {
+        "file_id": 247,
+        "content": "This code creates a CalculationResult object with various attributes and appends it to a result list. It then creates another CalculationResult object, sets its properties, and passes it to number manipulation routines. The modified result is parsed into a new object and logged.",
+        "type": "comment"
+    },
+    "2196": {
+        "file_id": 248,
+        "content": "/microgrid_base/mock_reload.sh",
+        "type": "filepath"
+    },
+    "2197": {
+        "file_id": 248,
+        "content": "This code performs a mock reload of a microgrid server, deletes previous logs, and extracts release files. It also creates a new directory for history logs and moves the extracted files to the \"logs\" folder. Finally, it runs two scripts in a mock environment and switches to config.py for another mock reload.",
+        "type": "summary"
+    },
+    "2198": {
+        "file_id": 248,
+        "content": "# mkdir history_logs\n# mv microgrid_server_release/server/logs history_logs\n# rm -rf microgrid_server_release\n# 7z x release.7z\n# cd microgrid_server_release\n# cd init\n# bash init.sh\n# cd ..\n# cd server\n# # mkdir logs\n# mv /root/history_logs logs\n# env MOCK='1' bash fastapi_tmuxp.sh windows\n# env MOCK='1' bash reload.sh\n# switch to config.py\nenv MOCK_TEST='1' bash reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/mock_reload.sh:1-15"
+    },
+    "2199": {
+        "file_id": 248,
+        "content": "This code performs a mock reload of a microgrid server, deletes previous logs, and extracts release files. It also creates a new directory for history logs and moves the extracted files to the \"logs\" folder. Finally, it runs two scripts in a mock environment and switches to config.py for another mock reload.",
+        "type": "comment"
+    }
+}

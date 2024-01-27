@@ -1,0 +1,548 @@
+{
+    "1900": {
+        "file_id": 217,
+        "content": "unishRate =(quicksum_indexed_var(self.discardedRenewableEnergyPower)/self.计算参数.迭代步数)* self.RenewableEnergyConsumptionPunishmentRate\n        elif self.RenewableEnergyConsumptionConstraint == 新能源消纳约束.限制消纳率:\n            self.mw.Constraint(expr = (1-self.RenewableEnergyConsumptionRate)*quicksum_indexed_var(self.电输出) > self.RenewableEnergyConsumptionRate*quicksum_indexed_var(self.discardedRenewableEnergyPower))\n        elif self.RenewableEnergyConsumptionConstraint == 新能源消纳约束.无:\n            ...\n        else:\n            raise Exception(f\"未知新能源消纳约束：{self.RenewableEnergyConsumptionConstraint}\\n元件模型: {self.__class__.__name__}\")\n        {% elif class_name in ['柴油发电', '燃气发电机'] %}\n        {# 总最小启动功率 = self.RatedPower * self.PowerStartupLimit * self.DeviceCount #}\n        {# 总最小启动功率 = self.RatedPower * self.PowerStartupLimit #}\n        {# 总最大输出功率 = self.RatedPower * self.DeviceCount #}\n{# \n        self.RangeConstraintMulti(self.单台发电功率, expression = lambda x: x <= self.RatedPower)\n        self.RangeConstraint(self.原电输出, self.电功率中转.x, lambda x,y: x == y + 总最小启动功率)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2181-2194"
+    },
+    "1901": {
+        "file_id": 217,
+        "content": "This code is setting up constraints for renewable energy consumption and generator power limits. The constraints are based on the RenewableEnergyConsumptionConstraint parameter, which can be one of three types: limited intake rate, no limit, or unknown (which raises an exception). For certain generator classes like diesel or gas, there are further power limitations set up using RangeConstraintMulti and RangeConstraint functions.",
+        "type": "comment"
+    },
+    "1902": {
+        "file_id": 217,
+        "content": "        self.Piecewise(y_var = self.单台柴油输入, x_var = self.单台发电功率, y_vals = [-x[0]*self.RatedPower*x[1] for x in self.DieselToPower_Load], x_vals = [self.RatedPower*x[1] for x in self.DieselToPower_Load])\n        # 柴油输入率: L/h\n        self.RangeConstraintMulti(self.电功率中转.x_pos, self.电输出, self.电功率中转.b_pos, expression = lambda x,y,z: x + self.BinVarMultiplySingle(z,总最小启动功率) == y) #}\n        if self.设备信息.unitPlanningAlgorithmSelection == 油耗规划算法.平均:\n            self.RangeConstraint(self.电输出, self.Nrun_indicators.b_pos, lambda x,y: x >= y * self.RatedPower * self.PowerStartupLimit)\n            self.RangeConstraint(self.电输出, self.Nrun, lambda x, y: x <= y * self.RatedPower)\n            self.RangeConstraint(self.电输出, self.Nrun, lambda x, y: x >= (y-1) * self.RatedPower)\n            self.RangeConstraint(self.柴油输入, self.电输出, lambda x, y: -x == self.averageDieselConsumptionRate * y)\n        elif self.设备信息.unitPlanningAlgorithmSelection == 油耗规划算法.最佳:\n            子机组购买数目 = 0\n            {% set subModelParamsNeeded = [] %}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2196-2212"
+    },
+    "1903": {
+        "file_id": 217,
+        "content": "The code is part of a microgrid optimization process, defining constraints and relationships between various variables such as power output, diesel input, and unit planning algorithm selection. It uses functions like Piecewise, RangeConstraintMulti, BinVarMultiplySingle, and RangeConstraint to enforce these constraints and calculate the optimal values for each variable based on the selected algorithm. The code also sets initial values for subModelParamsNeeded and counts the number of sub-unit purchases.",
+        "type": "comment"
+    },
+    "1904": {
+        "file_id": 217,
+        "content": "            {% for p, r in subModelParamsAndRanges %}\n                {% if p not in ['是否开启'] %}\n                    {% do subModelParamsNeeded.append(p) %}\n                {% endif %}\n            {% endfor %}\n            {% for p in subModelParamsNeeded%}\n            子机组{{p}}求和 = [0]* self.计算参数.迭代步数\n            {% endfor%}\n            for i in range(self.子机组数目):\n                logger_print(f\"正在为第{i+1}个柴油子机组模型创建约束\")\n                子机组模型:设备模型 = self.子机组列表[i]\n            {% for p, r in subModelParamsAndRanges%}\n                子机组{{p}} = self.子机组{{p}}列表[i]\n            {% endfor%}\n                子机组是否购买 = self.子机组是否购买[i]\n                子机组模型.RangeConstraintMulti(子机组电输出, expression = lambda x: x <= 子机组是否购买 * self.BigM)\n                子机组模型.RangeConstraint(子机组电输出, 子机组是否开启, expression = lambda x,y: x <= y * self.RatedPower)\n                子机组模型.RangeConstraint(子机组电输出, 子机组是否开启, expression = lambda x,y: x >= y * self.RatedPower * self.PowerStartupLimit)\n                子机组模型.RangeConstraint(子机组是否开启, 子机组是否真的开启, expression = lambda x,y: 子机组模型.BinVarMultiplySingle(子机组是否购买, x) == y)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2213-2238"
+    },
+    "1905": {
+        "file_id": 217,
+        "content": "This code is part of a larger script that appears to be optimizing a microgrid. It is iterating through sub-models, creating constraints for each diesel sub-model, and checking the on/off status and power output for those models. The code creates constraints based on whether the sub-model is turned on or off, the rated power of the model, and a BigM value which seems to be used in expressions for some constraints. It also calculates the total sum of all sub-models' parameters and appends them to a list called subModelParamsNeeded. The code appears to be written in Python using the Jinja2 templating engine (judging by the {% %} syntax).",
+        "type": "comment"
+    },
+    "1906": {
+        "file_id": 217,
+        "content": "                {# for j in range(self.计算参数.迭代步数): #}\n                    {# 子机组是否真的开启求和[j] += 子机组是否真的开启[j] #}\n                if self.计算参数.计算步长 == \"秒\":\n                    # deltalimit\n                    subModelElectricityPowerDeltaLimit = self.RatedPower * self.PowerDeltaLimit / 100\n                    子机组模型.CustomRangeConstraintMulti(子机组电输出,子机组是否真的开启, customRange = range(self.计算参数.迭代步数), expression = lambda x,y,i: x[i+1] - x[i]>= -subModelElectricityPowerDeltaLimit*y)\n                    子机组模型.CustomRangeConstraintMulti(子机组电输出,子机组是否真的开启, customRange = range(self.计算参数.迭代步数), expression = lambda x,y,i: x[i+1] - x[i]<=subModelElectricityPowerDeltaLimit*y)\n            {% for p in subModelParamsNeeded %}\n                子机组{{p}}求和 = 子机组模型.TimeSummation(子机组{{p}}求和, 子机组{{p}})\n            {% endfor %}\n                子机组模型.Piecewise(\n                    y_var=子机组柴油输入,\n                    x_var=子机组电输出,\n                    y_vals=[-x[0] * self.RatedPower * x[1] for x in self.DieselToPower_Load],\n                    x_vals=[self.RatedPower * x[1] for x in self.DieselToPower_Load],",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2239-2257"
+    },
+    "1907": {
+        "file_id": 217,
+        "content": "This code is calculating the summation of subModelParamsNeeded for a subgroup model, setting constraints on the electrical output power delta based on the PowerDeltaLimit and the computation parameters' iteration steps. It also adds piecewise functions to the diesel input based on the electrical output power and rate.",
+        "type": "comment"
+    },
+    "1908": {
+        "file_id": 217,
+        "content": "                )\n            子机组购买数目 = quicksum_indexed_var(self.子机组是否购买)\n            self.mw.Constraint(expr = 子机组购买数目 == self.DeviceCount)\n            self.RangeConstraint(self.Nrun, 子机组是否真的开启求和, expression = lambda x,y: x==y)\n            {% for p in ['柴油输入', '电输出'] %}\n            self.RangeConstraint(self.{{p}}, 子机组{{p}}求和, expression = lambda x,y: x==y)\n            {% endfor %}\n        else:\n            raise Exception(f\"未知油耗规划算法：{self.设备信息.unitPlanningAlgorithmSelection}\") \n        {% elif class_name in ['锂电池'] %}\n        {# self.RangeConstraintMulti(self.CurrentTotalActualCapacity, expression = lambda x: x <= self.TotalActualCapacity) #}\n        self.mw.Constraint(self.CurrentTotalCapacity[0] == self.InitCapacityPerUnit * self.DeviceCount)\n        {# self.mw.Constraint(self.CurrentTotalActualCapacity[0] == self.InitActualCapacityPerUnit * self.DeviceCount) #}\n            {# {% if needStorageDecayCompensation%} #}\n        {# if self.needStorageDecayCompensation: #}\n            {# S(t) - (1-sigma*deltaT)*S(t-1) = (p0_pos - p0_neg)*deltaT #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2258-2279"
+    },
+    "1909": {
+        "file_id": 217,
+        "content": "This code is setting constraints for a microgrid device based on its type. It checks the device's planning algorithm and applies appropriate constraints such as total count, power input/output sums, and capacity limitations. If the algorithm is unknown or if it's a lithium battery, it sets constraints on current total capacity and initial capacity per unit. There are also conditional comments related to storage decay compensation.",
+        "type": "comment"
+    },
+    "1910": {
+        "file_id": 217,
+        "content": "            {# deltaT = 1 if 计算步长 == 小时 else 1/3600 #}\n        self.CustomRangeConstraintMulti(\n            self.原电接口.x,\n            self.CurrentTotalCapacity,\n            {# self.CurrentTotalPowerOfDecayCompensated, #}\n            customRange = range(self.计算参数.迭代步数 - 1),\n            expression = \n            lambda x, y, i: x[i] *self.计算参数.deltaT == (y[i] * (1- self.计算参数.deltaT * self.sigma)  - y[i + 1])\n            {# lambda x, y, z, i: x[i] - z[i] == (y[i] - y[i + 1]) * self.计算参数.时间参数, #}\n        )\n        self.RangeConstraintMulti(\n            self.原电接口.x_pos,\n            self.原电接口.x_neg,\n            self.电接口,\n            {# self.CurrentTotalPowerOfDecayCompensated,  #}\n            expression=lambda x_pos, x_neg, y: x_pos * self.DischargeEfficiency - (x_neg) / self.ChargeEfficiency == y,\n            {# expression=lambda x_pos, x_neg, y, z: x_pos * self.DischargeEfficiency- (x_neg + (self.TotalStoragePowerOfDecay - z)) / self.ChargeEfficiency== y, #}\n        )\n        {# {% else%} #}\n{#             \n        else:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2280-2300"
+    },
+    "1911": {
+        "file_id": 217,
+        "content": "This code section sets the deltaT value and defines two constraint functions for the microgrid model. The CustomRangeConstraintMulti function applies a constraint to the original interface's x values, while RangeConstraintMulti enforces constraints on the interface's x_pos and x_neg values. The functions use lambda expressions to calculate the differences between time-step values based on specified parameters such as deltaT, sigma, ChargeEfficiency, DischargeEfficiency, and TotalStoragePowerOfDecay.",
+        "type": "comment"
+    },
+    "1912": {
+        "file_id": 217,
+        "content": "            self.CustomRangeConstraint(self.原电接口.x, self.CurrentTotalCapacity, customRange = range(self.计算参数.迭代步数-1),expression =  lambda x,y,i: x[i] == (y[i] - y[i+1]) * {{时间步长参数}})\n            self.RangeConstraintMulti(self.原电接口.x_pos, self.原电接口.x_neg, self.电接口,expression = lambda x_pos, x_neg, y: x_pos * self.DischargeEfficiency - (x_neg + self.TotalStoragePowerOfDecay)/self.ChargeEfficiency == y) \n         #}\n            {# {% endif%} #}\n        {# power = delta(capacity)/delta(time)#}\n            {# {% if needStorageDecayCompensation%} #}\n            {# {%else%} #}\n            {# {% endif%} #}\n        {# for i in range(self.计算参数.迭代步数): #}\n        self.RangeConstraintMulti(self.原电接口.x_abs, expression = lambda x: x <= self.MaxTotalChargeOrDischargeRate)\n        {# for i in range(self.计算参数.迭代步数-1): #}\n            {# \n            self.mw.Constraint(self.CurrentTotalCapacity[i+1] - self.CurrentTotalCapacity[i] <= self.MaxTotalCapacityDeltaPerStep)\n            self.mw.Constraint(self.CurrentTotalCapacity[i+1] - self.CurrentTotalCapacity[i] >= -self.MaxTotalCapacityDeltaPerStep)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2301-2314"
+    },
+    "1913": {
+        "file_id": 217,
+        "content": "This code defines a range constraint for a microgrid base and adds constraints to ensure the total capacity and power flow within certain limits. The constraints include a custom range constraint, a range constraint multi, and two range constraint single. It also checks for storage decay compensation and sets a range constraint multi for absolute charging/discharging rates. The code iterates through steps in the calculation parameters.",
+        "type": "comment"
+    },
+    "1914": {
+        "file_id": 217,
+        "content": "            #}\n{# \n        {{设计规划}}:\n            # if self.设备信息.循环边界条件 == '日间独立':\n                # self.mw.Constraint(self.原电接口.x[0] == self.EPS)\n                # BUG: override suspicious constraints with init values.\n                # self.原电接口.x[0].set_value(self.EPS)\n            if self.设备信息.循环边界条件 == '日间连接':\n                self.mw.Constraint(self.CurrentTotalCapacity[0] - self.CurrentTotalCapacity[self.计算参数.迭代步数-1] <=self.MaxTotalCapacityDeltaPerStep)\n                self.mw.Constraint(self.CurrentTotalCapacity[0] - self.CurrentTotalCapacity[self.计算参数.迭代步数-1] >=-self.MaxTotalCapacityDeltaPerStep)\n                if self.needStorageDecayCompensation:\n            # {% if needStorageDecayCompensation%}\n                    self.mw.Constraint(\n                        self.原电接口.x[0] - self.CurrentTotalPowerOfDecayCompensated[0]\n                        == (\n                            self.CurrentTotalCapacity[self.计算参数.迭代步数 - 1]\n                            - self.CurrentTotalCapacity[0]\n                        )",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2315-2334"
+    },
+    "1915": {
+        "file_id": 217,
+        "content": "If self.设备信息.循环边界条件 is '日间独立', set the original interface's x[0] to EPS, and override any suspicious constraints with init values. If self.设备信息.循环边界条件 is '日间连接', add constraints for the CurrentTotalCapacity changes. If needStorageDecayCompensation, add a constraint for the original interface's x[0] equal to the difference between current total capacity and decay compensated power at step 0.",
+        "type": "comment"
+    },
+    "1916": {
+        "file_id": 217,
+        "content": "                        * self.计算参数.时间参数\n                    )\n            # {%else%}\n                else:\n                    self.mw.Constraint(self.原电接口.x[0] == (self.CurrentTotalCapacity[self.计算参数.迭代步数-1] - self.CurrentTotalCapacity[0]) * {{时间步长参数}})\n            # {% endif%} \n            else:\n                raise Exception(\"未知循环边界条件:\", self.设备信息.循环边界条件)\n        else: # 仿真模拟\n        # elif self.计算参数.计算类型 == \"仿真模拟\": \n            # self.mw.Constraint(self.原电接口.x[0] == self.EPS) \n            self.原电接口.x[0].set_value(self.EPS) #}\n        if self.计算参数.典型日:\n            self.mw.Constraint(self.CurrentTotalCapacity[self.计算参数.迭代步数 - 1] == self.CurrentTotalCapacity[0])\n            {# self.mw.Constraint((lambda x, y: x[self.计算参数.迭代步数 - 1] *self.计算参数.deltaT == (y[self.计算参数.迭代步数 - 1] * (1- self.计算参数.deltaT * self.sigma)  - y[0])) (self.原电接口.x, self.CurrentTotalCapacity)) #}\n        {% endif %}\n        {# 秒级功率变化限制，有特定的变量限制 #}\n        {% if class_name in ['光伏发电', '风力发电', '柴油发电', '燃气发电机'] %}\n            {% set extraDeltaLimitConditions = {",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2335-2357"
+    },
+    "1917": {
+        "file_id": 217,
+        "content": "This code checks the simulation type and the iteration number to set constraints for power output and perform calculations. It also includes a time step parameter and applies deltaT for power adjustment, and applies constraints for certain device types (like solar, wind, diesel, or gas generators). If the computation type is simulation, it sets the value directly. The code also checks if the typical day option is enabled and imposes constraints accordingly. It includes a condition to limit second-level power changes with specific variable limits for certain device classes.",
+        "type": "comment"
+    },
+    "1918": {
+        "file_id": 217,
+        "content": "                \"风力发电\":\" and self.设备信息.machineType != 风力发电类型.标幺值\",\n                \"柴油发电\":\" and self.设备信息.unitPlanningAlgorithmSelection != 油耗规划算法.最佳\",\n                \"燃气发电机\":\" and self.设备信息.unitPlanningAlgorithmSelection != 油耗规划算法.最佳\"\n            }%}\n        {{秒}} {{extraDeltaLimitConditions.get(class_name, \"\")}}:\n            总最大功率 = {{'self.MaxPower' if class_name in ['光伏发电'] else 'self.RatedPower'}} * self.DeviceCount\n            最大功率变化 = 总最大功率 * self.PowerDeltaLimit / 100\n            {% if class_name in ['柴油发电', '燃气发电机'] %}\n            最大下行功率变化生成 = lambda Nrun_t: Nrun_t * self.RatedPower * self.PowerDeltaLimit / 100\n            {% endif %}\n            self.CustomRangeConstraintMulti(self.电输出 , customRange = range(self.计算参数.迭代步数-1), expression = lambda x,i: x[i+1] - x[i] <= 最大功率变化)\n            {% if class_name in ['柴油发电', '燃气发电机']%}\n            self.CustomRangeConstraintMulti(self.电输出, self.Nrun, customRange = range(self.计算参数.迭代步数-1), expression = lambda x,y,i: x[i+1] - x[i] >= -最大下行功率变化生成(y[i]))",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2358-2370"
+    },
+    "1919": {
+        "file_id": 217,
+        "content": "This code checks the device type and applies power delta limit conditions accordingly. It calculates the maximum power and power change limits for different device types, then sets constraints on the output power for each time step using lambda expressions.",
+        "type": "comment"
+    },
+    "1920": {
+        "file_id": 217,
+        "content": "            {% else %}\n            self.CustomRangeConstraintMulti(self.电输出, customRange =  range(self.计算参数.迭代步数-1),expression = lambda x,i: x[i+1] - x[i] >= -最大功率变化)\n            {% endif %}\n        {% endif %}\n        {# elif self.计算参数.计算步长 == \"小时\":\n            ... # skip it.\n        else:\n            raise Exception(\"未知计算步长:\", self.计算参数.计算步长) #}\n        # 计算年化\n        # unit: one\n        {# if 计算参数.计算类型 == \"规划设计\": #}\n        {# 规划设计和仿真模拟都需要计算年化 #}\n        {%with%}\n        {% if class_name in ['锂电池'] %} \n        # TODO: to get LifetimeDischargeCapacityPerUnit working\n        self.LifetimeDischargeCapacityPerUnit = self.LifetimeCycleCount * self.RatedCapacity\n        \"\"\"\n        单块电池生命周期总放电量\n        单位: kWh\n        \"\"\"\n        计算范围内总平均放电功率 = (self.SumRange(self.原电接口.x_pos)/self.计算参数.迭代步数)# kW\n        {# 计算范围内总平均功率 = (self.SumRange(self.原电接口.x_abs)/self.计算参数.迭代步数)+ self.TotalStoragePowerOfDecay # kW #}\n        # avg power\n        一小时总电变化量 = 计算范围内总平均放电功率 # 省略乘1\n        {# 一小时总电变化量 = 计算范围内总平均功率 #}\n        # kWh\n        一年总电变化量 = 一小时总电变化量 * 每年小时数",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2371-2402"
+    },
+    "1921": {
+        "file_id": 217,
+        "content": "Code calculates the lifetime discharge capacity for a lithium battery, using rated capacity and lifecycle count. It also computes the average power over the simulation range and estimates the annual energy output based on hourly energy output and yearly hours.",
+        "type": "comment"
+    },
+    "1922": {
+        "file_id": 217,
+        "content": "        self.mw.Constraint(一年总电变化量 * self.BatteryLife <= self.DeviceCount * self.LifetimeDischargeCapacityPerUnit * 0.85)\n        assert self.BatteryLife >=1\n        assert self.Life >= self.BatteryLife\n        Life = self.BatteryLife\n        {%else%}\n        Life = self.Life\n        {%endif%}\n        self.年化率 = 计算年化率(self.计算参数.贴现率, Life)\n        {# self.年化率 = ((1+(self.计算参数.年利率/100)) ** Life) / Life #}\n        {% if class_name in ['光伏发电'] %}\n            {% set m = '总最大功率' %}\n            {% set vi = 'Kilowatt' %}\n            {% set vm = 'Kilowatt' %}\n            {% set vb = 'Kilowatt' %}\n            {% set vv = 'Work' %}\n        {% elif class_name in ['风力发电'] + 单向变电器列表 + ['双向变流器'] %}\n            {% set m = 'self.DeviceCount * self.RatedPower' %}\n            {% set vi = 'Kilowatt' %}\n            {% set vm = 'Kilowatt' %}\n            {% set vb = 'Kilowatt' %}\n            {% set vv = 'Work' %}\n        {% elif class_name in ['柴油发电', '电解槽', '燃气发电机'] %}\n            {% set m='self.DeviceCount' %}\n            {% set vi = 'Machine' %}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2404-2427"
+    },
+    "1923": {
+        "file_id": 217,
+        "content": "This code sets the lifespan of a battery-based device and calculates its annual rate. If the device is a solar PV, it assigns specific variables for maximum power, units, etc. If the device is a wind turbine or unidirectional transformer, it uses the rated power multiplied by the number of devices. For diesel generators, electrolysis cells, and gasoline engines, it considers the device count. The code also defines variables for different power units and types.",
+        "type": "comment"
+    },
+    "1924": {
+        "file_id": 217,
+        "content": "            {% set vm = 'Machine' %}\n            {% set vb = 'Machine' %}\n            {% set vv = 'Work' %}\n        {% elif class_name in [\"锂电池\"] %}\n            {% set m='self.DeviceCount * self.RatedCapacity' %}\n            {% set vi = 'Capacity' %}\n            {% set vm = 'Capacity' %}\n            {% set vb = 'Capacity' %}\n            {% set vv = 'Work' %}\n        {% elif class_name in ['传输线'] %}\n            {% set m='self.Length' %}\n            {% set vi = 'Kilometer' %}\n            {% set vm = 'Kilometer' %}\n            {% set vb = 'Kilometer' %}\n        {% else %}\n            {% error(\"不支持的设备类型:\", class_name) %}\n        {% endif %}\n        self.总采购成本 = self.CostPer{{vi}} * ({{ m}}) \n        self.总固定维护成本 = self.CostPerYearPer{{vm}} * ({{ m}})\n        self.总建设费用 = self.BuildCostPer{{vb}} * ({{ m}}) + self.BuildBaseCost\n        self.总固定成本年化 = (self.总采购成本 + self.总建设费用) * self.年化率 + self.总固定维护成本\n        {# self.总固定成本年化 = (self.总采购成本 + self.总固定维护成本 + self.总建设费用) * self.年化率 #}\n        {% if class_name in ['光伏发电', '风力发电', '柴油发电', '燃气发电机']%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2428-2453"
+    },
+    "1925": {
+        "file_id": 217,
+        "content": "This code is dynamically setting variables based on the device type. For 'Machine' devices, it sets capacity as the variable; for '锂电池', it calculates cost and capacity based on rated capacity; for '传输线', it sets kilometer as the variable; for unsupported types, it raises an error. It then calculates total purchase cost, fixed maintenance cost, build costs, and annualized fixed cost based on these variables and other factors.",
+        "type": "comment"
+    },
+    "1926": {
+        "file_id": 217,
+        "content": "            {% set m1=\"self.SumRange(self.电输出)\" %}\n        {% elif class_name in ['电解槽'] %}\n            {% set m1=\"-self.SumRange(self.电接口)\" %}\n        {% elif class_name in ['锂电池'] %}\n            {% set m1=\"计算范围内总平均放电功率*self.计算参数.迭代步数\"%}\n            {# {% set m1=\"计算范围内总平均功率*self.计算参数.迭代步数\"%} #}\n        {% elif class_name in 单向变电器列表 %}\n        {# {% elif class_name in 单向变电器列表+['传输线']%} #}\n            {% if class_name in ['变压器'] %}\n            {# {% if class_name in ['变压器', '传输线']%} #}\n            {% set m1 = '(self.SumRange(self.PowerInput_.x_neg) + self.SumRange(self.PowerOutput_.x_neg))'%}\n            {% else%}\n            {% set m1='-self.SumRange(self.电输入)'%}\n            {% endif%}\n        {% elif class_name in ['双向变流器'] %}\n            {% set m1='(self.SumRange(self.储能端_.x_neg)+self.SumRange(self.线路端_.x_neg))'%}\n        {%elif class_name in ['传输线'] %}\n            {% set m1='0' %}\n        {% else %}\n            {% error(\"不支持的类型:\", class_name) %}\n        {% endif %}\n        {% if class_name not in ['传输线'] %}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2454-2475"
+    },
+    "1927": {
+        "file_id": 217,
+        "content": "This code sets the value of `m1` depending on the class_name. For '电解槽', it is -SumRange(self.电接口). For '锂电池', it calculates the average discharging power * self.计算参数.迭代步数. For single-direction transformer or transmission line, it sets m1 accordingly based on whether it's a transformer or a transmission line. If class_name is '双向变流器', it sums the ranges of 储能端_.x_neg and 线路端_.x_neg. For '传输线', m1 is set to 0. If class_name is not '传输线', it throws an error for unsupported types.",
+        "type": "comment"
+    },
+    "1928": {
+        "file_id": 217,
+        "content": "        {# 总可变维护成本年化 = ({{m1}}) * (8760 / self.计算参数.迭代步数) * ({{时间步长参数}}) *self.VariationalCostPer{{vv}} #}\n        self.总可变维护成本年化 = (({{m1}}) / self.计算参数.迭代步数) * 每年小时数 * self.VariationalCostPer{{vv}}\n        # avg_power * 8760 = annual_work\n        {% if class_name in ['柴油发电', '燃气发电机'] %}\n        self.总可变维护成本年化 += self.annualUnitStartupCosts\n        {% endif %}\n        self.总成本年化 = self.总固定成本年化 + self.总可变维护成本年化\n        {% else %}\n        self.总成本年化 = self.总固定成本年化\n        {% endif %}\n        {% endwith %}\n        {% if class_name != \"传输线\" %}\n        {# 忽略传输线 #}\n        self.处理最终财务输出(self)\n        {% endif %}\n        return self.总成本年化\n{% endfor %}\n{% set load_class_names = [] %}\n{% for v in load_types %}\n    {% do load_class_names.append(v+\"负荷\")%}\n{% endfor %}\n{% set input_class_names = input_types%}\n{% set special_classes = {\"load_class\": load_class_names, \"input_class\": input_class_names} %}\n{# check for coverage #}\n{% for class_name in 设备接口集合.keys() %}\n    {% if class_name not in NonLoadDeviceDict.keys() %}\n        {% if class_name not in input_class_names+load_class_names%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2476-2507"
+    },
+    "1929": {
+        "file_id": 217,
+        "content": "Calculates the total annualized variable maintenance cost for microgrid devices, including startup costs for some generators. The final output is processed if the class name is not a transmission line.",
+        "type": "comment"
+    },
+    "1930": {
+        "file_id": 217,
+        "content": "            {% error(\"未覆盖的非设备类型:\", class_name)%}\n        {% endif%}\n    {% endif%}\n{% endfor%}\n{% for k,clist in special_classes.items() %}\n    {% for class_name in clist %}\nclass {{class_name}}模型(设备模型):\n{{ init_super_class(class_name) }}\n{{ port_variable_define(class_name)}}\n    {% if k == \"load_class\"%}\n        {% if not class_name.endswith('负荷') %}\n            {% error(\"错误的负荷类名:\", class_name) %}\n        {% else %}\n            {% set v = class_name.strip(\"负荷\") %}\n        {% endif %}\n        assert len(self.设备信息.EnergyConsumption) == self.计算参数.迭代步数\n        {% set loadInfoAttrNameList = ['Pmin', 'Pmax', 'PunishmentRate', 'EnergyConsumption'] %}\n        {% for loadInfoAttrName in loadInfoAttrNameList %}\n        self.{{loadInfoAttrName}} = self.设备信息.toStandard({{repr(loadInfoAttrName)}})\n        {% endfor %}\n        # deal with MaxEnergyConsumption & PriceModel separately\n        if self.设备信息.LoadType == 负荷类型.Punished:\n            self.UnsatisfiedEnergyConsumption = self.变量列表(\n            \"UnsatisfiedEnergyConsumption\", within=NonNegativeReals",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2508-2535"
+    },
+    "1931": {
+        "file_id": 217,
+        "content": "This code is creating a class for load models, checking if the name ends with \"load\" and setting load attributes based on device information. It also performs error handling and asserts the number of energy consumption values in the device information matches the number of iterations specified by the computing parameters.",
+        "type": "comment"
+    },
+    "1932": {
+        "file_id": 217,
+        "content": "        )\n        if 负荷类型.Interruptable in self.设备信息.LoadType:\n            self.Interrupted = self.变量列表(\n            \"Interrupted\", within=Boolean)\n            # Binary is ok.\n        {% if v in ['电'] %}\n        MaxEnergyConsumptionDefault = max(self.EnergyConsumption)\n        if self.设备信息.MaxEnergyConsumption is None:\n            self.MaxEnergyConsumption = MaxEnergyConsumptionDefault\n        else:\n            assert self.设备信息.MaxEnergyConsumption >= MaxEnergyConsumptionDefault\n            self.MaxEnergyConsumption = self.设备信息.toStandard('MaxEnergyConsumption')\n        {% endif %}\n        self.IncomeRates = ...\n        self.punishRate = 0\n        self.PriceModel = self.设备信息.PriceModel\n    {% elif k == 'input_class' %}\n        class _Units(BaseModel):\n        {% for attrName, defaultUnit in 燃料能源相关数据默认单位[class_name].items() %}\n            {{attrName}}: str\n        {% endfor %}\n        UnitsDict = {}\n        {% for attrName, defaultUnit in 燃料能源相关数据默认单位[class_name].items() %}\n        ## PROCESSING: {{attrName}}\n        ### UNIT COMPATIBILITY CHECK ###",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2536-2570"
+    },
+    "1933": {
+        "file_id": 217,
+        "content": "Code is setting the default value for MaxEnergyConsumption based on the EnergyConsumption values, and initializing IncomeRates, punishRate, and PriceModel. For input_class, it defines a class with attributes for each default unit in 燃料能源相关数据默认单位[class_name].",
+        "type": "comment"
+    },
+    "1934": {
+        "file_id": 217,
+        "content": "        default_unit = self.设备信息.DefaultUnits.{{attrName}}\n        val_unit = self.设备信息.{{attrName}}[1]\n        has_exception, _ = getSingleUnitConverted(default_unit = default_unit, val_unit = val_unit)\n        if has_exception:\n            raise Exception(f\"Unit '{val_unit}' is not compatible with default unit '{default_unit}'\")\n        ### UNIT COMPATIBILITY CHECK ###\n        ### UNIT CONVERSION ###\n        ConversionRate, StandardUnit = unitFactorCalculator(ureg, standard_units, val_unit)\n        ### UNIT CONVERSION ###\n        self.{{attrName}} = self.设备信息.{{attrName}}[0] * ConversionRate\n        \"\"\"\n        单位: 标准单位 <- 现用单位\n        \"\"\"\n        UnitsDict.update(dict({{attrName}}= str(StandardUnit)))\n        {% endfor%}\n        self.Units = _Units.parse_obj(UnitsDict)\n    {% else %}\n        {% error(\"Unknown special class:\", k) %}\n    {% endif %}\n    def constraints_register(self):\n        super().constraints_register()\n    {% if k == \"load_class\" %}\n        {% if v in ['电'] %}\n            {% set port_name = '电接口' %}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2571-2601"
+    },
+    "1935": {
+        "file_id": 217,
+        "content": "This code is performing unit conversion and compatibility checks for variables in a microgrid system. It first checks if the value unit is compatible with the default unit, then calculates the conversion rate between them using the 'unitFactorCalculator' function. The converted value is stored in the object's attribute, while the standard unit information is updated in the 'Units' dictionary.",
+        "type": "comment"
+    },
+    "1936": {
+        "file_id": 217,
+        "content": "        {% elif v in ['氢'] %}\n            {% set port_name = '氢气接口' %}\n        {% else %}\n            {% error(\"未知负荷类型:\", class_name) %}\n        {% endif %}\n        # TODO: 典型日的分时分月电价取每天同一小时的平均，在电价模型内实现\n        getTimeInDay = lambda index: index {{小时}} else self.计算参数.分时计价开始时间点 + 每天小时数 * convertMonthToDays(self.计算参数.分时计价开始月份) + (index/每小时秒数)\n        self.IncomeRates = [self.PriceModel.getFee(power, getTimeInDay(index)) for index, power in enumerate(self.{{port_name}}.values())] # negative, means income\n        punishmentRates = [0]\n        if self.设备信息.LoadType == 负荷类型.Normal:\n            self.RangeConstraint(self.{{port_name}}, self.EnergyConsumption, lambda x,y: x == -y)\n        elif self.设备信息.LoadType == 负荷类型.Punished:\n            self.RangeConstraintMulti(self.{{port_name}}, self.UnsatisfiedEnergyConsumption, self.EnergyConsumption,expression =  lambda x,y,z: x == -(z-y))\n            punishmentRates = [v*self.PunishmentRate for v in self.UnsatisfiedEnergyConsumption.values()]\n        elif self.设备信息.LoadType == 负荷类型.Flexible:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2602-2618"
+    },
+    "1937": {
+        "file_id": 217,
+        "content": "This code is filtering the load type and applying different constraints based on it. If the load type is '氢', then the port name is set as '氢气接口'. If the load type is Normal, a RangeConstraint is applied to the port. If the load type is Punished, a RangeConstraintMulti is applied along with calculating punishment rates. For Flexible load types, it throws an error. Additionally, there is a TODO comment suggesting that the code will calculate average hourly prices for typical days in the future.",
+        "type": "comment"
+    },
+    "1938": {
+        "file_id": 217,
+        "content": "            self.RangeConstraintMulti(self.{{port_name}}, expression = lambda x: -x>=self.Pmin)\n            self.RangeConstraintMulti(self.{{port_name}}, expression = lambda x: -x<=self.Pmax)\n        elif self.设备信息.LoadType == 负荷类型.Interruptable:\n            self.RangeConstraintMulti(self.{{port_name}}, self.Interrupted, expression = lambda x,y : -x==self.Pmax*(1-y))\n        elif self.设备信息.LoadType == 负荷类型.InterruptableAndFlexible:\n            self.RangeConstraintMulti(self.{{port_name}}, self.Interrupted, expression = lambda x,y : -x>=self.Pmin*(1-y))\n            self.RangeConstraintMulti(self.{{port_name}}, self.Interrupted, expression = lambda x,y : -x<=self.Pmax*(1-y))\n        else:\n            raise Exception(\"不合理的负荷类型:\", self.设备信息.LoadType)\n        {# 年化费用 = ((0 if self.设备信息.LoadType == LoadType.Punished else (quicksum_indexed_var(self.IncomeRates)))/len(self.IncomeRates)) * 每年小时数 #}\n        if self.设备信息.LoadType == 负荷类型.Punished:\n            年化费用 = 0\n            self.punishRate = quicksum_indexed_var(punishmentRates)/self.计算参数.迭代步数",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2619-2632"
+    },
+    "1939": {
+        "file_id": 217,
+        "content": "Code adds constraint for load type, sets range and interruptible conditions, calculates annual cost based on load type, and assigns punishment rate for punished loads.",
+        "type": "comment"
+    },
+    "1940": {
+        "file_id": 217,
+        "content": "        else:\n            年化费用 = (quicksum_indexed_var(self.IncomeRates)/self.计算参数.迭代步数) * 每年小时数\n        {# 年化费用 = ((0 if self.设备信息.LoadType == LoadType.Punished else (quicksum_indexed_var(self.IncomeRates)) + quicksum_indexed_var(punishmentRates))/len(self.IncomeRates)) * 每年小时数 #}\n        # 已经是负数了\n        {# 计价模型 #}\n    {% elif k == \"input_class\" %}\n        {% if class_name in ['柴油'] %}\n        平均消耗率 = self.SumRange(self.燃料接口) / self.计算参数.迭代步数\n        {% else %}\n            {% error('未知能源类型:', class_name) %}\n        {% endif %}\n        年化费用 = 平均消耗率 * self.Price * 每年小时数\n    {% else %}\n        {% error(\"未知特殊类型:\", k) %}\n    {% endif %}\n        self.总成本年化 = self.总可变维护成本年化 = 年化费用\n        return 年化费用\n{% endfor %}\n{% endfor %}\nclass ModelWrapperContext:\n    def __init__(self, inputParams:InputParams):\n        mw = ModelWrapper()\n        self.mw = mw\n        self.mw.inputParams = deepcopy(inputParams)\n    def __enter__(self):\n        logger_print(\"ENTER MODEL WRAPPER CONTEXT\")\n        return self.mw\n    def __exit__(self, exc_type, exc_value, exc_traceback):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2633-2668"
+    },
+    "1941": {
+        "file_id": 217,
+        "content": "This code calculates the annualized cost for different types of devices in a microgrid. It handles various device types and uses average consumption rates, prices, and operating hours to calculate annual costs. The code also checks for unknown asset classes and throws errors if they are encountered. The result is stored as \"total annualized cost\" and \"variable O&M annualized cost\".",
+        "type": "comment"
+    },
+    "1942": {
+        "file_id": 217,
+        "content": "        # we don't have to take care of this.\n        if exc_type == None:\n            logger_print(\"NO ERROR IN MODEL WRAPPER CONTEXT\")\n        else:\n            logger_print(\"ERROR IN MODEL WRAPPER CONTEXT\")\n        {# del self.mw.model #}\n        del self.mw\n        {# self.mw.exit() #}\n        logger_print(\"EXITING MODEL WRAPPER CONTEXT\")\n{% for e in [\"Inst\", \"ID\", 'Info'] %}\n{% set class_types = {}%}\n{% set type_suffix = (\"模型\" if e == \"Inst\" else (\"信息\" if e == 'Info' else e)) %}\n{% for class_name in 设备接口集合.keys() %}\n{% do class_types.update({class_name:class_name+type_suffix}) %}\n{% endfor %}\ndev{{e}}ClassMap : Dict[str, {{\"设备\"+type_suffix if type_suffix != \"信息\" else \"BaseModel\"}}]= {\n    {% for class_name in 设备接口集合.keys() %}\n    \"{{class_name}}\": {{class_types[class_name]}},\n    {% endfor %}\n} # type: ignore\n{% endfor %}\ndef iterate_input_output_limit(attr, indexs, G, devInstDict):\n    m_limit_list = []\n    for m_id in indexs:\n        m_anchor = G.nodes[m_id]\n        m_node_id = m_anchor[\"device_id\"]\n        m_devInst = devInstDict[m_node_id]",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2669-2698"
+    },
+    "1943": {
+        "file_id": 217,
+        "content": "Code snippet initializes a logger and performs cleanup tasks when there's an error in the model wrapper context. It also defines `devInstClassMap` as a dictionary mapping device class names to their corresponding classes with different suffixes, and a function `iterate_input_output_limit()` that iterates over input/output limits for each device node.",
+        "type": "comment"
+    },
+    "1944": {
+        "file_id": 217,
+        "content": "        m_limit_list.append(getattr(m_devInst, attr))\n    io_limit = sum(m_limit_list)\n    return io_limit\n{# {% macro iterate_input_output_limit(io_type, attr, type_annotation) %}\n    {% set devInstVarName = \"m_devInst{}\".format(io_type.title())%}\n                m_limit_list = []\n                for m_id in {{io_type}}_indexs:\n                    m_anchor = G.nodes[m_id]\n                    m_node_id = m_anchor['device_id']\n                    {{devInstVarName}} : {{type_annotation}} = devInstDict[m_node_id]\n                    m_limit_list.append({{devInstVarName}}.{{attr}})\n                {{io_type}}_limit = {{- sum_reduce('m_limit_list') }}\n{% endmacro %} #}\n# export all these data with no dependency on calculation type.\ndef getSchemaFromDataModel(dataModel: BaseModel):\n    schema = dataModel.schema()\n    return schema\ndef getRequiredKeysSetFromDataModel(dataModel:BaseModel):\n    schema = getSchemaFromDataModel(dataModel)\n    requiredKeys = schema['required']\n    return set(requiredKeys)\ndef getDuplicatedSchemaKeysSetFromDataModels(dataModel_0:BaseModel, dataModel_1:BaseModel):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2699-2725"
+    },
+    "1945": {
+        "file_id": 217,
+        "content": "This code is a function that calculates the sum of input/output limits for microgrid devices. It iterates through the device instances, retrieves the limit attribute from each device, appends them to a list, and then returns the sum of all the limits. The function takes an io_type, attr (attribute name), and type_annotation as parameters. The code also includes three other functions: getSchemaFromDataModel, getRequiredKeysSetFromDataModel, and getDuplicatedSchemaKeysSetFromDataModels. These functions are related to exporting data model schema, obtaining required keys from a data model, and finding duplicated keys among two data models respectively.",
+        "type": "comment"
+    },
+    "1946": {
+        "file_id": 217,
+        "content": "    requiredKeysSet_0 = getRequiredKeysSetFromDataModel(dataModel_0)\n    requiredKeysSet_1 = getRequiredKeysSetFromDataModel(dataModel_1)\n    duplicatedSchemaKeysSet = requiredKeysSet_0.intersection(requiredKeysSet_1)\n    return duplicatedSchemaKeysSet\n{# TODO: 添加自来水消耗费用 自来水消耗量 #}\nclass 仿真结果(BaseModel):\n    {% for chineseName, englishName in frontend_translation_table.items()%}\n    {% if chineseName in ['元件名称', '设备型号', '元件类型']%}\n        {% set mtype = 'str'%}\n    {% elif chineseName in [\"设备台数\"]%}\n        {% set mtype = 'int'%}\n    {% else %}\n        {% set mtype  = 'float'%}\n        {# need to clarify units! #}\n        {# refer to \"export_format_validate.py\" for unit conversion details. #}\n    {% endif%}\n    {{englishName}} : {{mtype if mtype !='int' else 'float'}} = Field(title = \"{{chineseName}}\")\n    {# {% if mtype in ['int', 'float']%} #}\n    {# unit conversion has been skipped. #}\n    {# {%if mtype == 'int'%}\n    @validator('{{englishName}}')\n    def convert_number_{{englishName}}(cls, v):\n        try: ",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2726-2750"
+    },
+    "1947": {
+        "file_id": 217,
+        "content": "This code defines a class for simulated results that inherits from `BaseModel`. It has fields representing various parameters, with their types and titles determined by the `chineseName` and `englishName` variables. The code also includes a validator method for converting some integer fields to float type.",
+        "type": "comment"
+    },
+    "1948": {
+        "file_id": 217,
+        "content": "            val = int(v)\n        except:\n            val = v\n        return val\n    {% endif%} #}\n    {% endfor %}\n{% set planningResultKeyTranslationMap = {'方案详情': '规划结果详情', \"方案列表\": \"规划方案概览\"} %}\nclass 设备模型协议(Protocol):\n    设备信息: 设备信息\n{% macro createFieldsByList(lst)%}\n    {% for elem in lst%}\n    {{elem['vn']}}: {{elem['vt']}} = Field(title=\"{{elem['vn']}}\", description={{repr(elem['desc'])}})\n    \"\"\"\n{{elem['desc'] | indent(4, true)}}\n    \"\"\"\n    {%endfor%}\n{% endmacro%}\n{% for key, elemDict in planningExportFormatList %}\n    {% set planningResultExportClassName = planningResultKeyTranslationMap[key] %}\n    {% set planningParamLUT = {\"cn\": [], 'en': []}%}\n    {% set planningUnits = {} %}\n    {% for elemKey, elem in elemDict.items() %}\n        {% set valName = elemKey %}\n        {% set valEnglishName = elem['englishName'] %}\n        {% set valType = elem['type'] %}\n        {% set valUnit = elem['unit'] %}\n        {% set description %}{{'单位: '+valUnit+'\\n' if valUnit != None else ''}}对应字段: {{valEnglishName}}{% endset %}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2751-2783"
+    },
+    "1949": {
+        "file_id": 217,
+        "content": "The code defines a class \"设备模型协议\" and uses macros to create fields based on a list. It also sets planningResultExportClassName and planningParamLUT variables, as well as initializing planningUnits. The code aims at generating fields and handling translations for planning results and parameters.",
+        "type": "comment"
+    },
+    "1950": {
+        "file_id": 217,
+        "content": "        {% set description_en %}{{'单位: '+valUnit+'\\n' if valUnit != None else ''}}对应字段: {{valName}}{% endset %}\n        {% if valUnit != None%}\n            {% do planningUnits.update({valName: valUnit})%}\n        {% endif%}\n        {% do planningParamLUT['cn'].append({\"vn\": valName, \"vt\": valType, \"desc\": description}) %}\n        {% do planningParamLUT['en'].append({\"vn\": valEnglishName, \"vt\": valType, \"desc\": description_en}) %}\n    {% endfor %}\n    {% set planningResultExportClassNameTranslated= planningResultExportClassName+\"_翻译\"%}\nclass {{planningResultExportClassNameTranslated}}(BaseModel):\n{{createFieldsByList(planningParamLUT['en'])}}\nclass {{planningResultExportClassName}}(BaseModel):\n{{createFieldsByList(planningParamLUT['cn'])}}\n    class Units:\n    {% for key, unit in planningUnits.items() %}\n        {{key}} = {{repr(unit)}}\n        {# test type checker #}\n    {% endfor %}\n    def translate(self):\n        paramDict = self.dict()\n        {# paramDict = self.to_dict() #}\n        TT = self.get_translation_table()",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2784-2807"
+    },
+    "1951": {
+        "file_id": 217,
+        "content": "The code snippet is defining two classes, one for English parameters and another for Chinese parameters, which extend the BaseModel class. It also creates a Units section with translations for each parameter unit. The translate method converts the object's dictionary representation to its translation table format.",
+        "type": "comment"
+    },
+    "1952": {
+        "file_id": 217,
+        "content": "        params = {TT[k]: v for k,v in paramDict.items()}\n        return {{planningResultExportClassNameTranslated}}(**params)\n    @classmethod\n    def get_translation_table(cls) -> Dict[str, str]:\n        schema = cls.schema()\n        required_keys = schema['required']\n        properties = schema['properties']\n        translation_table = {}\n        for rk in required_keys:\n            prop = properties[rk]\n            desc = prop['description']\n            parse_result = parse.parse('对应字段: {englishTranslation}', desc.split(\"\\n\")[-1])\n            et = parse_result['englishTranslation']\n            translation_table[rk] = et\n        return translation_table\n    @classmethod\n    {% if key == \"方案列表\" %}\n    def export(cls, planningResultList: List[规划结果详情], simulationResultList: List[仿真结果], FSPT:Dict[str,str], totalAnnualFee:float, planType: str): # totalAnnualFee is equivalent to our \"financial\" objective\n        params = dict(年化费用 = totalAnnualFee, 方案类型 = planType)\n        def updateParam(k, v):\n            {# if type(v) in [float, int]: #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2808-2832"
+    },
+    "1953": {
+        "file_id": 217,
+        "content": "Function defines a method to export planning results, takes in a list of planning and simulation results, a dictionary of FSPT values, total annual fee, and plan type. Parameters for the result export are defined and returned. The function also includes an if condition to check if the key is \"方案列表\".",
+        "type": "comment"
+    },
+    "1954": {
+        "file_id": 217,
+        "content": "                {# if not np.isnan(v): #}\n            params[k] = params.get(k, 0)+(v if not np.isnan(v) else 0)\n                    {# params[k] = params.get(k,0)+v #}\n                {# else: #}\n                    {# params[k] = params.get(k,0) #}\n        duplicate_params_planning_keys = getDuplicatedSchemaKeysSetFromDataModels(规划方案概览,规划结果详情)\n        for planningResult in planningResultList:\n            for duplicatedKey in duplicate_params_planning_keys:\n                val = getattr(planningResult, duplicatedKey)\n                updateParam(duplicatedKey, val)\n        remainedKeys = getRequiredKeysSetFromDataModel(cls).difference(set(params.keys()))\n        for simulationResult in simulationResultList:\n            for remainedKey in remainedKeys: # '年热负荷', '年电负荷', '年冷负荷', '年蒸汽负荷', '年氢气负荷'\n                {# keyBase = remainedKey.strip(\"年\") #}\n                keyBase = remainedKey.strip(\"年\").strip('负荷').strip('消耗量')\n                for keySuffix in ['负荷', '消耗量']:\n                    attemptKey = f\"{keyBase}{keySuffix}\"",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2833-2852"
+    },
+    "1955": {
+        "file_id": 217,
+        "content": "This code is updating parameters in a microgrid optimization process. It checks for non-nan values and adds them to the params dictionary. It handles duplicate keys by retrieving values from planning results and updating the params dictionary. Finally, it finds remaining required keys and updates them with values from simulation results.",
+        "type": "comment"
+    },
+    "1956": {
+        "file_id": 217,
+        "content": "                {# if (val:=getattr(simulationResult, FSPT.get(keyBase,\"NO_TRANSLATION\"),...)) is not ...: #}\n                    if (val:=getattr(simulationResult, FSPT.get(attemptKey,\"NO_TRANSLATION\"), ...)) is not ...:\n                    {# if (val:=getattr(simulationResult, FSPT.get(attemptKey,...),...)) is not ...: #}\n                        updateParam(remainedKey, val)\n                    {# FIX: early break #}\n                    break\n        remainedKeys = getRequiredKeysSetFromDataModel(cls).difference(set(params.keys()))\n        for rk in remainedKeys:\n            params[rk] = cmath.nan\n    {% else %}\n    {# 方案详情 #}\n    # 此处的仿真结果是每个典型日的仿真结果，不是合并之后的仿真结果表格\n    # 出来的也是每个典型日对应的规划详情，需要根据设备ID进行合并\n        {# {% set simExportClassList = [] %}\n        {% for devName in 设备接口集合.keys() %}\n            {% do simExportClassList.append(\"{}仿真结果\".format(devName)) %}\n        {% endfor %} #}\n    {# @staticmethod #}\n    def export(cls, deviceModel: 设备模型协议, deviceSimulationResult, timeParam:float):\n    {# def exp",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2853-2872"
+    },
+    "1957": {
+        "file_id": 217,
+        "content": "This code is part of a function that handles parameters in simulation results. It updates uninitialized parameters with 'nan' values, and the function exports simulation results for different devices. The commented-out section may have been removed during development.",
+        "type": "comment"
+    },
+    "1958": {
+        "file_id": 217,
+        "content": "ort(deviceModel: 设备模型协议, deviceSimulationResult: Union[{{\", \".join(simExportClassList)}}], timeParam:float): #}\n    {# def export(deviceModel: 设备模型协议, deviceSimulationResult: 仿真结果, timeParam:float): #}\n        params = {}\n        params['元件名称'] = deviceModel.设备信息.设备名称\n        params['型号'] = getattr(deviceModel.设备信息, '设备型号', '')\n        {# params['设备型号'] = getattr(deviceModel.设备信息, '设备型号', '') #}\n        params['数量'] = value(getattr_with_ellipsis_fallback(deviceModel,'DeviceCount', 0))\n        {# params['数量'] = getattr_with_ellipsis_fallback(deviceSimulationResult,'equiCounts', 0) #}\n        {# params['数量'] = getattr_with_ellipsis_fallback(deviceModel.设备信息,'equiCounts', 0) # 不要累加数量！ #}\n        params['平均效率_平均COP'] = getattr_with_ellipsis_fallback(deviceSimulationResult, 'averageEfficiency', cmath.nan)\n        params['设备采购成本'] = value(deviceModel.总采购成本) * (timeParam/每年小时数)\n        {% for k in [\"机组年启动次数\",\"机组年运行时间\"] %}\n        params[{{repr(k)}}] = value(getattr_with_ellipsis_fallback(deviceModel,{{repr(k)}}, cmath.nan))",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2872-2885"
+    },
+    "1959": {
+        "file_id": 217,
+        "content": "This code defines a function called export that takes deviceModel, deviceSimulationResult and timeParam as input. It creates a dictionary of parameters which includes device information such as name, model, quantity, average efficiency, and purchase cost. The function uses getattr and value functions to fetch specific attributes from the input objects. It also calculates parameters like annual start-ups and running hours based on deviceModel attributes.",
+        "type": "comment"
+    },
+    "1960": {
+        "file_id": 217,
+        "content": "        {% endfor %}\n        params['设备年维护费'] = getattr_with_ellipsis_fallback(deviceSimulationResult, \"设备维护费用\", cmath.nan) # 乘过时间参数就不用乘了\n        {# params['设备年维护费'] = deviceSimulationResult.equipmentMaintenanceCosts # 乘过时间参数就不用乘了 #}\n        for attrName in ['年碳排放', '年NOX排放','年SO2排放']:\n            gasType = attrName.strip('年').strip('排放') if '碳' not in attrName else 'CO2'\n            # fuel instances. we cannot allow diesel engines for this, since this will introduce errors in summation.\n            if isinstance(deviceModel, 柴油模型): # fuel unit: L\n            {# if type(deviceModel) in [柴油模型]: # fuel unit: L #}\n                # L * (kg/L)\n                modelBaseName = deviceModel.__class__.__name__.strip(\"模型\")\n                dieselConsumptionUnit = getattr(globals().get(f'{modelBaseName}仿真结果导出单位'), f'{modelBaseName}消耗量')\n                val_raw, val_unit = multiplyWithUnit((deviceSimulationResult.柴油消耗量, dieselConsumptionUnit), getattr(deviceModel.设备信息, gasType)) # [数值，单位]\n                {# va",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2886-2899"
+    },
+    "1961": {
+        "file_id": 217,
+        "content": "Iterates through device models, extracts maintenance costs and gas emissions. Checks if model is diesel, multiplies with conversion unit, calculates gas emissions for each attribute ('年碳排放', '年NOX排放','年SO2排放').",
+        "type": "comment"
+    },
+    "1962": {
+        "file_id": 217,
+        "content": "l_raw, val_unit = multiplyWithUnit((deviceSimulationResult.dieselConsumption, dieselConsumptionUnit), getattr(deviceModel.设备信息, gasType)) # [数值，单位] #}\n                # gas emission unit: kg\n                # now you may want to convert this by acquiring units elsewhere...\n                target_unit = getattr({{planningResultExportClassName}}.Units, attrName)\n                {# magnitude, _ = unitFactorCalculator(ureg, standard_units, val_unit) #}\n                val_quantity = val_raw * ureg.Unit(val_unit)\n                val_quantity_target = val_quantity.to(target_unit)\n                val = val_quantity_target.magnitude\n                {# val = magnitude * val_raw #}\n                # kg -> t (standard)\n            else:\n                val = cmath.nan\n            params[attrName] = val\n    {% endif %}\n        {# FIX: return inside for loop #}\n        return cls(\n            **params\n        )\n{% endfor %}\nclass 节点基类(BaseModel):\n    {# type:{{normal_str}} = Field(title = \"节点类型\") #}\n    subtype:{{normal_str}} = Field(title = \"节点次类型\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2899-2924"
+    },
+    "1963": {
+        "file_id": 217,
+        "content": "This code seems to be defining a class with attributes such as \"type\" and \"subtype\". It calculates values based on different units and converts them accordingly. The code also uses unit conversion factors and checks for specific conditions before assigning values. There is a loop that creates an instance of the class, potentially multiple times, using the calculated values. However, there seems to be a fix needed for returning inside the loop. Overall, it appears to be a part of a larger data model or simulation process.",
+        "type": "comment"
+    },
+    "1964": {
+        "file_id": 217,
+        "content": "    id:int = Field(title = \"节点ID\")\nclass 连线节点(节点基类):\n    type: Literal['连接线','合并线']\nclass 锚点节点(节点基类):\n    type: Literal['锚点']\n    port_name:{{normal_str}} = Field(title = '锚点名称')\n    device_id:{{non_neg_int}} = Field(title = '锚点所对应设备ID')\nclass 母线节点(节点基类):\n    type: Literal['母线']\n    conn: conlist({{normal_str}}, min_items=2)  = Field(title = '母线连接线类型列表', description = '包括连接到母线上的连接线和合并线类型')# connection/merge types to literal.\nclass 设备接口映射(BaseModel):\n    subtype: {{normal_str}} = Field(title = \"接口类型\")\n    id: {{non_neg_int}} = Field(title = \"接口ID\", description = \"拓扑图上与设备、母线、连接线的ID相比较具有唯一性的ID\")\n{% set infoClassList = []%}\n{% for class_name in 设备接口集合.keys() %}\n    {% do infoClassList.append(class_name+\"信息\")%}\n{% endfor %}\nclass 设备节点基类(节点基类):\n    type: Literal['设备']\n    ports:Dict[{{normal_str}},设备接口映射] = Field(title = \"设备接口映射\", description = \"描述设备所对应接口的类型和接口ID\")\ndeviceSubtypeAlias = dict(变流器=[\"单向变流器\"], 变压器='双向变压器')\n{# deviceSubtypeAlias = dict(变流器=[\"单向变流器\"], 锂电池=['蓄热设备','蓄冷设备','蓄冰设备']) #}\nDSAToDS = {e:k for k, v in deviceSubtypeAlias.items() for e in v}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2925-2954"
+    },
+    "1965": {
+        "file_id": 217,
+        "content": "This code defines several classes representing different types of nodes in a microgrid model, including connection lines, junction points, anchors, busbars, and devices. The classes have unique attributes and IDs for identification and mapping purposes. There is also a dictionary defining device subtypes and their corresponding aliases. The code uses Python's Field class for data validation and title descriptions, and contains various comments for better understanding the structure and functionality of the microgrid model.",
+        "type": "comment"
+    },
+    "1966": {
+        "file_id": 217,
+        "content": "{# {% set deviceSubtypeAlias = dict(变流器=[\"单向变流器\"]) %} #}\n{% set deviceNodeClasses = [] %}\n{% for infoClass in infoClassList %}\n    {% set deviceName = infoClass.strip(\"信息\") %}\n    {% set deviceNodeClassName = deviceName+\"节点\" %}\n    {% do deviceNodeClasses.append(deviceNodeClassName) %}\nclass {{deviceNodeClassName}}(设备节点基类):\n    {# subtype_hidden:Union[None, str] = Field(default = None, title = \"节点原次类型\", description = \"内部变量，不要填写\") #}\n    subtype: Literal[{{repr(deviceName)}}, *deviceSubtypeAlias.get({{repr(deviceName)}}, [])] = Field(title = \"节点次类型\")\n    {# subtype: Literal[{{repr(deviceName)}}, {{\",\".join(aliasLiterals)}}] = Field(title = \"节点次类型\") #}\n    param:{{infoClass}} = Field(title = '设备信息', description = {{repr(infoClass)}})\n{# \n    @validator('subtype')\n    def validate_subtype(cls, v, values):\n        v = DSAToDS.get(v, v)\n        return v #}\n{% endfor %}\nclass mDict(BaseModel):\n    directed:bool=Field(default = False, title='保留字段')\n    multigraph:bool=Field(default = False, title='保留字段')\n    graph:计算参数 = Field(",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2955-2977"
+    },
+    "1967": {
+        "file_id": 217,
+        "content": "This code is defining classes for different device nodes in a microgrid, with each class inheriting from the \"DeviceNodeBase\" class. Each class has a specific device name, node name, and optional subtype. The code also includes a validator function to validate the subtype input. Additionally, there is a separate class called mDict with some reserved fields.",
+        "type": "comment"
+    },
+    "1968": {
+        "file_id": 217,
+        "content": "        title=\"能流拓扑图的附加属性\",\n        description=\"仿真和优化所需的模型参数字典\", example = {\n            \"计算步长\": \"小时\",\n            \"典型日\": False,\n            \"典型日代表的日期\": [],\n            \"计算类型\": \"设计规划\",\n            \"风速\": [], \"光照\":[],\"气温\":[] ,\"年利率\":0.1})\n    nodes:conlist(Union[锚点节点,{{\",\".join(deviceNodeClasses)}},母线节点,连线节点], min_items=5) = Field(\n    {# nodes:conlist(Union[锚点节点,设备节点,母线节点,连线节点], min_items=5) = Field( #}\n        title=\"节点\",\n        description=\"由所有节点ID和属性字典组成的列表\", example =[ {\n                \"type\": \"锚点\",\n                \"port_name\": \"电接口\",\n                \"subtype\": \"供电端输出\",\n                \"device_id\": 2,\n                \"id\": 3\n            }])\n    links:conlist(Dict[Literal['source','target'], int], min_items=4) = Field(\n        title=\"边\",\n        description=\"由能流图中节点互相连接的边组成的列表\", example = [\n            {\n                \"source\": 0,\n                \"target\": 1\n            },\n            {\n                \"source\": 1,\n                \"target\": 31\n            }])\n# TODO: 增加单典型日判断类型或者字段\nclass EnergyFlowGraph(BaseModel):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:2978-3009"
+    },
+    "1969": {
+        "file_id": 217,
+        "content": "This code defines a class `EnergyFlowGraph` that represents an energy flow graph with nodes and links. It includes fields for additional attributes, model parameters, simulation type, and weather data. Nodes include anchor points, device nodes, bus nodes, and line nodes. Links represent connections between nodes in the energy flow graph.",
+        "type": "comment"
+    },
+    "1970": {
+        "file_id": 217,
+        "content": "    mDictList: List[mDict]\n    residualEquipmentLife: confloat(ge=0) = Field(\n        default=0, title=\"辅助设备寿命\", description=\"默认为0，年化率返回为1\\n单位：年\\n用于计算辅助设备年化系数\"\n    )\nfrom networkx import Graph\nfrom failsafe_utils import failsafe_suppress_exception\n# partial if typical day mode is on.\ndef compute(devs:List[dict], adders:Dict[int,dict], graph_data:dict, G: Graph, mw: ModelWrapper):\n    PD = {}\n    algoParam = 计算参数.parse_obj(graph_data)\n    typicalDayIndex = algoParam.典型日ID\n    devInstDict = {}\n    for dev in devs:\n        with failsafe_suppress_exception():\n            __devSubtype = dev['subtype']\n            devSubtype = DSAToDS.get(__devSubtype, __devSubtype)\n            {# devSubtype = dev['subtype'] #}\n            {# devParam = {k:v for k,v in dev.items() if k not in {\"subtype\",\"type\",\"ports\"} } #}\n            devParam = dev['param']\n            devPorts = dev['ports']\n            devID_int = dev['id']\n            devIDClass = devIDClassMap[devSubtype]\n            devIDInstInit = {\"ID\": devID_int}\n            for port_name, port_info in devPorts.items():",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3010-3041"
+    },
+    "1971": {
+        "file_id": 217,
+        "content": "This code defines a function `compute()` that takes in device parameters, adds additional data, graph information, and a graph object. It computes power demand (PD) based on device subtypes and parameters.",
+        "type": "comment"
+    },
+    "1972": {
+        "file_id": 217,
+        "content": "                with failsafe_suppress_exception():\n                    port_id = port_info['id']\n                    devIDInstInit.update({port_name:port_id})\n            devIDInst = devIDClass.parse_obj(devIDInstInit)\n            devInfoInstInit = devParam\n            devInfoClass = devInfoClassMap[devSubtype]\n            devInfoInst = devInfoClass.parse_obj(devInfoInstInit)\n            devInstClass = devInstClassMap[devSubtype]\n            devInst = devInstClass(PD = PD, mw=mw, 计算参数实例=algoParam, 设备ID= devIDInst, 设备信息=devInfoInst) # type: ignore\n            devInstDict.update({devID_int: devInst})\n{% set extra_data_items = [\"adder_index_error_mapping\", \"adder_error_total\", \"adder_index_error_sum_mapping\"] %}\n{% for it in extra_data_items%}\n    {{it}} = {}\n{% endfor%}\n    # positive for too much input\n    # negative for insufficient input\n    # you may activate both\n{% set error_types = ['positive', 'negative', 'combined']%}\n{% for t in error_types%}\n    adder_{{t}}_error_total = 0\n{% endfor%}\n    for adder_index, adder in adders.items():",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3042-3070"
+    },
+    "1973": {
+        "file_id": 217,
+        "content": "Creates a device instance using provided parameters and adds it to a dictionary, also initializes empty dictionaries for extra data items and sets up variables for error types in adder devices.",
+        "type": "comment"
+    },
+    "1974": {
+        "file_id": 217,
+        "content": "        adder_error_mapping = {}\n{% for t in error_types%}\n        adder_current_{{t}}_error = 0\n{% endfor%}\n        with failsafe_suppress_exception():\n            input_indexs, output_indexs, io_indexs = adder['input'], adder['output'], adder['IO']\n            logger_print(f'adder #{adder_index}:', adder)\n            # fill in missing params\n            with failsafe_suppress_exception():\n                if len(input_indexs) >= 1:\n                    first_port_info = G.nodes[input_indexs[0]]\n                    if first_port_info['port_name'] == \"燃料接口\":\n                    {# if G.nodes[input_indexs[0]]['subtype'] == \"柴油输出\": #}\n                        assert len(input_indexs) == 1, \"燃料元件只能一对多连接\"\n                        {# assert len(input_indexs) == 1, \"柴油元件只能一对多连接\" #}\n                        diesel_node_id = G.nodes[input_indexs[0]]['device_id']\n                        {# 热值 = devInstDict[diesel_node_id].设备信息.热值 #}\n                        热值 = devInstDict[diesel_node_id].热值\n                        for output_index in output_indexs:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3071-3091"
+    },
+    "1975": {
+        "file_id": 217,
+        "content": "Initializing adder_error_mapping and adder_current_{t}_error variables for each error type.\nGetting input, output, and IO indexes from adder dictionary.\nChecking if there is at least one input index, then obtaining information of the first port node.\nIf the port name is \"燃料接口\" and the node has subtype \"柴油输出\", it asserts that only one input index exists and stores the diesel device ID for later use.",
+        "type": "comment"
+    },
+    "1976": {
+        "file_id": 217,
+        "content": "                            output_node_index = G.nodes[output_index]['device_id']\n                            devInstDict[output_node_index].燃料热值 = 热值\n            # add them all.\n            logger_print(\"_\"*20)\n            display_var_names = lambda indexs: '\\n    '.join([str(PD[i]) for i in indexs])\n            logger_print(f\"INPUTS:{display_var_names(input_indexs)}\")\n            logger_print()\n            logger_print(f\"OUTPUTS:{display_var_names(output_indexs)}\")\n            logger_print()\n            logger_print(f\"IO:{display_var_names(io_indexs)}\")\n            logger_print(\"_\"*20)\n            adder_index_repr = str(adder_index).replace(\"_\",\"-\").replace('-', 'N')\n            for j in range(algoParam.迭代步数):\n                seqsum = {{- sum_reduce('[PD[i][j] for i in input_indexs + output_indexs + io_indexs]') }}\n                # TODO: 消纳率约束\n{% for symbol, abbv in dict(positive='PE', negative='NE').items()%}\n                {{symbol}}_error = mw.Var(name = f\"TD_{typicalDayIndex}_AD_{adder_index_repr}_{{abbv}}_{j}\", within = NonNegativeReals)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3092-3111"
+    },
+    "1977": {
+        "file_id": 217,
+        "content": "This code is updating device IDs, displaying input, output, and IO variable names, and calculating a sequential sum for an iterative algorithm. It also mentions adding a constraint for load factors later. The code includes variables with different abbreviations (PE and NE) for each iteration step in the algorithm.",
+        "type": "comment"
+    },
+    "1978": {
+        "file_id": 217,
+        "content": "                if not({{repr(symbol)}} in ies_env.ADDER_ERROR_COMPENSATION or ies_env.ADDER_ERROR_COMPENSATION == 'combined'):\n                    {{symbol}}_error.fix(0)\n{% endfor %}\n                combined_error = positive_error+negative_error\n                adder_error_mapping[j] = dict(\n{% for t in error_types%}\n                    {{t}}_error={{t}}_error, \n{% endfor%}\n                    )\n{% for t in error_types%}\n                adder_current_{{t}}_error += {{t}}_error\n{% endfor%}\n                mw.Constraint(seqsum == positive_error - negative_error)\n                {# mw.Constraint(seqsum == 0) #}\n                {# mw.Constraint(seqsum >=0) #}\n            adder_index_error_mapping[adder_index] = adder_error_mapping\n            adder_index_error_sum_mapping[adder_index] = dict(\n{% for t in error_types%}\n                {{t}}_error = adder_current_{{t}}_error,\n{% endfor%}\n            )\n{% for t in error_types%}\n            adder_{{t}}_error_total += adder_current_{{t}}_error\n{% endfor%}\n            with failsafe_suppress_exception():",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3112-3139"
+    },
+    "1979": {
+        "file_id": 217,
+        "content": "The code calculates the combined adder error by adding positive and negative errors. It then creates a dictionary of adder_error_mapping with each error type's value, updates the adder_index_error_sum_mapping with current adder error values, and adds them to the total adder error. Finally, it uses failsafe_suppress_exception() for handling any exceptions that might occur during execution.",
+        "type": "comment"
+    },
+    "1980": {
+        "file_id": 217,
+        "content": "                if algoParam.计算类型 == '设计规划':\n                    cnt = 0\n                    if len(input_indexs)==0:\n                        continue\n                    input_anchor_0 = G.nodes[input_indexs[0]]\n                    if input_anchor_0['subtype'] == '变压器输出':\n                        logger_print(f\"Building Converter Constraint #{cnt}\")\n                        cnt+=1\n                        assert io_indexs == []\n                        input_limit = iterate_input_output_limit(\"最大允许的负载总功率\", input_indexs, G, devInstDict)\n    {# {{ iterate_input_output_limit(\"input\",\"最大允许的负载总功率\", \"变压器模型\") }} #}\n                        output_limit = iterate_input_output_limit(\"MaxEnergyConsumption\", output_indexs, G, devInstDict)\n    {# {{ iterate_input_output_limit(\"output\",\"MaxEnergyConsumption\", \"电负荷模型\") }} #}\n                        mw.Constraint(input_limit + output_limit >= 0)\n    adder_error_total = dict(\n{% for t in error_types%}\n        {{t}}_error=adder_{{t}}_error_total,\n{% endfor%}\n    )\n    {# financial_obj_expr = {{- sum_reduce('[e.constraints_register() for e in devInstDict.values()]') }} #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3140-3163"
+    },
+    "1981": {
+        "file_id": 217,
+        "content": "The code checks if the algorithm parameter type is '设计规划' and counts the constraint number. If there are input indexes, it retrieves the first input anchor node with a '变压器输出' subtype and performs input-output limit calculations for maximum allowed load power and MaxEnergyConsumption using iterate_input_output_limit function. These limits are added to a constraint, and an adder_error_total dictionary is initialized for error types.",
+        "type": "comment"
+    },
+    "1982": {
+        "file_id": 217,
+        "content": "    financial_obj_expr = 0\n    checkIfIsLoadClassInstance = lambda inst: \"负荷\" in inst.__class__.__name__ \n    for e in devInstDict.values():\n        with failsafe_suppress_exception():\n            val = e.constraints_register()\n            financial_obj_expr += (val if not checkIfIsLoadClassInstance(e) else 0)\n            financial_obj_expr = addPunishRateToFinancialTarget(financial_obj_expr, devInst)\n    financial_dyn_obj_expr = 0\n    for e in devInstDict.values():\n        with failsafe_suppress_exception():\n            val = e.总可变维护成本年化\n            financial_dyn_obj_expr += (val if not checkIfIsLoadClassInstance(e) else 0)\n            financial_dyn_obj_expr = addPunishRateToFinancialTarget(financial_obj_expr, devInst)\n    {# financial_dyn_obj_expr = sum([(e.总可变维护成本年化) for e in devInstDict.values()]) #}\n    environment_obj_exprs = [] # annual CO2 emission\n    for e in devInstDict.values():\n        {# if type(e) == 柴油模型: #}\n        if isinstance(e, 柴油模型):\n            environment_obj_exprs.append((sum(e.燃料接口.values())/e.计算参数.迭代步数)*每年小时数 * e.CO2)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3164-3191"
+    },
+    "1983": {
+        "file_id": 217,
+        "content": "This code calculates financial and environmental objectives for a microgrid. It iterates over devices in the `devInstDict` dictionary, excluding load instances, and sums their financial values (registered constraints and dynamic maintenance costs) separately. For generators (柴油模型), it also computes the annual CO2 emissions and adds them to a list of environment objectives.",
+        "type": "comment"
+    },
+    "1984": {
+        "file_id": 217,
+        "content": "    environment_obj_expr = sum(environment_obj_exprs)\n    obj_exprs = (financial_obj_expr,\n                financial_dyn_obj_expr,\n                environment_obj_expr,\n    )\n    # TODO: return 'adder_index_error_mapping'\n    extra_data = dict(\n{% for it in extra_data_items%}\n        {{it}} = {{it}},\n{% endfor%}\n    )\n    {# return obj_exprs, devInstDict, PD #}\n    return obj_exprs, devInstDict, PD, extra_data\n    # always minimize the objective.\ndef addValueToTarget(target, devInst, attrName:str, iterCount:int):\n    if hasattr(devInst, attrName):\n        target += getattr(devInst, attrName) * iterCount\n    return target\ndef addNewRateToAnnualTarget(target, devInst, attrName:str):\n    target = addValueToTarget(target, devInst, attrName, 每年小时数)\n    return target\ndef addPunishRateToFinancialTarget(target, devInst):\n    target = addNewRateToAnnualTarget(target, devInst, 'punishRate')\n    return target",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:3193-3220"
+    },
+    "1985": {
+        "file_id": 217,
+        "content": "The code calculates the objective expression for a microgrid optimization problem, including financial and environmental factors. It adds values to the target from device instances based on their attributes, minimizing the objective. The functions addValueToTarget, addNewRateToAnnualTarget, and addPunishRateToFinancialTarget are used to modify the target value accordingly. Extra data is also included in the return statement.",
+        "type": "comment"
+    },
+    "1986": {
+        "file_id": 218,
+        "content": "/microgrid_base/init.sh",
+        "type": "filepath"
+    },
+    "1987": {
+        "file_id": 218,
+        "content": "This script sources ~/.bashrc and executes three bash scripts in sequence: init_apt_environ.sh, init_solver.sh, and init_update_conda.sh. This may set up APT environment variables, initialize a solver for the microgrid system, and update the Conda environment. The comment advises that executables outside of Conda environments can still be used but may require differentiating with environment variables.",
+        "type": "summary"
+    },
+    "1988": {
+        "file_id": 218,
+        "content": "# source ~/.bashrc\nbash init_apt_environ.sh\nbash init_solver.sh\nbash init_update_conda.sh\n# you can still use executables outside conda environments, but you may need to pass some environment variables to differentiate.",
+        "type": "code",
+        "location": "/microgrid_base/init.sh:1-5"
+    },
+    "1989": {
+        "file_id": 218,
+        "content": "This script sources ~/.bashrc and executes three bash scripts in sequence: init_apt_environ.sh, init_solver.sh, and init_update_conda.sh. This may set up APT environment variables, initialize a solver for the microgrid system, and update the Conda environment. The comment advises that executables outside of Conda environments can still be used but may require differentiating with environment variables.",
+        "type": "comment"
+    },
+    "1990": {
+        "file_id": 219,
+        "content": "/microgrid_base/init_apt_environ.sh",
+        "type": "filepath"
+    },
+    "1991": {
+        "file_id": 219,
+        "content": "This script defines a function to install packages and checks the installation status. If failed, it runs apt update before re-executing the installation.",
+        "type": "summary"
+    },
+    "1992": {
+        "file_id": 219,
+        "content": "#!/bin/bash\nfunction install_packages {\n  # Install the packages\n  apt install -y redis rabbitmq-server tmux tmuxp openjdk-8-jdk htop swi-prolog\n  # courtesy from ChatGPT\n  local status=$?\n  # Return the exit status\n  return $status\n}\ninstall_packages\n# Check the status of the package installation\nif [ $? -ne 0 ]; then\n# If the installation failed, run apt update and try again\necho \"Package installation failed. Running apt update and trying again...\"\napt update\ninstall_packages\nfi",
+        "type": "code",
+        "location": "/microgrid_base/init_apt_environ.sh:1-20"
+    },
+    "1993": {
+        "file_id": 219,
+        "content": "This script defines a function to install packages and checks the installation status. If failed, it runs apt update before re-executing the installation.",
+        "type": "comment"
+    },
+    "1994": {
+        "file_id": 220,
+        "content": "/microgrid_base/init_docker_launch.sh",
+        "type": "filepath"
+    },
+    "1995": {
+        "file_id": 220,
+        "content": "This script checks if Docker is installed, and if not, installs it using the \"install_docker.sh\" script. If Docker is already installed, it simply states that fact. The script then uninstalls two packages (progressbar and progressbar2) before re-installing multiple packages listed in the \"requirements_docker_launch.txt\" file.",
+        "type": "summary"
+    },
+    "1996": {
+        "file_id": 220,
+        "content": "if which docker; [ \"$?\" -ne 0 ]; then\n    echo \"Docker not installed.\"\n    echo \"Setting up now.\"\n    bash install_docker.sh\nelse\n    echo \"Docker already installed.\"\nfi\npip3 uninstall -y progressbar progressbar2\npip3 install -r requirements_docker_launch.txt",
+        "type": "code",
+        "location": "/microgrid_base/init_docker_launch.sh:1-10"
+    },
+    "1997": {
+        "file_id": 220,
+        "content": "This script checks if Docker is installed, and if not, installs it using the \"install_docker.sh\" script. If Docker is already installed, it simply states that fact. The script then uninstalls two packages (progressbar and progressbar2) before re-installing multiple packages listed in the \"requirements_docker_launch.txt\" file.",
+        "type": "comment"
+    },
+    "1998": {
+        "file_id": 221,
+        "content": "/microgrid_base/init_solver.sh",
+        "type": "filepath"
+    },
+    "1999": {
+        "file_id": 221,
+        "content": "Installing necessary libraries (coin-or-cbc, scip, ipopt) in a conda environment named \"cplex\" for solving optimization problems.",
+        "type": "summary"
+    }
+}

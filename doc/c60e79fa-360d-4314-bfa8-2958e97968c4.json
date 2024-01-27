@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary modules and defines a model with constraints and variables. It then uses a solver to solve the problem and checks if the model is unbounded or infeasible, logging results as needed.",
+    "details": [
+        {
+            "comment": "The code imports necessary modules and defines a model with constraints and variables. It then uses a solver to solve the problem and checks if the model is unbounded or infeasible, logging results as needed.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model_import_external.py\":0-32",
+            "content": "import sys\n# from pyomo.environ import * # do not do this afterwards, otherwise model.solutions.symbol_map will be always empty.\nsys.path.append(\"../\")\nfrom pyomo_environ import *\nfrom ies_optim import ModelWrapper\nfrom debug_utils import checkInfeasibleOrUnboundedModel\n# @@@@@@@@@@@!!!!!DO NOT DO THIS!!!!!@@@@@@@@@@@\n# from pyomo.environ import *\nimport os\nlog_dir = \"logs\"\nos.system(f\"mkdir {log_dir}\")\nmw = ModelWrapper()\nx = mw.Var(\"\u53d8\u91cfx\")\ny = mw.Var(\"\u53d8\u91cfy\")\nmw.Constraint(expr=x + y >= 10)\nx.setlb(-10)\nx.setub(10)\nobj_expr = 2 * x - 5 + y\nobj = mw.Objective(expr=obj_expr, sense=minimize)\nsolver = SolverFactory('cplex')\ncheckInfeasibleOrUnboundedModel(mw, solver, log_dir)"
+        }
+    ]
+}

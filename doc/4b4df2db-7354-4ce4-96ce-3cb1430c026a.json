@@ -1,0 +1,15 @@
+{
+    "summary": "The code sends a GET request to 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' with headers, cookies for authentication and session management, and CORS settings for browser detection.",
+    "details": [
+        {
+            "comment": "The code is making a GET request to 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' with various headers and cookies. It sets the authority, accepts any content type, specifies the language as Chinese, and includes various cookies for authentication and session management. The referer is set to 'https://ies.cloudpss.net:8202/editor/?id=21559'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_port_get.sh\":0-6",
+            "content": "curl 'https://ies.cloudpss.net:8202/editor/componentheatList/?page=1' \\\n  -H 'authority: ies.cloudpss.net:8202' \\\n  -H 'accept: */*' \\\n  -H 'accept-language: zh-CN,zh;q=0.9' \\\n  -H 'cookie: first=1; theme=default; csrftoken=3FDpA3heSB6cmzwGFwUstfQ7PBCMjXi8fyhyOdAGEKlRDBCgS5n0xTLtRg3dqWF7; first=1; theme=default; TK=4e128a76808f4e283cb57df7d3fd098e18c91354; username=Steven0128; email=; id=1197; setlang=test; setlang1=test213; SECKEY_ABVK=V2LDA8s7CsTqpEEHZq0kunbrSZIbVUyBKuZLzkxV+vw%3D; BMAP_SECKEY=Gn9oAOjImVjpMeGQEOuqu-zE2PUFOpAlR0LOJUXUUmQkP5Nkqu-6wpuNDgbgk1mXXjumQhwk7yBTOiU-jHcWek_wLf9N8O3r2yss8J30VnEmuhyI2HR7aJsENkDqXayJ8W5qBUpZNx4ZXmCRabQpy15Rc0cFryLOVOB7VhKJ3qqIErNMIjvaToW7irv6Anss; csrf=y44LdL8zKAS5ekFb0juN8AQIT4sUFULlm6zyM7COSOVS2zCiYTtJGTl7xNmg5s5r; csrftoken=y44LdL8zKAS5ekFb0juN8AQIT4sUFULlm6zyM7COSOVS2zCiYTtJGTl7xNmg5s5r; sessionid=mqn7ewz4kiayaun1ztsde5vfnrxg1udl' \\\n  -H 'referer: https://ies.cloudpss.net:8202/editor/?id=21559' \\\n  -H 'sec-ch-ua: \"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"' \\"
+        },
+        {
+            "comment": "Headers being set for a CORS request, including user-agent and x-requested-with, with specific values for browser detection.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_port_get.sh\":7-13",
+            "content": "  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"Windows\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-origin' \\\n  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36' \\\n  -H 'x-requested-with: XMLHttpRequest'"
+        }
+    ]
+}

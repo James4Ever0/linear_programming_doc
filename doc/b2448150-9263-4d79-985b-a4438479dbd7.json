@@ -1,0 +1,10 @@
+{
+    "summary": "The code reads a JavaScript file, parses its lines to extract English and Chinese names, creates a dictionary mapping Chinese names to English names, and writes the dictionary as a JSON file.",
+    "details": [
+        {
+            "comment": "The code reads a JavaScript file, parses its lines to extract English and Chinese names, creates a dictionary mapping Chinese names to English names, and writes the dictionary as a JSON file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/parse_frontend_sim_param_translation.py\":0-34",
+            "content": "from log_utils import logger_print\nfilepath = \"frontend_sim_param_translation.js\"\noutput_path = \"frontend_sim_param_translation.json\"\nMAKEFILE = dict(inputs=[filepath], outputs=[output_path], args=[])\nimport parse\nwith open(filepath, \"r\") as f:\n    data = f.read()\n    lines = data.split(\"\\n\")\n    # logger_print(lines)\nresultMap = {}\nfor line in lines:\n    line = line.replace(\":\", \": \").replace(\",\", \" , \").strip()\n    while True:\n        if \" :\" in line:\n            line = line.replace(\" :\", \":\")\n        else:\n            break\n    result = parse.parse(\n        \"{englishName}:{space_1}'{sampleData}'{space_2},{space_3}//{chineseName}\", line\n    )\n    if result:\n        logger_print(result)\n        resultMap[result[\"chineseName\"].upper()] = result[\"englishName\"]\nimport json\nlogger_print(\"writing to:\", output_path)\nwith open(output_path, \"w+\") as f:\n    f.write(json.dumps(resultMap, ensure_ascii=False, indent=4))"
+        }
+    ]
+}

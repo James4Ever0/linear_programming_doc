@@ -1,0 +1,10 @@
+{
+    "summary": "This script checks if Docker is installed, and if not, installs it using the \"install_docker.sh\" script. If Docker is already installed, it simply states that fact. The script then uninstalls two packages (progressbar and progressbar2) before re-installing multiple packages listed in the \"requirements_docker_launch.txt\" file.",
+    "details": [
+        {
+            "comment": "This script checks if Docker is installed, and if not, installs it using the \"install_docker.sh\" script. If Docker is already installed, it simply states that fact. The script then uninstalls two packages (progressbar and progressbar2) before re-installing multiple packages listed in the \"requirements_docker_launch.txt\" file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_docker_launch.sh\":0-9",
+            "content": "if which docker; [ \"$?\" -ne 0 ]; then\n    echo \"Docker not installed.\"\n    echo \"Setting up now.\"\n    bash install_docker.sh\nelse\n    echo \"Docker already installed.\"\nfi\npip3 uninstall -y progressbar progressbar2\npip3 install -r requirements_docker_launch.txt"
+        }
+    ]
+}

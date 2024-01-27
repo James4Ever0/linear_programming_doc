@@ -1,0 +1,10 @@
+{
+    "summary": "The code snippet demonstrates various methods for rendering Markdown with LaTeX to different formats, including HTML, PDF, and executing a Playwright PDF conversion. It utilizes several tools like Pandoc, markdown-it, and npm packages.",
+    "details": [
+        {
+            "comment": "The code snippet demonstrates various methods for rendering Markdown with LaTeX to different formats, including HTML, PDF, and executing a Playwright PDF conversion. It utilizes several tools like Pandoc, markdown-it, and npm packages.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/render_markdown_to_html.cmd\":0-14",
+            "content": "@REM python -m markdown -f jump_to_line.html -o html jump_to_line.md\n@REM https://facelessuser.github.io/pymdown-extensions/extensions/arithmatex/\n@REM https://mdit-py-plugins.readthedocs.io/\n@REM python render_markdown_with_latex.py\n@REM pandoc -o jump_to_line.html jump_to_line.md\n@REM markdown-it jump_to_line.md > jump_to_line.html\n@REM npm install markdown-it markdown-it-mathjax3\nnode render_latex.js\n@REM then pdf\n@REM no unicode support?\n@REM pandoc -o jump_to_line.pdf --pdf-engine lualatex jump_to_line.md\n@REM pandoc -o jump_to_line.pdf --pdf-engine xelatex jump_to_line.md\n@REM pandoc -o jump_to_line.pdf  jump_to_line.html\nplaywright pdf jump_to_line.html jump_to_line.pdf"
+        }
+    ]
+}

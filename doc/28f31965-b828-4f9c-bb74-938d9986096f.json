@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the environment variable FAILSAFE to True and then executes the reload.sh script using Bash, likely for a failsafe reloading process in a microgrid context.",
+    "details": [
+        {
+            "comment": "This code sets the environment variable FAILSAFE to True and then executes the reload.sh script using Bash, likely for a failsafe reloading process in a microgrid context.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/failsafe_reload.sh\":0-0",
+            "content": "env FAILSAFE=True bash reload.sh"
+        }
+    ]
+}

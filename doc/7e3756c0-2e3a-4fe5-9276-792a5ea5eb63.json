@@ -1,0 +1,15 @@
+{
+    "summary": "The code uses the requests library to check task status on a local Celery server, making GET requests with provided IDs. It periodically loops for 20 times and prints relevant data. If revoke occurs before \"SUCCESS,\" it's considered REVOKED.",
+    "details": [
+        {
+            "comment": "This code uses the requests library to make HTTP GET requests to a local Celery server. It checks the status of two tasks with different IDs and attempts to revoke one of them. The loop runs 20 times to periodically check the task status, printing relevant data along the way.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/celery_client_test.py\":0-46",
+            "content": "import requests\nLOOP_COUNT = 20\nbase_url = \"http://localhost:8010\"\nurl = f\"{base_url}/add/2/1\"\nr = requests.get(url)\ndata = r.json()\nprint(\"DATA\", data)\ntask_id = data[\"task_id\"]\nr2 = requests.get(f'{base_url}/add/1/2')\ndata2 = r2.json()\ntask_id2 = data2['task_id']\nurl_new = f\"{base_url}/task_status\"\nimport time\n# import celery.states as S\n# PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED,\n# how to limit the task threads?\nfor i in range(LOOP_COUNT):\n    print(i)\n    r2 = requests.get(url_new, params=dict(task_id=task_id))\n    data2 = r2.json()\n    print(\"DATA2\", data2)  # STARTED.\n    # till: SUCCESS.\n    r3 = requests.get(url_new, params=dict(task_id=task_id2))\n    data3 = r3.json()\n    print(\"DATA3\", data3)\n    # how many status indicators can it have?\n    time.sleep(1)\nurl_revoke = f\"{base_url}/revoke\"\nr3 = requests.get(url_revoke, params=dict(task_id=task_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\nr3 = requests.get(url_revoke, params=dict(task_id=task_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)"
+        },
+        {
+            "comment": "This code is making a GET request to a new URL with the provided task ID, then storing the response in data2. The subsequent print statement displays \"DATA2\" along with the content of data2. If revoke occurs before \"SUCCESS,\" it's considered REVOKED.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/celery_client_test.py\":47-52",
+            "content": "time.sleep(1)\nr2 = requests.get(url_new, params=dict(task_id=task_id))\ndata2 = r2.json()\nprint(\n    \"DATA2\", data2\n)  # SUCCESS if revoke after SUCCESS. but if revoke before SUCCESS it is REVOKED."
+        }
+    ]
+}

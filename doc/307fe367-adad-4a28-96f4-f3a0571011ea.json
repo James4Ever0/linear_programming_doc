@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary modules, sets the path for code and template files using a utility function, and then loads, renders, and formats the template to generate functional base code.",
+    "details": [
+        {
+            "comment": "This code imports necessary modules, sets the path for code and template files using a utility function, and then loads, renders, and formats the template to generate functional base code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/generate_code.py\":0-9",
+            "content": "import sys\nsys.path.append(\"../\")\nimport jinja_utils\ncode_path, template_path = jinja_utils.code_and_template_path(\"functional_base\")\njinja_utils.load_render_and_format(\n    template_path, code_path, render_params=dict(), banner=\"FUNCTIONAL BASE CODE\"\n)"
+        }
+    ]
+}

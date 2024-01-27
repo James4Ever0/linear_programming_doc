@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the \"cyipopt\" library, which is an interface to IPOPT, a nonlinear optimization solver. This library will be used for solving optimization problems in further parts of the code.",
+    "details": [
+        {
+            "comment": "This code imports the \"cyipopt\" library, which is an interface to IPOPT, a nonlinear optimization solver. This library will be used for solving optimization problems in further parts of the code.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/ipopt_persistent.py\":0-0",
+            "content": "import cyipopt"
+        }
+    ]
+}

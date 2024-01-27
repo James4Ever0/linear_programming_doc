@@ -1,0 +1,10 @@
+{
+    "summary": "This code serializes and deserializes a Pyomo model using the dill and pickle libraries. It creates or loads a model, prints its structure, and saves it to a file for later use.",
+    "details": [
+        {
+            "comment": "This code serializes and deserializes a Pyomo model using the dill and pickle libraries. It creates or loads a model, prints its structure, and saves it to a file for later use.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/dill_pickle_model.py\":0-39",
+            "content": "import dill\nimport pickle\nfrom pyomo.environ import *\n# ensure you load all files from pyomo_environ\ndef serializeObjectToFile(obj, filename: str, module=pickle):\n    with open(filename, \"wb\") as f:\n        module.dump(obj, f)\ndef deserializeObjectFromFile(filename: str, module=pickle):\n    with open(filename, \"rb\") as f:\n        obj = module.load(f)\n        return obj\nif __name__ == \"__main__\":\n    fpath = \"model.pickle\"\n    # mode = 'create'\n    mode = \"load\"\n    if mode == \"create\":\n        model = ConcreteModel()\n        model.a = Var()\n        model.b = Var([1, 2])\n        model.const = Constraint(expr=model.a <= model.b[1])\n        model.obj = Objective(expr=model.a + model.b[1], sense=minimize)\n        model.subm = model.clone()\n        model.pprint()\n        print(\"-\" * 60)\n        print(\"writing model to file: \", fpath)\n        print(\"-\" * 60)\n        serializeObjectToFile(model, fpath)\n    elif mode == \"load\":\n        subm: ConcreteModel = deserializeObjectFromFile(fpath)\n        subm.pprint()\n    else:\n        raise Exception(\"Unable to determine action from mode '%s'\" % mode)"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "summary": "The function `adaptive_piecewise_approximation` performs iterative linear regression on data subsections and terminates upon exceeding error threshold, updating and returning new subsection list. The code snippet adjusts max subsection count and prints results with lengths.",
+    "details": [
+        {
+            "comment": "Function `adaptive_piecewise_approximation` performs iterative linear regression on subsections of input data, creating new subsections based on errors calculated from predicted values. Maximum number of subsections is defined by `max_subsection_count`. Error threshold and start/end point fusion are TODOs to be implemented.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_bisect.py\":0-26",
+            "content": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n# TODO: shift the breakpoints iteratively\n# Adaptive Piecewise Approximation algorithm\ndef adaptive_piecewise_approximation(x, y, max_subsection_count, error_threshold = 0):\n    # Initialize with the entire range as the first subsection\n    subsections = [(0, len(x)-1)]\n    # Iterate until the maximum subsection count is reached\n    while len(subsections) < max_subsection_count:\n        new_subsections = []\n        errors = []\n        # Iterate over each subsection\n        for start, end in subsections:\n            # TODO: change the error calculation method, fix the start & end points, fuse the connecting points\n            # Perform linear regression on the subsection\n            model = LinearRegression()\n            model.fit(x[start:end+1].reshape(-1, 1), y[start:end+1])\n            # Calculate the predicted values\n            y_pred = model.predict(x[start:end+1].reshape(-1, 1))\n            # Calculate the error (element-wise)\n            error = np.abs(y[start:end+1] - y_pred)"
+        },
+        {
+            "comment": "The code iteratively bisects a time series to identify the highest error within defined subsections and terminates if it exceeds a specified threshold. The code then updates and returns the new list of subsections.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_bisect.py\":28-58",
+            "content": "            # Store the error and subsection\n            errors.append(np.sum(error))\n            new_subsections.append((start, end))\n        # Find the subsection with the highest error\n        max_error_index = np.argmax(errors)\n        max_error = errors[max_error_index]\n        max_error_subsection = new_subsections[max_error_index]\n        # Check if the maximum error is greater than a threshold\n        if max_error > error_threshold:\n            # Bisect the subsection with the highest error\n            start, end = max_error_subsection\n            if end-start <= 1:\n                break\n            mid = (end+start) // 2\n            new_subsections[max_error_index] = (max_error_subsection[0], mid)\n            new_subsections.append((mid+1, max_error_subsection[1]))\n            new_subsections.sort(key = lambda x: x[0])\n        else:\n            break\n        # Update the subsections\n        subsections = new_subsections\n    return subsections\n# Example usage\nx = np.linspace(0, 10, 100)\ny = x **2\n# y = np.sin(x)"
+        },
+        {
+            "comment": "The code snippet adjusts the max subsection count for an adaptive piecewise approximation and prints the resulting subsections along with their lengths.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_bisect.py\":60-66",
+            "content": "# msc = 20\n# msc = 12\nmsc = 10\n# msc = 12\nsubsections = adaptive_piecewise_approximation(x, y, max_subsection_count=msc)\nprint(\"Subsections:\", subsections)\nprint(\"Subsection lengths:\", [(end-start) for start, end in subsections])"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This script defines a function to install packages and checks the installation status. If failed, it runs apt update before re-executing the installation.",
+    "details": [
+        {
+            "comment": "This script defines a function to install packages and checks the installation status. If failed, it runs apt update before re-executing the installation.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_apt_environ.sh\":0-19",
+            "content": "#!/bin/bash\nfunction install_packages {\n  # Install the packages\n  apt install -y redis rabbitmq-server tmux tmuxp openjdk-8-jdk htop swi-prolog\n  # courtesy from ChatGPT\n  local status=$?\n  # Return the exit status\n  return $status\n}\ninstall_packages\n# Check the status of the package installation\nif [ $? -ne 0 ]; then\n# If the installation failed, run apt update and try again\necho \"Package installation failed. Running apt update and trying again...\"\napt update\ninstall_packages\nfi"
+        }
+    ]
+}

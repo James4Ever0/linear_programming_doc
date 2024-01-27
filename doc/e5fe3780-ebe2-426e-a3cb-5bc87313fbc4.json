@@ -1,0 +1,10 @@
+{
+    "summary": "The code snippet is written in Jinja2 template language and includes custom macros. Macro \"mymacro\" takes two arguments and displays their values. Macro \"mycalledmacro\" also takes two arguments, but calls another macro \"caller\", which displays the argument names along with the calling function. The code includes multiple calls to different macros with various arguments, displaying their results.",
+    "details": [
+        {
+            "comment": "The code snippet is written in Jinja2 template language and includes custom macros. Macro \"mymacro\" takes two arguments and displays their values. Macro \"mycalledmacro\" also takes two arguments, but calls another macro \"caller\", which displays the argument names along with the calling function. The code includes multiple calls to different macros with various arguments, displaying their results.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/macro_test.j2\":0-39",
+            "content": "{{ test}}\n{% macro mymacro(a,b) -%}\nsource code path: {{ a }}\nfile size: {{ b }}\n{% endmacro %}\n{% macro mycalledmacro(a,b) %}\n1st arg: {{a}}\n{{caller()}}\n2nd arg: {{b}}\n{{caller()}}\n{% endmacro%}\n{{ mymacro(1,2)}}\n{% macro mycalledmacroarg(a,b) %}\n{{ caller(a,b) }}\n{{a}}\n{{b}}\n{% endmacro%}\n----\n{% call mycalledmacro(2,3)%}\n{{ test}}\n{% endcall%}\n----\n{% call mycalledmacro(1,2)%}\nabcdefg\n{%endcall%}\n----\n{% call(arg1, arg2) mycalledmacroarg(3,4)%}\n{{ mymacro(arg1, arg2) }}\n{%endcall%}"
+        }
+    ]
+}

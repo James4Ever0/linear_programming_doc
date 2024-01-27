@@ -1,0 +1,10 @@
+{
+    "summary": "This code describes a fuel model called \"\u67f4\u6cb9\u6a21\u578b\" with constants like Price, thermal value (MJ/L), CO2, NOX, and SO2. It lists inputs such as fuel interfaces and constraints including average consumption rate, annual cost, and total cost yearly.",
+    "details": [
+        {
+            "comment": "This code describes a fuel model called \"\u67f4\u6cb9\u6a21\u578b\" with constants like Price, thermal value (MJ/L), CO2, NOX, and SO2. It lists inputs such as fuel interfaces and constraints including average consumption rate, annual cost, and total cost yearly.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/\u67f4\u6cb9.ies\":0-14",
+            "content": "\u6a21\u578b\u540d\u79f0\uff1a\n    \u67f4\u6cb9\u6a21\u578b\n\u5e38\u91cf\uff1a\n    Price\n    \u70ed\u503c (MJ/L) # if bracket is ahead of any symbols (not function name!), treat it content as unit specification\n    CO2 (kg/L) # unit annotation shall not be shown more than once.\n    NOX \"kg/L\" # provide unit inference to unannotated symbols. default unit to any unannotated symbol is \"one\"\n    SO2 (kg/L)\n\u53d8\u91cf\u5217\u8868\uff1a\n    >| \u71c3\u6599\u63a5\u53e3\n\u7ea6\u675f:\n    \u5e73\u5747\u6d88\u8017\u7387 = avg(\u71c3\u6599\u63a5\u53e3) # or: average\n    \u5e74\u5316\u8d39\u7528 (\u4e07\u5143/\u5e74) = \u5e73\u5747\u6d88\u8017\u7387 * Price * \u6bcf\u5e74\u5c0f\u65f6\u6570 # global constant: 8760\n    # this shall be unit conversion problem, like: dollar/hour -> dollar/year\n    \u603b\u6210\u672c\u5e74\u5316 = \u5e74\u5316\u8d39\u7528"
+        }
+    ]
+}

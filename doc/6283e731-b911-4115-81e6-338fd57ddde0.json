@@ -1,0 +1,10 @@
+{
+    "summary": "This script kills the rabbitmq and redis processes using the TERM signal, then waits for 3 seconds before terminating any remaining panes with tmux's kill-server command.",
+    "details": [
+        {
+            "comment": "This script kills the rabbitmq and redis processes using the TERM signal, then waits for 3 seconds before terminating any remaining panes with tmux's kill-server command.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/fastapi_terminate_service.sh\":0-8",
+            "content": "ps aux | grep rabbitmq | grep -v grep | awk '{print $2}' | xargs -Iabc kill -s TERM abc\nps aux | grep redis | grep 6380 | grep -v grep | awk '{print $2}' | xargs -Iabc kill -s TERM abc\n# shall you wait till terminated.\n# you may use libtmux for better 'killing' experience.\n# session name -> pane pids -> send SIGTERM -> kill session by name\n# check if it is really killed. if not, send SIGKILL\n# tmux kill-session -t fastapi_tmuxp\ntmux kill-server # no other panes running anyway.\nsleep 3"
+        }
+    ]
+}

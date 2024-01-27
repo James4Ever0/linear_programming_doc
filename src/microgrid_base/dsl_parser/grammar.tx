@@ -1,0 +1,46 @@
+Model: modelInfo=ModelInfo subModels+=SubModel;
+SubModel: ConstantLists | Constants;
+ModelInfo: '模型名称' BLOCK_SEP modelName=TOKEN;
+Constants: '常量' BLOCK_SEP subConstantBlocks+=subConstantBlock;
+subConstantBlock: (branch=BRANCHING_KEYWORDS BLOCK_SEP)? constants+=Constant;
+Constant: indicator?=INDICATOR constantName=TOKEN unit?=STRING;
+ConstantLists: '常量列表' BLOCK_SEP subConstantListBlocks+=subConstantListBlock;
+subConstantListBlock: (branch=BRANCHING_KEYWORDS BLOCK_SEP)? constantLists+=CONSTANT_LIST_CANDIDATE;
+CONSTANT_LIST_CANDIDATE: ConstantList | CONSTANTLIST_PAIR ;
+ConstantList: indicator?=INDICATOR listName=TOKEN modifier?=MODIFIER unit?=STRING indexRange?=INDEXRANGE;
+INDEXRANGE: ':' '[' ((size=INT) | (index_start=INT ',' index_end=INT (',' index_jump=INT )? ) ) ']';
+TOKEN: !(KEYWORDS BLOCK_SEP) !INDICATOR /[\w]+/;
+MODIFIER: BOUNDS | CAST;
+BLOCK_SEP: ':' | '：' | '' ;
+BOUND: /[^,^<^>]+/;
+BOUNDS: '<' ((lb=BOUND ',' ub=BOUND) | (lb=BOUND ',' ) | (',' ub=BOUND )) '>';
+CAST: '<' cast=TOKEN '>';
+KEYWORDS: '常量列表' 
+        | '常量'
+        | '模型名称';
+INDICATOR:  '<|'
+        | '<<'
+        | '>|'
+        | '>>';
+ARITH_0: "+" | "-";
+ARITH_1: "*" | "/";
+ARITH_2: "^";
+COMPARISON: '>=' | '<=' | '>' | '<' | '==';
+INIT_VAL: ':=';
+FUNCTION: 'sum' | 'mean';
+SPECIAL_OPS: '?>' | '??>'
+        | '?<' | '??<'
+        | '|>' | '|<'
+        | '~' | '||';
+Constraints: '约束' BLOCK_SEP subConstantBlocks+=subConstantBlock;
+subConstraintBlock: (branch=BRANCHING_KEYWORDS BLOCK_SEP)?  constraints+=CONSTRAINT;
+OP: INIT_VAL | COMPARISON;
+CANDIDATE: CONSTRAINT | ELEMENT;
+CONSTRAINT: left=CANDIDATE  op=OP right=CANDIDATE;
+ELEMENT: token=TOKEN subscripts*=SUBSCRIPT | special?=SPECIAL_OPS element=ELEMENT | funcName=FUNCTION "(" element=ELEMENT ")";
+SUBSCRIPT_TOKEN: TOKEN (ARITH_0 (TOKEN | INT) )? ;
+SUBSCRIPT: "[" subscript=SUBSCRIPT_TOKEN "]" ;
+COMMENT: '#' comment=/.+$/;
+BRANCHING_KEYWORDS: '设计规划' | '仿真模拟' | '秒级仿真' | '日间独立' | '日间连接';
+PIECEWISE: outputVarName=TOKEN '(' inputVarName=TOKEN ')' '~' ( TOKEN | '(' conList_x=ConstantList ',' conList_y=ConstantList ')' ) ;
+CONSTANTLIST_PAIR: pairName=TOKEN '~' '(' conList_x=ConstantList ',' conList_y=ConstantList ')' ;

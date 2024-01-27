@@ -1,0 +1,10 @@
+{
+    "summary": "Creating a shim named SHOT.shim with the specified path and copying pandoc executable to SHOT executable location.",
+    "details": [
+        {
+            "comment": "Creating a shim named SHOT.shim with the specified path and copying pandoc executable to SHOT executable location.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/create_shim_for_shot.ps1\":0-2",
+            "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/SHOT.shim -Value 'path = C:\\Users\\ss\\Downloads\\SHOT\\SHOT.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/SHOT.exe"
+        }
+    ]
+}

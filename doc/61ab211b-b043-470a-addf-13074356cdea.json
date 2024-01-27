@@ -1,0 +1,10 @@
+{
+    "summary": "The code defines a lambda function, 'func', which takes an input 'x' and returns the value of 'x+1'.",
+    "details": [
+        {
+            "comment": "The code defines a lambda function, 'func', which takes an input 'x' and returns the value of 'x+1'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/erglang_test/sample_external_func.py\":1-1",
+            "content": "func = lambda x: x+1"
+        }
+    ]
+}

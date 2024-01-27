@@ -1,0 +1,15 @@
+{
+    "summary": "Code creates a Pyomo model with 4 integer variables and defines disjuncts for units 1 & 2, applies constraints, solves using CPLEX/IPOPT, prints results for x1-x4 & objective value.",
+    "details": [
+        {
+            "comment": "This code creates a concrete Pyomo model with four integer variables and defines two disjuncts representing units 1 and 2, each having input and output constraints. The objective is not set yet.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py\":0-29",
+            "content": "from pyomo.environ import *\nfrom pyomo.gdp import *\n# Create a concrete model\nm = model =  ConcreteModel()\nm.x1 = Var(within=Integers, bounds=(-10,10))\nm.x2 = Var(within=Integers, bounds=(-10,10))\nm.x3 = Var(within=Integers, bounds=(-10,10))\nm.x4 = Var(within=Integers, bounds=(-10,10))\n# m.x1 = Var(within=Integers)\n# m.x2 = Var(within=Integers)\n# m.x3 = Var(within=Integers)\n# m.x4 = Var(within=Integers)\nm.unit1 = Disjunct()\nm.unit1.inout = Constraint(expr=2*m.x2 - 2 == m.x1)\n# m.unit1.inout = Constraint(expr=exp(m.x2) - 1 == m.x1)\nm.unit1.no_unit2_flow1 = Constraint(expr=m.x3 == 0)\nm.unit1.no_unit2_flow2 = Constraint(expr=m.x4 == 0)\nm.unit2 = Disjunct()\nm.unit2.inout = Constraint(expr=2*m.x4 - 1 <= m.x3) # linear\n# m.unit2.inout = Constraint(expr=exp(m.x4 / 1.2) - 1 == m.x3) # ipopt only!\nm.unit2.no_unit1_flow1 = Constraint(expr=m.x1 == 0)\nm.unit2.no_unit1_flow2 = Constraint(expr=m.x2 == 0)\nm.use_unit1or2 = Disjunction(expr=[m.unit1, m.unit2])\n# Set the objective\n# model.obj = Objective(expr=model.x[4]+model[1]+model.x[2]+model.x[3])"
+        },
+        {
+            "comment": "This code defines an optimization model with objectives, applies logical constraints transformation, and solves the problem using CPLEX or IPOPT solver. The results are printed for variables x1 to x4 and the objective value.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/logical_constraint_demo.py\":30-47",
+            "content": "# model.obj = Objective(expr=0, sense=minimize)\nmodel.obj = Objective(expr=m.x1+m.x2+m.x3+m.x4, sense=minimize)\n# model.obj = Objective(expr=quicksum(model.x), sense=minimize)\n# Solve the problem\n# apply to logical constraints, not gdp!\n# TransformationFactory('core.logical_to_linear').apply_to(m)\nTransformationFactory('gdp.bigm').apply_to(m, bigM = 1e7)\nsolver = SolverFactory('cplex')\n# solver = SolverFactory('ipopt')\n# no such option.\n# results = solver.solve(model, profile_memory=True)\nresults = solver.solve(model)\n# solver.print_profile()\n# Print the results\nfor i in range(1,5):\n    print(f\"x{i} =\", value(getattr(model,f\"x{i}\"), exception=False))\nprint(\"obj =\", value(model.obj, exception=False))"
+        }
+    ]
+}

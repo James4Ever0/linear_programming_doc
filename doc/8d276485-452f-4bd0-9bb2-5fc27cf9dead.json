@@ -1,0 +1,15 @@
+{
+    "summary": "This code uses BeautifulSoup to parse HTML, manipulates structure by inserting sidebar and article before main content, removes title and footer, and outputs two modified files.",
+    "details": [
+        {
+            "comment": "This code reads an HTML file, uses BeautifulSoup to parse it, and then processes the sidebar and main content by extracting them and inserting the sidebar before the content. The footer and source codes are also removed. Finally, it prettifies and writes the modified HTML into separate output files for further processing.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/html/process_output_html.py\":0-24",
+            "content": "from bs4 import BeautifulSoup as bs\ninput_file = \"example_docstring.html\"\noutput_file = \"processed.html\"\noutput_index_file = \"processed_index.html\"\noutput_article_file = \"processed_article.html\"\nwith open(input_file, \"r\",encoding=\"utf-8\") as f, open(output_file, \"w+\",encoding=\"utf-8\") as fw, open(\n    output_index_file, \"w+\",encoding=\"utf-8\"\n) as fw_index, open(output_article_file, \"w+\",encoding=\"utf-8\") as fw_article:\n    soup = bs(f.read(),'lxml')\n    # how about let's split the sidebar and main content into different pages?\n    footer = soup.find(id=\"footer\",encoding=\"utf-8\").extract()\n    for details in soup.find_all(\"details\"):\n        details.extract()  # remove source code.\n    # footer.clear()\n    # print('footer?',footer)\n    # breakpoint()\n    sidebar = soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()\n    soup.find(id=\"content\").insert_before(sidebar)\n    fw.write(str(soup.prettify()))\n    # well let's split.\n    # after done for the index.\n    article = soup.find(\"article\").extract()\n    sidebar = soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()"
+        },
+        {
+            "comment": "The code snippet is manipulating the HTML structure of a webpage. It finds the main section, inserts a sidebar and an article at the beginning, removes the title, and writes the modified HTML to two separate files (fw_index and fw_article).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/html/process_output_html.py\":25-31",
+            "content": "    main = soup.find(\"main\")\n    main.insert(0,sidebar)\n    fw_index.write(str(soup.prettify()))\n    soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()\n    title = soup.find(\"title\").extract()  # removing the title.\n    main.insert(0,article)  # insert the article\n    fw_article.write(str(soup.prettify()))"
+        }
+    ]
+}

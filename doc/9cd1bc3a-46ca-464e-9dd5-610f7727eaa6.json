@@ -1,0 +1,10 @@
+{
+    "summary": "Runs Conda environment with Dash optimization library and executes Python script \"docplex_feasopt.py\", capturing output in real-time without buffering.",
+    "details": [
+        {
+            "comment": "Runs Conda environment with Dash optimization library and executes Python script \"docplex_feasopt.py\", capturing output in real-time without buffering.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.cmd\":0-0",
+            "content": "conda run -n docplex --live-stream --no-capture-output python docplex_feasopt.py"
+        }
+    ]
+}

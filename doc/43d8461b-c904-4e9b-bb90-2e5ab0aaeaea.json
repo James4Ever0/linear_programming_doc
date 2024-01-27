@@ -1,0 +1,15 @@
+{
+    "summary": "The code defines a LexMeta metaclass that processes class attributes, ensuring token attribute naming consistency and easy identification. It imports PLY lexer and parser modules, builds a sample lexer instance, and creates a parser object from the sampleLex class.",
+    "details": [
+        {
+            "comment": "This code defines a LexMeta metaclass that processes class attributes, appends \"t_\" to token-related attribute names and stores them as \"t_{token}\", and skips non-token attribute names. The tokens are stored in the 'tokens' attribute of the class. This approach is used for parser starting with \"p_\", ensuring attribute naming consistency and easy identification of token attributes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/lex_yacc.py\":0-22",
+            "content": "class LexMeta(type):\n    def __new__(cls, name, bases, cdict):\n        tokens = []\n        # unprocessed_tokens = []\n        skipped_tokens = []\n        for attrName, attr in cdict.items():\n            # for parser starting with \"p_\"\n            assert not attrName.startswith(\n                \"t_\"\n            ), f\"Wrong attribute name: {attrName}\\nShall not start any attribute with 't_'!\"\n            # if attrName.startswith(\"t_\"):\n            #    unprocessed_tokens.append(attrName)\n            splitedAttrName = list(filter(lambda e: len(e) > 0, attrName.split(\"_\")))\n            if len(splitedAttrName) > 0:\n                indicator = splitedAttrName[-1][0]\n                if indicator.upper() == indicator and indicator.lower() != indicator:\n                    tokens.append(attrName)\n            else:\n                skipped_tokens.append(attrName)\n        cdict[\"tokens\"] = tokens\n        for token in tokens + skipped_tokens:\n            cdict[f\"t_{token}\"] = cdict.pop(token)\n        return super(LexMeta, cls).__new__(cls, name, bases, cdict)"
+        },
+        {
+            "comment": "This code imports the PLY lexer and parser modules, defines a custom sampleLex class extending LexMeta, and builds a sample lexer instance. It then prints the attributes of the sampleLex class and its instance, before importing the yacc module to create a parser object from the sampleLex class.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/lex_yacc.py\":25-43",
+            "content": "import ply.lex as lex\nclass sampleLex(metaclass=LexMeta):\n    ID = r\"\\w+\"\n    def build(self, **kwargs):\n        self.lexer = lex.lex(object=self, **kwargs)\nmyLex = sampleLex()\nprint(dir(sampleLex))\nprint(dir(myLex))\nimport ply.yacc as yacc\n# be it a class?\nmyParser = yacc.yacc(module = myModule)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "The code defines three facts about a dog: it is a pet, an animal, and cute.",
+    "details": [
+        {
+            "comment": "The code defines three facts about a dog: it is a pet, an animal, and cute.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query.pro\":0-2",
+            "content": "dog(pet).\ndog(animal).\ndog(cute)."
+        }
+    ]
+}

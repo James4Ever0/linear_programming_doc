@@ -1,0 +1,10 @@
+{
+    "summary": "The code attempts to convert a PDF file named \"original_example_docstring.pdf\" to a DOCX format using the \"mutool\" command, and outputs the result as \"test.docx\". However, it seems that there might be an issue with converting from PDF to DOCX, as mentioned in the comment.",
+    "details": [
+        {
+            "comment": "The code attempts to convert a PDF file named \"original_example_docstring.pdf\" to a DOCX format using the \"mutool\" command, and outputs the result as \"test.docx\". However, it seems that there might be an issue with converting from PDF to DOCX, as mentioned in the comment.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/pdf_to_docx.sh\":0-3",
+            "content": "# pandoc original_example_docstring.pdf -o test.docx\n# cannot convert from pdf.\n# mutool is bad.\nmutool convert -o test.docx original_example_docstring.pdf"
+        }
+    ]
+}

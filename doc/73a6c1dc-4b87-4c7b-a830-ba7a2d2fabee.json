@@ -1,0 +1,15 @@
+{
+    "summary": "This function, `unitFactorCalculator`, utilizes the pint library to convert an old unit into a compatible standard unit within a given UnitRegistry. It appends units, converts quantities, prints both old and new values, obtains magnitude and new unit name, then returns these as output.",
+    "details": [
+        {
+            "comment": "The code defines a function `unitFactorCalculator` which takes in a UnitRegistry, a set of standard units, and an old unit name as input. It converts the old unit to a compatible standard unit using pint library functions and raises an exception if no common units are found.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pint_convert_units.py\":0-30",
+            "content": "import pint\ndef unitFactorCalculator(\n    ureg: pint.UnitRegistry, standard_units: frozenset, old_unit_name: str\n):  # like \"\u5143/kWh\"\n    assert old_unit_name != \"\"\n    assert type(old_unit_name) == str\n    ## now, the classic test?\n    standard_units_mapping = {ureg.get_compatible_units(unit):unit for unit in standard_units}\n    try:\n        quantity = ureg.Quantity(1, old_unit_name)  # one, undoubtable.\n    except:\n        raise Exception(\"Unknown unit name:\", old_unit_name)\n    # quantity = ureg.Quantity(1, ureg.\u5143/ureg.kWh)\n    magnitude, units = quantity.to_tuple()\n    new_units_list = []\n    for unit, power in units:\n        # if type(unit)!=str:\n        print(\"UNIT?\", unit, \"POWER?\", power)\n        compat_units = ureg.get_compatible_units(unit)  # the frozen set, as the token for exchange.\n        target_unit = standard_units_mapping.get(compat_units,None)\n        if target_unit:\n            # ready to convert?\n            unit = str(target_unit)\n        else:\n            raise Exception(\"No common units for:\",unit)"
+        },
+        {
+            "comment": "Appends units to list, prints new units list, creates new unit container, converts quantity using new unit, prints old and new quantities, obtains magnitude of new quantity, gets new unit name as string, returns new magnitude and unit name.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pint_convert_units.py\":31-46",
+            "content": "        new_units_list.append((unit, power))\n    print(\"NEW UNITS LIST:\", new_units_list)\n    new_unit = ureg.UnitsContainer(tuple(new_units_list))\n    new_quantity = quantity.to(new_unit)\n    print(\"OLD QUANTITY:\", quantity)\n    print(\"NEW QUANTITY:\", new_quantity)\n    # get the magnitude?\n    new_magnitude = new_quantity.magnitude  # you multiply that.\n    print(\"FACTOR:\", new_magnitude)\n    new_unit_name = str(new_unit)\n    print(\"NEW UNIT NAME:\", new_unit_name)\n    return new_magnitude, new_unit_name"
+        }
+    ]
+}

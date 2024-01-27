@@ -1,0 +1,10 @@
+{
+    "summary": "This code is running the Huey consumer to process tasks in the task_queue.huey using Python.",
+    "details": [
+        {
+            "comment": "This code is running the Huey consumer to process tasks in the task_queue.huey using Python.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_worker.cmd\":0-0",
+            "content": "python -m huey.bin.huey_consumer -k process task_queue.huey"
+        }
+    ]
+}

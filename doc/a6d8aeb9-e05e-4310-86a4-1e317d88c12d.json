@@ -1,0 +1,10 @@
+{
+    "summary": "This script removes all packages from the \"cplex\" conda environment and installs Python 3.11.2 in it.",
+    "details": [
+        {
+            "comment": "This script removes all packages from the \"cplex\" conda environment and installs Python 3.11.2 in it.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/conda_init.sh\":0-2",
+            "content": "# source ~/.bashrc\nconda remove -n cplex --all\nconda install -n cplex python==3.11.2"
+        }
+    ]
+}

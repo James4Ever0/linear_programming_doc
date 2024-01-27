@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the PATH environment variable to include CPLEX Studio's directory and runs a Python script named log_infeasible.py, likely for solving optimization problems with CPLEX.",
+    "details": [
+        {
+            "comment": "This code sets the PATH environment variable to include CPLEX Studio's directory and runs a Python script named log_infeasible.py, likely for solving optimization problems with CPLEX.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/log_infeasible.sh\":0-0",
+            "content": "env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" python3 log_infeasible.py"
+        }
+    ]
+}

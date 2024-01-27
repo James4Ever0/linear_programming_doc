@@ -1,0 +1,20 @@
+{
+    "summary": "The code generates a directed graph representing the energy system, saves as JSON, and displays the figure with labels and bold fonts. It provides flexibility in file saving and avoids immediate display.",
+    "details": [
+        {
+            "comment": "Creates a directed graph (G) representing the energy system topology, adding nodes for devices and I/O nodes. Device node names are formatted based on device IDs, while I/O node names follow an incremental index.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/system_topology_utils.py\":0-30",
+            "content": "from integratedEnergySystemPrototypes import EnergyFlowNodeFactory\nimport networkx as nx\nimport matplotlib.pyplot as plt\ndef visualizeSystemTopology(\n    NodeFactory: EnergyFlowNodeFactory,\n    draw_options={\n        \"node_color\": \"yellow\",\n        \"node_size\": 1000,\n    },\n    system_name=\"ies_system\",\n):\n    G = nx.DiGraph(None, attrs={}) # global simulation params go here.\n    node_index = 0\n    for device_id in NodeFactory.device_ids:\n        device_name = NodeFactory.device_id_to_device_name[device_id]\n        device_node_name = f\"{device_name}_{device_id[:4]}_device\"\n        G.add_node(device_node_name,attrs={},node_type='device')\n    for node in NodeFactory.nodes:\n        node_name = f\"{node.energy_type}_io_{node_index}\"\n        G.add_node(node_name,attrs={},node_type='io') # energy i/o nodes\n        node_index += 1\n        # G.add_node(2,\"BESS\")\n        for input_id in node.input_ids:\n            device_id = input_id.split(\"_\")[0]\n            try:\n                # device_id = input_id\n                device_node_name = f\"{NodeFactory.device_id_to_device_name[device_id]}_{device_id[:4]}_device\""
+        },
+        {
+            "comment": "Creates a directed graph (G) representing a system topology by adding edges between nodes and devices based on output_ids. Saves the graph as JSON for future use, and draws the graph with labels and bold fonts.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/system_topology_utils.py\":31-62",
+            "content": "                G.add_edge(\n                    node_name,\n                    device_node_name,\n                )\n            except:\n                breakpoint()\n                pass\n        for output_id in node.output_ids:\n            device_id = output_id.split(\"_\")[0]\n            try:\n                # device_id = output_id\n                device_node_name = f\"{NodeFactory.device_id_to_device_name[device_id]}_{device_id[:4]}_device\"\n                G.add_edge(\n                    device_node_name,\n                    node_name,\n                )\n            except:\n                breakpoint()\n                pass\n    # breakpoint() # check how to save the graph as json.\n    from networkx.readwrite import json_graph\n    serialized = json_graph.adjacency_data(G)\n    # import rich\n    # rich.print(serialized)\n    # breakpoint()\n    import json\n    serialized_string = json.dumps(serialized)\n    with open('test_graph_data.json','w+') as f:\n        f.write(serialized_string)\n    nx.draw(G, with_labels=True, font_weight=\"bold\", **draw_options)"
+        },
+        {
+            "comment": "Code snippet saves a figure to a file with the specified system name, avoiding immediate display and providing flexibility.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/system_topology_utils.py\":63-66",
+            "content": "    # plt.show()\n    figure_path = f\"topology_{system_name}.png\"\n    print(\"Saving figure to:\", figure_path)\n    plt.savefig(figure_path)"
+        }
+    ]
+}

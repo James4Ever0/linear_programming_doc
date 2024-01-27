@@ -1,0 +1,543 @@
+{
+    "700": {
+        "file_id": 90,
+        "content": "        # kill_cplex()\n        pycplex = cplex._internal._pycplex\n        # that's what you called \"intervention\"\n        getattr(pycplex, \"set_py_terminator\", getattr(pycplex, \"setpyterminate\"))()\n        print(\"exit kill_cplex\")\n    thread = threading.Thread(target=run, daemon=True)\n    thread.start()\nfrom docplex.mp.conflict_refiner import ConflictRefiner, ConflictRefinerResult\nimport traceback\ndef check_conflict(model, maxtime: float) -> bool:\n    has_conflict = False\n    output_table = None\n    try:\n        refiner = ConflictRefiner()  # 先实例化ConflictRefiner类\n        kill_cplex_after_duration(maxtime)\n        # pdb.set_trace() # for py3.6\n        res: ConflictRefinerResult = refiner.refine_conflict(model)\n        # res: ConflictRefinerResult = func_timeout(\n        #     MAXTIME,\n        #     refiner.refine_conflict,\n        #     args=(model,),\n        #     kwargs=dict(log_output=True),\n        # )  # 将模型导入该类,调用方法\n        # not (self) writable.\n        # sys.stdin.write(\"\\n\")\n        number_of_conflicts = res.number_of_conflicts",
+        "type": "code",
+        "location": "/microgrid_base/conflict_utils.py:32-63"
+    },
+    "701": {
+        "file_id": 90,
+        "content": "Function \"check_conflict\" initializes a ConflictRefiner object, sets a time limit for the conflict analysis, and attempts to refine any detected conflicts in the model. If a conflict is found within the specified time limit, it returns True; otherwise, it returns False. The code also includes an error handling mechanism via a try-except block in case any issues occur during the conflict analysis process.",
+        "type": "comment"
+    },
+    "702": {
+        "file_id": 90,
+        "content": "        print(\"conflict count:\", number_of_conflicts)  # taking too long.\n        has_conflict = number_of_conflicts != 0\n        if has_conflict:\n            # print(dir(res))\n            # breakpoint()\n            output_table = res.as_output_table()\n            # res.display()  # 显示冲突约束\n        del res\n        del refiner\n    except:\n        traceback.print_exc()\n        print(\"conflict check failed\")\n        has_conflict = True\n        output_table = None\n    return has_conflict, output_table\nfrom shared_datamodels import ConflictRefinerParams\n# def conflict_refiner(model_path: str, output: str, config: str, timeout: float):\n@conflictRefinerManager.answer\ndef conflict_refiner(params: ConflictRefinerParams):\n    # def conflict_refiner(params):\n    model_path, output, config, timeout = (\n        params.model_path,\n        params.output,\n        params.config,\n        params.timeout,\n    )\n    assert timeout > 0, f\"invalid timeout: {timeout}\"\n    mdl: Model = ModelReader.read(model_path, model_name=\"InfeasibelLP\")",
+        "type": "code",
+        "location": "/microgrid_base/conflict_utils.py:64-95"
+    },
+    "703": {
+        "file_id": 90,
+        "content": "This code defines a function called `conflict_refiner` that uses the `ModelReader` class to read a model from a given path. The function then calls an internal method (not shown) which checks for conflicts in the model and returns a boolean value indicating if conflicts were found along with an output table containing information about the conflicts or None if no conflict was found. If any exception occurs during the process, it will print the error traceback and set has_conflict to True. The function also performs input validation to ensure timeout is greater than 0.",
+        "type": "comment"
+    },
+    "704": {
+        "file_id": 90,
+        "content": "    print(\"model loaded successfully from: %s\" % model_path)\n    if config == \"docplex\":\n        _, output_table = check_conflict(mdl, timeout)\n        if output_table is not None:\n            output_table.to_csv(output)\n        else:\n            print(\"no conflict was found.\")\n    elif config == \"cplex\":\n        # 获取cplex.Cplex()类对象\n        c = mdl.cplex\n        # 进行冲突检测\n        # print(dir(c.conflict))\n        # breakpoint()\n        all_constraints = c.conflict.all_constraints()\n        kill_cplex_after_duration(timeout)\n        c.conflict.refine(\n            all_constraints,\n        )\n        # func_timeout(MAXTIME, c.conflict.refine, args=(all_constraints,))\n        # 输出检测信息，再重新读入并在控制台中输出\n        # 需要吐槽的是Cplex并不支持以IOSteam为对象输入输出，因此不得不反复建立临时文件\n        c.conflict.write(output)\n        print(\"conflict written to:\", output)\n    else:\n        raise Exception(\"unknown config: %s\" % config)\nif __name__ == \"__main__\":\n    conflict_refiner()\n    # argparser = argparse.ArgumentParser()\n    # argparser.add_argument(\n    #     \"-m\", \"--model_path\", type=str, required=True, help=\"'.lp' model file path\"",
+        "type": "code",
+        "location": "/microgrid_base/conflict_utils.py:96-127"
+    },
+    "705": {
+        "file_id": 90,
+        "content": "This code snippet is performing conflict detection and refinement using CPLEX software. It checks if the configuration is \"docplex\" or \"cplex\", then performs the necessary operations accordingly. If there's no conflict found, it prints a message stating so. The code also includes a function for terminating the CPLEX after a certain duration.",
+        "type": "comment"
+    },
+    "706": {
+        "file_id": 90,
+        "content": "    # )\n    # argparser.add_argument(\n    #     \"-o\",\n    #     \"--output\",\n    #     type=str,\n    #     required=True,\n    #     help=\"conflict analysis output file path\",\n    # )\n    # argparser.add_argument(\n    #     \"-c\",\n    #     \"--config\",\n    #     type=str,\n    #     required=True,\n    #     help=\"conflict resolution method, can be one of ['cplex', 'docplex']\",\n    # )\n    # argparser.add_argument(\n    #     \"-t\",\n    #     \"--timeout\",\n    #     type=float,\n    #     default=5,\n    #     help=\"timeout in seconds, default is 5 seconds\",\n    # )\n    # arguments = argparser.parse_args()\n    # conflict_refiner(\n    #     arguments.model_path, arguments.output, arguments.config, arguments.timeout\n    # )",
+        "type": "code",
+        "location": "/microgrid_base/conflict_utils.py:128-153"
+    },
+    "707": {
+        "file_id": 90,
+        "content": "The code defines command line argument options for a conflict analysis tool. It allows users to specify the output file path, conflict resolution method (either 'cplex' or 'docplex'), and timeout in seconds. The arguments are then parsed and passed to the 'conflict_refiner' function for execution.",
+        "type": "comment"
+    },
+    "708": {
+        "file_id": 91,
+        "content": "/microgrid_base/constants.py",
+        "type": "filepath"
+    },
+    "709": {
+        "file_id": 91,
+        "content": "This code configures solver options for microgrid optimization and defines CLI commands to interact with the optimizer, including printing progress, exiting, saving/restoring solutions, displaying solver statistics, branching/cutting variables, performing heuristic search, solving using MIP solver, and setting variable/constraint priority.",
+        "type": "summary"
+    },
+    "710": {
+        "file_id": 91,
+        "content": "from log_utils import logger_print\n# UNKNOWN = 'unconnected'\nUNKNOWN = \"any\"\n每小时秒数 = 3600\n每天小时数 = 24\n每年天数 = 365\n秒级仿真小时数 = 2\n两小时秒数 = 每小时秒数 * 秒级仿真小时数\n每年小时数 = 每天小时数 * 每年天数\n每年月数 = 12\nfrom enum import auto\nfrom strenum import StrEnum\nclass Solver(StrEnum):\n    cplex = auto()\n    gurobi = auto()\n    ipopt = auto()\n    cbc = auto()\n    scip = auto()\n    # params: https://www.scipopt.org/doc/html/PARAMETERS.php\n    # TODO: set all failsafe methods into find first solution and return\n    \"\"\"change minuc -> optimize\"\"\"\n    glpk = auto()\n\"\"\"\ncbc repl keywords explained: (from chatgpt)\nSure, here's an explanation of all the CBC REPL keywords:\nDouble parameters:\n- `dualB(ound)` - dual bound value for the problem\n- `dualT(olerance)` - dual feasibility tolerance\n- `primalT(olerance)` - primal feasibility tolerance\n- `primalW(eight)` - weight for primal infeasibility in the objective\n- `psi` - objective function weight\n- `zeroT(olerance)` - zero tolerance for problem constraints\nBranch and Cut double parameters:\n- `allow(ableGap)` - allowable gap between the best integer feasible solution and the best bound",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:1-44"
+    },
+    "711": {
+        "file_id": 91,
+        "content": "Code snippet contains various constants and solver options, including time-related variables, and CBC REPL keywords with corresponding double parameters for a microgrid simulation. It also includes references to log_utils, enum, and strenum modules.",
+        "type": "comment"
+    },
+    "712": {
+        "file_id": 91,
+        "content": "- `cuto(ff)` - cutoff bound for the problem\n- `inc(rement)` - increment in the objective function value when the solver is unable to find a better feasible solution\n- `integerT(olerance)` - tolerance for considering a variable to be integer\n- `preT(olerance)` - tolerance for problem constraints before presolve\n- `pumpC(utoff)` - cutoff value for the feasibility pump heuristic\n- `ratio(Gap)` - relative gap tolerance for the problem\n- `sec(onds)` - maximum time allowed for solving the problem in seconds\nInteger parameters:\n- `force(Solution)` - force a solution to be found within a certain number of iterations\n- `idiot(Crash)` - enable/disable idiot crash mode\n- `maxF(actor)` - maximum factorization size allowed\n- `maxIt(erations)` - maximum number of iterations allowed\n- `output(Format)` - output format for the solution\n- `randomS(eed)` - seed for the random number generator\n- `slog(Level)` - logging level for the solver\n- `slogger_print(Crash)` - enable/disable sprint crash mode\nBranch and Cut integer parameters:",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:45-63"
+    },
+    "713": {
+        "file_id": 91,
+        "content": "This code defines various integer parameters for a solver, including cutoff bounds, tolerances, time limits, and factorization sizes. It also includes options for output format, logging level, random number generator seed, and enabling/disabling certain modes. These parameters control the behavior of the solver and influence its efficiency and accuracy.",
+        "type": "comment"
+    },
+    "714": {
+        "file_id": 91,
+        "content": "- `cutD(epth)` - maximum depth to explore when generating cutting planes\n- `cutL(ength)` - maximum number of non-zero coefficients in a generated cutting plane\n- `depth(MiniBab)` - maximum depth for the tree search\n- `hot(StartMaxIts)` - maximum number of iterations to perform during a hot start\n- `log(Level)` - logging level for the branch and cut solver\n- `maxN(odes)` - maximum number of nodes to explore during the tree search\n- `maxSaved(Solutions)` - maximum number of solutions to save during the search\n- `maxSo(lutions)` - maximum number of solutions to find before stopping the search\n- `passC(uts)` - enable/disable passing cuts from parent to child nodes during the tree search\n- `passF(easibilityPump)` - enable/disable passing information from the feasibility pump heuristic from parent to child nodes during the tree search\n- `passT(reeCuts)` - enable/disable passing tree cuts from parent to child nodes during the tree search\n- `pumpT(une)` - tuning parameter for the feasibility pump heuristic",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:64-75"
+    },
+    "715": {
+        "file_id": 91,
+        "content": "This code defines various constants for a branch and cut solver, including maximum depth for cutting planes, tree search parameters, and logging levels. It also includes settings for passing cuts and information between nodes during the search process.",
+        "type": "comment"
+    },
+    "716": {
+        "file_id": 91,
+        "content": "- `randomC(bcSeed)` - seed for the random number generator used by the branch and cut solver\n- `slow(cutpasses)` - number of passes to make when generating cutting planes\n- `strat(egy)` - strategy for selecting variables to branch on\n- `strong(Branching)` - enable/disable strong branching\n- `trust(PseudoCosts)` - trust level for the pseudo-costs of variables\nKeyword parameters:\n- `allC(ommands)` - display all available commands\n- `chol(esky)` - enable/disable the use of Cholesky factorization\n- `crash` - enable/disable crash mode\n- `cross(over)` - enable/disable crossover during tree search\n- `direction` - direction of the optimization\n- `error(sAllowed)` - number of allowed errors during execution\n- `fact(orization)` - factorization method to use\n- `keepN(ames)` - enable/disable keeping original variable names in the output\n- `mess(ages)` - enable/disable display of messages during execution\n- `perturb(ation)` - perturbation amount to use\n- `presolve` - enable/disable presolve\n- `printi(ngOptions)` - display printing options",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:76-94"
+    },
+    "717": {
+        "file_id": 91,
+        "content": "This code defines constants and keyword parameters for a branch and cut solver. The constants include seed for random number generator, passes to make when generating cutting planes, and strategy for variable selection. Keyword parameters control display of commands, use of Cholesky factorization, enabling/disabling crash mode or crossover during tree search, direction of optimization, allowed errors, factorization method, keeping original variable names in output, displaying messages, perturbation amount, and presolve.",
+        "type": "comment"
+    },
+    "718": {
+        "file_id": 91,
+        "content": "- `scal(ing)` - enable/disable scaling of the problem\n- `timeM(ode)` - display timing information\nBranch and Cut keyword parameters:\n- `clique(Cuts)` - enable/disable the generation of clique cuts\n- `combine(Solutions)` - enable/disable the combination of solutions during tree search\n- `combine2(Solutions)` - enable/disable the combination of solutions during tree search\n- `constraint(fromCutoff)` - constraint to add when a cutoff bound is reached\n- `cost(Strategy)` - cost strategy to use\n- `cplex(Use)` - use CPLEX for linear programming\n- `cuts(OnOff)` - enable/disable all cuts\n- `Dins` - enable/disable DINS heuristic\n- `DivingS(ome)` - enable/disable diving heuristic\n- `DivingC(oefficient)` - diving coefficient to use\n- `DivingF(ractional)` - enable/disable diving on fractional variables\n- `DivingG(uided)` - enable/disable guided diving heuristic\n- `DivingL(ineSearch)` - enable/disable line search for diving heuristic\n- `DivingP(seudoCost)` - enable/disable pseudo-cost diving heuristic\n- `DivingV(ectorLength)` - diving vector length to use",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:95-113"
+    },
+    "719": {
+        "file_id": 91,
+        "content": "This code defines various parameters for a Branch and Cut algorithm, including scaling, timing information, and different types of cuts to enable/disable. It also includes options for using CPLEX for linear programming and specific heuristics like DINS and diving.",
+        "type": "comment"
+    },
+    "720": {
+        "file_id": 91,
+        "content": "- `dw(Heuristic)` - enable/disable DW heuristic\n- `feas(ibilityPump)` - enable/disable feasibility pump heuristic\n- `flow(CoverCuts)` - enable/disable the generation of flow cover cuts\n- `GMI(Cuts)` - enable/disable the generation of Gomory mixed integer cuts\n- `gomory(Cuts)` - enable/disable the generation of Gomory cuts\n- `greedy(Heuristic)` - enable/disable greedy heuristic\n- `heur(isticsOnOff)` - enable/disable all heuristics\n- `knapsack(Cuts)` - enable/disable the generation of knapsack cuts\n- `lagomory(Cuts)` - enable/disable the generation of Lagrangean relaxation Gomory cuts\n- `latwomir(Cuts)` - enable/disable the generation of Lattimore-Foland cuts\n- `lift(AndProjectCuts)` - enable/disable the generation of lift-and-project cuts\n- `local(TreeSearch)` - enable/disable local search during tree search\n- `mixed(IntegerRoundingCuts)` - enable/disable mixed integer rounding cuts\n- `node(Strategy)` - node selection strategy to use\n- `PrepN(ames)` - enable/disable preserving original variable names in the output",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:114-128"
+    },
+    "721": {
+        "file_id": 91,
+        "content": "This code snippet appears to be defining various options that can be enabled or disabled for a certain optimization algorithm. These options include different heuristics, cuts types, and search strategies. The user has the flexibility to choose which options they want to use based on their specific needs. It seems to be related to mathematical optimization, potentially involving linear programming problems.",
+        "type": "comment"
+    },
+    "722": {
+        "file_id": 91,
+        "content": "- `pivotAndC(omplement)` - enable/disable pivot-and-complement heuristic\n- `pivotAndF(ix)` - enable/disable pivot-and-fix heuristic\n- `preprocess` - enable/disable preprocessing\n- `probing(Cuts)` - enable/disable the generation of probing cuts\n- `proximity(Search)` - enable/disable proximity search\n- `randomi(zedRounding)` - enable/disable randomized rounding heuristic\n- `reduce(AndSplitCuts)` - enable/disable the generation of reduce-and-split cuts\n- `reduce2(AndSplitCuts)` - enable/disable the generation of reduce-and-split cuts\n- `residual(CapacityCuts)` - enable/disable the generation of residual capacity cuts\n- `Rens` - enable/disable RENS heuristic\n- `Rins` - enable/disable RINS heuristic\n- `round(ingHeuristic)` - enable/disable rounding heuristic\n- `sosO(ptions)` - SOS option to use\n- `sosP(rioritize)` - SOS prioritization method to use\n- `two(MirCuts)` - enable/disable the generation of two-MIR cuts\n- `Vnd(VariableNeighborhoodSearch)` - enable/disable variable neighborhood search heuristic\n- `zero(HalfCuts)` - enable/disable the generation of zero-half cuts",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:129-145"
+    },
+    "723": {
+        "file_id": 91,
+        "content": "This code defines various heuristics and options that can be enabled or disabled in a microgrid optimization process. These include pivot-and-complement, pivot-and-fix, preprocessing, probing cuts, proximity search, randomized rounding, reduce-and-split cuts, residual capacity cuts, RENS heuristic, RINS heuristic, rounding heuristic, SOS options and prioritization methods, generation of two-MIR cuts, variable neighborhood search heuristic, and generation of zero-half cuts.",
+        "type": "comment"
+    },
+    "724": {
+        "file_id": 91,
+        "content": "Actions or string parameters:\n- `allS(lack)` - display all slack variables\n- `barr(ier)` - enable/disable barrier method\n- `basisI(n)` - load an initial basis from a file\n- `basisO(ut)` - write the final basis to a file\n- `directory` - set the directory for input/output files\n- `dualS(implex)` - enable/disable dual simplex method\n- `either(Simplex)` - enable/disable either simplex method\n- `end` - end the current execution\n- `exit` - exit the CBC REPL\n- `export` - export the problem to a file\n- `gsolu(tion)` - enable/disable display of best feasible solution found so far\n- `guess` - enable/disable intelligent guess for initial solution\n- `help` - display help information\n- `import` - import a problem from a file\n- `initialS(olve)` - solve the problem using the initial values of the decision\n- `max(imize)` - set the optimization direction to maximize (default)\n- `min(imize)` - set the optimization direction to minimize\n- `para(metrics)` - display the parameters used by the solver\n- `primalS(implex)` - enable/disable primal simplex method",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:147-166"
+    },
+    "725": {
+        "file_id": 91,
+        "content": "The code provides a list of available actions or string parameters that can be used to control the behavior and execution of the CBC solver. These commands include options for displaying solution variables, enabling/disabling certain solving methods, setting optimization direction, importing/exporting problems, and displaying help information.",
+        "type": "comment"
+    },
+    "726": {
+        "file_id": 91,
+        "content": "- `printM(ask)` - enable/disable printing of the solution progress\n- `quit` - exit the CBC REPL\n- `restoreS(olution)` - restore a saved solution\n- `saveS(olution)` - save the current solution\n- `solu(tion)` - display the current solution\n- `stat(istics)` - display the solver statistics\n- `stop` - stop the current execution\nBranch and Cut actions:\n- `branch(AndCut)` - branch on a variable and generate cutting planes\n- `doH(euristic)` - perform a heuristic search\n- `mips(tart)` - start solving the problem using the MIP solver\n- `nextB(estSolution)` - display the next best solution found so far\n- `prio(rityIn)` - set the priority of a variable or constraint\n- `solv(e)` - solve the problem\n\"\"\"",
+        "type": "code",
+        "location": "/microgrid_base/constants.py:167-183"
+    },
+    "727": {
+        "file_id": 91,
+        "content": "This code snippet defines various command-line interface (CLI) commands to interact with the optimization solver. Commands include enabling/disabling progress printing, exiting the program, saving and restoring solutions, displaying current solution, showing solver statistics, stopping execution, branching and cutting variables, performing heuristic search, solving the problem using MIP solver, displaying best found solution, and setting variable or constraint priority.",
+        "type": "comment"
+    },
+    "728": {
+        "file_id": 92,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/README.md",
+        "type": "filepath"
+    },
+    "729": {
+        "file_id": 92,
+        "content": "This code aims to identify the device model causing trouble in the CPLEX abnormal exit condition by counting problematic variables/expressions and sorting/displaying them.",
+        "type": "summary"
+    },
+    "730": {
+        "file_id": 92,
+        "content": "find out which model possibly causes the trouble.\ncount problematic variables/expressions which causes the trouble per device model, sort and display.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/README.md:1-3"
+    },
+    "731": {
+        "file_id": 92,
+        "content": "This code aims to identify the device model causing trouble in the CPLEX abnormal exit condition by counting problematic variables/expressions and sorting/displaying them.",
+        "type": "comment"
+    },
+    "732": {
+        "file_id": 93,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py",
+        "type": "filepath"
+    },
+    "733": {
+        "file_id": 93,
+        "content": "The code initializes a model, sets timezone, prints current time, adds constraints, defines objective function, handles solver options and exceptions, logs results, possibly switches LP algorithm. It provides functions for diagnostics, solution iteration, and expression decomposition, checking model solutions and calculating variable values, while identifying linearity of the objective expression and translating logs and models in lp format.",
+        "type": "summary"
+    },
+    "734": {
+        "file_id": 93,
+        "content": "# ref: https://yalmip.github.io/debuggingunbounded\n# solve the model without objective?\n# add bounds to objective expression\n# note that won't indicate all infinite rays\n# you spot one, you fix one.\nMAX_BOUND = 1e8\n# pyomo can utilize any solver without version specific libraries.\nfrom pyomo.environ import *\nimport os\nfrom contextlib import contextmanager\nimport weakref\ndef getModelSolution(model: ConcreteModel):\n    solution = {}\n    for v in model.component_data_objects(ctype=Var, active=True, descend_into=True):\n        varName = v.name\n        val = value(v, exception=None)\n        if val is not None:\n            solution[varName] = val\n        else:\n            return None\n    return solution\nNULL_SOLUTIONS = [None, {}]\nis_null_solution = lambda sol: sol in NULL_SOLUTIONS\ndef model_write(model: ConcreteModel, name):\n    # for fmt in 'lp', 'nl':\n    for fmt in [\"lp\", \"nl\"]:\n        model.write(filename=f\"{name}.{fmt}\")\ndef checkIfSolved(sol_before, sol_after):\n    if is_null_solution(sol_after):\n        has_solution = False",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:1-44"
+    },
+    "735": {
+        "file_id": 93,
+        "content": "This code defines a function getModelSolution that retrieves the solution of an active ConcreteModel and returns it as a dictionary. The variable MAX_BOUND is set to 1e8, and the function model_write writes the model in both lp and nl formats. The function checkIfSolved checks if the solution after solving is null and sets has_solution to False in that case.",
+        "type": "comment"
+    },
+    "736": {
+        "file_id": 93,
+        "content": "    else:\n        has_solution = True\n    has_difference = sol_before != sol_after\n    return has_solution, has_difference\nfrom copy import deepcopy\n@contextmanager\ndef modelSolutionContext(model):\n    class ModelSolutionChecker:\n        def __init__(self, model_wr):\n            self.model_wr = model_wr\n            self.previous_solution = None\n            self.update()\n        @property\n        def model(self):\n            return self.model_wr()\n        @property\n        def solution(self):\n            return getModelSolution(self.model)\n        def update(self):\n            self.previous_solution = deepcopy(self.solution)\n        def check(self, update=False):\n            has_solution, has_difference = checkIfSolved(self.previous_solution, self.solution)\n            if update:\n                self.update()\n            return has_solution, has_difference\n        def has_new_solution(self, update=False):\n            has_solution, has_difference = self.check(update=update)\n            return has_solution and has_difference",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:45-81"
+    },
+    "737": {
+        "file_id": 93,
+        "content": "This code defines a context manager for monitoring and checking the changes in the solution of an optimization model. The ModelSolutionChecker class initializes with the model writer function, stores the previous solution, and updates it when requested. It provides methods to check if there is a new solution and whether there's a difference between the old and new solutions.",
+        "type": "comment"
+    },
+    "738": {
+        "file_id": 93,
+        "content": "    modelSolutionChecker = ModelSolutionChecker(weakref.ref(model))\n    try:\n        yield modelSolutionChecker\n    finally:\n        del modelSolutionChecker\ndef clearModelVariableValues(model: ConcreteModel):\n    for v in model.component_data_objects(ctype=Var, active=True, descend_into=True):\n        v: Var\n        v.clear()  # clear value.\nimport pytz\n# with respect to our dearly Py3.6\ntimezone_str = \"Asia/Shanghai\"\n# timezone = pytz.timezone(timezone_str:='Asia/Shanghai')\ntimezone = pytz.timezone(timezone_str)\n# import logging\nimport datetime\nnow = datetime.datetime.now(tz=timezone)\nprint(\"Current time: \" + now.isoformat())\nprint(\"=\" * 60)\nsolver_name = os.environ[\"SOLVER_NAME\"]\ninfeasible = os.environ.get(\"INFEASIBLE\", None) is not None\nwarm_start = os.environ.get(\"WARM_START\", None) is not None\nprint(\"running solver \" + solver_name)\nprint(f\"warm start? {repr(warm_start)}\")\nprint(\"=\" * 60)\n# that is during presolve, not during solve.\n# from pyomo.contrib.iis import write_iis\nmodel = ConcreteModel()\nx = model.变量x = Var()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:83-120"
+    },
+    "739": {
+        "file_id": 93,
+        "content": "Code snippet initializes a model and variable, sets timezone and prints the current time. It also checks solver name and warm start options from environment variables before running the solver.",
+        "type": "comment"
+    },
+    "740": {
+        "file_id": 93,
+        "content": "y = model.变量y = Var()\nif warm_start:\n    x.set_value(0.5)\n    y.set_value(0.5)\nmodel.constraint_x_y = Constraint(expr=x + y >= 10)\nmodel.constraint_x_y_inv = Constraint(expr=x + y <= 9)\nif not infeasible:\n    model.constraint_x_y_inv.deactivate()\nz = model.z = Var([0, 1])\nx.setlb(-10)\nx.setub(10)\nobj_expr = 2 * x - 5 + y + z[0] + z[1] + 3 * (z[0] + y) + 10\nobj = model.obj = Objective(expr=obj_expr, sense=minimize)\nmodel_write(model, \"no_bound\")\n# warning: shall not be NaN\n# from cmath import nan\n# no_obj = model.no_obj = Objective(expr=nan, sense=minimize) # treated as 0\nno_obj = model.no_obj = Objective(expr=0)\n# write_iis(model, \"no_bound.ilp\", \"cplex\")\n# no conflict! how comes? it is unbounded.\nsolver = SolverFactory(solver_name)\nif warm_start:\n    solver_name += \"_warmstart\"\nif infeasible:\n    solver_name += \"_infeasible\"\n# switch lp algorithm\n# ref: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-algorithm-continuous-linear-problems\"\n# working?\n# solver.options['lpmethod'] = 1  # 0(automatic)-6(concurrent)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:121-157"
+    },
+    "741": {
+        "file_id": 93,
+        "content": "This code creates a model with variables x and y, sets warm start values for x and y, adds constraints to the model, defines an objective function, writes the model without bounds, creates a NaN objective as well, writes the model without bounds in ILP format, initializes a solver with the specified name based on warm_start and infeasible values, and potentially switches the LP algorithm.",
+        "type": "comment"
+    },
+    "742": {
+        "file_id": 93,
+        "content": "# solver.options[\"timelimit\"] = 15\n# solver.options[\"conflict display\"] = 2  # detailed display\n# not working.\n# solver.options['feasopt tolerance'] = 100 # seems not working.\n# solver.options['feasopt mode'] = 5 # 0(default)-5\n# cannot be too big.\n# solver.options['simplex tolerances optimality'] = 1e-1\nsmap_ids = []\nmodel.obj.deactivate()\nsolver_name_base = solver_name.split(\"_\")[0]\n# pass interactive options instead of commandline option.\n# solver.options[\"warm_start_init_point\"] = True\n# scan for \"Number of Iterations\" in output. get the number and set it here. (n-1)\n# ref: https://coin-or.github.io/Ipopt/OPTIONS.html#OPT_Termination\nif solver_name_base == \"ipopt\":\n    # solver.options['acceptable_iter'] = 10\n    # solver.options['max_iter'] = 10\n    solver.options[\"max_iter\"] = 3000\n    # solver.options['max_iter'] = 33-1\n    # solver.options['diverging_iterates_tol'] = 1e10\n    # solver.options['tol'] = 1e30\n    # solver.options['inf_pr_output'] = 'internal'\ndef solver_solve(model: ConcreteModel, **kwargs):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:159-185"
+    },
+    "743": {
+        "file_id": 93,
+        "content": "This code sets various solver options for a model, including timelimit, conflict display, feasopt tolerance, and simplex tolerances. It also checks if the solver name is \"ipopt\" and sets specific options like maximum iterations, diverging iterates tolerance, and inf_pr_output. The function solver_solve takes a ConcreteModel and optional arguments as input.",
+        "type": "comment"
+    },
+    "744": {
+        "file_id": 93,
+        "content": "    with modelSolutionContext(model) as modelSolutionChecker:\n        ret = solver.solve(\n            model,\n            **kwargs,\n            **(\n                dict(warmstart=True)\n                if warm_start\n                # if warm_start and solver_name_base not in [\"ipopt\"]\n                else {}\n            ),\n        )\n        # has_solution, _ = modelSolutionChecker.check()  # check if we have new solution\n        has_new_solution = modelSolutionChecker.check()\n        # ret[\"solved\"] = has_solution\n        ret['has_new_solution'] = has_new_solution\n        # scip can find feasible solution, but only if no conflict is found\n        # if solver_name_base == \"scip\":\n        #     breakpoint()\n        return ret\nimport traceback\ntry:\n    result_no_obj = solver_solve(\n        model,\n        tee=True,\n        logfile=f\"no_obj_solver_{solver_name}.log\",\n    )\nexcept:\n    traceback.print_exc()\n    raise Exception(f\"solver {solver_name.split('_')[0]} does not support warmstart\")\nsmap_ids.append(solver._smap_id)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:186-218"
+    },
+    "745": {
+        "file_id": 93,
+        "content": "The code uses a solver to solve a model and checks if the solution is new or not. It also handles exceptions for warm starts, logs results, and appends the solver's ID to a list.",
+        "type": "comment"
+    },
+    "746": {
+        "file_id": 93,
+        "content": "print(f\"X={value(x)}, Y={value(y)}\")\nprint()\nprint(\"=\" * 70)\nmodel.no_obj.deactivate()\nmodel.obj.activate()\n# model.bound_obj.deactivate()\nresult_unbound = solver_solve(\n    model, tee=True, logfile=(unbound_logfile := f\"unbound_solver_{solver_name}.log\")\n)\nimport re\nsmap_ids.append(solver._smap_id)\nITERATION_KW = \"Number of Iterations\"\nif solver_name_base == \"ipopt\":\n    # these are forced exits. could get results nevertheless.\n    if result_unbound.solver.termination_condition not in [\n        TerminationCondition.maxIterations,\n        TerminationCondition.maxTimeLimit,\n        TerminationCondition.maxEvaluations,  # what is this?\n    ]:\n        with open(unbound_logfile, \"r\") as f:\n            content = f.read()\n            content_lines = content.split(\"\\n\")\n            for line in content_lines:\n                if ITERATION_KW in line:\n                    iteration = re.search(r\"\\d+\", line).group()\n                    print(\"ITERATION: \", iteration)\n                    solver.options[\"max_iter\"] = int(iteration) - 1",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:219-248"
+    },
+    "747": {
+        "file_id": 93,
+        "content": "The code prints the values of X and Y, separates with a line, deactivates the no_obj model and activates obj, solves unbound problem using solver, appends _smap_id to smap_ids list, checks if the exit condition is a forced one (maxIterations, maxTimeLimit, or maxEvaluations), reads log file content, finds the iteration number, subtracts 1 and sets it as max_iter in solver options.",
+        "type": "comment"
+    },
+    "748": {
+        "file_id": 93,
+        "content": "                    result_unbound_rerun = solver_solve(\n                        model,\n                        tee=True,\n                        logfile=(\n                            unbound_logfile := f\"unbound_solver_{solver_name}_rerun.log\"\n                        ),\n                    )\n                    smap_ids.append(solver._smap_id)\n                    break\nprint()\nprint(\"=\" * 70)\n# no need to create new objective. just limit the objective expression to bounds.\nmobjVar = model.mobjVar = Var()\nmobjVar.setub(MAX_BOUND)\nmobjVar.setlb(-MAX_BOUND)\nmodel.constraint_bound_obj = Constraint(expr=mobjVar == obj_expr)\n# bound_obj = model.bound_obj = Objective(expr=mobjVar, sense=minimize)\n# model.obj.deactivate()\n# model.bound_obj.activate()\nclearModelVariableValues(model)\nresult_bound = solver_solve(model, tee=True, logfile=f\"bound_solver_{solver_name}.log\")\nsmap_ids.append(solver._smap_id)\n# if solver_name_base == \"ipopt\":\n#     breakpoint()\n# you still need to set time limit options over this.\nsolverResultDiagosticInfo = (",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:249-281"
+    },
+    "749": {
+        "file_id": 93,
+        "content": "Code creates an alternative solver model with bound constraints and solves it. If the solver is IPOPT, a breakpoint is set. The code also sets time limit options for further optimization.",
+        "type": "comment"
+    },
+    "750": {
+        "file_id": 93,
+        "content": "    lambda banner, solverResult: \"%s TERMINATION CONDITION: %s; SOLVED: %s\"\n    % (banner, solverResult.solver.termination_condition, solverResult[\"has_new_solution\"])\n)\nprintSolverResultDiagosticInfo = lambda banner, solverResult: print(\n    solverResultDiagosticInfo(banner, solverResult)\n)\nprintSolverResultDiagosticInfo(\"UNBOUND\", result_unbound)\nif solver_name_base == \"ipopt\":\n    if \"result_unbound_rerun\" in globals().keys():\n        printSolverResultDiagosticInfo(\"UNBOUND RERUN\", result_unbound_rerun)\nprintSolverResultDiagosticInfo(\"BOUND\", result_bound)\nimport rich\nfor it in model.solutions.symbol_map.values():\n    rich.print(it.bySymbol)\n# now analyze what variable is doing havoc to the model.\nfrom pyomo.core.expr import current as EXPR\n# class ExpressionDecomposer(EXPR.SimpleExpressionVisitor):\n#     def __init__(self):\n#         # self.counter = 0\n#         self.varmap = {}\n#     def visit(self, node):\n#         # self.counter += 1\n#         print(node)\n#         print(type(node))\n#         # breakpoint()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:282-317"
+    },
+    "751": {
+        "file_id": 93,
+        "content": "The code defines a function to print solver result diagnostic information, with separate print statements for unbound and bound results. If the solver name is \"ipopt\" and \"result_unbound_rerun\" exists in the global scope, it prints the unbound rerun result as well. It then iterates over model solutions by symbol, printing each variable's value using the rich library. Finally, it defines an ExpressionDecomposer class to analyze variables causing havoc in the model.",
+        "type": "comment"
+    },
+    "752": {
+        "file_id": 93,
+        "content": "#         print(\"_____\")\n#     def finalize(self):\n#         return self.varmap\n# def decomposeExpression(expr):\n#     #\n#     # Create the visitor object\n#     #\n#     visitor = ExpressionDecomposer()\n#     #\n#     # Compute the varmap using the :func:`xbfs` search method.\n#     #\n#     varmap = visitor.xbfs(expr)\n#     return varmap\nfrom typing import TypedDict, Dict\nclass DecomposedExpression(TypedDict):\n    constant: float\n    varNameToVarObject: Dict[str, str]\n    varNameToVarCoefficient: Dict[str, float]\ndef decomposeExpression(expr):\n    const = 0\n    varNameToVarObject = {}\n    varNameToVarCoefficient = {}\n    is_linear, terms = EXPR.decompose_term(expr)\n    if is_linear:\n        for coef, var in terms:\n            if var is None:\n                const += coef\n            else:\n                varName = str(var)\n                varNameToVarObject[varName] = var\n                varNameToVarCoefficient[varName] = (\n                    varNameToVarCoefficient.get(varName, 0) + coef\n                )\n        return DecomposedExpression(",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:318-357"
+    },
+    "753": {
+        "file_id": 93,
+        "content": "The code defines a function `decomposeExpression` that takes an expression as input and decomposes it into its constant term, variable names, and their corresponding coefficients. The decomposition is done by iterating over the terms of the expression using EXPR's `decompose_term`, then adding each coefficient to the constant term or storing it in the respective dictionaries for the variable names and coefficients. The function returns a DecomposedExpression object containing this information.",
+        "type": "comment"
+    },
+    "754": {
+        "file_id": 93,
+        "content": "            constant=const,\n            varNameToVarObject=varNameToVarObject,\n            varNameToVarCoefficient=varNameToVarCoefficient,\n        )\nfrom typing import List, Tuple\ndef getValueListFromValueDict(valueDict: Dict[str, float]):\n    valueList = list(valueDict.items())\n    return valueList\ndef sortAndDisplayVarValues(\n    valueList: List[Tuple[str, float]], banner: str, head_count=10, reverse=False\n):\n    print(banner.center(70, \"=\"))  # to be commented out\n    valueList.sort(key=lambda x: x[1], reverse=reverse)\n    head_count = min(len(valueList), head_count)\n    message = [f\"reversed: {reverse}\", \"\"]\n    for i in range(head_count):\n        message.append(\"%s\\t%s\" % valueList[i])\n    output = \"\\n\".join(message)\n    print(output)\nif is_null_solution(getModelSolution(model)):\n    print(\"model not solved.\")\n    exit()\ndecomposedResult = decomposeExpression(obj_expr)\nif decomposedResult:\n    print(decomposedResult)\n    varNameToVarValue = {}\n    varNameToTermValue = {}\n    for varName, varObj in decomposedResult[\"varNameToVarObject\"].items():",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:358-394"
+    },
+    "755": {
+        "file_id": 93,
+        "content": "This code is checking the solution of a model, displaying variable values in sorted order, and decomposing objective expression. It exits if the model is not solved, prints the result if the decomposition is successful, and initializes dictionaries for variable names and term values.",
+        "type": "comment"
+    },
+    "756": {
+        "file_id": 93,
+        "content": "        varValue = value(varObj)\n        coef = decomposedResult[\"varNameToVarCoefficient\"][\n            varName\n        ]  # seems to be no typeddict type checking in pyright\n        termValue = coef * varValue\n        varNameToVarValue[varName] = varValue\n        varNameToTermValue[varName] = termValue\n    # sort and display\n    valueListOfVarNameToVarValue = getValueListFromValueDict(varNameToVarValue)\n    valueListOfVarNameToTermValue = getValueListFromValueDict(varNameToTermValue)\n    BANNER_VARNAME_TO_VAR_VALUE = \"VAR NAME TO VAR VALUE\"\n    BANNER_VARNAME_TO_TERM_VALUE = \"VAR NAME TO TERM VALUE\"\n    sortAndDisplayVarValues(valueListOfVarNameToVarValue, BANNER_VARNAME_TO_VAR_VALUE)\n    sortAndDisplayVarValues(\n        valueListOfVarNameToVarValue, BANNER_VARNAME_TO_VAR_VALUE, reverse=True\n    )\n    sortAndDisplayVarValues(valueListOfVarNameToTermValue, BANNER_VARNAME_TO_TERM_VALUE)\n    sortAndDisplayVarValues(\n        valueListOfVarNameToTermValue, BANNER_VARNAME_TO_TERM_VALUE, reverse=True\n    )\n    print()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:395-416"
+    },
+    "757": {
+        "file_id": 93,
+        "content": "This code calculates the value of variables and their corresponding coefficients from decomposed results. It stores the values in dictionaries, sorts and displays them in specific ways, and then prints a blank line.",
+        "type": "comment"
+    },
+    "758": {
+        "file_id": 93,
+        "content": "    obj_val = value(obj_expr)\n    obj_const = decomposedResult[\"constant\"]\n    print(\"(OBJ - OBJ_CONST)?\", obj_val - obj_const)\n    print(\"OBJ?\", obj_val)\n    print(\"OBJ_CONST?\", obj_const)\nelse:\n    print(\"objective expression is non-linear.\")\nprint(\"solver smap ids:\", smap_ids)  # three unique ids.\n# pick up the most recent one to translate the log and exported model (lp format).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/alternative_solver.py:417-426"
+    },
+    "759": {
+        "file_id": 93,
+        "content": "This code checks if the objective expression is linear or not. It calculates the objective value and constant part of the objective function from decomposedResult. If the expression is non-linear, it prints a message stating so. It then prints the objective value and constant part separately. Finally, it prints the solver's smap ids and picks up the most recent one to translate the log and exported model in lp format.",
+        "type": "comment"
+    },
+    "760": {
+        "file_id": 94,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/arithmatic_prolog.pro",
+        "type": "filepath"
+    },
+    "761": {
+        "file_id": 94,
+        "content": "The code defines two solve functions using constraint programming to find the solution, with comments suggesting alternative approaches and including an unused line for library(random) and a count_probability function that is not utilized in the final solution.",
+        "type": "summary"
+    },
+    "762": {
+        "file_id": 94,
+        "content": "% not useable.\n% :- use_module(library(clpfd)).\n:- use_module(library(clpr)).\n% need separation.\n% Y < -1 instead of Y < -1\n% {X => 0, X =< 1}, minimize(X).\n% do not use strict inequalities.\n% replace(\"=>\", \">=\").replace(\"<=\", \"=<\")\n% {Y >= 0, Y =< 1.5}, {(Y >= 0.5, Y =< 1, X = 0.5 + Y; Y >= 1, X = 2*Y ; Y =< 0.5, X = 0.5 - Y)} , {X >= 1}, minimize(X).\nsolve(X) :- \n    {Y >= 0, Y =< 1.5}, {(Y >= 0.5, Y =< 1, X = 0.5 + Y; Y >= 1, X = 2*Y ; Y =< 0.5, X = 0.5 - Y)} , {X >= 1}.\nsolve_false(X) :-\n    {X > 0, X < -1}.\n% solve(X) :-\n%     Y is random_float, (Y > 0.5, X = 0.5+Y; Y =< 0.5, X = 0.5-Y), X>1.\n% :- use_module(library(random)).\n% % Generate N random numbers and count the number of times a number less than 0.5 is generated\n% count_probability(N, Prob) :-\n%     count_probability(N, 0, Count),\n%     Prob is Count / N.\n% count_probability(0, Count, Count).\n% count_probability(N, Acc, Count) :-\n%     random(R),\n%     ( R < 0.5 ->\n%         Acc1 is Acc + 1\n%     ; Acc1 is Acc\n%     ),\n%     N1 is N - 1,\n%     count_probability(N1, Acc1, Count).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/arithmatic_prolog.pro:1-37"
+    },
+    "763": {
+        "file_id": 94,
+        "content": "The code defines two solve functions, one with a fixed range for Y and another that generates a random value for X. It uses the library(clpr) module for constraint programming and includes comments indicating alternative approaches using library(clpfd). The code also has an unused line referencing library(random) and includes comments defining a count_probability function, which is not used in the final solution.",
+        "type": "comment"
+    },
+    "764": {
+        "file_id": 94,
+        "content": "% % count_probability(1000000, Prob).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/arithmatic_prolog.pro:39-39"
+    },
+    "765": {
+        "file_id": 94,
+        "content": "This code defines a predicate called \"count_probability\" which takes an integer argument (1000000) and returns the probability as the second argument.",
+        "type": "comment"
+    },
+    "766": {
+        "file_id": 95,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py",
+        "type": "filepath"
+    },
+    "767": {
+        "file_id": 95,
+        "content": "This code defines a Pyomo model with various variables and constraints, writes it to file, and prints the solution symbols and associated names, stripping brackets from variable names. It also iterates through model components, retrieving their base and original object names.",
+        "type": "summary"
+    },
+    "768": {
+        "file_id": 95,
+        "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.a = Var()\nmodel.b = Var([1, 2])\nmodel.pw = Piecewise(\n    model.b[1],\n    model.a,\n    pw_pts=[1, 2, 3],\n    pw_repn=\"MC\",\n    f_rule=[3, 2, 1],\n    pw_constr_type=\"EQ\",\n    unbounded_domain_var=True,\n)\nmodel.g = Var([1, 2, 3], [4, 5, 6])\nmodel.subm = model.clone()\nmodel.cons = Constraint(expr=model.a >= model.b[2] + model.g[1, 4] - model.subm.b[1])\nmodel.obj = Objective(expr=0, sense=minimize)\nimport re\nBRACKETS_RE = re.compile(r\"\\[.*?\\]\")\ndef getBaseAndOriginalObjectName(obj) -> tuple[str, str]:\n    objname = obj.name\n    base_objname, _ = BRACKETS_RE.subn(\"\", objname)\n    return objname, base_objname\nfor obj in model.component_data_objects():\n    print(\"\\t\".join(getBaseAndOriginalObjectName(obj)))\nmodel.write(\"associativity_output.lp\")\nprint(\"_\" * 60)\nfor it in model.solutions.symbol_map.values():\n    for k, v in it.bySymbol.items():\n        print(k, v().name)  # strip away rectangular brackets\n# if it is not block, just keep the base name\n# if it is, keep its names of components",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py:1-43"
+    },
+    "769": {
+        "file_id": 95,
+        "content": "This code defines a Pyomo model with various variables and constraints. It then prints the base and original names of each object in the model, writes the model to file, and prints the solution symbols and their associated names, stripping any brackets from variable names.",
+        "type": "comment"
+    },
+    "770": {
+        "file_id": 95,
+        "content": "# for c in [model.b, model.pw]:\nfor c in [model.a, model.b, model.pw, model.cons, model.subm]:\n    if (func := getattr(c, \"component_data_objects\", None)) is not None:\n        for obj in func():\n            print(\"\\t\".join(getBaseAndOriginalObjectName(obj)))\n    else:\n        print(c.name)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/associativity_attr_model.py:44-50"
+    },
+    "771": {
+        "file_id": 95,
+        "content": "Iterating through model components, retrieving and printing their base and original object names.",
+        "type": "comment"
+    },
+    "772": {
+        "file_id": 96,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/cbc_persistent.py",
+        "type": "filepath"
+    },
+    "773": {
+        "file_id": 96,
+        "content": "This code imports the CyClpSimplex class from the cylp.cy module, which is likely used for optimization and linear programming tasks within the microgrid_base project.",
+        "type": "summary"
+    },
+    "774": {
+        "file_id": 96,
+        "content": "from cylp.cy import CyClpSimplex",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/cbc_persistent.py:1-1"
+    },
+    "775": {
+        "file_id": 96,
+        "content": "This code imports the CyClpSimplex class from the cylp.cy module, which is likely used for optimization and linear programming tasks within the microgrid_base project.",
+        "type": "comment"
+    },
+    "776": {
+        "file_id": 97,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro",
+        "type": "filepath"
+    },
+    "777": {
+        "file_id": 97,
+        "content": "This code defines devices and their working conditions, along with rules for using them. It includes a predicate to check the presence of an adder device and related battery/generator devices in given conditions.",
+        "type": "summary"
+    },
+    "778": {
+        "file_id": 97,
+        "content": "% Define the devices and their ports\ndevice(battery, [port1]).\ndevice(generator, [port1]).\n% Define the working conditions for each device\nworking_condition(battery, [port1, charging]).\nworking_condition(generator, [port1, output]).\n% Define the rules for using the devices\nrule_battery(port1, charging).\nrule_generator(port1, output).\n% Define the adder device and its rules\ndevice(adder, [port1, port2, port3]).\nworking_condition(adder, [port1, port2, port3, input, output]).\nrule_adder(port1, input).\nrule_adder(port2, input).\nrule_adder(port3, output).\n% Define a predicate to enumerate all working conditions\nenumerate_working_conditions(Conditions) :-\n    findall(Device-Ports-Conditions, (\n        device(Device, Ports),\n        working_condition(Device, Conditions),\n        apply_rules(Ports, Conditions),\n        check_adder(Conditions)\n    ), Conditions).\n% Define a predicate to apply the rules to a set of ports and conditions\napply_rules(Ports, Conditions) :-\n    forall((member(Port, Ports), rule(Device, Port, Condition)),",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro:1-31"
+    },
+    "779": {
+        "file_id": 97,
+        "content": "This code defines devices, their working conditions, and rules for using them. It includes a predicate to enumerate all working conditions and apply rules to a set of ports and conditions. The adder device is also defined with its own rules.",
+        "type": "comment"
+    },
+    "780": {
+        "file_id": 97,
+        "content": "           member(Device-Condition, Conditions)).\n% Define a predicate to check the adder device\ncheck_adder(Conditions) :-\n    member(adder-[P1, P2, P3, input, output]-C1, Conditions),\n    member(battery-[P1, C2]-C2, Conditions),\n    member(generator-[P2, C3]-C3, Conditions),\n    (member(adder-[P3, input, output]-C4, Conditions) ; C4 = C1).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro:32-39"
+    },
+    "781": {
+        "file_id": 97,
+        "content": "This code defines a predicate, \"check_adder\", that verifies the presence of an adder device in a given set of conditions, along with related battery and generator devices.",
+        "type": "comment"
+    },
+    "782": {
+        "file_id": 98,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_examaple.pro",
+        "type": "filepath"
+    },
+    "783": {
+        "file_id": 98,
+        "content": "This code defines devices, their ports, and working conditions. It also establishes rules for using devices based on port status and wind speed. The code includes predicates to enumerate all working conditions and apply rules to a set of ports and conditions.",
+        "type": "summary"
+    },
+    "784": {
+        "file_id": 98,
+        "content": "% Define the devices and their ports\ndevice(solar_panel, [port1]).\ndevice(battery, [port1, port2]).\ndevice(wind_turbine, [port1]).\n% Define the working conditions for each device\nworking_condition(solar_panel, [port1, day]).\nworking_condition(battery, [port1, port2, day, night]).\nworking_condition(wind_turbine, [port1, wind_speed]).\n% Define the rules for using the devices\nrule_solar_panel(port1, day).\nrule_battery(_).\nrule_wind_turbine(port1, WindSpeed) :- WindSpeed > 5.\n% Define a predicate to enumerate all working conditions\nenumerate_working_conditions(Conditions) :-\n    findall(Device-Ports-Conditions, (\n        device(Device, Ports),\n        working_condition(Device, Conditions),\n        apply_rules(Ports, Conditions)\n    ), Conditions).\n% Define a predicate to apply the rules to a set of ports and conditions\napply_rules(Ports, Conditions) :-\n    forall((member(Port, Ports), rule(Device, Port, Condition)),\n           member(Device-Condition, Conditions)).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_examaple.pro:1-27"
+    },
+    "785": {
+        "file_id": 98,
+        "content": "This code defines devices, their ports, and working conditions. It also establishes rules for using devices based on port status and wind speed. The code includes predicates to enumerate all working conditions and apply rules to a set of ports and conditions.",
+        "type": "comment"
+    },
+    "786": {
+        "file_id": 99,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py",
+        "type": "filepath"
+    },
+    "787": {
+        "file_id": 99,
+        "content": "The code tests Pyomo's bounds detection, defines classes for variable and constraint details, validates domains and constraints using dictionaries, introduces PiecewiseInfo class for constraint decomposition, and includes ModelScanner class to handle microgrid problems.",
+        "type": "summary"
+    },
+    "788": {
+        "file_id": 99,
+        "content": "# assign invalid values to var and constraints.\n# see if the system can detect bounds/constraint violations\nfrom pyomo.environ import *\n# advanced logical expression linearization using pyomo.GDP\n# ref: https://pyomo.readthedocs.io/en/latest/modeling_extensions/gdp/modeling.html\nmodel = ConcreteModel()\nmodel.a = Var(within=Binary)\nmodel.b = Var(within=NonNegativeReals)\nmodel.c = Var(within=NonNegativeIntegers)\nmodel.d = Var(bounds=(-10, 10))\nmodel.e = Var()\nmodel.a.set_value(1.5)\nmodel.b.set_value(-0.5)\nmodel.c.set_value(100.5)\nmodel.d.set_value(-11)\nmodel.e.set_value(-50.5)\nmodel.con1 = Constraint(expr=model.d >= model.c)\nmodel.con2 = Constraint(expr=model.b >= model.c)\nmodel.con3 = Constraint(expr=model.a + model.b <= -model.c)\nmodel.con4 = Constraint(expr=model.b * model.b >= model.c)\n# piecewise is not constraint, though.\nmodel.pw = Piecewise(\n    model.c,  # y_var\n    model.e,  # x_var\n    pw_pts=[-100, 0, 100],\n    pw_repn=\"MC\",\n    # pw_repn=\"SOS2\",\n    f_rule=[100, 0, -100],\n    pw_constr_type=\"EQ\",\n    unbounded_domain_var=True,",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:1-37"
+    },
+    "789": {
+        "file_id": 99,
+        "content": "This code assigns invalid values to variables and constraints in Pyomo, a modeling language for optimization problems. It tests if the system can detect bounds/constraint violations by setting variable values outside of their defined ranges and creating conflicting constraints.",
+        "type": "comment"
+    },
+    "790": {
+        "file_id": 99,
+        "content": "    warn_domain_coverage=False,\n)\nmodel.pw.MC_poly_x[1] = 1\nmodel.pw.MC_poly_x[2] = 1\nmodel.pw.MC_bin_y[1] = 1\nmodel.pw.MC_bin_y[2] = 1\n# you might need to sort it out. check how much further it goes.\n# from pyomo.util.infeasible import log_infeasible_constraints,\nfrom pydantic import BaseModel\nfrom typing import Union, Literal, List\ndef get_var_or_constraint_bounds(var: Var):\n    lb, ub = None, None\n    if var.has_lb():\n        lb = value(var.lower, exception=False)\n    if var.has_ub():\n        ub = value(var.upper, exception=False)\n    return lb, ub\nclass VarViolation(BaseModel):\n    bound_violation: float\n    vartype_violation: float\n    @property\n    def has_violation(self):\n        return any([v > 0 for v in [self.bound_violation, self.vartype_violation]])\ndef moderate_violation(violation, tol):\n    assert tol >= 0, f\"violation tolerance must be non-negative\\npassed: {tol}\"\n    violation = abs(violation)\n    if violation <= tol:\n        violation = 0\n    return violation\ndef get_lower_bound_violation(val: float, lower_bound: Union[float, None], tol: float):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:38-79"
+    },
+    "791": {
+        "file_id": 99,
+        "content": "This code defines a function to get the violation of variable bounds and checks for any violations in the given variable. It also defines a class to store these violations and a method to moderate the violation value based on tolerance. This is used to check the validity of constraints in a model.",
+        "type": "comment"
+    },
+    "792": {
+        "file_id": 99,
+        "content": "    violation = 0\n    if any([v is None for v in [val, lower_bound]]):\n        return violation\n    if val < lower_bound:\n        violation = moderate_violation(lower_bound - val, tol)\n    return violation\ndef get_bounds_violation(\n    val: float,\n    lower_bound: Union[float, None],\n    upper_bound: Union[float, None],\n    tol: float,\n):\n    if all([bound is not None for bound in [lower_bound, upper_bound]]):\n        assert (\n            lower_bound <= upper_bound\n        ), \"invalid bound ({lower_bound}, {upper_bound})\\nlower bound shall not be greater than upper bound.\"\n    violation = get_lower_bound_violation(val, lower_bound, tol)\n    if violation == 0:\n        violation = get_lower_bound_violation(upper_bound, val, tol)\n    return violation\ndef get_boolean_or_integer_violation(val: float, tol: float):\n    violation = val % 1\n    if violation != 0:\n        violation = min([violation, 1 - violation])\n    return moderate_violation(violation, tol)\ndef constructVarChecker(domainName: str, domainBounds):\n    def checker(var: Var, tol: float):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:80-113"
+    },
+    "793": {
+        "file_id": 99,
+        "content": "This code checks the bounds and values of variables in a constraint programming problem. It calculates violations based on these bounds and values, ensuring that they are within the defined tolerances. The get_bounds_violation function checks both lower and upper bounds for validity and returns a violation score. The get_boolean_or_integer_violation function handles violations related to variable type (boolean or integer). The constructVarChecker function creates a variable checker function using provided domain name and bounds information, taking into account the specific type of variable being checked.",
+        "type": "comment"
+    },
+    "794": {
+        "file_id": 99,
+        "content": "        val = value(var)\n        var_bounds = get_var_or_constraint_bounds(var)\n        bounds_violation = get_bounds_violation(val, *var_bounds, tol)\n        vartype_violation = get_bounds_violation(val, *domainBounds, tol)\n        if vartype_violation == 0:\n            if \"Integers\" in domainName or domainName in [\"Boolean\", \"Binary\"]:\n                vartype_violation = get_boolean_or_integer_violation(val, tol)\n        varViolation = VarViolation(\n            bound_violation=bounds_violation, vartype_violation=vartype_violation\n        )\n        return (varViolation, *var_bounds)\n    return checker\nfrom functools import lru_cache\n@lru_cache(maxsize=1)\ndef getVarCheckers():\n    varDomainObjs = [\n        Reals,\n        PositiveReals,\n        NonPositiveReals,\n        NegativeReals,\n        NonNegativeReals,\n        Integers,\n        PositiveIntegers,\n        NonPositiveIntegers,\n        NegativeIntegers,\n        NonNegativeIntegers,\n        Boolean,\n        Binary,\n    ]\n    checkers = {}\n    for varDomainObj in varDomainObjs:",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:114-150"
+    },
+    "795": {
+        "file_id": 99,
+        "content": "This code defines a function `getVarCheckers()` that utilizes the LRU cache decorator and checks for bounds and variable type violations in variables of different data types. It creates checker functions for each variable domain (e.g., Reals, Integers, Booleans) and returns them. The checker function identifies if a given value is within the variable's bound and has the correct data type.",
+        "type": "comment"
+    },
+    "796": {
+        "file_id": 99,
+        "content": "        domainName = varDomainObj.name\n        domainBounds = varDomainObj.bounds()\n        checker = constructVarChecker(domainName, domainBounds)\n        checkers[domainName] = checker\n    return checkers\nclass VarInfo(BaseModel):\n    varName: str\n    val: float\n    domainName: Literal[  # usually, just need to check if it is boolean/binary/integer.\n        \"Reals\",\n        \"PositiveReals\",\n        \"NonPositiveReals\",\n        \"NegativeReals\",\n        \"NonNegativeReals\",\n        \"Integers\",\n        \"PositiveIntegers\",\n        \"NonPositiveIntegers\",\n        \"NegativeIntegers\",\n        \"NonNegativeIntegers\",\n        \"Boolean\",\n        \"Binary\",\n    ]\n    lower_bound: Union[float, None]\n    upper_bound: Union[float, None]\n    violation: VarViolation\nclass ConstraintInfo(BaseModel):\n    constraintName: str\n    variables: List[VarInfo]\n    violation: float\n    representation: str\n    is_linear: bool\n    @property\n    def has_violation(self):\n        # TODO: consider overall violation among variables inside constraint\n        return self.violation > 0",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:151-190"
+    },
+    "797": {
+        "file_id": 99,
+        "content": "The code defines a class `VarInfo` for storing variable information including its name, value, domain type, and lower/upper bounds. It also defines a class `ConstraintInfo` for storing constraint details such as its name, associated variables, violation level, and representation. The code creates a dictionary of checkers to validate the domain and constraints of variables.",
+        "type": "comment"
+    },
+    "798": {
+        "file_id": 99,
+        "content": "from pyomo.core.expr import current as EXPR\ndef get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n    var: Var, tol=1e-6, violation_only: bool = True\n):\n    checkers = getVarCheckers()\n    domainName = var.domain._name\n    varName = var.name\n    val = value(var)\n    if domainName in checkers.keys():\n        checker = checkers[domainName]\n        varViolation, lower_bound, upper_bound = checker(\n            var, tol\n        )  # violation shall be positive when actual violation is greater than tolerance, otherwise zero.\n        if violation_only and not varViolation.has_violation:\n            return\n        varInfo = VarInfo(\n            varName=varName,\n            val=val,\n            domainName=domainName,\n            lower_bound=lower_bound,\n            upper_bound=upper_bound,\n            violation=varViolation,\n        )\n        return varInfo\n    else:\n        raise Exception(\"unknown domain name: %s\" % domainName)\nfrom typing import Dict\ndef getVarInfoListFromVarInfoDict(varInfoDict: Dict[str, VarInfo]):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:193-226"
+    },
+    "799": {
+        "file_id": 99,
+        "content": "This function retrieves the violation and variable information for a single variable. It first checks if the variable's domain has a corresponding checker in the getVarCheckers dictionary. If so, it calls the checker to determine the violation status and bounds of the variable. The function returns a VarInfo object containing the variable name, value, domain name, lower bound, upper bound, and violation information. If the violation is not needed or if there's no violation, it doesn't return anything.",
+        "type": "comment"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines two test functions, `test_a` and `test_b`, where `test_a` asserts that 1 is equal to 1 and `test_b` asserts that 2 is equal to 1. The uncommented assertion in `test_b` will fail.",
+    "details": [
+        {
+            "comment": "This code defines two test functions, `test_a` and `test_b`, where `test_a` asserts that 1 is equal to 1 and `test_b` asserts that 2 is equal to 1. The uncommented assertion in `test_b` will fail.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/lfnf.py\":0-7",
+            "content": "def test_a():\n    print(\"RUNNING A\")\n    assert 1 == 1\ndef test_b():\n    print(\"RUNNING B\")\n    # assert 1 == 1\n    assert 2 == 1"
+        }
+    ]
+}

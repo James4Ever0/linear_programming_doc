@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the torchpwl library and creates a Piecewise Linear (PWL) function with 5 channels and 3 breakpoints. A random tensor x is generated, and the PWL function is applied to it, resulting in output tensor y.",
+    "details": [
+        {
+            "comment": "The code imports the torchpwl library and creates a Piecewise Linear (PWL) function with 5 channels and 3 breakpoints. A random tensor x is generated, and the PWL function is applied to it, resulting in output tensor y.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_torchpwl.py\":0-5",
+            "content": "import torchpwl\n# Create a PWL consisting of 3 segments for 5 channels - each channel will have its own PWL function.\npwl = torchpwl.PWL(num_channels=5, num_breakpoints=3)\nx = torch.Tensor(11, 5).normal_()\ny = pwl(x)"
+        }
+    ]
+}

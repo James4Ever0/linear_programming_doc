@@ -1,0 +1,15 @@
+{
+    "summary": "The code initializes a Celery application and worker process with specific configurations, defining a task function `mfunc` that raises an exception. It ensures the worker operates within defined resource constraints.",
+    "details": [
+        {
+            "comment": "This code initializes a Celery application with specific configurations for error handling, worker settings, and task execution. It defines a function `mfunc` as a Celery task that calls another function `func`, which raises an exception.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_wrapper.py\":0-44",
+            "content": "from log_utils import logger_print\nfrom ies_optim import ModelWrapperContext\nfrom celery.app.task import Task\nTask.__class_getitem__ = classmethod(lambda cls, *args, **kwargs: cls)  # type: ignore[attr-defined]\ndef func():\n    def func2():\n        with ModelWrapperContext(...) as m:\n            raise Exception(\"error\")\n    func2()\n# func()\nfrom celery import Celery\nfrom passwords import redis_password\nfrom typing import Union\nMAIN_NAME = \"test_wrapper\"\napp = Celery(\n    MAIN_NAME,\n    broker=\"amqp://guest@localhost:5672//\",\n    backend=f\"redis://:{redis_password}@localhost:6380\",\n    # backend=f\"redis://:{redis_password}@localhost:6379\",\n)\n@app.task(store_errors_even_if_ignored=True)\ndef mfunc():\n    func()\napp.conf.update(task_track_started=True)\napp.conf.update(worker_send_task_events=True)\nconcurrent_tasks = 3\napp.conf.update(worker_concurrency=concurrent_tasks)\nmemory_limit = 20_000_000  # kB -> 20GB\napp.conf.update(worker_max_memory_per_child=memory_limit)\ntime_limit = 60 * 25  # sec, 25 minutes.\napp.conf.update(worker_time_limit=time_limit)"
+        },
+        {
+            "comment": "Initializes a worker process with resource constraints and starts it. This ensures the worker operates within defined limits of RAM, concurrency, and execution time.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_wrapper.py\":45-49",
+            "content": "# limits on ram usage, concurrency, execution time\nif __name__ == \"__main__\":\n    worker = app.Worker()\n    worker.start()"
+        }
+    ]
+}

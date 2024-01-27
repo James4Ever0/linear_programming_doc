@@ -1,0 +1,15 @@
+{
+    "summary": "This code demonstrates PiecewiseRegressor's usage by generating sample data, splitting it into train and test sets, fitting a piecewise model using DecisionTreeRegressor as the binner, and visualizing predictions. It uses matplotlib to display the plot titled \"Piecewise Linear Regression\\n2 buckets\".",
+    "details": [
+        {
+            "comment": "This code demonstrates the usage of PiecewiseRegressor from mlinsights library. It generates sample data, splits it into train and test sets, fits a piecewise regression model using DecisionTreeRegressor as the binner, and visualizes the predictions compared to the actual data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_mlinsights.py\":0-31",
+            "content": "# ref: http://www.xavierdupre.fr/app/mlinsights/helpsphinx/notebooks/piecewise_linear_regression.html\nimport numpy\nimport numpy.random as npr\nimport matplotlib.pyplot as plt\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.tree import DecisionTreeRegressor\nfrom sklearn.preprocessing import KBinsDiscretizer\nfrom sklearn.dummy import DummyRegressor\nfrom mlinsights.mlmodel import PiecewiseRegressor\nX = npr.normal(size=(1000, 4))\nalpha = [4, -2]\nt = (X[:, 0] + X[:, 3] * 0.5) > 0\nswitch = numpy.zeros(X.shape[0])\nswitch[t] = 1\ny = alpha[0] * X[:, 0] * t + alpha[1] * X[:, 0] * (1 - t) + X[:, 2]\nfig, ax = plt.subplots(1, 1)\nax.plot(X[:, 0], y, \".\")\nax.set_title(\"Piecewise examples\")\nX_train, X_test, y_train, y_test = train_test_split(X[:, :1], y)\nmodel = PiecewiseRegressor(\n    verbose=True, binner=DecisionTreeRegressor(min_samples_leaf=300)\n)\nmodel.fit(X_train, y_train)\npred = model.predict(X_test)\n# pred[:5]\nfig, ax = plt.subplots(1, 1)\nax.plot(X_test[:, 0], y_test, \".\", label=\"data\")\nax.plot(X_test[:, 0], pred, \".\", label=\"predictions\")"
+        },
+        {
+            "comment": "This code sets the title of the plot to \"Piecewise Linear Regression\\n2 buckets\", adds a legend, and displays the plot using matplotlib's plt.show().",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_mlinsights.py\":32-35",
+            "content": "ax.set_title(\"Piecewise Linear Regression\\n2 buckets\")\nax.legend()\nplt.show()"
+        }
+    ]
+}

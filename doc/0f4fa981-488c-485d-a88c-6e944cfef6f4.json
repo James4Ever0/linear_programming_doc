@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary libraries, sets up a mathematical model using Pyomo's ConcreteModel, defines variables and objective function, and solves the problem using COptAMPL Solver. The results are then printed using rich print function.",
+    "details": [
+        {
+            "comment": "This code imports necessary libraries, sets up a mathematical model using Pyomo's ConcreteModel, defines variables and objective function, and solves the problem using COptAMPL Solver. The results are then printed using rich print function.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/coptampl_test.py\":0-17",
+            "content": "from pyomo.environ import *\nsolver = SolverFactory(\"coptampl\")\nmodel = ConcreteModel()\nmodel.a = Var(bounds=(-1, 1))\nmodel.b = Var(bounds=(-1, 1))\nmodel.obj = Objective(expr=model.a+model.b, sense=minimize)\n# print(dir(model.obj.expr))\n# breakpoint()\nret = solver.solve(model, tee=True)\nimport rich\nrich.print(ret)"
+        }
+    ]
+}

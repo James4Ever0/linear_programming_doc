@@ -1,0 +1,10 @@
+{
+    "summary": "Creates a task in Task Scheduler to run the \"scheduled_commit.cmd\" file every 5 minutes with the name \"IES_Modeling\".",
+    "details": [
+        {
+            "comment": "Creates a task in Task Scheduler to run the \"scheduled_commit.cmd\" file every 5 minutes with the name \"IES_Modeling\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/schedule_update.cmd\":0-2",
+            "content": "schtasks /CREATE /SC MINUTE /MO 5  /TN \"IES_Modeling\" /TR \"D:\\project\\xianxing\\scheduled_commit.cmd\"\nschtasks /RUN /I /TN \"IES_Modeling\"\nREM https://www.windowscentral.com/how-create-task-using-task-scheduler-command-prompt"
+        }
+    ]
+}

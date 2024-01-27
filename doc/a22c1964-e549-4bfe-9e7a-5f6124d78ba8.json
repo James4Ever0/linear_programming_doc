@@ -1,0 +1,10 @@
+{
+    "summary": "This code appears to be related to a programming language or framework. It describes the process of automatic unit conversion based on identified units, defining different contexts for automatic sorting, and preparing three execution stacks - imminent, late, and temporary late. The code also mentions that variables in functional programming are immutable, and suggests using the model on fictitious models before fully delegating it to *.ies files.",
+    "details": [
+        {
+            "comment": "This code appears to be related to a programming language or framework. It describes the process of automatic unit conversion based on identified units, defining different contexts for automatic sorting, and preparing three execution stacks - imminent, late, and temporary late. The code also mentions that variables in functional programming are immutable, and suggests using the model on fictitious models before fully delegating it to *.ies files.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/README.md\":0-12",
+            "content": "\u6839\u636e\u8bc6\u522b\u5230\u7684\u5355\u4f4d \u8fdb\u884c\u81ea\u52a8\u5355\u4f4d\u8f6c\u6362\n\u5b9a\u4e49\u4e0d\u540c\u8bed\u5883 \u6839\u636e\u4f9d\u8d56\u5173\u7cfb\u81ea\u52a8\u6392\u5e8f\nprepare three stacks:\n- imminent execution stack: as final program will return\n- late execution stack: checked after current statement displacement, repeat checking this until no change is detected in IES\n- temporary late execution stack: put current statement to here before checking LES, then check statement inside, either put statement to IES or LES\nin functional programming, variables are immutable (can only be defined once).\ndo not delegate the whole model to *.ies yet. use it on \"fictious\" models first."
+        }
+    ]
+}

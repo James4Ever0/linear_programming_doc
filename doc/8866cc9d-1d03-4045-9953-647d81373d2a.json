@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary libraries, defines a path for data input and output files, reads the content of the specified file, and logs the data using rich library. It is likely preparing device names for a microgrid from a CSV file.",
+    "details": [
+        {
+            "comment": "The code imports necessary libraries, defines a path for data input and output files, reads the content of the specified file, and logs the data using rich library. It is likely preparing device names for a microgrid from a CSV file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/generate_microgrid_device_names.py\":0-16",
+            "content": "from log_utils import logger_print\n# path = \"microgrid_device_params_intermediate.json\"\n# \u7535\u8d1f\u8377 \u67f4\u6cb9\u539f\u4ef6\u9700\u8981\u5355\u72ec\u5217\u51fa\u6765\n# microgrid_device_name_path = \"microgrid_device_names.json\"\n# path = \"\u8bbe\u5907\u63a5\u53e3-\u79bb\u7f51\u578b\u5fae\u7535\u7f51.csv\"\nimport json\nwith open(path, \"r\") as f:\n    data = json.load(f)\nimport rich\nlogger_print(data)"
+        }
+    ]
+}

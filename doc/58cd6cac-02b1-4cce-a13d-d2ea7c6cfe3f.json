@@ -1,0 +1,10 @@
+{
+    "summary": "The code is using cat to concatenate multiple Python files (integratedEnergySystemPrototypes.py, system_topology_utils.py, mini_data_log_utils.py, mini_ies_test.py, mini_heat_system.py, mini_refrigeration_system.py, result_processlib.py, demo_utils.py, data_visualize_utils.py, config.py, and cpExample.py) and piping the output to grep \"import\" (rg import) to list all imports, then using uniq to remove duplicates from the output.",
+    "details": [
+        {
+            "comment": "The code is using cat to concatenate multiple Python files (integratedEnergySystemPrototypes.py, system_topology_utils.py, mini_data_log_utils.py, mini_ies_test.py, mini_heat_system.py, mini_refrigeration_system.py, result_processlib.py, demo_utils.py, data_visualize_utils.py, config.py, and cpExample.py) and piping the output to grep \"import\" (rg import) to list all imports, then using uniq to remove duplicates from the output.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/get_requirements.cmd\":0-0",
+            "content": "cat integratedEnergySystemPrototypes.py system_topology_utils.py mini_data_log_utils.py  mini_ies_test.py mini_heat_system.py mini_refrigeration_system.py result_processlib.py demo_utils.py data_visualize_utils.py config.py cpExample.py | rg import | uniq"
+        }
+    ]
+}

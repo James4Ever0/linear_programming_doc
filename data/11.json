@@ -1,0 +1,542 @@
+{
+    "1100": {
+        "file_id": 144,
+        "content": "import inspect\n# import ast\n# import astor\nfrom typing import List #, Union\n# TODO: use metaclass instead of this!\nclass MethodRegistry(list):\n    \"\"\"\n    A registry of methods, used to register methods with given signature.\n    \"\"\"\n    def __init__(self, signature: List[str]):\n    # def __init__(self, registry_name:str, signature: List[str]):\n        # TODO: dynamically infer registry name\n        # self.registry_name = registry_name\n        # self.decorator_source = f\"{self.registry_name}.register\"\n        self.signature = signature\n        self.names = set()\n        super().__init__()\n    def check_signature(self, obj):\n        obj_sig = inspect.signature(obj)\n        obj_keys = list(obj_sig.parameters.keys())\n        assert (\n            obj_keys == self.signature\n        ), \"Signature mismatch: (registered signature: {}, given signature: {})\".format(\n            self.signature, obj_keys\n        )\n        return True\n    def add(self, obj):\n        if self.check_signature(obj):\n            self.append(obj)\n    def register(self, obj):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py:2-38"
+    },
+    "1101": {
+        "file_id": 144,
+        "content": "The code defines a class, MethodRegistry, which serves as a registry for methods with specific signatures. It accepts a list of required parameter names and checks the signature of an object against this expected signature before adding it to the registry. The register function is used to add objects to the registry if they have matching signatures.",
+        "type": "comment"
+    },
+    "1102": {
+        "file_id": 144,
+        "content": "        self.add(obj)\n        return obj\n    # def collect(self):\n    #     currentframe=inspect.currentframe()\n    #     caller = currentframe.f_back\n    #     for name, obj in caller.f_locals.items():\n    #         if name not in self.names:\n    #             test_passed = False\n    #             try:\n    #                 source = inspect.getsource(obj)\n    #                 tree = ast.parse(source)\n    #                 elem = tree.body[0]\n    #                 # TODO: async function def\n    #                 if isinstance(elem, Union[ast.AsyncFunctionDef,ast.FunctionDef]):\n    #                     decs = elem.decorator_list\n    #                     for d in decs:\n    #                         dec_source = astor.to_source(d).strip()\n    #                         # dec_source = ast.unparse(d)\n    #                         # breakpoint()\n    #                         if dec_source.endswith(self.decorator_source):\n    #                             test_passed = True\n    #             except:\n    #                 pass",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py:39-62"
+    },
+    "1103": {
+        "file_id": 144,
+        "content": "This code is part of a decorator registry. It collects functions from the caller frame, checks if they have certain decorators, and adds them to the registry if applicable. The code uses the ast module for parsing source code and inspect module to get function details.",
+        "type": "comment"
+    },
+    "1104": {
+        "file_id": 144,
+        "content": "    #             if test_passed:\n    #                 self.names.add(name)\n    #                 self.add(obj)\nfailsafe_methods = MethodRegistry([\"mw\"])\n# failsafe_methods = MethodRegistry(\"failsafe_methods\",[\"mw\"])\n@failsafe_methods.register\ndef dummy_method(mw):\n    ...\n# failsafe_methods.collect()\nprint(failsafe_methods) # nothing!\n# class MethodRegistryMetaclass(type):\n#     def __new__(cls, name, bases):\n#         ...\n# class FailsafeMethodRegistry(metaclass = MethodRegistryMetaclass):\n#     @staticmethod\n#     def dummy_method(mw):\n#         ...",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py:63-85"
+    },
+    "1105": {
+        "file_id": 144,
+        "content": "Creates a MethodRegistry object with the name \"mw\" to store and manage methods; registers a dummy method using the @failsafe_methods.register decorator; when called, it prints nothing because no methods are registered; defines a MethodRegistryMetaclass and FailsafeMethodRegistry class for potential future use",
+        "type": "comment"
+    },
+    "1106": {
+        "file_id": 145,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro",
+        "type": "filepath"
+    },
+    "1107": {
+        "file_id": 145,
+        "content": "This Prolog code imports CLP(FD) library, defines device types and associations. It includes utility predicates and a function for checking port energy type consistency and returning status. The code may be incomplete or unfinished.",
+        "type": "summary"
+    },
+    "1108": {
+        "file_id": 145,
+        "content": ":- use_module(library(clpfd)). % for transpose/2.\nport(bat_port1).\nport(generator_port1).\nport(load_port1).\nidle_port(bat_port1).\nidle_port(generator_port1).\nidle_port(load_port1).\ninput_port(bat_port1).\ninput_port(load_port1).\noutput_port(bat_port1).\noutput_port(generator_port1).\ndevice(battery).\ndevice(load).\ndevice(generator).\ndevice(DEVICE_NAME):- device(DEVICE_TYPE), call(DEVICE_TYPE, DEVICE_NAME).\nbattery(battery1).\ngenerator(generator1).\nload(load1).\nport_mapping(battery1, bat_port1).\nport_mapping(generator1, generator_port1).\nport_mapping(load1, load_port1).\nenergy(electricity).\nelectricity(bat_port1).\nelectricity(generator_port1).\nelectricity(load_port1).\nlist_member(X,[X|_]).\nlist_member(X,[_|TAIL]) :- list_member(X, TAIL).\n% port_list_member(X, LIST):- list_member(X, LIST), port(X).\nall_satisfy_constraint([], _).\nall_satisfy_constraint([H|T], Constraint) :-\n    call(Constraint, H),\n    all_satisfy_constraint(T, Constraint).\nall_with_same_type(PORT_LIST, ENERGY_TYPE) :- energy(ENERGY_TYPE), all_satisfy_constraint(PORT_LIST, ENERGY_TYPE).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro:1-47"
+    },
+    "1109": {
+        "file_id": 145,
+        "content": "This Prolog code imports the CLP(FD) library for transpose operations and defines various device types, ports, energy types, and their associations. It also includes utility predicates like port_mapping, all_satisfy_constraint, and all_with_same_type.",
+        "type": "comment"
+    },
+    "1110": {
+        "file_id": 145,
+        "content": "port_status(PORT, input) :- input_port(PORT).\nport_status(PORT, output) :- output_port(PORT).\nport_status(PORT, idle):- idle_port(PORT).\ninput_status(STATUS) :- STATUS = input.\noutput_status(STATUS) :- STATUS = output.\nidle_status(STATUS) :- STATUS = idle.\napply_list([], [], _).\napply_list([INP], [RET], FUNC) :- call(FUNC, INP, RET).\napply_list([INP|INP_TAIL], [RET|RET_TAIL], FUNC) :- apply_list(INP_TAIL, RET_TAIL, FUNC), call(FUNC, INP, RET).\nport_status_list(PORT, STATUS) :- apply_list(PORT, STATUS, port_status).\nadder(adder1, [bat_port1, generator_port1, load_port1]).\n% battery port must have input state.\n% load port must have input state.\nadder_port_status(ADDER, [ENERGY_TYPE|[STATUS_LIST]]) :- \n    adder(ADDER, PORT_LIST),\n    all_satisfy_constraint(PORT_LIST, port),\n    all_with_same_type(PORT_LIST, ENERGY_TYPE),\n    port_status_list(PORT_LIST, STATUS_LIST),\n    (\n        list_member(STATUS_X, STATUS_LIST), list_member(STATUS_Y, STATUS_LIST),STATUS_X=input, STATUS_Y = output;\n        all_satisfy_constraint(STATUS_LIST, idle_status)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro:49-75"
+    },
+    "1111": {
+        "file_id": 145,
+        "content": "The code defines a function `adder_port_status` that takes an adder and a list of energy types as inputs. It checks if all ports in the adder have the same energy type, and ensures that battery and load ports have input states. It then returns the status of each port.",
+        "type": "comment"
+    },
+    "1112": {
+        "file_id": 145,
+        "content": "    ).\nadder_port_all_status(ADDER, ALL_STATUS):-\n    findall(STATUS, adder_port_status(ADDER, STATUS), ALL_STATUS).\nadder_port_status_list(ADDER_LIST, ADDER_STATUS_LIST) :- apply_list(ADDER_LIST, ADDER_STATUS_LIST, adder_port_status).\n% had better not to go any further.\n% topology_status(ADDER_LIST, E, P) :- adder_port_status_list(ADDER_LIST, ADDER_STATUS_LIST), transpose(ADDER_STATUS_LIST, [E|P]), P=[[bat_port1_status, generator_port1_status, ]].",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog.pro:76-84"
+    },
+    "1113": {
+        "file_id": 145,
+        "content": "This code defines functions for getting the status of adder ports and creating a list of adder port statuses. It also mentions that it's better not to go any further, possibly indicating incomplete or unfinished code.",
+        "type": "comment"
+    },
+    "1114": {
+        "file_id": 146,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog_advanced.pro",
+        "type": "filepath"
+    },
+    "1115": {
+        "file_id": 146,
+        "content": "This code defines dynamic facts for key-value pairs in a dictionary, provides predicates to add, remove, and look up values by key, uses the library(dicts) module, and demonstrates usage with example points A and B. The code also showcases the dicts_same_tag function to find common tag values between dictionaries.",
+        "type": "summary"
+    },
+    "1116": {
+        "file_id": 146,
+        "content": "% % use our dictionary.\n% % Define a dynamic fact to represent a key-value pair\n% :- dynamic pair/2.\n% % Define a predicate to add a key-value pair to the dictionary\n% add_pair(Key, Value) :-\n%    \\+ pair(Key, _), % Check if the key already exists\n%    assert(pair(Key, Value)).\n% % Define a predicate to remove a key-value pair from the dictionary\n% remove_pair(Key) :-\n%    retract(pair(Key, _)).\n% % Define a predicate to look up a value by key\n% get_value(Key, Value) :-\n%    pair(Key, Value).\n:- use_module(library(dicts)).\n:- A = point{a:1}, B = point{b:1}, print(A), print(B), dicts_same_tag([A, B], Tag), print(Tag), dicts_same_tag([A], Tag), print(Tag).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_prolog_advanced.pro:1-19"
+    },
+    "1117": {
+        "file_id": 146,
+        "content": "This code defines dynamic facts for key-value pairs in a dictionary, provides predicates to add, remove, and look up values by key, uses the library(dicts) module, and demonstrates usage with example points A and B. The code also showcases the dicts_same_tag function to find common tag values between dictionaries.",
+        "type": "comment"
+    },
+    "1118": {
+        "file_id": 147,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py",
+        "type": "filepath"
+    },
+    "1119": {
+        "file_id": 147,
+        "content": "Code defines a Pyomo model with disjunctive variables, applies constraints for each option and solves using CPLEX. Outputs decision value, mret list, and transformed variables for debugging abnormal exit conditions.",
+        "type": "summary"
+    },
+    "1120": {
+        "file_id": 147,
+        "content": "from pyomo.environ import *\nfrom pyomo.gdp import *\nmodel = ConcreteModel()\n# model.decision = Var(within=Integers, bounds=(0, 2))\n# x_points = [-2, 0.5, 1]\n# y_points = [2, 1.5, 0]\nmodel.x = Var(bounds=(-10, 10))\nmodel.y = Var(bounds=(-10, 10))\ndisj0 = Disjunct()\n# model.disj0.decision = Constraint(expr=model.decision == 0)\ndisj0.definition_x = Constraint(expr=model.x == -2)\ndisj0.definition_y = Constraint(expr=model.y == 2)\nmodel.disj0 = disj0\nmodel.disj1 = Disjunct()\n# model.disj1.decision = Constraint(expr=model.decision == 1)\nmodel.disj1.definition_x = Constraint(expr=model.x == 0)\nmodel.disj1.definition_y = Constraint(expr=model.y == 1)\nmodel.disj2 = Disjunct()\n# model.disj2.decision = Constraint(expr=model.decision == 2)\nmodel.disj2.definition_x = Constraint(expr=model.x == 1)\nmodel.disj2.definition_y = Constraint(expr=model.y == 0)\n# remember to use the expr argument.\nmodel.disj_unite = Disjunction(expr = [model.disj0, model.disj1, model.disj2])\n# model.pw = Piecewise(model.b, model.a, pw_pts = , f_rule = [2, 1.5, 0],pw_repn = 'MC' ,pw_constr_type='EQ')",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py:1-33"
+    },
+    "1121": {
+        "file_id": 147,
+        "content": "This code defines a Pyomo model with variables x and y, and three disjuncts representing decision options. It creates disjunction constraints for each decision option based on variable values x and y. The Piecewise function is defined but not instantiated or used in the current code.",
+        "type": "comment"
+    },
+    "1122": {
+        "file_id": 147,
+        "content": "# model.obj = Objective(expr=0, sense=minimize)\n# model.obj = Objective(expr=model.x + model.y, sense=maximize)\nmodel.obj = Objective(expr=model.x + model.y, sense=minimize)\n# TransformationFactory(\"gdp.bigm\").apply_to(model)\ndef checkDisjunctive(model:ConcreteModel):\n    for _ in model.component_data_objects(ctype=Disjunct):\n        return True\n    return False\ndef transformDisjunctiveModel(model, bigM = 1e7):\n    is_disjunctive = checkDisjunctive(model)\n    if is_disjunctive: \n        TransformationFactory(\"gdp.bigm\").apply_to(model, bigM=bigM)\n    return is_disjunctive\ntransformed = transformDisjunctiveModel(model)\nsolver = SolverFactory(\"cplex\")\nsolver.solve(model, tee=True)\nprint(\"x:\", value(model.x))\nprint(\"y:\", value(model.y))\nprint(\"obj:\", value(model.obj))\nprint(\"disj0 bin_ind\", value(model.disj0.binary_indicator_var)) # 1.0\nprint(\"disj0 ind\", value(model.disj0.indicator_var)) # True, most likely to be logical\n# print(\"disj1\", value(model.disj1.binary_indicator_var))\n# print(\"disj2\", value(model.disj2.binary_indicator_var))",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py:35-63"
+    },
+    "1123": {
+        "file_id": 147,
+        "content": "The code performs a transformation on the model if it is found to be disjunctive, applies the \"gdp.bigm\" transformation with a given bigM value, solves the model using CPLEX solver, and prints the values of x, y, and objective function. It also prints binary indicator variables for disjunctive variables (disj0) and possibly others (disj1, disj2).",
+        "type": "comment"
+    },
+    "1124": {
+        "file_id": 147,
+        "content": "# print(\"decision:\", value(model.decision))\n# print([mret])\n# \nprint(\"transformed:\", transformed)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_stepwise.py:64-67"
+    },
+    "1125": {
+        "file_id": 147,
+        "content": "The code snippet prints the decision value from the model, a list of mret values, and transformed variables to help with debugging the abnormal exit condition in the CPLEX optimization problem.",
+        "type": "comment"
+    },
+    "1126": {
+        "file_id": 148,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/transform_tests.py",
+        "type": "filepath"
+    },
+    "1127": {
+        "file_id": 148,
+        "content": "This code creates a Pyomo model with variables and constraints, then solves it using CPLEX solver. The code also attempts to apply transformations to make the model linear but is unsuccessful due to nonlinearity in some constraints.",
+        "type": "summary"
+    },
+    "1128": {
+        "file_id": 148,
+        "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.a = Var()\nmodel.b = Var(bounds = (-10,10))\nmodel.c = Var()\nmodel.con1 = Constraint(expr = model.a <=model.b)\nmodel.con2 = Constraint(expr = model.a >=model.c)\nmodel.con3 = Constraint(expr = model.c >=-20)\nmodel.con4 = Constraint(expr = model.c <=20)\nmodel.nl_con = Constraint(expr = model.b * model.c >=10) # not convex?\n# model.nl_con = Constraint(expr = model.a * model.b * model.c >=10)\nmodel.obj = Objective(expr = 0, sense=minimize)\n# TransformationFactory('core.tighten_constraints_from_vars').apply_to(model)\n# not working.\nprint(model.a.bounds)\nprint(model.c.bounds)\n# TransformationFactory('contrib.induced_linearity').apply_to(model)\n# new_model = TransformationFactory('core.radix_linearization').create_using(model) # this is python2 code. you need to replace 'iter...' with '...'\n# not working!\nsolver = SolverFactory(\"cplex\")\n# solver.solve(new_model)\nsolver.solve(model, tee=True)\nm = model\nprint('a:',m.a())\nprint('b:',m.b())\nprint('c:',m.c())",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/transform_tests.py:1-34"
+    },
+    "1129": {
+        "file_id": 148,
+        "content": "This code creates a Pyomo model with variables and constraints, then solves it using CPLEX solver. The code also attempts to apply transformations to make the model linear but is unsuccessful due to nonlinearity in some constraints.",
+        "type": "comment"
+    },
+    "1130": {
+        "file_id": 149,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py",
+        "type": "filepath"
+    },
+    "1131": {
+        "file_id": 149,
+        "content": "This code uses flashtext for keyword replacements, translates variable names, checks termination conditions, prints variable values and senses, and appends them to a list. It also handles errors and writes a CPLEX solver file.",
+        "type": "summary"
+    },
+    "1132": {
+        "file_id": 149,
+        "content": "# taking different approach.\n# use flashtext to replace keywords\nimport sys\nsys.path.append(\"../\")\nfrom debug_utils import *\n# import flashtext\n# import os\n# from pyomo.environ import *\n# from typing import Dict\n# def convertSymbolMapToTranslationTable(symbol_map: SymbolMap):\n#     translationTable = {}\n#     # get alias from symbol map.\n#     full_map = {**symbol_map.bySymbol, **symbol_map.aliases}\n#     for numeric_name, object_weakref in full_map.items():\n#         obj = object_weakref()\n#         if obj is not None:\n#             object_name = getattr(obj, \"name\", None)\n#             if isinstance(object_name, str):\n#                 translationTable[numeric_name] = object_name\n#             else:\n#                 raise Exception(f\"Cannot retrieve name from symbol '{obj}'\")\n#         else:\n#             raise Exception(\n#                 f\"Numeric symbol name '{numeric_name}' does not have reference to model.\"\n#             )\n#     return translationTable\n# from contextlib import contextmanager\n# @contextmanager",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:1-37"
+    },
+    "1133": {
+        "file_id": 149,
+        "content": "The code imports necessary libraries and defines a function to convert a symbol map into a translation table, which replaces numeric names with object names in the model. It uses weak references and error handling to avoid reference errors or missing model information.",
+        "type": "comment"
+    },
+    "1134": {
+        "file_id": 149,
+        "content": "# def getKeywordProcessorFromTranslationTable(translationTable: Dict[str, str]):\n#     keyword_processor = flashtext.KeywordProcessor(case_sensitive=True)\n#     try:\n#         for replaced_item, wanted_item in translationTable.items():\n#             keyword_processor.add_keyword(replaced_item, wanted_item)\n#         yield keyword_processor\n#     finally:\n#         del keyword_processor\n# def translateTextUsingTranslationTable(\n#     text: str, translationTable: Dict[str, str]\n# ) -> str:\n#     with getKeywordProcessorFromTranslationTable(translationTable) as keyword_processor:\n#         translatedText = keyword_processor.replace_keywords(text)\n#         return translatedText\n# def translateFileUsingTranslationTable(filepath: str, translationTable: Dict[str, str]):\n#     if os.path.exists(filepath):\n#         with open(filepath, \"r\") as f:\n#             content_before_translation = f.read()\n#             content_after_translation = translateTextUsingTranslationTable(\n#                 content_before_translation, translationTable",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:38-61"
+    },
+    "1135": {
+        "file_id": 149,
+        "content": "Function \"translateTextUsingTranslationTable\" takes a text and translation table as input, processes the keyword replacements using \"getKeywordProcessorFromTranslationTable\", and returns the translated text. Function \"translateFileUsingTranslationTable\" reads a file, translates its content, and returns the translated version of it. Both functions make use of the \"flashtext\" library for keyword replacement.",
+        "type": "comment"
+    },
+    "1136": {
+        "file_id": 149,
+        "content": "#             )\n#         with open(filepath, \"w+\", encoding=\"utf-8\") as f:\n#             f.write(content_after_translation)\n#         print(\"File %s translated.\" % filepath)\n#     else:\n#         raise Exception(\"Could not open file: %s\" % filepath)\nx_bounds = []\nfor sense in [minimize, maximize]:\n    model = ConcreteModel()\n    x = model.变量x = Var()\n    y = model.变量y = Var()\n    z = model.变量z = Var()\n    h = model.变量h = Var()\n    # z = model.z = Var()\n    # x, y, z = symbols(\"x y z\")\n    # infeasible on y.\n    # unbounded\n    # expressions = [y >= z, y <= 20, y >= 10, z <= 0, z >= -10, x <= 100 - y]\n    # feasible\n    # expressions = [y >= z, y <= 20, y >= 10, z <= 0, z >= -10, x <= 100 - y, x >= y - z]\n    # infeasible\n    # expressions = [y >= z, y >= 20, y <= 10, z <= 0, z >= -10, x <= 100 - y, x >= y - z]\n    # double infeasible (will not show both)\n    expressions = [\n        y >= z,\n        y >= 20,\n        y <= 10,\n        h >= 20,\n        h <= 10,\n        z <= 0,\n        z >= -10,\n        x <= 100 - (h + y) / 2,",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:62-95"
+    },
+    "1137": {
+        "file_id": 149,
+        "content": "This code snippet defines a ConcreteModel with variables x, y, z, and h. It then creates expressions defining the relationships between these variables. The code also includes commentary on possible feasibility statuses (feasible, infeasible) for different sets of expressions. The purpose of this code seems to be testing the model's feasibility under various expression conditions.",
+        "type": "comment"
+    },
+    "1138": {
+        "file_id": 149,
+        "content": "        x >= (h + y) / 2 - z,\n    ]\n    # Bound infeasibility column '变量y'.\n    # check if is unbounded or infeasible.\n    # try to comment that out, see if it can solve\n    # red = reduce_inequalities(expresssions, [x])\n    for i, _expr in enumerate(expressions):\n        model.__setattr__(f\"expr_{i}\", Constraint(expr=_expr))\n    # print(red)\n    obj = model.obj = Objective(expr=x, sense=sense)\n    # io_options = dict(symbolic_solver_labels=True)\n    model_filename, model_smap_id = model.write(filename=\"your_model_name.lp\")\n    solver = SolverFactory(\"cplex\")\n    # 求解器变量乱码,影响求解\n    # solver.options[\"read fileencoding\"] = 'utf-8'\n    # TODO: get solver log.\n    solver_log = os.path.join(os.curdir, \"solver.log\")\n    result = solver.solve(model, tee=True, logfile=solver_log)\n    solver_smap_id = solver._smap_id\n    model_smaps = model.solutions.symbol_map\n    # print(dir(result))\n    print(model_smaps)  # {symbol_map_id: symbol_map}\n    print(\"MODEL SYMBOL MAP ID:\", model_smap_id)\n    print(\"SOLVER SYMBOL MAP ID:\", solver_smap_id)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:96-120"
+    },
+    "1139": {
+        "file_id": 149,
+        "content": "This code is writing a CPLEX model file, setting up a solver, and solving it. It checks for infeasibilities in the expressions and writes the symbolic map of the model and solver. The code also attempts to comment out certain lines and observe the changes in solving.",
+        "type": "comment"
+    },
+    "1140": {
+        "file_id": 149,
+        "content": "    # breakpoint()\n    model_smap = model_smaps[model_smap_id]\n    model_translation_table = convertSymbolMapToTranslationTable(model_smap)\n    translateFileUsingTranslationTable(model_filename, model_translation_table)\n    solver_smap = model_smaps[solver_smap_id]\n    solver_translation_table = convertSymbolMapToTranslationTable(solver_smap)\n    translateFileUsingTranslationTable(solver_log, solver_translation_table)\n    # breakpoint()\n    TC = result.solver.termination_condition\n    import rich\n    rich.print(result)\n    normalTCs = [\n        TerminationCondition.globallyOptimal,\n        TerminationCondition.locallyOptimal,\n        TerminationCondition.feasible,\n        TerminationCondition.optimal,\n    ]\n    if TC == TerminationCondition.infeasible:\n        raise Exception(\"infeasible constraint found. please check expression\")\n    elif TC == TerminationCondition.unbounded:\n        raise Exception(\"unbounded constraint found. please check expression\")\n    elif TC not in normalTCs:\n        raise Exception(f\"abnormal solver exit condition: {TC}\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:121-146"
+    },
+    "1141": {
+        "file_id": 149,
+        "content": "This code translates variable names from model and solver symbol maps to a translation table, then uses the table to translate files. It checks the solver termination condition and raises an exception for abnormal exit conditions not in normalTCs list.",
+        "type": "comment"
+    },
+    "1142": {
+        "file_id": 149,
+        "content": "    print(\"val? %s, sense? %s\" % (val_x := value(x), sense))\n    x_bounds.append(val_x)\nprint(\"x bounds:\", x_bounds)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/translate_model_var_name_unicode.py:147-150"
+    },
+    "1143": {
+        "file_id": 149,
+        "content": "This code snippet prints the value (val_x) and sense of a variable (x), then appends the val_x to a list (x_bounds). Finally, it prints the x bounds.",
+        "type": "comment"
+    },
+    "1144": {
+        "file_id": 150,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py",
+        "type": "filepath"
+    },
+    "1145": {
+        "file_id": 150,
+        "content": "The code uses PyGCKOpt to load data for a Capacitated Multiple-Depot Routing Problem instance, build an optimization model, apply presolve and decomposition, select and optimize the model.",
+        "type": "summary"
+    },
+    "1146": {
+        "file_id": 150,
+        "content": "# ref: https://scipopt.github.io/PyGCGOpt/examples/cpmp/cpmp.html?highlight=visual\n# conda install --channel conda-forge -n cplex pygcgopt\nimport json\ndef get_simple_instance():\n    n = 5\n    p = 2\n    d = {0: {0: 0, 1: 25, 2: 46, 3: 43, 4: 30}, 1: {1: 0, 2: 22, 3: 20, 4: 22}, 2: {2: 0, 3: 22, 4: 40}, 3: {3: 0, 4: 22}, 4: {4: 0}}\n    q = {0: 14, 1: 13, 2: 9, 3: 15, 4: 6}\n    Q = {i: 33 for i in range(5)}\n    return n, p, d, q, Q\n# def read_instance_json(path):\n#     with open(path) as f:\n#         instance = json.load(f)\n#     d = {int(k): {int(kk): vv for kk, vv in v.items()} for k, v in instance[\"d\"].items()}\n#     q = {int(k): v for k, v in instance[\"q\"].items()}\n#     Q = {int(k): v for k, v in instance[\"Q\"].items()}\n#     return instance[\"n\"], instance[\"p\"], d, q, Q\n# n_locations, n_clusters, distances, demands, capacities = read_instance_json(\"instances/p550-01.json\")\nn_locations, n_clusters, distances, demands, capacities = get_simple_instance()\nfrom pygcgopt import Model, quicksum\ndef build_model(n_locations, n_clusters, distances, demands, capacities):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py:1-29"
+    },
+    "1147": {
+        "file_id": 150,
+        "content": "This code is loading data for a Capacitated Multiple-Depot Routing Problem (CMDRP) instance. It defines a function to read the data from a JSON file or provide it directly, and then uses the PyGCKOpt library to build an optimization model. The CMDRP involves routing clusters of vehicles from multiple depots to deliver goods to locations while satisfying capacity constraints.",
+        "type": "comment"
+    },
+    "1148": {
+        "file_id": 150,
+        "content": "    m = Model()\n    m.printVersion()\n    m.redirectOutput()\n    m.setMinimize()\n    x = {}\n    y = {}\n    for j in range(n_locations):\n        y[j] = m.addVar(f\"y_{j}\", vtype=\"B\")\n        for i in range(n_locations):\n            x[i, j] = m.addVar(f\"x_{i}_{j}\", vtype=\"B\", obj=distances[min(i,j)][max(i,j)])\n    # Hold different constraint types\n    conss_assignment = []\n    conss_capacity = []\n    cons_pmedian = None\n    # Create the assignment constraints\n    for i in range(n_locations):\n        conss_assignment.append(\n            m.addCons(quicksum(x[i, j] for j in range(n_locations)) == 1)\n        )\n    # Create the capacity constraints\n    for j in range(n_locations):\n        conss_capacity.append(\n            m.addCons(quicksum(demands[i] * x[i, j] for i in range(n_locations)) <= capacities[j] * y[j])\n        )\n    # Create the p-median constraint\n    cons_pmedian = m.addCons(quicksum(y[j] for j in range(n_locations)) == n_clusters)\n    return m, conss_assignment, conss_capacity, cons_pmedian\nm, *conss = build_model(n_locations, n_clusters, distances, demands, capacities)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py:30-67"
+    },
+    "1149": {
+        "file_id": 150,
+        "content": "Builds a CPLEX model with variables for assignment (x) and location selection (y). Adds assignment, capacity, and p-median constraints. Returns the model (m), assignment constraints (*conss_assignment), capacity constraints (*conss_capacity), and p-median constraint (cons_pmedian).",
+        "type": "comment"
+    },
+    "1150": {
+        "file_id": 150,
+        "content": "m.presolve()\nm.detect()\ndecomps = m.listDecompositions()\nprint(\"GCG found {} finished decompositions.\".format(len(decomps)))\nprint(decomps)\nd = decomps[2]\nprint(\n    f\"Decomp scores: {d.classicScore:.04f}, {d.borderAreaScore:.04f}, {d.maxWhiteScore:.04f}, {d.maxForWhiteScore:.04f}\"\n    # f\"Decomp scores: {d.classicScore=:.04f}, {d.borderAreaScore=:.04f}, {d.maxWhiteScore=:.04f}, {d.maxForWhiteScore=:.04f}\"\n)\nd\nd.isSelected = True\nm.optimize()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/visualize_decomposition_pygcgopt.py:68-88"
+    },
+    "1151": {
+        "file_id": 150,
+        "content": "The code applies presolve and detection to the model 'm', lists decompositions, prints the number of finished decompositions, selects a specific decomposition, displays its scores, sets it as selected, and then optimizes the model.",
+        "type": "comment"
+    },
+    "1152": {
+        "file_id": 151,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/word_counter.py",
+        "type": "filepath"
+    },
+    "1153": {
+        "file_id": 151,
+        "content": "This code uses the \"flashtext\" library to extract keywords and count their occurrences in a given text. It adds the keywords, \"keywords\" and \"with,\" to the keyword processor, extracts them from the text, and counts their occurrences using a dictionary.",
+        "type": "summary"
+    },
+    "1154": {
+        "file_id": 151,
+        "content": "mytext = \"\"\"\nmy text with some keywords\nmy text with some keywords\nmy text with some keywords\nmy text with some keywords\nmy_variable_with_index[0]\n\"\"\"\nimport flashtext\n# you may use two different views, one is the element view, another is the array view.\n# array view is simply done by removing bracket enclosed indexes from variable names.\nkeyword_processor = flashtext.KeywordProcessor()\nkeyword_processor.add_keyword('keywords')\nkeyword_processor.add_keyword('with')\nkeywords_found = keyword_processor.extract_keywords(mytext)\nprint(keywords_found)\nkeyword_counts = {}\nfor keyword in keywords_found:\n    keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1\nprint(keyword_counts)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/word_counter.py:1-24"
+    },
+    "1155": {
+        "file_id": 151,
+        "content": "This code uses the \"flashtext\" library to extract keywords and count their occurrences in a given text. It adds the keywords, \"keywords\" and \"with,\" to the keyword processor, extracts them from the text, and counts their occurrences using a dictionary.",
+        "type": "comment"
+    },
+    "1156": {
+        "file_id": 152,
+        "content": "/microgrid_base/cplex_test.sh",
+        "type": "filepath"
+    },
+    "1157": {
+        "file_id": 152,
+        "content": "Setting PATH variable to include CPLEX bin directory and enabling better exceptions for running Python script test_topo_check.py with additional flag -f. Alternative PyPI mirror site options provided.",
+        "type": "summary"
+    },
+    "1158": {
+        "file_id": 152,
+        "content": "env PATH=\"$PATH:/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx/\" BETTER_EXCEPTIONS=1 python3 test_topo_check.py -f\n# alternative pypi mirrow sites:\n# - https://pypi.douban.com/simple",
+        "type": "code",
+        "location": "/microgrid_base/cplex_test.sh:1-3"
+    },
+    "1159": {
+        "file_id": 152,
+        "content": "Setting PATH variable to include CPLEX bin directory and enabling better exceptions for running Python script test_topo_check.py with additional flag -f. Alternative PyPI mirror site options provided.",
+        "type": "comment"
+    },
+    "1160": {
+        "file_id": 153,
+        "content": "/microgrid_base/csv_utils.py",
+        "type": "filepath"
+    },
+    "1161": {
+        "file_id": 153,
+        "content": "This function reads a CSV file, ensures all lines have the same number of comma-separated values by appending extra commas if necessary, and then returns a pandas DataFrame containing the data.",
+        "type": "summary"
+    },
+    "1162": {
+        "file_id": 153,
+        "content": "from log_utils import logger_print\nimport pandas\ndef fix_csv_and_return_dataframe(csv_path):\n    lines = []\n    line_sep_count_list = []\n    with open(csv_path, \"r\") as f:\n        for line in f.readlines():\n            line_sep_count = line.count(\",\")\n            if line_sep_count == 0:\n                continue\n            lines.append(line)\n            line_sep_count_list.append(line_sep_count)\n    line_sep_count_max = max(line_sep_count_list)\n    for index, line_sep_count in enumerate(line_sep_count_list):\n        lines[index] = lines[index].strip() + \",\" * (\n            line_sep_count_max - line_sep_count\n        )\n    with open(csv_path, \"w+\") as f:\n        for line in lines:\n            f.write(line + \"\\n\")\n    df = pandas.read_csv(csv_path, header=None, on_bad_lines=\"warn\")\n    return df",
+        "type": "code",
+        "location": "/microgrid_base/csv_utils.py:1-28"
+    },
+    "1163": {
+        "file_id": 153,
+        "content": "This function reads a CSV file, ensures all lines have the same number of comma-separated values by appending extra commas if necessary, and then returns a pandas DataFrame containing the data.",
+        "type": "comment"
+    },
+    "1164": {
+        "file_id": 154,
+        "content": "/microgrid_base/debug_utils.py",
+        "type": "filepath"
+    },
+    "1165": {
+        "file_id": 154,
+        "content": "The code includes debugging, logging, and error handling, with a context manager for micro challenges. It offers utility functions for variable constraints, word counters, and keyword addition. The code calculates system variables, logs objective values, and provides optimization solver options for solving models while analyzing results without affecting the original model.",
+        "type": "summary"
+    },
+    "1166": {
+        "file_id": 154,
+        "content": "# TODO: assign debug/error id and separate logger/folder for error logging.\n# TODO: use miplib (problem dataset) to test our debugging tools\n# ref: https://miplib.zib.de/\n# sensitivity analysis cannot be done before solution\n# ref: https://www.ibm.com/docs/en/icos/12.9.0?topic=tutorial-performing-sensitivity-analysis\nfrom log_utils import logger_print\n# input: model, objective, etc.\n# output: multiple diagnostics\n# from pyomo.environ import *\nfrom pyomo_environ import *\n# from ies_optim import ModelWrapper\nfrom contextlib import contextmanager\nimport flashtext\nimport os\nfrom beartype import beartype\n# import subprocess\n# from typing import TypedDict\nfrom pydantic import BaseModel\nimport uuid\n# from typing import Literal, TypedDict\nnormalSSs = [SolverStatus.ok, SolverStatus.warning]\n# should you include more termination conditions, or should you just check for values, by creating dummy uninitialized variable or dummy independent  constraints with variables init at violation regions\nnormalTCs = [\n    TerminationCondition.globallyOptimal,",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:1-34"
+    },
+    "1167": {
+        "file_id": 154,
+        "content": "Code from \"jubilant-adventure/microgrid_base/debug_utils.py\":0-33 contains functions related to debugging, logging, and error handling using Python libraries like log_utils, flashtext, pydantic, etc. It also includes functionality for solving optimization problems with Pyomo and defining normal SolverStatus and TerminationCondition.",
+        "type": "comment"
+    },
+    "1168": {
+        "file_id": 154,
+        "content": "    TerminationCondition.locallyOptimal,\n    TerminationCondition.feasible,\n    TerminationCondition.optimal,\n]\nIOUTerminationConditions = [\n    TerminationCondition.infeasible,\n    TerminationCondition.infeasibleOrUnbounded,\n]\nfrom enum import auto\nfrom strenum import StrEnum\nclass SolvedTestMode(StrEnum):\n    values_exist = auto()  # does not work well with cplex.\n    values_exist_and_inbound = auto()\n    values_exist_and_satisfy_constraint = auto()  # default.\ndef get_unassigned_attrname(obj):\n    while True:\n        attrname = str(uuid.uuid4()).replace(\"-\", \"_\")\n        challange = uuid.uuid4()\n        attr = getattr(obj, attrname, challange)\n        if attr == challange:\n            return attrname\ndef assign_attr_to_obj_with_random_name(obj, value):\n    attrName = get_unassigned_attrname(obj)\n    setattr(obj, attrName, value)\n    return attrName\n@contextmanager\ndef modelSolvedTestContext(\n    model: ConcreteModel,\n    testMode: SolvedTestMode = SolvedTestMode.values_exist_and_satisfy_constraint,\n):\n    \"\"\"\n    Context manager that checks that the model is solved, by means of micro challenges.",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:35-76"
+    },
+    "1169": {
+        "file_id": 154,
+        "content": "This code defines a context manager that checks if a given model is solved by using micro challenges. It includes different test modes to check if values exist, exist and are inbound, or satisfy constraints. It also provides utility functions for assigning attributes with random names to objects.",
+        "type": "comment"
+    },
+    "1170": {
+        "file_id": 154,
+        "content": "    \"\"\"\n    lb = 20\n    ub = 40\n    attrNames = []\n    attrNames.append(assign_attr_to_obj_with_random_name(model, var := Var()))\n    if testMode == SolvedTestMode.values_exist_and_inbound:\n        var.setlb(lb)\n        var.setub(ub)\n    elif testMode == SolvedTestMode.values_exist_and_satisfy_constraint:\n        attrNames.append(\n            assign_attr_to_obj_with_random_name(\n                model, con1 := Constraint(expr=var >= lb)\n            )\n        )\n        attrNames.append(\n            assign_attr_to_obj_with_random_name(\n                model, con2 := Constraint(expr=var <= ub)\n            )\n        )\n    elif testMode == SolvedTestMode.values_exist:\n        ...\n    else:\n        raise Exception(\"Unsupported test mode:\", testMode)\n    def check_solved():\n        var_value = value(var, exception=False)\n        solved = False\n        if var_value is not None:\n            if testMode != SolvedTestMode.values_exist:\n                solved = var_value >= lb and var_value <= ub\n            else:\n                solved = True",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:77-108"
+    },
+    "1171": {
+        "file_id": 154,
+        "content": "This code sets bounds for a variable and creates constraints based on the test mode. It defines a check_solved function to verify if the solution falls within the specified range.",
+        "type": "comment"
+    },
+    "1172": {
+        "file_id": 154,
+        "content": "        return solved\n    try:\n        yield check_solved\n    finally:\n        for name in attrNames:\n            delattr(model, name)\nclass SolverReturnStatus(BaseModel):\n    terminationCondition: TerminationCondition\n    solverStatus: SolverStatus\nclass CheckSolverReturnValResult(BaseModel):\n    success: bool\n    status: SolverReturnStatus\n# deprecated.\n# def buildWordCounterFromModelWrapper(mw):\n#     keyword_processor = flashtext.KeywordProcessor()\n#     for varName in mw.varNameToSubmodelName.keys():\n#         keyword_processor.add_keyword(varName)\n#     def word_counter(text: str) -> Dict[str, int]:\n#         keywords_found = keyword_processor.extract_keywords(text)\n#         keyword_counts = {}\n#         for keyword in keywords_found:\n#             keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1\n#         return keyword_counts\n#     return word_counter\n# deprecated!\ndef checkIfSolverHasSolvedModel(solver_result) -> CheckSolverReturnValResult:\n    TC = solver_result.solver.termination_condition",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:109-148"
+    },
+    "1173": {
+        "file_id": 154,
+        "content": "This code defines a SolverReturnStatus class and a CheckSolverReturnValResult class, as well as a function to build a word counter from a model wrapper. The word_counter function extracts keywords from text using a keyword processor and returns a dictionary of keyword counts. The checkIfSolverHasSolvedModel function takes solver_result as input and checks if the solver has solved the model. The termination_condition variable is defined using TC from solver_result. The code also includes deprecated functions for building word counters and adding keywords to a keyword processor.",
+        "type": "comment"
+    },
+    "1174": {
+        "file_id": 154,
+        "content": "    SS = solver_result.solver.status\n    solved = TC in normalTCs and SS in normalSSs\n    return CheckSolverReturnValResult(\n        success=solved,\n        status=SolverReturnStatus(terminationCondition=TC, solverStatus=SS),\n    )\n# TODO: gluecode automation (maybe metaclass?)\n# ref: https://github.com/gwenzek/func_argparse\n# ref: https://github.com/Acellera/func2argparse (py3.9+)\n# ref: https://github.com/pseeth/argbind\n# @beartype\n# def conflict_refiner(\n#     model_path: str,\n#     output: str,\n#     config: Literal[\"cplex\", \"docplex\"],\n#     timeout: float = 5,\n# ):\nfrom shared_datamodels import ConflictRefinerParams\nfrom argparse_utils import conflictRefinerManager\n@conflictRefinerManager.call\ndef conflict_refiner(params: ConflictRefinerParams):\n    # def conflict_refiner(param):\n    # cmd = \"conda run -n docplex --live-stream --no-capture-output python conflict_utils.py\"\n    # arguments = [\n    #     \"--model_path\",\n    #     model_path,\n    #     \"--config\",\n    #     config,\n    #     \"--timeout\",\n    #     timeout,",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:149-182"
+    },
+    "1175": {
+        "file_id": 154,
+        "content": "This code defines a function named 'conflict_refiner' that takes parameters such as model_path, output, config, and timeout. It uses argparse_utils module's conflictRefinerManager to call the function. The function is designed to solve conflicts by calling 'conflict_utils.py', using specified model_path and config, with a timeout of 5 seconds.",
+        "type": "comment"
+    },
+    "1176": {
+        "file_id": 154,
+        "content": "    #     \"--output\",\n    #     output,\n    # ]\n    # proc = subprocess.run(cmd.split() + arguments)\n    # logger_print(\"process output:\", proc.stdout.decode())\n    # logger_print(\"process stderr:\", proc.stderr.decode())\n    # # logger_print(\"process return code\", proc.returncode)\n    # if proc.returncode != 0:\n    #     logger_print(\"invalid process return code:\", proc.returncode)\n    output = params.output\n    if os.path.exists(output):\n        with open(output, \"r\") as f:\n            output_content = f.read()\n        return output_content\n    else:\n        logger_print(\"output file not found:\", output)\nfrom typing import Dict\ndef convertSymbolMapToTranslationTable(symbol_map: SymbolMap):\n    translationTable = {}\n    # get alias from symbol map.\n    full_map = {**symbol_map.bySymbol, **symbol_map.aliases}\n    for numeric_name, object_weakref in full_map.items():\n        obj = object_weakref()\n        if obj is not None:\n            object_name = getattr(obj, \"name\", None)\n            if isinstance(object_name, str):",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:183-212"
+    },
+    "1177": {
+        "file_id": 154,
+        "content": "The code reads a symbol map and converts it to a translation table. It first combines the symbol map's bySymbol and aliases into a full map, then iterates through each numeric name in the full map. For each numeric name, it retrieves the corresponding object using the weakref and checks if its name is a string. If so, this name is added to the translation table. Additionally, the code includes error handling for output files not found, as well as checking the process return code for potential errors.",
+        "type": "comment"
+    },
+    "1178": {
+        "file_id": 154,
+        "content": "                translationTable[numeric_name] = object_name\n            else:\n                raise Exception(f\"Cannot retrieve name from symbol '{obj}'\")\n        else:\n            translationTable[numeric_name] = numeric_name\n            # raise Exception(\n            #     f\"Numeric symbol name '{numeric_name}' does not have reference to model.\"\n            # )\n    return translationTable\nclass ExportedModel:\n    def __init__(self, model: ConcreteModel, filepath: str):\n        self._model = model\n        self._filepath = filepath\n        fmt = filepath.split(\".\")[-1]\n        if fmt not in [\"mps\", \"lp\"]:\n            raise Exception(f\"Cannot export unknown format: {fmt}\")\n        _, smap_id = model.write(filepath, format=fmt)\n        self.smap: SymbolMap = model.solutions.symbol_map[smap_id]\n        self.translation_table = convertSymbolMapToTranslationTable(self.smap)\n        \"\"\"\n        Translate exported names back to the original name.\n        \"\"\"\n        self.reverse_translation_table = {\n            v: k for k, v in self.translation_table.items()",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:213-240"
+    },
+    "1179": {
+        "file_id": 154,
+        "content": "The code defines a class ExportedModel that takes a model and filepath as parameters. It checks the format of the filepath, writes the model to the file, and retrieves the symbol map. Then, it converts the symbol map to translation tables using convertSymbolMapToTranslationTable function. The reverse_translation_table is created by swapping keys and values in the translation_table.",
+        "type": "comment"
+    },
+    "1180": {
+        "file_id": 154,
+        "content": "        }\n        \"\"\"\n        Translate original names to exported names.\n        \"\"\"\n@contextmanager\ndef getKeywordProcessorFromTranslationTable(translationTable: Dict[str, str]):\n    keyword_processor = flashtext.KeywordProcessor(case_sensitive=True)\n    try:\n        for replaced_item, wanted_item in translationTable.items():\n            keyword_processor.add_keyword(replaced_item, wanted_item)\n        yield keyword_processor\n    finally:\n        del keyword_processor\ndef translateTextUsingTranslationTable(\n    text: str, translationTable: Dict[str, str]\n) -> str:\n    with getKeywordProcessorFromTranslationTable(translationTable) as keyword_processor:\n        translatedText = keyword_processor.replace_keywords(text)\n        return translatedText\n@beartype\ndef translateFileUsingTranslationTable(filepath: str, translationTable: Dict[str, str]):\n    if os.path.exists(filepath):\n        with open(filepath, \"r\") as f:  # unsure what the encoding is!\n            content_before_translation = f.read()\n            content_after_translation = translateTextUsingTranslationTable(",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:241-271"
+    },
+    "1181": {
+        "file_id": 154,
+        "content": "This code defines functions for translating text using a translation table. The `getKeywordProcessorFromTranslationTable` function creates a keyword processor and adds replaced items to it based on the given translation table. The `translateTextUsingTranslationTable` function uses this keyword processor to replace keywords in a given text. The `translateFileUsingTranslationTable` function reads a file, translates its content using the previous function, and returns the translated content.",
+        "type": "comment"
+    },
+    "1182": {
+        "file_id": 154,
+        "content": "                content_before_translation, translationTable\n            )\n        with open(filepath, \"w+\", encoding=\"utf-8\") as f:\n            f.write(content_after_translation)\n        logger_print(\"File %s translated.\" % filepath)\n    else:\n        raise Exception(\"Could not open file: %s\" % filepath)\n@beartype\ndef translateFileUsingSymbolMap(filepath: str, symbolMap: SymbolMap):\n    translationTable = convertSymbolMapToTranslationTable(symbolMap)\n    translateFileUsingTranslationTable(filepath, translationTable)\ndef solve_with_translated_log_and_statistics(\n    model: ConcreteModel, solver, log_directory, label\n):\n    # def solve_with_translated_log_and_statistics(modelWrapper, solver, log_directory, label):\n    # model = modelWrapper.model\n    label = label.strip()\n    assert \" \" not in label\n    msg_label = label.replace(\"_\", \" \")\n    ret = solver.solve(\n        model,\n        tee=True,\n        logfile=(logfile := os.path.join(log_directory, f\"{label}.log\")),\n    )\n    # breakpoint()\n    smap = model.solutions.symbol_map[solver._smap_id]",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:272-301"
+    },
+    "1183": {
+        "file_id": 154,
+        "content": "This code defines a function `translateFileUsingSymbolMap` that takes a file path and a symbol map as arguments, converts the symbol map to a translation table, and then calls another function `translateFileUsingTranslationTable` with these parameters. The `solve_with_translated_log_and_statistics` function solves a model using a specific solver, logging the result to a file with the given label and directory. It also asserts that the label does not contain spaces, replaces underscores with spaces in the label, and uses this updated label for the log file name.",
+        "type": "comment"
+    },
+    "1184": {
+        "file_id": 154,
+        "content": "    translateFileUsingSymbolMap(logfile, smap)\n    termination_condition = ret.solver.termination_condition\n    logger_print(f\"{msg_label} termination condition:\", termination_condition)\n    logger_print(f\"{msg_label} logfile: %s\" % logfile)\n    checkResult = checkIfSolverHasSolvedModel(ret)\n    solved = checkResult.success\n    if not solved:\n        logger_print(\"solver does not have solution.\")\n    # else:\n    #     ...\n    return solved\nfrom pyomo.core.expr import current as EXPR\nfrom typing import Dict, Any\nclass DecomposedExpression(BaseModel):\n    constant: float\n    varNameToVarObject: Dict[str, Any]\n    varNameToVarCoefficient: Dict[str, float]\ndef decomposeExpression(expr):\n    const = 0\n    varNameToVarObject = {}\n    varNameToVarCoefficient = {}\n    is_linear, terms = EXPR.decompose_term(expr)\n    if is_linear:\n        for coef, var in terms:\n            if var is None:\n                const += coef\n            else:\n                varName = str(var)\n                varNameToVarObject[varName] = var\n                varNameToVarCoefficient[varName] = (",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:303-339"
+    },
+    "1185": {
+        "file_id": 154,
+        "content": "Function decomposeExpression takes an expression and returns its constant term, variable names as keys in varNameToVarObject dictionary, and their coefficients in varNameToVarCoefficient dictionary. This function helps to break down the expression into its components.",
+        "type": "comment"
+    },
+    "1186": {
+        "file_id": 154,
+        "content": "                    varNameToVarCoefficient.get(varName, 0) + coef\n                )\n        # breakpoint()\n        return DecomposedExpression(\n            constant=const,\n            varNameToVarObject=varNameToVarObject,\n            varNameToVarCoefficient=varNameToVarCoefficient,\n        )\nfrom typing import List, Tuple\ndef getValueListFromValueDict(valueDict: Dict[str, float]):\n    valueList = list(valueDict.items())\n    return valueList\ndef sortAndDisplayVarValues(\n    valueList: List[Tuple[str, float]],\n    mw,\n    banner: str,\n    head_count=10,\n    reverse=False,\n):\n    output = []\n    output.append(f\"SORT BY {banner}\".center(70, \"=\"))  # to be commented out\n    valueList.sort(key=lambda x: x[1], reverse=reverse)\n    head_count = min(len(valueList), head_count)\n    message = [f\"reversed: {reverse}\", \"\"]\n    for i in range(head_count):\n        varName, val = valueList[i]\n        message.append(\n            \"%s\\t%s\\t%s<%s>\"\n            % (\n                varName,\n                val,\n                mw.varNameToSubmodelName[varName],",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:340-377"
+    },
+    "1187": {
+        "file_id": 154,
+        "content": "This code defines functions to decompose an expression, get a list of variable values and their associated values from a dictionary, and sort and display the top N sorted variables by their values. The code is used for debugging utility in microgrid base.",
+        "type": "comment"
+    },
+    "1188": {
+        "file_id": 154,
+        "content": "                mw.varNameToSubmodelClassName[varName],\n            )\n        )\n    output.append(\"\\n\".join(message))\n    logger_print(*output)\n    return output\ndef sortAndDisplayVarValuesAndTermValues(\n    varNameToVarValue: Dict[str, float],\n    varNameToTermValue: Dict[str, float],\n    mw,\n    submodelName: str = \"\",\n):\n    BANNER_VARNAME_TO_VAR_VALUE = (\n        f\"{submodelName if submodelName+' ' else ''}VAR NAME TO VAR VALUE\",\n    )\n    BANNER_VARNAME_TO_TERM_VALUE = (\n        f\"{submodelName if submodelName+' ' else ''}VAR NAME TO TERM VALUE\",\n    )\n    valueListOfVarNameToVarValue = getValueListFromValueDict(varNameToVarValue)\n    valueListOfVarNameToTermValue = getValueListFromValueDict(varNameToTermValue)\n    sortAndDisplayVarValues(\n        valueListOfVarNameToVarValue, mw, BANNER_VARNAME_TO_VAR_VALUE\n    )\n    sortAndDisplayVarValues(\n        valueListOfVarNameToVarValue, mw, BANNER_VARNAME_TO_VAR_VALUE, reverse=True\n    )\n    sortAndDisplayVarValues(\n        valueListOfVarNameToTermValue, mw, BANNER_VARNAME_TO_TERM_VALUE",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:378-407"
+    },
+    "1189": {
+        "file_id": 154,
+        "content": "The code contains two functions. The first function `logger_print` takes a list of strings and prints them as a message. The second function `sortAndDisplayVarValuesAndTermValues` takes dictionaries containing variable names to their values or term values, a microgrid object, and an optional submodel name. It displays the sorted and formatted variable value lists for both variables and terms, along with banners indicating the type of values being displayed (VAR NAME TO VAR VALUE and VAR NAME TO TERM VALUE). The function calls `sortAndDisplayVarValues` multiple times to achieve this.",
+        "type": "comment"
+    },
+    "1190": {
+        "file_id": 154,
+        "content": "    )\n    sortAndDisplayVarValues(\n        valueListOfVarNameToTermValue, mw, BANNER_VARNAME_TO_TERM_VALUE, reverse=True\n    )\n    logger_print()\ndef selectiveSortVarNames(\n    keyToSelectedVarNames, varNameCountDict, mw, banner=\"SELECTIVE\"\n):\n    output = []\n    for key, selectedVarNames in keyToSelectedVarNames.items():\n        if selectedVarNames != []:  # skip empty\n            submodelVarNameCountList = [\n                (varName, count)\n                for varName, count in varNameCountDict.items()\n                if varName in selectedVarNames\n            ]\n            output.extend(\n                sortAndDisplayVarValues(\n                    submodelVarNameCountList, mw, banner=f\"{banner} <{key}>\"\n                )\n            )\n            output.extend(\n                sortAndDisplayVarValues(\n                    submodelVarNameCountList,\n                    mw,\n                    banner=f\"{banner} <{key}> REVERSE\",\n                    reverse=True,\n                )\n            )\n    return output\ndef cplex_refine_model_and_display_info(",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:408-442"
+    },
+    "1191": {
+        "file_id": 154,
+        "content": "The code defines two functions: `selectiveSortVarNames` and `cplex_refine_model_and_display_info`. The first function takes a dictionary of selected variable names, a dictionary mapping variable names to counts, and other parameters. It sorts and displays the selected variable names in descending order of count, and also in reverse order. The second function seems incomplete as it is not fully indented, making it difficult to determine its purpose without further context.",
+        "type": "comment"
+    },
+    "1192": {
+        "file_id": 154,
+        "content": "    mw,\n    lp_filepath,\n    log_dir,\n    smap,\n    # word_counter,\n    output_filename=\"cplex_conflict.txt\",\n    statistics_filename=\"cplex_conflict_statistics.txt\",\n):\n    word_counter = mw.word_counter\n    crp = ConflictRefinerParams(\n        model_path=lp_filepath,\n        output=(cplex_conflict_output_path := os.path.join(log_dir, output_filename)),\n        timeout=7,\n    )\n    refine_log = conflict_refiner(crp)\n    if refine_log:\n        logger_print(\"cplex refine log:\", refine_log)\n        # translate_and_append(\n        #     cplex_conflict_output_path, export_model_smap\n        # )\n        translateFileUsingSymbolMap(cplex_conflict_output_path, smap)\n        # then you sort it by model.\n        with open(cplex_conflict_output_path, \"r\") as f:\n            content = f.read()\n            varNameCountDict = word_counter(content)\n            varNameCountList = [\n                (varName, count) for varName, count in varNameCountDict.items()\n            ]\n        output = []\n        output.extend(\n            sortAndDisplayVarValues(varNameCountList, mw, banner=\"CONFLICT VAR COUNT\")",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:443-476"
+    },
+    "1193": {
+        "file_id": 154,
+        "content": "This code refines a cplex conflict log, translates it using a symbol map, and sorts the resulting output by model. It then reads the translated content and counts occurrences of variable names, creating a list of (variable name, count) pairs. Finally, it extends an output list with sorted and displayed information related to conflict variable counts.",
+        "type": "comment"
+    },
+    "1194": {
+        "file_id": 154,
+        "content": "        )\n        output.extend(\n            sortAndDisplayVarValues(\n                varNameCountList,\n                mw,\n                banner=\"CONFLICT VAR COUNT REVERSE\",\n                reverse=True,\n            )\n        )\n        output.extend(\n            selectiveSortVarNames(\n                mw.submodelNameToVarName,\n                varNameCountDict,\n                mw,\n                banner=\"(CONFLICT) SUBMODEL NAME\",\n            )\n        )\n        output.extend(\n            selectiveSortVarNames(\n                mw.submodelClassNameToVarName,\n                varNameCountDict,\n                mw,\n                banner=\"(CONFLICT) SUBMODEL CLASS NAME\",\n            )\n        )\n        with open(os.path.join(log_dir, statistics_filename), \"w+\") as f:\n            f.write(\"\\n\".join(output))\n        return True\ndef filterVarNameBySubModelVarNames(mDict, submodelVarNames):\n    return {k: v for k, v in mDict.items() if k in submodelVarNames}\ndef groupBySubModelRelatedTranslationTable(\n    varNameToVarValue: Dict[str, float],",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:477-515"
+    },
+    "1195": {
+        "file_id": 154,
+        "content": "This code appears to be part of a larger debugging utility module in Python. It seems to handle conflict resolution by counting variables, sorting them based on counts and submodel names/classes, and storing the output in a file. The functions `sortAndDisplayVarValues`, `selectiveSortVarNames`, and `filterVarNameBySubModelVarNames` are used for this purpose.",
+        "type": "comment"
+    },
+    "1196": {
+        "file_id": 154,
+        "content": "    varNameToTermValue: Dict[str, float],\n    translationTable: Dict[str, List[str]],\n    label: str,\n    mw,\n):\n    logger_print(f\"grouping by submodel {label}:\")\n    for submodelNameOrClassName, varNames in translationTable.items():\n        submodel_vn2v = filterVarNameBySubModelVarNames(varNameToVarValue, varNames)\n        submodel_vn2t = filterVarNameBySubModelVarNames(varNameToTermValue, varNames)\n        sortAndDisplayVarValuesAndTermValues(\n            submodel_vn2v, submodel_vn2t, mw, submodelName=submodelNameOrClassName\n        )\ndef decomposeAndAnalyzeObjectiveExpression(\n    obj_expr,\n    submodelNameToVarNames: Dict[str, List[str]],\n    submodelClassNameToVarNames: Dict[str, List[str]],\n    mw,\n):\n    decomposedResult = decomposeExpression(obj_expr)\n    if decomposedResult:\n        logger_print(decomposedResult)\n        varNameToVarValue = {}\n        varNameToTermValue = {}\n        for varName, varObj in decomposedResult.varNameToVarObject.items():\n            varValue = value(varObj)\n            coef = decomposedResult.varNameToVarCoefficient[",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:516-544"
+    },
+    "1197": {
+        "file_id": 154,
+        "content": "Code snippet defines functions for grouping and analyzing objective expression by submodels. It filters variable names by submodel, sorts and displays variable values and term values, and decomposes the expression into its constituent terms and coefficients. This information can be used to analyze the objective function's components in a more granular manner.",
+        "type": "comment"
+    },
+    "1198": {
+        "file_id": 154,
+        "content": "                varName\n            ]  # seems to be no typeddict type checking in pyright\n            termValue = coef * varValue\n            varNameToVarValue[varName] = varValue\n            varNameToTermValue[varName] = termValue\n        # sort and display\n        sortAndDisplayVarValuesAndTermValues(varNameToVarValue, varNameToTermValue, mw)\n        obj_val = value(obj_expr)\n        obj_const = decomposedResult.constant\n        # now we need to sort value by submodel name (grouping). don't count keywords here, because that is done in conflict report.\n        groupBySubModelRelatedTranslationTable(\n            varNameToVarValue, varNameToTermValue, submodelNameToVarNames, \"name\", mw\n        )\n        groupBySubModelRelatedTranslationTable(\n            varNameToVarValue,\n            varNameToTermValue,\n            submodelClassNameToVarNames,\n            \"className\",\n            mw,\n        )\n        logger_print(\"(OBJ - OBJ_CONST)?\", obj_val - obj_const)\n        logger_print(\"OBJ?\", obj_val)\n        logger_print(\"OBJ_CONST?\", obj_const)",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:545-572"
+    },
+    "1199": {
+        "file_id": 154,
+        "content": "The code performs calculations and displays results for variables related to a microgrid system. It multiplies coefficients with variable values, stores them in dictionaries, sorts the values by submodel name, and logs the objective value, constant, and their difference. The code also prints these logged values for reference.",
+        "type": "comment"
+    }
+}

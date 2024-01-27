@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the GPTcommit configuration for OpenAI with a local API base and API key. It ensures this is done regularly without being too fast, likely for updating or syncing purposes.",
+    "details": [
+        {
+            "comment": "This code sets the GPTcommit configuration for OpenAI with a local API base and API key. It ensures this is done regularly without being too fast, likely for updating or syncing purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/setup_gptcommit.sh\":0-2",
+            "content": "gptcommit config set --local openai.apt_base \"https://api.chatanywhere.com.cn\"\ngptcommit config set --local openai.api_key \"sk-CXMgNasrAvxNDYDTVE1LZtJvTWEF5scC6OvHhbTe1i016urg\"\n@REM ensure that we do this in regular interval. do not do this too fast."
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Sets OpenAI API base, key, and model for GPTCommit, then installs configuration. Ensures periodic updates without overloading.",
+    "details": [
+        {
+            "comment": "Sets OpenAI API base, key, and model for GPTCommit, then installs configuration. Ensures periodic updates without overloading.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/setup_gptcommit.cmd\":0-4",
+            "content": "gptcommit config set --local openai.api_base \"https://api.chatanywhere.com.cn/v1\"\ngptcommit config set --local openai.api_key \"sk-CXMgNasrAvxNDYDTVE1LZtJvTWEF5scC6OvHhbTe1i016urg\"\ngptcommit config set --local openai.model \"gpt-3.5-turbo\"\ngptcommit install\n@REM ensure that we do this in regular interval. do not do this too fast."
+        }
+    ]
+}

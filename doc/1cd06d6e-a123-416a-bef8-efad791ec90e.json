@@ -1,0 +1,15 @@
+{
+    "summary": "The code imports necessary libraries, defines two classes A and B, creates a graph using NetworkX, logs its attributes and connected components, and prints its structure. It also converts the graph to data format using JSON, prints original logger output, and defines an empty dictionary.",
+    "details": [
+        {
+            "comment": "Code imports necessary libraries and defines two classes A and B. Class A creates an instance of B in its B method. Then, a graph is created using NetworkX library and various nodes and edges are added. The graph's nodes and neighbors are iterated over, and their attributes are logged. Finally, connected components of the graph are found and logged. The graph structure and type are also printed.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_class.py\":0-57",
+            "content": "from log_utils import logger_print\nclass A:\n    def __init__(self):\n        ...\n    def B(self):\n        return B(self)\nclass B:\n    def __init__(self, a: A):\n        self.a = a\n        logger_print(\"CLASS NAME?\", self.__class__.__name__)\n        logger_print(\"CREATING B\")\na = A()\nb = a.B()\nimport json\nimport networkx as nx\nimport rich\ngraph_data = {\"a\": 1, \"b\": 2}\nG = nx.Graph(**graph_data)\nG.add_node(1, **{\"val\": 1, \"val2\": 2})\nG.add_node(2, **{\"val\": 1, \"val2\": 2})\nG.add_node(3, **{\"val\": 1, \"val2\": 2})\nG.add_edge(1, 2)\nG.add_edge(2, 3)\nG.add_node(4)\nG.add_node(5)\nG.add_edge(4, 5)\n# G.neighbors(node_id)\nfor n_with_items in G.nodes.items():\n    n, d = n_with_items\n    logger_print(\"NODE\", n, type(n))\n    logger_print(\"DATA\", d, type(d))\n    # G.nodes[n]\nlogger_print()\nG.nodes[2][\"attr2\"] = 2\nlogger_print(G.nodes[2])  # attrs of this node.\nlogger_print()\n# logger_print(list(G.neighbors(1)))\ncomponents = list(nx.connected_components(G))\nlogger_print(components)\nlogger_print()\nlogger_print(G.graph, type(G.graph))  # this is dict."
+        },
+        {
+            "comment": "Code imports networkx and pydantic libraries, creates a graph object G, converts it to data format using json_graph, prints the original logger output, creates a new BM object using Pydantic's BaseModel, and defines an empty dictionary a of int keys and dict values.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_class.py\":59-84",
+            "content": "from networkx.readwrite import json_graph\ndata = json_graph.node_link_data(G)\nlogger_print()\nlogger_print(data)\nG0 = json_graph.node_link_graph(data)\nlogger_print(\"GRAPH DATA?\", G0.graph)\n# attribute just do not collide with id.\nfrom pydantic import BaseModel\nclass BM(BaseModel):\n    a: float\nnew_bm = BM.parse_obj(dict(a=1))\nlogger_print(new_bm)\nfrom typing import Dict\na: Dict[int, dict] = {1: {}}"
+        }
+    ]
+}

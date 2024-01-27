@@ -1,0 +1,20 @@
+{
+    "summary": "The code provides guidance on debugging MILP models, focusing on error tracking and resolving issues in microgrid models through categorization and objective function adjustments. It relaxes adder constraints, accumulates errors, isolates error models, and locates conflicting code within device models.",
+    "details": [
+        {
+            "comment": "This code provides guidance on debugging MILP models, with different configuration options and preferences for modeling logical non-linearities. Error tracking is discussed as well, suggesting a mapping between line number, file name, and variables being defined to aid in learning about error logs.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/HOW_TO_DEBUG.md\":0-20",
+            "content": "# Debugging MILP Models\n## Configuration\nYou can configure the program in the following ways:\n1. Setting environmental variables with corresponding name\n2. Pass configuration as commandline options (the syntax is different, so use `--help` to learn it first)\n3. Write configuration in an dotenv formatted file and pass the path of that file into either as environment variable or commandline option\n## Debugging Preference\nSmall models are always preferred since they are fast and concise. If one big model is troublesome and hard to analyze, you can either reduce the iteration size or submodel count.\n## Modeling Preference\nWhen you want to model some logical non-linearities (like disjunctions), the GDP method (`pyomo.gdp`) is always preferred over manual Big-M definitions. This can minimize error, ensure clarity and reduce cognitive loads.\n## Error Tracking\nTo learn more about error logs, we need to create a mapping between the line number, the file name and the variables being defined. Once the varia"
+        },
+        {
+            "comment": "This code explains how to debug issues in a microgrid model by categorizing and sorting errors based on importance, setting objective function to a constant for infeasibility or unbounded variables detection, using feasopt for detailed analysis of hard-to-reduce models, and adjusting relaxation targets as needed.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/HOW_TO_DEBUG.md\":20-40",
+            "content": "ble/constraint name is found in the error log, we can reference the source and learn more abount the cause of the error.\nWe can categorize and sort errors by importance (like violation degree) and relevance.\n### Infeasibility or Unbounded variables\nTo know more of the cause of the error, we need to set the objective function to a constant, so if in this way the model is still not valid, it must be infeasible, or having contradictive constraints.\nTo use this feature, set `INFEASIBILITY_DIAGNOSTIC=True` in configuration.\n### Feasopt\nWhen the model is hard to reduce, and must be analyzed in detail, we can use the `feasopt` option to find the violated constraints.\nFeasopt is part of the failsafe protocols. Set `FAILSAFE=True` in configuration to enable it.\nMore options like `FEASOPT_TIMELIMIT` can be found as constants in file `failsafe_utils.py`.\nIn case you may want more specific relaxation targets than all constraints, you can tweak the adders, device count bounds and more.\nOne common routine is "
+        },
+        {
+            "comment": "Relaxes adder constraints, accumulates errors in target, isolates error models while relaxing device count bounds, and locates conflicting code within device model.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/HOW_TO_DEBUG.md\":40-40",
+            "content": "that first relax all adder constraints and add the sum of all adder errors into target, then locate the error, create isolated models which enforce error must be fulfilled and relax constraints like device count bounds, also we can locate the conflicting code location within the device model."
+        }
+    ]
+}

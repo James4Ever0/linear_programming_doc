@@ -1,0 +1,532 @@
+{
+    "3000": {
+        "file_id": 318,
+        "content": ")  # why it is not working under mode 0?\n# define energy balance restrictions\nfrom integratedEnergySystemPrototypes import EnergyFlowNodeFactory\n# util = EnengySystemUtils(model, num_hour)\n#\n# | r\\dv | PV | BESS | GRID | LOAD |\n# |------|----|------|------|------|\n# | recv |    |  x   |   x  |  x   |\n# | send | x  |  x   |   x  |      |\n#\n############## HOW WE CONNECT THIS ##############\n#\n# are you sure we can connect to the same node?\n#\n#     _ BESS _   \n#    /        \\ \n# PV - [NODE1] - LOAD\n#    \\_ GRID _/           \n#                                   \n#\n# TOTAL: 1 Node\n# no checking!\nelectricity_type = 'electricity'\nNodeFactory = EnergyFlowNodeFactory(model, num_hour,debug=debug)\nNode1 = NodeFactory.create_node(electricity_type)\n# Node2 = NodeFactory.create_node(electricity_type)\n# channels here are not bidirectional, however any connection between nodes is bidirectional, and any attempt of connection between 3 and more nodes will result into interlaced connections. (fully connected)\n# from integratedEnergySystemPrototypes import NodeUtils",
+        "type": "code",
+        "location": "/mini_ies_test.py:116-152"
+    },
+    "3001": {
+        "file_id": 318,
+        "content": "The code defines energy balance restrictions and creates a node for an integrated energy system. It utilizes the EnergyFlowNodeFactory to create a single node (Node1) connected to BESS, PV, Grid, and Load in a bidirectional manner. The connection between nodes allows for energy exchange among them, while any attempt to connect three or more nodes will result in interlaced connections.",
+        "type": "comment"
+    },
+    "3002": {
+        "file_id": 318,
+        "content": "# Channel1 = model.continuous_var_list(\n#     [i for i in range(num_hour)], lb=0, name=\"channel_1\"\n# )\n# Channel2 = model.continuous_var_list(\n#     [i for i in range(num_hour)], lb=0, name=\"channel_2\"\n# )\nNode1.add_input(photoVoltaic)\n# Node1.add_input(Channel2)\nNode1.add_input_and_output(gridNet)\n# Node1.add_input(gridNet)\n# Node1.add_output(gridNet)\n# Node1.add_output(Channel1)\nNode1.add_input_and_output(batteryEnergyStorageSystem)\n# Node1.add_input(batteryEnergyStorageSystem)\n# Node1.add_output(batteryEnergyStorageSystem)\n# Node2.add_input(Channel1)\nNode1.add_output(electricityLoad)\n# Node2.add_output(Channel2)\n# nodeUtils = NodeUtils(model, num_hour)\n# nodeUtils.fully_connected(Node1,Node2)\nsystems = [photoVoltaic, batteryEnergyStorageSystem, gridNet, electricityLoad]\nNodeFactory.build_relations(systems)\nfrom system_topology_utils import visualizeSystemTopology\nvisualizeSystemTopology(NodeFactory)\n# Node1.build_relations()\n# Node2.build_relations()\n# model.add_constraints(\n#     power_load[h]\n#     - batteryEnergyStorageSystem.power_energyStorageSystem[h]",
+        "type": "code",
+        "location": "/mini_ies_test.py:154-194"
+    },
+    "3003": {
+        "file_id": 318,
+        "content": "Creates continuous variables for Channel1 and Channel2, adds inputs and outputs to Node1, adds input to Node2, builds relations among systems using NodeFactory, and visualizes the system topology.",
+        "type": "comment"
+    },
+    "3004": {
+        "file_id": 318,
+        "content": "#     - photoVoltaic.power_photoVoltaic[h]\n#     == gridNet.total_power[h]\n#     for h in range(num_hour)\n# )\nassert NodeFactory.built\nfrom mini_data_log_utils import check_solve_and_log\ncheck_solve_and_log(systems, model, simulation_name)",
+        "type": "code",
+        "location": "/mini_ies_test.py:195-203"
+    },
+    "3005": {
+        "file_id": 318,
+        "content": "This code asserts that the NodeFactory is built and then calls a function to check, solve, and log the given systems, model, and simulation_name. It seems to be part of a larger program involving power generation from solar panels (photoVoltaic) and comparing it with gridNet's total power during each hour of the simulation.",
+        "type": "comment"
+    },
+    "3006": {
+        "file_id": 319,
+        "content": "/mini_ies_topology.py",
+        "type": "filepath"
+    },
+    "3007": {
+        "file_id": 319,
+        "content": "Code imports networkx library and defines drawing options, then creates a directed graph with nodes \"PV\", \"BESS\", \"LOAD\", \"[NODE1]\", and \"GRID\". Edges represent connections between nodes. Imports matplotlib for visualization and draws the graph with specified options before displaying it.",
+        "type": "summary"
+    },
+    "3008": {
+        "file_id": 319,
+        "content": "import networkx as nx\ndraw_options = {\n    \"node_color\": \"yellow\",\n    \"node_size\": 1000,\n}\nG = nx.DiGraph()\nG.add_node(\"PV\")\nG.add_node(\"BESS\")\nG.add_node(\"LOAD\")\nG.add_node(\"[NODE1]\")\nG.add_node(\"GRID\")\nG.add_edge(\"PV\", \"[NODE1]\")\nG.add_edge(\"BESS\", \"[NODE1]\")\nG.add_edge(\"[NODE1]\", \"BESS\")\nG.add_edge(\"GRID\", \"[NODE1]\")\nG.add_edge(\"[NODE1]\", \"GRID\")\nG.add_edge(\"[NODE1]\", \"LOAD\")\nimport matplotlib.pyplot as plt\nnx.draw(G, with_labels=True, font_weight=\"bold\", **draw_options)\nplt.show()",
+        "type": "code",
+        "location": "/mini_ies_topology.py:1-30"
+    },
+    "3009": {
+        "file_id": 319,
+        "content": "Code imports networkx library and defines drawing options, then creates a directed graph with nodes \"PV\", \"BESS\", \"LOAD\", \"[NODE1]\", and \"GRID\". Edges represent connections between nodes. Imports matplotlib for visualization and draws the graph with specified options before displaying it.",
+        "type": "comment"
+    },
+    "3010": {
+        "file_id": 320,
+        "content": "/mini_refrigeration_system.py",
+        "type": "filepath"
+    },
+    "3011": {
+        "file_id": 320,
+        "content": "This code imports refrigeration classes, initializes a LiBr model, adjusts data, registers constraints, creates nodes for cold and hot water systems, solves problems with photothermal plate, and visualizes the topology.",
+        "type": "summary"
+    },
+    "3012": {
+        "file_id": 320,
+        "content": "from integratedEnergySystemPrototypes import (\n    LiBrRefrigeration,  # are you sure there's no need to consume electricity here?\n    CitySupply,\n    Load,\n    # PhotoVoltaic,\n    # GridNet,\n    # no storage?\n    # WaterEnergyStorage,\n)\nfrom demo_utils import LoadGet, ResourceGet\nfrom config import num_hour, day_node\n# num_hour *=3\ndebug = False\nfrom docplex.mp.model import Model\nsimulation_name = \"micro_refrigeration\"\nload = LoadGet()\n# let's augment the load.\nimport math\nimport numpy as np\ncool_load = load.get_cool_load(num_hour)\ndelta = 0.3\ncool_load = (\n    np.array([(1 - delta) + math.cos(i * 0.1) * delta for i in range(len(cool_load))])\n    * cool_load\n)\ncoldWaterLoad = Load(\"cold_water\", cool_load)\nmodel = Model(name=simulation_name)\nresource = ResourceGet()\nmunicipalHotWater_price0 = resource.get_municipalHotWater_price(num_hour)\n# intensityOfIllumination0 = (\n#     resource.get_radiation(path=\"jinan_changqing-hour.dat\", num_hour=num_hour) * 100\n# )\n# let's add illumination data.\nhotWaterLiBr = LiBrRefrigeration(",
+        "type": "code",
+        "location": "/mini_refrigeration_system.py:1-44"
+    },
+    "3013": {
+        "file_id": 320,
+        "content": "Code imports necessary classes for refrigeration system simulation, including LiBrRefrigeration, CitySupply, Load, and ResourceGet. It then retrieves the cooling load data and adjusts it based on a mathematical formula. The code creates a cold water load, initializes a Model object, gets municipal hot water prices, and begins to initialize a LiBr refrigeration system.",
+        "type": "comment"
+    },
+    "3014": {
+        "file_id": 320,
+        "content": "    num_hour,\n    model,\n    device_count_max=10000 * 10000,\n    device_price=1000,\n    efficiency=0.9,\n    input_type=\"hot_water\",\n    debug=debug,\n)\nhotWaterLiBr.constraints_register()\n# power_highTemperatureHotWater_sum = model.continuous_var_list(\n#     [i for i in range(0, num_hour)], name=\"power_highTemperatureHotWater_sum\"\n# )\n# # 平板光热\n# platePhotothermal = PhotoVoltaic(\n#     num_hour,\n#     model,\n#     photoVoltaic_device_max=10000,\n#     device_price=500,\n#     intensityOfIllumination0=intensityOfIllumination0,\n#     efficiency=0.8,\n#     device_name=\"platePhotothermal\",\n# )  # platePhotothermal\n# platePhotothermal.constraints_register(model)\n# 市政热水\nmunicipalHotWater = CitySupply(\n    num_hour,\n    model,\n    device_count_max=10000,\n    device_price=3000,\n    running_price=municipalHotWater_price0,\n    efficiency=0.9,\n    output_type=\"hot_water\",\n    debug=debug,\n)\nmunicipalHotWater.constraints_register()\n# model.add_constraints(\n#     power_highTemperatureHotWater_sum[h] ==\n#     # platePhotothermal.power_photoVoltaic[h]+",
+        "type": "code",
+        "location": "/mini_refrigeration_system.py:45-87"
+    },
+    "3015": {
+        "file_id": 320,
+        "content": "This code registers constraints for a mini refrigeration system, including high temperature hot water power, plate photothermal device, and municipal hot water supply. It defines the number of hours, model, maximum devices, device prices, efficiencies, output/input types, and debug settings for each component. Constraints are registered for the power_highTemperatureHotWater_sum, platePhotothermal device, and municipalHotWater device in the model.",
+        "type": "comment"
+    },
+    "3016": {
+        "file_id": 320,
+        "content": "#     municipalHotWater.heat_citySupplied[h]\n#     for h in range(num_hour)\n# )\n# model.add_constraints(\n#     hotWaterLiBr.heat_LiBr_from[h] <= power_highTemperatureHotWater_sum[h]\n#     for h in range(num_hour)\n# )\n# # consumption and production\n# model.add_constraints(\n#     cool_load[h] == hotWaterLiBr.cool_LiBr[h] for h in range(num_hour)\n# )\n###### SYSTEM OVERVIEW ######\n#\n# |e\\dv | LB | MH | CL |\n# |-----|----|----|----|\n# | cw  |  s |    |  r |\n# | hw  |  r |  s |    |\n#\n###### SYSTEM TOPOLOGY ######\n#\n# MH -> [NODE1] -> LB -> [NODE2] -> CL\n#\nfrom integratedEnergySystemPrototypes import EnergyFlowNodeFactory\ncold_water_type = \"cold_water\"\nhot_water_type = \"hot_water\"\nNodeFactory = EnergyFlowNodeFactory(model, num_hour, debug)\nNode1 = NodeFactory.create_node(energy_type=hot_water_type)\nNode2 = NodeFactory.create_node(energy_type=cold_water_type)\nNode1.add_input(municipalHotWater)\nNode1.add_output(hotWaterLiBr)\nNode2.add_input(hotWaterLiBr)\nNode2.add_output(coldWaterLoad)\n# Node1.build_relations()\n# Node2.build_relations()",
+        "type": "code",
+        "location": "/mini_refrigeration_system.py:88-134"
+    },
+    "3017": {
+        "file_id": 320,
+        "content": "This code is creating nodes for cold water and hot water systems. It adds inputs and outputs to each node, connects them in the system topology, and sets constraints for consumption and production during specific hours. The code uses EnergyFlowNodeFactory to simplify node creation and builds relations between nodes.",
+        "type": "comment"
+    },
+    "3018": {
+        "file_id": 320,
+        "content": "systems = [hotWaterLiBr, municipalHotWater, coldWaterLoad]\nNodeFactory.build_relations(systems)\n# systems = [platePhotothermal,hotWaterLiBr,municipalHotWater]\nassert NodeFactory.built\nfrom system_topology_utils import visualizeSystemTopology\nvisualizeSystemTopology(NodeFactory, system_name = 'refrigeration')\nfrom mini_data_log_utils import solve_and_log\nsolve_and_log(systems, model, simulation_name)\n# without platephotothermal: 19327715.402514137\n# with platephotothermal: 13374199.775218224\n# obviously cheaper.",
+        "type": "code",
+        "location": "/mini_refrigeration_system.py:135-149"
+    },
+    "3019": {
+        "file_id": 320,
+        "content": "Code builds systems, asserts NodeFactory's built status, visualizes system topology, solves and logs data with/without plate photothermal.",
+        "type": "comment"
+    },
+    "3020": {
+        "file_id": 321,
+        "content": "/network_visualize_packup.cmd",
+        "type": "filepath"
+    },
+    "3021": {
+        "file_id": 321,
+        "content": "This command is using 7z (a compression tool) to add multiple Python files (integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py) into a single compressed archive named \"integratedEnergySystemPrototypes.py\". The REM keyword indicates a comment in batch scripting, suggesting there will be more commands added later to this script.",
+        "type": "summary"
+    },
+    "3022": {
+        "file_id": 321,
+        "content": "7z a integratedEnergySystemPrototypes.py demo_utils.py cpExample.py\nREM more to come!",
+        "type": "code",
+        "location": "/network_visualize_packup.cmd:1-2"
+    },
+    "3023": {
+        "file_id": 321,
+        "content": "This command is using 7z (a compression tool) to add multiple Python files (integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py) into a single compressed archive named \"integratedEnergySystemPrototypes.py\". The REM keyword indicates a comment in batch scripting, suggesting there will be more commands added later to this script.",
+        "type": "comment"
+    },
+    "3024": {
+        "file_id": 322,
+        "content": "/neural_network_demo.py",
+        "type": "filepath"
+    },
+    "3025": {
+        "file_id": 322,
+        "content": "The code imports necessary libraries and defines a neural network model with an input layer, two hidden layers, and an output layer. The activation function used is Hardtanh, and the model structure is created using nn.Sequential.",
+        "type": "summary"
+    },
+    "3026": {
+        "file_id": 322,
+        "content": "# import torch\nimport torch.nn as nn\n# from torch import Tensor\nhidden_size = 40\ninput_layer = nn.Linear(2, hidden_size)\n# activation_func = nn.ReLU()\n# activation_func = nn.RReLU()\nactivation_func = nn.Hardtanh()\nhidden_layer = nn.Linear(hidden_size, hidden_size)\noutput_layer = nn.Linear(hidden_size, 1)\n# model = nn.Sequential(input_layer, output_layer)\nmodel = nn.Sequential(\n    input_layer, activation_func, hidden_layer, activation_func, output_layer\n)",
+        "type": "code",
+        "location": "/neural_network_demo.py:1-17"
+    },
+    "3027": {
+        "file_id": 322,
+        "content": "The code imports necessary libraries and defines a neural network model with an input layer, two hidden layers, and an output layer. The activation function used is Hardtanh, and the model structure is created using nn.Sequential.",
+        "type": "comment"
+    },
+    "3028": {
+        "file_id": 323,
+        "content": "/neural_network_linearize_nonlinear_function_test.py",
+        "type": "filepath"
+    },
+    "3029": {
+        "file_id": 323,
+        "content": "The code trains a neural network model using inputs and outputs, defines the MSE loss function, and employs Adam optimizer. It performs forward pass and backpropagation for training, prints loss every 100 iterations, zeroes gradients before backward pass, and uses linear layer parameters as weight and bias.",
+        "type": "summary"
+    },
+    "3030": {
+        "file_id": 323,
+        "content": "import numpy as np\nfrom linearization_config import *\n# expression: z = x * sin(y)\nx = np.linspace(x_lb, x_ub, x_sample_size)\ny = np.linspace(y_lb, y_ub, y_sample_size)\nz = outputs = np.array(\n    [z_func(x_element, y_element) for y_element in y for x_element in x]\n)\ninputs = np.array([[x_element, y_element] for y_element in y for x_element in x])\nimport torch\nfrom torch import Tensor\nfrom neural_network_demo import model\nprint(model)\ninputs_tensor = Tensor(inputs)\noutputs_tensor = Tensor(outputs.reshape(-1, 1))\nprint(inputs_tensor.shape, outputs_tensor.shape)\n# The nn package also contains definitions of popular loss functions; in this\n# case we will use Mean Squared Error (MSE) as our loss function.\nlearning_rate = 1e-4\ntrain_epoches = 30000\noptimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)\nloss_fn = torch.nn.MSELoss(reduction=\"sum\")\nfor t in range(train_epoches):\n    # Forward pass: compute predicted y by passing x to the model. Module objects\n    # override the __call__ operator so you can call them like functions. When",
+        "type": "code",
+        "location": "/neural_network_linearize_nonlinear_function_test.py:1-39"
+    },
+    "3031": {
+        "file_id": 323,
+        "content": "Code creates inputs and outputs for neural network training, defines model, loss function (MSE), optimizer (Adam), and trains the model using forward pass and backpropagation.",
+        "type": "comment"
+    },
+    "3032": {
+        "file_id": 323,
+        "content": "    # doing so you pass a Tensor of input data to the Module and it produces\n    # a Tensor of output data.\n    y_pred = model(inputs_tensor)\n    # Compute and print loss. We pass Tensors containing the predicted and true\n    # values of y, and the loss function returns a Tensor containing the\n    # loss.\n    loss = loss_fn(y_pred, outputs_tensor)\n    if t % 100 == 99:\n        print(t, loss.item())\n    # Zero the gradients before running the backward pass.\n    optimizer.zero_grad()\n    loss.backward()\n    optimizer.step()\nprint(\"TRAINING COMPLETE\")\n# You can access the first layer of `model` like accessing the first item of a list\n# bias_1 = input_layer.bias\n# weight_1 = input_layer.weight\nmodel_save_path = \"model.pt\"\ntorch.save(model.state_dict(), model_save_path)\n# breakpoint()\n# # For linear layer, its parameters are stored as `weight` and `bias`.\n# print(f'Result: y = {linear_layer.bias.item()} + {linear_layer.weight[:, 0].item()} x + {linear_layer.weight[:, 1].item()} x^2 + {linear_layer.weight[:, 2].item()} x^3')",
+        "type": "code",
+        "location": "/neural_network_linearize_nonlinear_function_test.py:40-66"
+    },
+    "3033": {
+        "file_id": 323,
+        "content": "The code trains a neural network model, computes the loss, performs backpropagation, and saves the trained model. It prints the loss every 100 iterations, zeroes gradients before the backward pass, and uses a linear layer for calculations. The linear layer's parameters are stored as weight and bias.",
+        "type": "comment"
+    },
+    "3034": {
+        "file_id": 324,
+        "content": "/neural_network_loading_convert_to_numpy_matrix.py",
+        "type": "filepath"
+    },
+    "3035": {
+        "file_id": 324,
+        "content": "The code loads and converts a neural network model, applies hard-tanh activation to weights, generates test data, performs forward propagation, and verifies results.",
+        "type": "summary"
+    },
+    "3036": {
+        "file_id": 324,
+        "content": "from neural_network_demo import model, input_layer, hidden_layer, output_layer\nimport numpy as np\nmodel_save_path = \"model.pt\"\nimport torch\nmodel.load_state_dict(torch.load(model_save_path))\nmodel.eval()\nlayers = [input_layer, hidden_layer, output_layer]\nbias_list = [layer.bias.detach().numpy() for layer in layers]\nweight_list = [layer.weight.detach().numpy() for layer in layers]\n# what about the hard-tanh?\ndef hard_tanh(numpy_array: np.ndarray):  # destructive!\n    numpy_array[np.where(numpy_array < -1)] = -1\n    numpy_array[np.where(numpy_array > 1)] = 1\n    return numpy_array  # you can discard it anyway.\nlayer_depth = len(layers)\nsample_size = 100\nimport random\nfrom linearization_config import *\ntest_xy_vals = [\n    [random.uniform(x_lb, x_ub), random.uniform(y_lb, y_ub)] for _ in range(sample_size)\n]\nfor x_val, y_val in test_xy_vals:\n    input_val = np.array([x_val, y_val]).reshape(1, -1)\n    for i in range(layer_depth):\n        # breakpoint()\n        input_val = np.matmul(input_val, weight_list[i].T)\n        input_val += bias_list[i].reshape(1, -1)",
+        "type": "code",
+        "location": "/neural_network_loading_convert_to_numpy_matrix.py:1-41"
+    },
+    "3037": {
+        "file_id": 324,
+        "content": "The code loads a saved neural network model and converts its weights and biases to numpy arrays. It then applies the hard-tanh activation function to the layers' weights, but it's noted as destructive (changes original data). The code generates sample input data for testing and applies forward propagation through the layers, multiplying inputs with layer weights and adding biases.",
+        "type": "comment"
+    },
+    "3038": {
+        "file_id": 324,
+        "content": "        if i != layer_depth - 1:\n            input_val = hard_tanh(input_val)\n    # check the output.\n    answer = z_func(x_val, y_val)\n    print(\"XY VALS:\", x_val, y_val)\n    print(input_val, answer)\n    print()",
+        "type": "code",
+        "location": "/neural_network_loading_convert_to_numpy_matrix.py:42-49"
+    },
+    "3039": {
+        "file_id": 324,
+        "content": "This code snippet applies the hard_tanh activation function to input values except for the last layer, and then checks the output by passing x_val and y_val through a z_func. The results are printed for verification.",
+        "type": "comment"
+    },
+    "3040": {
+        "file_id": 325,
+        "content": "/output_pdf/convert_utf8.py",
+        "type": "filepath"
+    },
+    "3041": {
+        "file_id": 325,
+        "content": "The code reads a UTF-16 encoded input file, converts it to UTF-8, and writes the resulting content into an output file.",
+        "type": "summary"
+    },
+    "3042": {
+        "file_id": 325,
+        "content": "input_file = \"example_docstring.md\"\noutput_file = \"example_docstring_utf8.md\"\nwith open(input_file,\"r\",encoding=\"utf-16\") as f:\n    with open(output_file,'w+',encoding='utf-8') as f8:\n        f8.write(f.read())",
+        "type": "code",
+        "location": "/output_pdf/convert_utf8.py:1-6"
+    },
+    "3043": {
+        "file_id": 325,
+        "content": "The code reads a UTF-16 encoded input file, converts it to UTF-8, and writes the resulting content into an output file.",
+        "type": "comment"
+    },
+    "3044": {
+        "file_id": 326,
+        "content": "/output_pdf/docx_concat/concat_index_with_article.py",
+        "type": "filepath"
+    },
+    "3045": {
+        "file_id": 326,
+        "content": "The code is concatenating two DOCX files, a processed index and an article, into a single combined DOCX file using the docxcompose library. The code checks the file paths and appends the second document to the first one, creating the final combined file at the specified basepath. However, it mentions that hyperlinks in the resulting file might be broken due to issues in the original conversion process.",
+        "type": "summary"
+    },
+    "3046": {
+        "file_id": 326,
+        "content": "output_index_file = \"processed_index.docx\"\noutput_article_file = \"processed_article.docx\"\nbasepath = \"../\"\nimport os\nmaster_path = os.path.join(basepath, output_index_file)\nappend_path_1 = os.path.join(basepath, output_article_file)\ncombined_path = os.path.join(basepath, \"combined.docx\")\nfrom docxcompose.composer import Composer\nfrom docx import Document\nmaster = Document(master_path)\nmaster.add_page_break() # working?\ncomposer = Composer(master)\n# but these hyperlinks are broken. it is the same in the original conversion, even if you do nothing just converting the html generated by pdoc3 using pandoc.\ndoc1 = Document(append_path_1)\ncomposer.append(doc1)\ncomposer.save(combined_path)\n# no newpage avaliable?",
+        "type": "code",
+        "location": "/output_pdf/docx_concat/concat_index_with_article.py:1-26"
+    },
+    "3047": {
+        "file_id": 326,
+        "content": "The code is concatenating two DOCX files, a processed index and an article, into a single combined DOCX file using the docxcompose library. The code checks the file paths and appends the second document to the first one, creating the final combined file at the specified basepath. However, it mentions that hyperlinks in the resulting file might be broken due to issues in the original conversion process.",
+        "type": "comment"
+    },
+    "3048": {
+        "file_id": 327,
+        "content": "/output_pdf/docx_reference_convert/test_convert.sh",
+        "type": "filepath"
+    },
+    "3049": {
+        "file_id": 327,
+        "content": "This code utilizes the Pandoc tool to convert DOCX files, referencing other DOCX files for formatting. It converts algorithm_report_1.docx with reference to algorithm_format_reference.docx and saves as algorithm_converted_1.docx. Another conversion is performed on ../original_example_docstring.docx using reference to ../pandoc-templates/templates/rmd-minion-reference.docx and saved as docstring_converted.docx.",
+        "type": "summary"
+    },
+    "3050": {
+        "file_id": 327,
+        "content": "# pandoc algorithm_report_1.docx --reference-doc=algorithm_format_reference.docx -o algorithm_converted_1.docx # this sucks\n# pandoc ../original_example_docstring.docx --reference-doc=../pandoc-templates/templates/rmd-minion-reference.docx -o docstring_converted.docx #looks like hell",
+        "type": "code",
+        "location": "/output_pdf/docx_reference_convert/test_convert.sh:1-3"
+    },
+    "3051": {
+        "file_id": 327,
+        "content": "This code utilizes the Pandoc tool to convert DOCX files, referencing other DOCX files for formatting. It converts algorithm_report_1.docx with reference to algorithm_format_reference.docx and saves as algorithm_converted_1.docx. Another conversion is performed on ../original_example_docstring.docx using reference to ../pandoc-templates/templates/rmd-minion-reference.docx and saved as docstring_converted.docx.",
+        "type": "comment"
+    },
+    "3052": {
+        "file_id": 328,
+        "content": "/output_pdf/export_docx.ps1",
+        "type": "filepath"
+    },
+    "3053": {
+        "file_id": 328,
+        "content": "This code deletes a file named \"example_docstring.docx\", then uses Python's \"convert_utf8.py\" script to convert a file to UTF-8 encoding, and finally generates a new DOCX file using Pandoc by converting an MD file (example_docstring_utf8.md) with the output saved as example_docstring.docx.",
+        "type": "summary"
+    },
+    "3054": {
+        "file_id": 328,
+        "content": "rm example_docstring.docx\npython .\\convert_utf8.py # use iconv instead. installed along with busybox.\npandoc example_docstring_utf8.md -o example_docstring.docx",
+        "type": "code",
+        "location": "/output_pdf/export_docx.ps1:1-3"
+    },
+    "3055": {
+        "file_id": 328,
+        "content": "This code deletes a file named \"example_docstring.docx\", then uses Python's \"convert_utf8.py\" script to convert a file to UTF-8 encoding, and finally generates a new DOCX file using Pandoc by converting an MD file (example_docstring_utf8.md) with the output saved as example_docstring.docx.",
+        "type": "comment"
+    },
+    "3056": {
+        "file_id": 329,
+        "content": "/output_pdf/export_pdf.ps1",
+        "type": "filepath"
+    },
+    "3057": {
+        "file_id": 329,
+        "content": "The code sets the PATH environment variable to include a directory and uses Pandoc to convert a markdown file into a PDF document, specifying metadata such as title, font, and table of content depth.",
+        "type": "summary"
+    },
+    "3058": {
+        "file_id": 329,
+        "content": "$env:PATH=\"$env:PATH;C:/Users/ss/scoop/apps/miktex/current/texmfs/install/miktex/bin/x64/\"\npandoc --metadata=title:\"MyProject Documentation\"  --from=markdown+abbreviations+tex_math_single_backslash  --pdf-engine=xelatex --variable=mainfont:\"DejaVu Sans\"   --toc --toc-depth=4 --output=example_docstring.pdf  example_docstring_utf8.md\n# pandoc -s -o example_docstring.docx example_docstring.md",
+        "type": "code",
+        "location": "/output_pdf/export_pdf.ps1:1-5"
+    },
+    "3059": {
+        "file_id": 329,
+        "content": "The code sets the PATH environment variable to include a directory and uses Pandoc to convert a markdown file into a PDF document, specifying metadata such as title, font, and table of content depth.",
+        "type": "comment"
+    },
+    "3060": {
+        "file_id": 330,
+        "content": "/output_pdf/generate_html.ps1",
+        "type": "filepath"
+    },
+    "3061": {
+        "file_id": 330,
+        "content": "Command-line tool pdoc is used to generate HTML documentation from a Python file with example docstring.",
+        "type": "summary"
+    },
+    "3062": {
+        "file_id": 330,
+        "content": "pdoc --html ..\\example_docstring.py",
+        "type": "code",
+        "location": "/output_pdf/generate_html.ps1:1-1"
+    },
+    "3063": {
+        "file_id": 330,
+        "content": "Command-line tool pdoc is used to generate HTML documentation from a Python file with example docstring.",
+        "type": "comment"
+    },
+    "3064": {
+        "file_id": 331,
+        "content": "/output_pdf/generate_html.sh",
+        "type": "filepath"
+    },
+    "3065": {
+        "file_id": 331,
+        "content": "The code is using the Markdown Python library to convert a markdown file (example_docstring_utf8.md) into HTML, applying multiple extensions such as abbr, attr_list, def_list, fenced_code, tables, admonition, smarty, and toc, and storing the result in example_docstring_utf8.html.",
+        "type": "summary"
+    },
+    "3066": {
+        "file_id": 331,
+        "content": "markdown_py  --extension=abbr         \\\n                --extension=attr_list    \\\n                --extension=def_list     \\\n                --extension=fenced_code  \\\n                --extension=tables       \\\n                --extension=admonition   \\\n                --extension=smarty       \\\n                --extension=toc          \\\n                example_docstring_utf8.md > example_docstring_utf8.html",
+        "type": "code",
+        "location": "/output_pdf/generate_html.sh:1-9"
+    },
+    "3067": {
+        "file_id": 331,
+        "content": "The code is using the Markdown Python library to convert a markdown file (example_docstring_utf8.md) into HTML, applying multiple extensions such as abbr, attr_list, def_list, fenced_code, tables, admonition, smarty, and toc, and storing the result in example_docstring_utf8.html.",
+        "type": "comment"
+    },
+    "3068": {
+        "file_id": 332,
+        "content": "/output_pdf/html/process_output_html.py",
+        "type": "filepath"
+    },
+    "3069": {
+        "file_id": 332,
+        "content": "This code uses BeautifulSoup to parse HTML, manipulates structure by inserting sidebar and article before main content, removes title and footer, and outputs two modified files.",
+        "type": "summary"
+    },
+    "3070": {
+        "file_id": 332,
+        "content": "from bs4 import BeautifulSoup as bs\ninput_file = \"example_docstring.html\"\noutput_file = \"processed.html\"\noutput_index_file = \"processed_index.html\"\noutput_article_file = \"processed_article.html\"\nwith open(input_file, \"r\",encoding=\"utf-8\") as f, open(output_file, \"w+\",encoding=\"utf-8\") as fw, open(\n    output_index_file, \"w+\",encoding=\"utf-8\"\n) as fw_index, open(output_article_file, \"w+\",encoding=\"utf-8\") as fw_article:\n    soup = bs(f.read(),'lxml')\n    # how about let's split the sidebar and main content into different pages?\n    footer = soup.find(id=\"footer\",encoding=\"utf-8\").extract()\n    for details in soup.find_all(\"details\"):\n        details.extract()  # remove source code.\n    # footer.clear()\n    # print('footer?',footer)\n    # breakpoint()\n    sidebar = soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()\n    soup.find(id=\"content\").insert_before(sidebar)\n    fw.write(str(soup.prettify()))\n    # well let's split.\n    # after done for the index.\n    article = soup.find(\"article\").extract()\n    sidebar = soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()",
+        "type": "code",
+        "location": "/output_pdf/html/process_output_html.py:1-25"
+    },
+    "3071": {
+        "file_id": 332,
+        "content": "This code reads an HTML file, uses BeautifulSoup to parse it, and then processes the sidebar and main content by extracting them and inserting the sidebar before the content. The footer and source codes are also removed. Finally, it prettifies and writes the modified HTML into separate output files for further processing.",
+        "type": "comment"
+    },
+    "3072": {
+        "file_id": 332,
+        "content": "    main = soup.find(\"main\")\n    main.insert(0,sidebar)\n    fw_index.write(str(soup.prettify()))\n    soup.find(id=\"sidebar\",encoding=\"utf-8\").extract()\n    title = soup.find(\"title\").extract()  # removing the title.\n    main.insert(0,article)  # insert the article\n    fw_article.write(str(soup.prettify()))",
+        "type": "code",
+        "location": "/output_pdf/html/process_output_html.py:26-32"
+    },
+    "3073": {
+        "file_id": 332,
+        "content": "The code snippet is manipulating the HTML structure of a webpage. It finds the main section, inserts a sidebar and an article at the beginning, removes the title, and writes the modified HTML to two separate files (fw_index and fw_article).",
+        "type": "comment"
+    },
+    "3074": {
+        "file_id": 333,
+        "content": "/output_pdf/html_to_pdf.sh",
+        "type": "filepath"
+    },
+    "3075": {
+        "file_id": 333,
+        "content": "Converting HTML to PDF using Playwright with three different input files.",
+        "type": "summary"
+    },
+    "3076": {
+        "file_id": 333,
+        "content": "# playwright pdf example_docstring_utf8.html example_docstring_utf8.pdf\nplaywright pdf html/processed.html original_example_docstring.pdf\n# playwright pdf html/example_docstring.html original_example_docstring.pdf",
+        "type": "code",
+        "location": "/output_pdf/html_to_pdf.sh:1-3"
+    },
+    "3077": {
+        "file_id": 333,
+        "content": "Converting HTML to PDF using Playwright with three different input files.",
+        "type": "comment"
+    },
+    "3078": {
+        "file_id": 334,
+        "content": "/output_pdf/original_html_to_docx.sh",
+        "type": "filepath"
+    },
+    "3079": {
+        "file_id": 334,
+        "content": "The code uses pandoc to convert HTML files (example_docstring, processed, processed_article and processed_index) to DOCX format. The output file names are specified with their corresponding extensions (.docx), and the \"-o\" flag specifies the output filename.",
+        "type": "summary"
+    },
+    "3080": {
+        "file_id": 334,
+        "content": "pandoc -o original_example_docstring.docx html/example_docstring.html\npandoc -o processed.docx html/processed.html\npandoc -o processed_article.docx html/processed_article.html\npandoc -o processed_index.docx html/processed_index.html",
+        "type": "code",
+        "location": "/output_pdf/original_html_to_docx.sh:1-4"
+    },
+    "3081": {
+        "file_id": 334,
+        "content": "The code uses pandoc to convert HTML files (example_docstring, processed, processed_article and processed_index) to DOCX format. The output file names are specified with their corresponding extensions (.docx), and the \"-o\" flag specifies the output filename.",
+        "type": "comment"
+    },
+    "3082": {
+        "file_id": 335,
+        "content": "/output_pdf/pdf_to_docx.sh",
+        "type": "filepath"
+    },
+    "3083": {
+        "file_id": 335,
+        "content": "The code attempts to convert a PDF file named \"original_example_docstring.pdf\" to a DOCX format using the \"mutool\" command, and outputs the result as \"test.docx\". However, it seems that there might be an issue with converting from PDF to DOCX, as mentioned in the comment.",
+        "type": "summary"
+    },
+    "3084": {
+        "file_id": 335,
+        "content": "# pandoc original_example_docstring.pdf -o test.docx\n# cannot convert from pdf.\n# mutool is bad.\nmutool convert -o test.docx original_example_docstring.pdf",
+        "type": "code",
+        "location": "/output_pdf/pdf_to_docx.sh:1-4"
+    },
+    "3085": {
+        "file_id": 335,
+        "content": "The code attempts to convert a PDF file named \"original_example_docstring.pdf\" to a DOCX format using the \"mutool\" command, and outputs the result as \"test.docx\". However, it seems that there might be an issue with converting from PDF to DOCX, as mentioned in the comment.",
+        "type": "comment"
+    },
+    "3086": {
+        "file_id": 336,
+        "content": "/packup.sh",
+        "type": "filepath"
+    },
+    "3087": {
+        "file_id": 336,
+        "content": "This code creates an archive named \"archive.7z\" and removes any existing file with the same name, finds all files with extensions \".py\", \".j2\", \".json\", or \".txt\", and uses 7-zip (7z) to add each file found to the new \"archive.7z\".",
+        "type": "summary"
+    },
+    "3088": {
+        "file_id": 336,
+        "content": "archive_name=archive.7z\nrm -rf $archive_name\nfind . | grep -E \".+(py|j2|json|txt)\\$\" | xargs -Iabc 7z a $archive_name abc",
+        "type": "code",
+        "location": "/packup.sh:1-3"
+    },
+    "3089": {
+        "file_id": 336,
+        "content": "This code creates an archive named \"archive.7z\" and removes any existing file with the same name, finds all files with extensions \".py\", \".j2\", \".json\", or \".txt\", and uses 7-zip (7z) to add each file found to the new \"archive.7z\".",
+        "type": "comment"
+    },
+    "3090": {
+        "file_id": 337,
+        "content": "/parse_device_parameters_excel.py",
+        "type": "filepath"
+    },
+    "3091": {
+        "file_id": 337,
+        "content": "This code uses Openpyxl to access an Excel file, gathers sheet information, and collects font color data for specified values. It identifies cell types, updates a \"uniqs\" dictionary based on color and value, and prints its contents.",
+        "type": "summary"
+    },
+    "3092": {
+        "file_id": 337,
+        "content": "import openpyxl\nfilepath = \"device_parameters_v3.3.xlsx\"\nexcel_file = openpyxl.load_workbook(filename=filepath)\n# print(excel_file.sheetnames) # ['Sheet1']\nfrom openpyxl.worksheet.worksheet import Worksheet\nfrom openpyxl.cell.cell import Cell, MergedCell \nsheet1 = excel_file[\"Sheet1\"]\nif type(sheet1) == Worksheet:\n    # order: category; name (unit), example, delete or not\n    # you need to scan through all cells to find some cell with specific color.\n    # and with some example.\n    # COL: A;B,C,D;F,G,H for all data need to export\n    # after (partial) serialization, you can do something more interesting with it.\n    dims = sheet1.row_dimensions, sheet1.column_dimensions\n    # print(dims)\n    # breakpoint()\n    # print(sheet1)\n    # print(type(sheet1))\n    # breakpoint()\n    # print(dir(sheet1))\n    # breakpoint()\n    uniqs = {}\n    for row in sheet1.rows:\n        # a tuple containing every cell in the row\n        for cell1 in row:\n            # cell1 = sheet1.cell(row=1, column=1)  # cell or merged cell.\n            # need to determine its type.",
+        "type": "code",
+        "location": "/parse_device_parameters_excel.py:1-31"
+    },
+    "3093": {
+        "file_id": 337,
+        "content": "Loading and initializing an Openpyxl workbook for a specific Excel file, specifically the \"device_parameters_v3.3.xlsx\" file. The code checks if 'Sheet1' exists in the workbook and assigns it to the variable 'sheet1'. It also gathers information about the row and column dimensions of the sheet.",
+        "type": "comment"
+    },
+    "3094": {
+        "file_id": 337,
+        "content": "            # now we don't care about the color anymore.\n            # we just want the value.\n            if type(cell1) == Cell:\n                # print(type(cell1))\n                # print(dir(cell1))\n                # breakpoint()\n                cell1_fill = cell1.fill\n                cell1_value = cell1.value\n                cell1_column_letter = cell1.column_letter\n                cell1_font = cell1.font\n                # breakpoint()\n                print()\n                print(\"FONT:\",cell1_font) # font color here.\n                print()\n                print(\"FILL:\", cell1_fill) # includes fg and bg\n                print()\n                print(\"VALUE:\", cell1_value)\n                if cell1_value in [\n                    # '增加', # fg: FF92D050\n                                #    '水水换热器',\n                                #    '非必填', (no color?)\n                                #    '配电传输' # fg: FF92D050\n                                   ]:\n                    # breakpoint()\n                    ...\n                font_color = cell1_font.color",
+        "type": "code",
+        "location": "/parse_device_parameters_excel.py:32-58"
+    },
+    "3095": {
+        "file_id": 337,
+        "content": "Code is checking the value of a cell and if it matches one of the specified values, it extracts the font color from that cell.",
+        "type": "comment"
+    },
+    "3096": {
+        "file_id": 337,
+        "content": "                fgColor = cell1_fill.fgColor\n                bgColor = cell1_fill.bgColor\n                if font_color:\n                    uniqs.update({font_color.rgb: cell1_value})\n                if fgColor:\n                    uniqs.update({fgColor.rgb: cell1_value})\n                if bgColor:\n                    uniqs.update({bgColor.rgb: cell1_value})\n                # breakpoint()\n                # use .rgb to access the color string\n                # '00000000'\n            elif type(cell1) == MergedCell:\n                ...\n            else:\n                print(\"Unknown cell type: %s\" % type(cell1))\n    print(\"*\" * 50)\n    for key, value in uniqs.items():\n        print(key, value)\n# 00000000 None\n# FF92D050 计算单位功率成本\n# FFFFFF00 气水换热器\n# FFFF0000 None",
+        "type": "code",
+        "location": "/parse_device_parameters_excel.py:59-81"
+    },
+    "3097": {
+        "file_id": 337,
+        "content": "This code checks the type of an Excel cell and updates a dictionary called \"uniqs\" based on its color and value. If the cell has a specific type (MergedCell), it proceeds with further actions, otherwise it prints an error message for unknown cell types. The code then prints the keys and values in the \"uniqs\" dictionary.",
+        "type": "comment"
+    },
+    "3098": {
+        "file_id": 338,
+        "content": "/parse_device_parameters_excel_v2.py",
+        "type": "filepath"
+    },
+    "3099": {
+        "file_id": 338,
+        "content": "The code loads an Excel file, extracts device parameters, and creates a JSON structure containing BCD and other information. It handles empty values and processes the data before writing it to a file for further use.",
+        "type": "summary"
+    }
+}

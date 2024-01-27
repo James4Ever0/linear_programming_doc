@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the PrologMQI module and defines a file path and query. It then creates a thread in the PrologMQI context, executes the Prolog file, queries the database with the provided query asynchronously, and continuously fetches the query results until there are no more results. The fetched results are printed to the console.",
+    "details": [
+        {
+            "comment": "This code imports the PrologMQI module and defines a file path and query. It then creates a thread in the PrologMQI context, executes the Prolog file, queries the database with the provided query asynchronously, and continuously fetches the query results until there are no more results. The fetched results are printed to the console.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query_prolog.py\":0-21",
+            "content": "from swiplserver import PrologMQI\nprolog_file_path = 'test_iterative_query.pro'\n# query = 'member(X, [a,b,c])'\nquery = 'dog(X)'\nwith PrologMQI() as mqi:\n    with mqi.create_thread() as prolog_thread:\n        prolog_thread.query(f'[\"{prolog_file_path}\"].')\n        # obj = prolog_thread.query(query)\n        prolog_thread.query_async(query, find_all=False)\n        while True:\n            result = prolog_thread.query_async_result()\n            if result is None:\n                break\n            else:\n                print('fetched result:', result)\n# fetched result: [{'X': 'pet'}]\n# fetched result: [{'X': 'animal'}]\n# fetched result: [{'X': 'cute'}]"
+        }
+    ]
+}

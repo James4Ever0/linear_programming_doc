@@ -1,0 +1,20 @@
+{
+    "summary": "The `get_all_combinations` function generates all possible state combinations and checks conditions before adding them to the result list, returning the final list of all states.",
+    "details": [
+        {
+            "comment": "Function `get_all_combinations` retrieves all possible state combinations. It utilizes a dictionary to store port energy types and another for simultaneous adder energy types, then generates these combinations using itertools.product.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/enumerate_possible_states.py\":0-32",
+            "content": "from log_utils import logger_print\nimport itertools\ndef get_all_combinations(\n    portNameToPortPossibleStates, energyTypeToPortNames, adderNameToAdderPortNames\n):\n    port_name_to_possible_energy_types = {}\n    for k, vlist in energyTypeToPortNames.items():\n        for v in vlist:\n            if v not in port_name_to_possible_energy_types.keys():\n                port_name_to_possible_energy_types[v] = [k]\n            port_name_to_possible_energy_types[v].append(k)\n    adder_name_list = list(adderNameToAdderPortNames.keys())\n    possible_simutaneous_adder_energy_types = set()\n    adder_name_to_possible_adder_energy_types = {}\n    for adder_name, _port_name_list in adderNameToAdderPortNames.items():\n        paet = set()\n        for pn in _port_name_list:\n            ets = port_name_to_possible_energy_types[pn]\n            paet.update(ets)\n        adder_name_to_possible_adder_energy_types[adder_name] = paet\n    possible_simutaneous_adder_energy_types = []\n    possible_simutaneous_adder_energy_types = list(\n        itertools.product(*adder_name_to_possible_adder_energy_types.values())"
+        },
+        {
+            "comment": "This code is iterating over possible combinations of energy types for different adder devices in a microgrid. It checks if any combination has all devices idle or at least one device with input and output states, then adds it to the result list. The possible energy types are retrieved from some prolog data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/enumerate_possible_states.py\":33-59",
+            "content": "    )\n    result = []\n    # get `possible_adder_energy_types` from prolog?\n    for simutaneous_adder_energy_types in possible_simutaneous_adder_energy_types:\n        simutaneous_state = []\n        # all idle, otherwise at least one input one output\n        aet_to_ps_l = []\n        for adder_index, aet in enumerate(simutaneous_adder_energy_types):\n            sasp = []\n            adder_name = adder_name_list[adder_index]\n            _port_name_list = adderNameToAdderPortNames[adder_name]\n            psl = []\n            for pn in _port_name_list:\n                ppet = port_name_to_possible_energy_types[pn]\n                pps = portNameToPortPossibleStates[pn]\n                if aet in ppet:\n                    ps = pps\n                else:\n                    assert \"idle\" in pps\n                    ps = [\"idle\"]\n                psl.append(ps)\n            for elem in itertools.product(*psl):\n                if all([e == \"idle\" for e in elem]) or (\n                    \"input\" in elem and \"output\" in elem\n                ):"
+        },
+        {
+            "comment": "The code generates all possible combinations of state elements for each area-element tuple, appends them to a list, and extends the result list. Finally, it returns the resulting list containing all possible states.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/enumerate_possible_states.py\":60-66",
+            "content": "                    sasp.append([aet, elem])\n            aet_to_ps_l.append(sasp)\n        for elem in itertools.product(*aet_to_ps_l):\n            simutaneous_state.append(elem)\n        result.extend(simutaneous_state)\n    return result"
+        }
+    ]
+}

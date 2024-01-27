@@ -1,0 +1,10 @@
+{
+    "summary": "The code hides the console, navigates to a specific directory, executes a script, and redirects its output to a log file.",
+    "details": [
+        {
+            "comment": "The code hides the console, navigates to a specific directory, executes a script, and redirects its output to a log file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/scheduled_commit.cmd\":0-6",
+            "content": "CONSOLESTATE /Hide\n@REM http://www.robvanderwoude.com\n@REM https://www.robvanderwoude.com/battech_hideconsole.php\nD:\ncd D:\\project\\xianxing\n@REM not to output too many things. just look at the most recent one.\ncommit.cmd > run.log"
+        }
+    ]
+}

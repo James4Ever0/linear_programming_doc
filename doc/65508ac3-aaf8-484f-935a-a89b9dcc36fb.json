@@ -1,0 +1,10 @@
+{
+    "summary": "The code snippet defines an external function in Erlang. It takes a single natural number as input and returns a natural number output.",
+    "details": [
+        {
+            "comment": "The code snippet defines an external function in Erlang. It takes a single natural number as input and returns a natural number output.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/erglang_test/sample_external_func.d.er\":0-0",
+            "content": ".func!: Nat => Nat"
+        }
+    ]
+}

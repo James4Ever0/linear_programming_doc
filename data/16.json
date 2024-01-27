@@ -1,0 +1,538 @@
+{
+    "1600": {
+        "file_id": 195,
+        "content": "ps aux | grep rabbitmq | grep -v grep | awk '{print $2}' | xargs -Iabc kill -s TERM abc\nps aux | grep redis | grep 6380 | grep -v grep | awk '{print $2}' | xargs -Iabc kill -s TERM abc\n# shall you wait till terminated.\n# you may use libtmux for better 'killing' experience.\n# session name -> pane pids -> send SIGTERM -> kill session by name\n# check if it is really killed. if not, send SIGKILL\n# tmux kill-session -t fastapi_tmuxp\ntmux kill-server # no other panes running anyway.\nsleep 3",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_terminate_service.sh:1-9"
+    },
+    "1601": {
+        "file_id": 195,
+        "content": "This script kills the rabbitmq and redis processes using the TERM signal, then waits for 3 seconds before terminating any remaining panes with tmux's kill-server command.",
+        "type": "comment"
+    },
+    "1602": {
+        "file_id": 196,
+        "content": "/microgrid_base/fastapi_tmuxp.sh",
+        "type": "filepath"
+    },
+    "1603": {
+        "file_id": 196,
+        "content": "This code checks the platform (macOS or Windows) and loads the appropriate tmuxp configuration file accordingly, while also setting environment variables for CPLEX_DIR and CONDA_ENV_NAME.",
+        "type": "summary"
+    },
+    "1604": {
+        "file_id": 196,
+        "content": "if [ \"$1\" != \"macos\" ] ; then\n    if [ \"$1\" != \"windows\" ] ; then \n        echo \"supports: [ macos | windows ]\"\n        echo \"unknown platform: $1\"\n        exit 1\n    fi\nfi\necho \"running under: $1\"\nexport NO_PYTHON_TYPECHECK=True\nbash fastapi_terminate_service.sh\nif [ \"$1\" == \"macos\" ] ; then\n    env CPLEX_DIR=\":/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx/\" CONDA_ENV_NAME=\"rosetta\" tmuxp load fastapi_tmuxp.yml\nelif [ \"$1\" == \"windows\" ] ; then\n    env CPLEX_DIR=\"\" CONDA_ENV_NAME=\"cplex\" tmuxp load fastapi_tmuxp.yml\nfi",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_tmuxp.sh:1-17"
+    },
+    "1605": {
+        "file_id": 196,
+        "content": "This code checks the platform (macOS or Windows) and loads the appropriate tmuxp configuration file accordingly, while also setting environment variables for CPLEX_DIR and CONDA_ENV_NAME.",
+        "type": "comment"
+    },
+    "1606": {
+        "file_id": 197,
+        "content": "/microgrid_base/fastapi_tmuxp.yml",
+        "type": "filepath"
+    },
+    "1607": {
+        "file_id": 197,
+        "content": "This code defines a Tmux session named \"fastapi_tmuxp\" with multiple windows and panes. Each pane runs different commands, including running FastAPI server templates, celery worker, RabbitMQ server, Redis server, and htop for monitoring the server.",
+        "type": "summary"
+    },
+    "1608": {
+        "file_id": 197,
+        "content": "session_name: fastapi_tmuxp\nwindows:\n  - window_name: dev window\n    layout: tiled\n    panes:\n      - env NO_PYTHON_TYPECHECK=\"True\" conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output env python fastapi_server_template.py\n      # - conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output env python fastapi_server_template.py | tee -a logs/fastapi.log\n      # - conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output python fastapi_server_template.py\n      # - celery -A fastapi_celery_server worker --pool=prefork --concurrency=1\n      - env PATH=\"$PATH${CPLEX_DIR}\" NO_PYTHON_TYPECHECK=\"True\" conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output python fastapi_celery_server.py\n      - rabbitmq-server\n      - redis-server --port 6380\n      - htop # monitor server",
+        "type": "code",
+        "location": "/microgrid_base/fastapi_tmuxp.yml:1-13"
+    },
+    "1609": {
+        "file_id": 197,
+        "content": "This code defines a Tmux session named \"fastapi_tmuxp\" with multiple windows and panes. Each pane runs different commands, including running FastAPI server templates, celery worker, RabbitMQ server, Redis server, and htop for monitoring the server.",
+        "type": "comment"
+    },
+    "1610": {
+        "file_id": 198,
+        "content": "/microgrid_base/financial/financial_calc.py",
+        "type": "filepath"
+    },
+    "1611": {
+        "file_id": 198,
+        "content": "The code imports the 'sympy' library and defines a function called 'calc'. The function uses symbolic variables 'i' and 'x' to calculate an expression for financial calculations, specifically for annuity factors. It then iterates over the 'a_arr' list of values to update the result expression. Finally, it prints the calculated expression and returns the result after substituting values for 'i' and 'x'. The code also provides example values for 'a_arr', 'i', and 'x' to test the function.",
+        "type": "summary"
+    },
+    "1612": {
+        "file_id": 198,
+        "content": "import sympy\nfrom typing import cast\ndef calc(i0, a_arr: list, x0):\n    i, x = sympy.symbols('i x')\n    f = lambda i, n, a: a / ((1 + i) ** n)\n    result = cast(sympy.Expr, -x)\n    for n, a in enumerate(a_arr):\n        result += f(i, n + 1, a)\n    print('[expr]', result)\n    return result.evalf(subs={i:i0, x:x0})\n# a_arr = [\n#     -28197.28,\n#     -4789.57,\n#     6691,\n#     8706.48,\n#     8932.69,\n#     9605.62,\n#     11030.94,\n#     11281.97,\n#     11259.61,\n#     11236.13,\n#     11609.99,\n#     2075.55,\n# ]\na_arr = [\n    -28197.28,\n    -5172.43,\n    5884.55,\n    7848.69,\n    7518.68,\n    8149.41,\n    9051.99,\n    9191.49,\n    9174.72,\n    9157.11,\n    9537.14,\n    1817.88,\n]\ni = 0.05\nx = 29695.24\nret = calc(i, a_arr, x)\nprint('[val]',ret)",
+        "type": "code",
+        "location": "/microgrid_base/financial/financial_calc.py:1-46"
+    },
+    "1613": {
+        "file_id": 198,
+        "content": "The code imports the 'sympy' library and defines a function called 'calc'. The function uses symbolic variables 'i' and 'x' to calculate an expression for financial calculations, specifically for annuity factors. It then iterates over the 'a_arr' list of values to update the result expression. Finally, it prints the calculated expression and returns the result after substituting values for 'i' and 'x'. The code also provides example values for 'a_arr', 'i', and 'x' to test the function.",
+        "type": "comment"
+    },
+    "1614": {
+        "file_id": 199,
+        "content": "/microgrid_base/financial/financial_equation_solve.py",
+        "type": "filepath"
+    },
+    "1615": {
+        "file_id": 199,
+        "content": "This code utilizes sympy to solve financial equations with varying inputs, checking for exact solutions and providing alternatives when necessary. It iterates through multiple sets of numbers, printing solutions or indicating no solution if none exist.",
+        "type": "summary"
+    },
+    "1616": {
+        "file_id": 199,
+        "content": "import sympy\nimport numpy as np\nfrom typing import cast\ndef solve_eq(a_arr: list, build_time: int, business_time: int):\n    assert len(a_arr) == build_time + business_time\n    i = sympy.symbols(\"i\")\n    expr = cast(sympy.Expr, 0)\n    for n in range(build_time + business_time):\n        expr += a_arr[n] / ((1 + i) ** (n + (0 if n < build_time else 1)))\n    print(\"[expr]\", expr)\n    try:\n        sol = sympy.nsolve(\n            sympy.Eq(expr, 0), i, (0, 1), solver=\"bisect\", verify=True\n        )  # will raise exception if no solution exists.\n        return sol\n    except:\n        vals = [expr.evalf(subs={i: v}) for v in np.linspace(0, 1, 100)]\n        print(\"possible vals:\", vals)\n# a_arr = [\n#     -6511.07,\n#     1283.97,\n#     5714.22,\n#     7854.22,\n#     -14725.82,\n#     1841.11,\n#     10792.05,\n#     10792.05,\n#     10792.05,\n#     10792.05,\n#     11190.56,\n#     2343.6,\n# ]\n# a_arr = [\n#     -7075.02,\n#     1105.57,\n#     5714.22,\n#     7854.22,\n#     -14725.82,\n#     1841.11,\n#     10792.05,\n#     10792.05,\n#     10792.05,\n#     10792.05,",
+        "type": "code",
+        "location": "/microgrid_base/financial/financial_equation_solve.py:1-48"
+    },
+    "1617": {
+        "file_id": 199,
+        "content": "This function solves a financial equation using the sympy library. It takes three inputs: a_arr (a list of coefficients), build_time, and business_time. The code checks the length of a_arr and then constructs an expression for the equation. After attempting to solve the equation using sympy's nsolve function, it provides possible solutions if no exact solution is found.",
+        "type": "comment"
+    },
+    "1618": {
+        "file_id": 199,
+        "content": "#     11190.56,\n#     2343.6,\n# ]\n# a_arr = [\n#     -5947.12,\n#     1462.36,\n#     5714.22,\n#     2077.78,\n#     25721.82,\n#     9883.89,\n#     1920.25,\n#     1920.25,\n#     1920.25,\n#     1920.25,\n#     1920.25,\n#     511.45,\n# ]\n# a_arr = [\n#     -6524.35,\n#     1270.69,\n#     5700.94,\n#     7840.94,\n#     -14813.62,\n#     1777.67,\n#     10778.77,\n#     10778.77,\n#     10778.77,\n#     10778.77,\n#     11177.28,\n#     2330.32,\n# ]\n# a_arr = [\n#     -6497.79,\n#     191.68,\n#     5727.5,\n#     7867.5,\n#     14638.02,\n#     1904.55,\n#     10805.33,\n#     10805.33,\n#     10805.33,\n#     10805.33,\n#     11203.84,\n#     2356.88,\n# ]\n# a_arr = [\n#     -62130034399.855,\n#     -62130034399.855,\n#     966.026,\n#     859.026,\n#     869.026,\n#     859.026,\n#     6307364303.757,\n# ]\n# a_arr = [\n#     -62130034399.855,\n#     -62130034399.855,\n#     4793596993.616,\n#     4793596890.016,\n#     4793596898.016,\n#     4793596890.016,\n#     11100960332.746,\n# ]\n# a_arr = [\n#     -43491024079.899,\n#     -43491024079.90,\n#     -3860929680.735,\n#     -3931808967.953,\n#     -4006232097.503,",
+        "type": "code",
+        "location": "/microgrid_base/financial/financial_equation_solve.py:49-123"
+    },
+    "1619": {
+        "file_id": 199,
+        "content": "Code snippet contains multiple arrays, each potentially representing different financial values or variables. The values in the arrays seem to be constantly changing and vary significantly between array definitions.",
+        "type": "comment"
+    },
+    "1620": {
+        "file_id": 199,
+        "content": "#     -4084376399.929,\n#     2140935528.653,\n# ]\n# a_arr = [-68.291, -68.291, 796.343, 687.631, 695.514, 687.392, 705.167]\na_arrs = [\n    [-609.991, -609.991, 585.69, 478.69, 488.69, 478.69, 555.616],\n    [-609.991, -609.991, 529.815, 426.215, 434.215, 426.215, 501.141],\n    [ -426.994, -426.994, 449.726, 340.43, 347.699, 338.932, 408.052],\n]\nbuild_time = 2\nbusiness_time = 5\n# business_time = 10\nfor i, a_arr in enumerate(a_arrs):\n    print(f\"SOLVING ARR #{i}\".center(70, \"=\"))\n    sol = solve_eq(a_arr, build_time, business_time)\n    if sol:\n        print(\"[sol]\", sol)  # float\n    else:\n        print(\"no solution.\")",
+        "type": "code",
+        "location": "/microgrid_base/financial/financial_equation_solve.py:124-145"
+    },
+    "1621": {
+        "file_id": 199,
+        "content": "This code is iterating through multiple sets of numbers (a_arrs) and solving an equation for each set, storing the solution in 'sol'. The number of arrays being processed is determined by the length of a_arrs. If a solution is found, it is printed. If no solution exists, \"no solution.\" is printed. Build time and business time are constants used in the equation solving process.",
+        "type": "comment"
+    },
+    "1622": {
+        "file_id": 200,
+        "content": "/microgrid_base/generate_basic_params.sh",
+        "type": "filepath"
+    },
+    "1623": {
+        "file_id": 200,
+        "content": "This code runs two Python scripts, checks for nonzero exit codes, and then generates code if no errors occurred.",
+        "type": "summary"
+    },
+    "1624": {
+        "file_id": 200,
+        "content": "python3 parse_params.py\n# echo \"exit code? $?\"\n# if [ $? -ne 0 ] ; then\n# echo \"nonzero exit code for: `python3 parse_params.py`\"\n# exit\n# fi\npython3 parse_units_and_names.py\n# echo \"exit code? $?\"\n# if [ $? -ne 0 ] ; then\n# echo \"nonzero exit code for: `python3 parse_units_and_names.py`\"\n# exit\n# fi\n# then execute the template to generate code",
+        "type": "code",
+        "location": "/microgrid_base/generate_basic_params.sh:1-14"
+    },
+    "1625": {
+        "file_id": 200,
+        "content": "This code runs two Python scripts, checks for nonzero exit codes, and then generates code if no errors occurred.",
+        "type": "comment"
+    },
+    "1626": {
+        "file_id": 201,
+        "content": "/microgrid_base/generate_makefile.py",
+        "type": "filepath"
+    },
+    "1627": {
+        "file_id": 201,
+        "content": "The code reads a directory, extracts Python modules using ast and os. It searches for \"MAKEFILE\" assignments, executes its source code, updates MAKEFILE, removes duplicates, appends to python_files and renders generate_path without formatting.",
+        "type": "summary"
+    },
+    "1628": {
+        "file_id": 201,
+        "content": "from log_utils import logger_print\nimport os\nimport sys\nassert (generate_path := sys.argv[-1]).endswith(\".tmp\")\n# generate_path = \"Makefile.tmp\"\nimport ast\nimport astor\nfrom typing import TypedDict, List\nclass MakefileDict(TypedDict):\n    inputs: List[str]\n    outputs: List[str]\n    args: List[str]\n    fname: str\ndef read_file(fname):\n    with open(fname, \"r\") as f:\n        content = f.read()\n        return content\npython_files = []\nfor fname in (fnames := os.listdir(\".\")):\n    if fname.endswith(\".py\"):\n        content = read_file(fname)\n        tree = ast.parse(content)\n        # you shall walk over this. see if it imports any python file in the same directory.\n        mymodules = []\n        for it in ast.walk(tree):\n            if isinstance(it, ast.Import):\n                modules = [alias.name for alias in it.names]\n                mymodules.extend(modules)\n            elif isinstance(it, ast.ImportFrom):\n                module = it.module\n                mymodules.append(module)\n        mymodules = set(mymodules)",
+        "type": "code",
+        "location": "/microgrid_base/generate_makefile.py:1-42"
+    },
+    "1629": {
+        "file_id": 201,
+        "content": "This code reads a directory, identifies Python files, and extracts the imported modules from each file. It stores the module names in a list called mymodules. The code uses the ast module to parse the Python code and ast.walk to traverse the Abstract Syntax Tree (AST). It also utilizes the os module for file operations and the TypedDict class for defining the MakefileDict data structure.",
+        "type": "comment"
+    },
+    "1630": {
+        "file_id": 201,
+        "content": "        mymodules = [f\"{m}.py\" for m in mymodules]\n        required_pyfiles = [f for f in mymodules if f != fname and f in fnames]\n        myindex = -1\n        for index, elem in enumerate(tree.body):  # shall be an assignment.\n            if isinstance(elem, ast.Assign):\n                targets = elem.targets\n                if len(targets) == 1:\n                    if isinstance(targets[0], ast.Name) and targets[0].id == \"MAKEFILE\":\n                        # this will be our last line.\n                        myindex = index\n                        break\n        if myindex != -1:\n            MAKEFILE: MakefileDict\n            tree.body = tree.body[: myindex + 1]\n            source_code = astor.to_source(tree)\n            exec(source_code)\n            logger_print((\"MAKEFILE ENTRY: %s\" % fname).center(60, \"=\"))\n            logger_print(MAKEFILE)  # type: ignore\n            for argname in [\"inputs\", \"outputs\", \"args\"]:\n                assert (\n                    argname in MAKEFILE.keys()\n                ), f\"{argname} not in {MAKEFILE.keys()}\"  # type:ignore",
+        "type": "code",
+        "location": "/microgrid_base/generate_makefile.py:43-64"
+    },
+    "1631": {
+        "file_id": 201,
+        "content": "Code searches for an assignment with target \"MAKEFILE\", extracts the tree up to that line, converts it into source code and executes it. It then prints the MAKEFILE entry in a centered format and checks if required arguments are present in the MAKEFILE dictionary.",
+        "type": "comment"
+    },
+    "1632": {
+        "file_id": 201,
+        "content": "            MAKEFILE.update(fname=fname)  # type: ignore\n            MAKEFILE[\"outputs\"].extend(required_pyfiles)\n            MAKEFILE[\"outputs\"] = list(set(MAKEFILE[\"outputs\"]))\n            python_files.append(MAKEFILE.copy())  # type: ignore\n            logger_print()\nfrom jinja_utils import load_render_and_format\n# logger_print(python_files)\n# breakpoint()\nload_render_and_format(\n    generate_path.split(\".\")[0] + \".j2\",\n    generate_path,\n    render_params=dict(python_files=python_files),\n    banner=\"MAKEFILE TMP RENDER\",\n    needFormat=False,\n)",
+        "type": "code",
+        "location": "/microgrid_base/generate_makefile.py:65-81"
+    },
+    "1633": {
+        "file_id": 201,
+        "content": "Updates the MAKEFILE with fname, extends \"outputs\" with required_pyfiles, removes duplicates from \"outputs\", appends a copy of MAKEFILE to python_files, and renders generate_path without formatting using load_render_and_format.",
+        "type": "comment"
+    },
+    "1634": {
+        "file_id": 202,
+        "content": "/microgrid_base/generate_microgrid_device_names.py",
+        "type": "filepath"
+    },
+    "1635": {
+        "file_id": 202,
+        "content": "The code imports necessary libraries, defines a path for data input and output files, reads the content of the specified file, and logs the data using rich library. It is likely preparing device names for a microgrid from a CSV file.",
+        "type": "summary"
+    },
+    "1636": {
+        "file_id": 202,
+        "content": "from log_utils import logger_print\n# path = \"microgrid_device_params_intermediate.json\"\n# 电负荷 柴油原件需要单独列出来\n# microgrid_device_name_path = \"microgrid_device_names.json\"\n# path = \"设备接口-离网型微电网.csv\"\nimport json\nwith open(path, \"r\") as f:\n    data = json.load(f)\nimport rich\nlogger_print(data)",
+        "type": "code",
+        "location": "/microgrid_base/generate_microgrid_device_names.py:1-17"
+    },
+    "1637": {
+        "file_id": 202,
+        "content": "The code imports necessary libraries, defines a path for data input and output files, reads the content of the specified file, and logs the data using rich library. It is likely preparing device names for a microgrid from a CSV file.",
+        "type": "comment"
+    },
+    "1638": {
+        "file_id": 203,
+        "content": "/microgrid_base/get_poly_degree_decompose_expression.py",
+        "type": "filepath"
+    },
+    "1639": {
+        "file_id": 203,
+        "content": "The code imports necessary libraries, creates a ConcreteModel with a variable v initialized as 1 and expression e defined as 2v^2 + 2. The expression is then converted to Sympy format using sympyify_expression function and logged. The logged expression is then simplified into terms and symbols using as_terms() function, which logs the result.",
+        "type": "summary"
+    },
+    "1640": {
+        "file_id": 203,
+        "content": "from log_utils import logger_print\nfrom pyomo_environ import *\n# from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.v = Var(initialize=1)\nmodel.e = 2 * model.v * model.v + 2\n# import pyomo.core.expr as E\nfrom pyomo.core.expr.sympy_tools import sympyify_expression\n# to sympy.\nobjmap, vis = sympyify_expression(model.e)\nimport rich\nlogger_print(objmap)\nfrom sympy import Mul\n# 'getPyomoSymbol', 'getSympySymbol', 'i', 'pyomo2sympy', 'sympy2pyomo', 'sympyVars'\nlogger_print(vis)  # sympy expression.\nbreakpoint()\nlogger_print(\n    vis.as_terms()\n)  # ([(2, ((2.0, 0.0), (0,), ())), (2*x0**2, ((2.0, 0.0), (2,), ()))], [x0])\n# (terms, symbols)\n# terms = [(expr, deg, pow)]",
+        "type": "code",
+        "location": "/microgrid_base/get_poly_degree_decompose_expression.py:1-31"
+    },
+    "1641": {
+        "file_id": 203,
+        "content": "The code imports necessary libraries, creates a ConcreteModel with a variable v initialized as 1 and expression e defined as 2v^2 + 2. The expression is then converted to Sympy format using sympyify_expression function and logged. The logged expression is then simplified into terms and symbols using as_terms() function, which logs the result.",
+        "type": "comment"
+    },
+    "1642": {
+        "file_id": 204,
+        "content": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py",
+        "type": "filepath"
+    },
+    "1643": {
+        "file_id": 204,
+        "content": "The code defines a class for model training, fits polynomial coefficients based on temperature and load rate inputs, and calculates normalized COP for predicting heat pump power.",
+        "type": "summary"
+    },
+    "1644": {
+        "file_id": 204,
+        "content": "import numpy as np\nfrom sklearn.linear_model import LinearRegression\nclass Set_Para_Fit(object):\n    def __init__(self, para):\n        \"\"\"\n        Initializes a new instance of the Set_Para_Fit class.\n        Args:\n            para (list[list[float]]): A list of parameter values for the instance. Each element is a list of four float\n            values representing the output temperature (Tout), input temperature (Tin), rated heat/cooling power output correlation coefficient (parr), and\n            rated electricity input correlation coefficient (PWarr).\n        Returns:\n            None\n        \"\"\"\n        # para=[[Tout,Tin,parr,PWarr],[],[]]\n        self.X_train = []\n        y_train = []\n        self.Tout = []\n        self.Tin = []\n        self.parr = []\n        self.pwarr = []\n        self.row, self.col = np.shape(para)\n        self.pk_coeff = []\n        self.pwk_coeff = []\n        self.pwk_coeff_without_rate = []\n        self.pwk_rate_coeff = []\n        for i in range(self.row):\n            self.Tout.append(para[i][0])",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:1-31"
+    },
+    "1645": {
+        "file_id": 204,
+        "content": "Initializes a Set_Para_Fit object with given parameter values. It also prepares the data for model training by creating empty lists for input and output values. The class uses a nested loop to separate each set of parameter values into its components, such as Tout, Tin, parr, and pwarr.",
+        "type": "comment"
+    },
+    "1646": {
+        "file_id": 204,
+        "content": "            self.Tin.append(para[i][1])\n            self.parr.append(para[i][2])\n            self.pwarr.append(para[i][3])\n            self.X_train.append(\n                [\n                    1,\n                    self.Tout[i],\n                    self.Tout[i] * self.Tout[i],\n                    self.Tin[i],\n                    self.Tin[i] * self.Tin[i],\n                    self.Tout[i] * self.Tin[i],\n                ]\n            )\n        self.pk_regression = LinearRegression(fit_intercept=False)\n        self.pwk_regression = LinearRegression(fit_intercept=False)\n        self.pwk_regression_without_rate = LinearRegression(fit_intercept=False)\n        self.pwk_rate_regression = LinearRegression(fit_intercept=False)\n    def fit_pkcoeff(self):\n        # print(self.X_train)\n        self.pk_regression.fit(self.X_train, self.parr)\n        self.pk_coeff = self.pk_regression.coef_\n    def get_pkcoeff(self):\n        return self.pk_coeff\n    def get_pk(self, tout, tin):\n        \"\"\"\n        Calculates the current cooling/heating power correction coefficient.",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:32-61"
+    },
+    "1647": {
+        "file_id": 204,
+        "content": "The code creates a LinearRegression object for cooling/heating power and fits the coefficients using given data. It also allows retrieval of cooling/heating power correction coefficient values based on input temperatures.",
+        "type": "comment"
+    },
+    "1648": {
+        "file_id": 204,
+        "content": "        Args:\n            tout (float): Output temperature value.\n            tin (float): Input temperature value.\n        Returns:\n            float: The cooling/heating power correction coefficient.\n        \"\"\"\n        xtest = np.array([1, tout, tout * tout, tin, tin * tin, tout * tin])\n        return self.pk_regression.predict(xtest.reshape(1, -1))[0]\n    ####################################3\n    def fit_pwkcoeff_without_rate(self):\n        self.pwk_regression_without_rate.fit(self.X_train, self.pwarr)\n        self.pwk_coeff_without_rate = self.pwk_regression_without_rate.coef_\n    def get_pwkcoeff_without_rate(self):\n        return self.pwk_coeff_without_rate\n    def get_pwk_without_rate(self, tout, tin):\n        \"\"\"\n        Parameters:\n            tout: output temperature\n            tin: input temperature\n        Returns:\n            rated electricity input correlation coefficient at given temperature\n        \"\"\"\n        xtest = np.array([1, tout, tout * tout, tin, tin * tin, tout * tin])\n        return self.pwk_regression_without_rate.predict(xtest.reshape(1, -1))[0]",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:63-91"
+    },
+    "1649": {
+        "file_id": 204,
+        "content": "This code defines a class with methods for fitting and getting power correction coefficients without rate. The fit_pwkcoeff_without_rate() method trains the model using training data (X_train, pwarr), while get_pwkcoeff_without_rate() returns the fitted coefficients. The get_pwk_without_rate() method takes input and output temperatures, then uses the trained model to predict the rated electricity input correlation coefficient at those temperatures.",
+        "type": "comment"
+    },
+    "1650": {
+        "file_id": 204,
+        "content": "    ###################################33\n    # deprecated\n    def fit_pwkcoeff(self, load_rate_arr):\n        # load_rate_arr=[[0.25,1.2],[0.5,1.3],[0.75,1.5],[1,1]\n        row_rate = np.shape(load_rate_arr)[0]\n        xwtrain = []\n        ywtrain = []\n        for i in range(self.row):\n            for j in range(row_rate):\n                \"\"\"\n                xwtrain.append([1, load_rate_arr[j][0] * self.parr[i],\n                                (load_rate_arr[j][0] * self.parr[i]) * (load_rate_arr[j][0] * self.parr[i]),\n                                self.Tout[i], self.Tin[i], self.Tout[i] * self.Tin[i],\n                                self.Tout[i] * (load_rate_arr[j][0] * self.parr[i]),\n                                self.Tin[i] * (load_rate_arr[j][0] * self.parr[i])])\n                \"\"\"\n                xwtrain.append(\n                    [\n                        1,\n                        load_rate_arr[j][0],\n                        (load_rate_arr[j][0]) * (load_rate_arr[j][0]),\n                        self.Tout[i],",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:93-116"
+    },
+    "1651": {
+        "file_id": 204,
+        "content": "This deprecated function fits polynomial coefficients for a heat pump based on load rate and temperature inputs. It appends the necessary data to xwtrain list. The function iterates through rows, then through load rates, appending 1, load rate, square of load rate, and various temperature combinations to xwtrain.",
+        "type": "comment"
+    },
+    "1652": {
+        "file_id": 204,
+        "content": "                        self.Tin[i],\n                        self.Tout[i] * self.Tin[i],\n                        self.Tout[i] * (load_rate_arr[j][0]),\n                        self.Tin[i] * (load_rate_arr[j][0]),\n                    ]\n                )\n                ywtrain.append(\n                    self.pwarr[i] * load_rate_arr[j][0] / load_rate_arr[j][1]\n                )\n        self.pwk_regression.fit(xwtrain, ywtrain)\n        self.pwk_coeff = self.pwk_regression.coef_\n    def get_pwkcoeff(self):\n        return self.pwk_coeff\n    def get_pwk(self, tout, tin, load_rate):\n        xtest = np.array(\n            [\n                1,\n                load_rate,\n                load_rate * load_rate,\n                tout,\n                tin,\n                tout * tin,\n                tout * load_rate,\n                tin * load_rate,\n            ]\n        )\n        res = self.pwk_regression.predict(xtest.reshape(1, -1))\n        return res[0]\n    def fit_pwk_rate_coeff(self, load_rate_arr):\n        \"\"\"\n        Fit ",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:117-153"
+    },
+    "1653": {
+        "file_id": 204,
+        "content": "This code fits a linear regression model to predict the heat pump's heating power (pwk) based on indoor temperature (Tin), outdoor temperature (Tout), and load rate. It stores the regression coefficients for later use, allowing the user to get the pwk by providing the current indoor and outdoor temperatures along with the load rate. The code fits the model using a list of load_rate_arr, which may contain multiple load rates.",
+        "type": "comment"
+    },
+    "1654": {
+        "file_id": 204,
+        "content": "parameters for: f(1, load_rate, load_rate^2) = load_rate/normalized_cop (actual cop/cop at max load rate)\n        \"\"\"\n        # load_rate_arr=[[0.25,1.2],[0.5,1.3],[0.75,1.5],[1,1]\n        row_rate = np.shape(load_rate_arr)[0]\n        xwtrain = []\n        ywtrain = []\n        for j in range(row_rate):\n            xwtrain.append( # 1 is probably for bias\n                [1, load_rate_arr[j][0], load_rate_arr[j][0] * load_rate_arr[j][0]]\n            )\n            ywtrain.append(load_rate_arr[j][0] / load_rate_arr[j][1]) # f(1, load_rate, load_rate^2) = load_rate/normalized_cop\n        self.pwk_rate_regression.fit(xwtrain, ywtrain)\n        self.pwk_rate_coeff = self.pwk_rate_regression.coef_\n    def get_pwk_rate_coeff(self):\n        \"\"\"\n        Get parameters for: f(1, load_rate, load_rate^2) = load_rate/normalized_cop\n        \"\"\"\n        return self.pwk_rate_coeff\n    def get_pwk_rate(self, rate):\n        xtest = np.array([1, rate, rate * rate])\n        return self.pwk_rate_regression.predict((xtest.reshape(1, -1)))[0]",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:153-175"
+    },
+    "1655": {
+        "file_id": 204,
+        "content": "This code defines a regression model to calculate the normalized COP of a heat pump based on load rate. It trains the model with different load rates, fits the data, and stores the coefficients for future use. The get_pwk_rate function uses these coefficients to predict the normalized COP given a specific load rate.",
+        "type": "comment"
+    },
+    "1656": {
+        "file_id": 204,
+        "content": "        # (1)\n        # (2)\n        # (3)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/Machine_para_fit2.py:177-179"
+    },
+    "1657": {
+        "file_id": 204,
+        "content": "The code snippet appears to be incomplete, as there are only three comments (1, 2, and 3) without any corresponding lines of code. Please provide the complete code block for a more accurate analysis.",
+        "type": "comment"
+    },
+    "1658": {
+        "file_id": 205,
+        "content": "/microgrid_base/heatpump_code_reference/SoilSource_new.py",
+        "type": "filepath"
+    },
+    "1659": {
+        "file_id": 205,
+        "content": "This code sets up a soil heat pump model, defines variables for heat pump systems, and calculates coefficients. It develops a class with optimization methods and stores results in Tfav.",
+        "type": "summary"
+    },
+    "1660": {
+        "file_id": 205,
+        "content": "# !/usr/bin/python3\nimport docplex\nfrom docplex.mp.model import Model\nimport pandas as pd\nimport numpy as np\nimport time\nimport os.path\nimport math\nimport random\n# import sys\nfrom docplex.mp.conflict_refiner import ConflictRefiner\nimport matplotlib.pyplot as plt\nfrom matplotlib import style\nfrom result_processlib import Value\nfrom plot_arr import IGESPlot\nfrom cpExample import IGES\nfrom IGES_Math import RRproduct\nfrom IGES_Math import RRSqure\nclass SoilSource(IGES):\n    index = 0\n    def __init__(\n        self,\n        num_h,\n        mdl: Model,\n        cool_max,\n        cool_min,\n        heat_max,\n        heat_min,\n        set_price,\n        Tmin,\n        Tmax,\n        Length,\n        set_name=\"SoilSource\",\n    ):\n        self.num_h = num_h\n        IGES(set_name)\n        SoilSource.index += 1\n        num_period = round(self.num_h / 120)\n        self.mdl = mdl\n        self.set_price = set_price\n        self.heat_max = heat_max\n        self.heat_min = heat_min\n        self.cool_max = cool_max\n        self.cool_min = cool_min\n        # self.dd = mdl.continuous_var(name='dd{0}'.format(SoilSource.index), lb=-1e3)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:1-50"
+    },
+    "1661": {
+        "file_id": 205,
+        "content": "The code is initializing a class \"SoilSource\" that extends the IGES class and takes input parameters such as number of hours, model object, cooling/heating maximum/minimum values, set price, temperature range, length, and a set name. It also increments an index variable for each instance created. The code defines some attributes and variables for the class but does not fully define its methods or functionality.",
+        "type": "comment"
+    },
+    "1662": {
+        "file_id": 205,
+        "content": "        self.T = np.zeros(self.num_h)\n        self.q = np.zeros(self.num_h)\n        self.qln_sumf = np.zeros(self.num_h)\n        self.qln_sumb = np.zeros(self.num_h)\n        self.Tfav = np.zeros(self.num_h)\n        self.Tfav_1 = np.zeros(self.num_h)\n        self.Tfav_2 = np.zeros(self.num_h)\n        self.qav = np.zeros(self.num_h)\n        self.pcool_out = self.mdl.continuous_var_list(\n            [i for i in range(0, self.num_h)],\n            name=\"SoilSource.pcool_out{0}\".format(SoilSource.index),\n            lb=-1e3,\n        )\n        self.pheat_out = self.mdl.continuous_var_list(\n            [i for i in range(0, self.num_h)],\n            name=\"SoilSource.tpheat{0}\".format(SoilSource.index),\n            lb=-1e3,\n        )\n        self.nianhua = self.mdl.continuous_var(\n            name=\"SoilSource_nianhua{0}\".format(SoilSource.index)\n        )\n        self.length = self.mdl.continuous_var(\n            name=\"SoilSourcelength{0}\".format(SoilSource.index)\n        )\n        self.nset = self.mdl.continuous_var(\n            name=\"SoilSource.nset{0}\".format(SoilSource.index)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:52-79"
+    },
+    "1663": {
+        "file_id": 205,
+        "content": "This code initializes variables for a heat pump model, including temperature arrays (T), heat flow arrays (q), summed heat flow arrays (qln_sumf and qln_sumb), average temperature arrays (Tfav), average heat flow array (qav), continuous variable lists for heat output (pcool_out) and heat input (pheat_out), and two more continuous variables (nianhua and length).",
+        "type": "comment"
+    },
+    "1664": {
+        "file_id": 205,
+        "content": "        )\n        self.zcool = self.mdl.integer_var_list(\n            [i for i in range(self.num_h)],\n            name=\"SoilSource.zcool{0}\".format(SoilSource.index),\n        )\n        self.zheat = self.mdl.integer_var_list(\n            [i for i in range(self.num_h)],\n            name=\"SoilSource.zheat{0}\".format(SoilSource.index),\n        )\n        self.Tff = 16\n        self.lamdas = 1.72\n        self.k = 1 / (4 * 3.1415926 * self.lamdas)\n        # 单U\n        self.pi = 3.1415926\n        self.db = 0.2\n        self.do = 0.032\n        # 钻孔回填材料的导热系数\n        self.lamdab = 2\n        #\n        self.lamdap = 0.42\n        self.di = 0.026\n        self.D = 0.0064\n        self.lh = 3000\n        # shall be the translation of the formula\n        self.Rb = 0.5 * (\n            1\n            / (2 * self.pi * self.lamdab)\n            * (\n                np.log(self.db / self.do)\n                + np.log(self.db / self.D)\n                + (self.lamdab - self.lamdas)\n                / (self.lamdab + self.lamdas)\n                * np.log(",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:80-115"
+    },
+    "1665": {
+        "file_id": 205,
+        "content": "This code initializes variables for a soil heat pump model. It defines integer variables for each hour, calculates thermal properties, and sets values for various factors such as drill bit diameter, hole outer diameter, thermal conductivity of backfill material, and hole depth.",
+        "type": "comment"
+    },
+    "1666": {
+        "file_id": 205,
+        "content": "                    math.pow(self.db, 4) / (math.pow(self.db, 4) - math.pow(self.D, 4))\n                )\n            )\n            + 1 / (2 * self.pi * self.lamdap) * np.log(self.do / self.di)\n            + 1 / (self.pi * self.di * self.lh)\n        )\n        # 增加以下代码\n        self.Tmin = Tmin  # 流体最低控制温度，从拓扑参数读入\n        self.Tmax = Tmax  # 流体最高控制温度，，从拓扑参数读入\n        # self.Length = 120  # 从基础参数读入\n        self.Length = Length\n        self.q_ex_heat = (self.Tff - self.Tmin) / self.Rb\n        self.q_ex_cool = (self.Tmax - self.Tff) / self.Rb\n    def cons_register(self, mdl:Model, loop_flag):\n        ####simple\n        bigM = 1e8\n        # mdl.add_constraint(self.nset >= 0)\n        # mdl.add_constraint(self.nset <= 1000)\n        mdl.add_constraint(self.nset * self.q_ex_heat <= self.heat_max)\n        mdl.add_constraint(self.nset * self.q_ex_heat >= self.heat_min)\n        mdl.add_constraint(self.nset * self.q_ex_cool <= self.cool_max)\n        mdl.add_constraint(self.nset * self.q_ex_cool >= self.cool_min)\n        # mdl.add_constraint(self.nset * 4 <= self.heat_max)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:116-141"
+    },
+    "1667": {
+        "file_id": 205,
+        "content": "This code defines a class for a soil source component in a heat pump system. It calculates the heat exchange coefficients based on various parameters and adds constraints to a model object. The class also has methods to register the component in a model, read parameters from basic or topology files, and update the heat exchange rates based on flow temperature.",
+        "type": "comment"
+    },
+    "1668": {
+        "file_id": 205,
+        "content": "        # mdl.add_constraint(self.nset * 4 >= self.heat_min)\n        # mdl.add_constraint(self.nset * 6 <= self.cool_max)\n        # mdl.add_constraint(self.nset * 6 >= self.cool_min)\n        # force the balance inbetween heating and cooling mode, ensure this is doeable every year\n        if loop_flag == 1:\n            pcool_sum = mdl.sum(self.pcool_out)\n            pheat_sum = mdl.sum(self.pheat_out)\n            mdl.add_constraint(pcool_sum <= pheat_sum * 1.25)\n            mdl.add_constraint(pcool_sum >= pheat_sum * 0.8)\n        mdl.add_constraints(\n            self.pcool_out[h] <= 4 * self.nset for h in range(self.num_h)\n        )\n        mdl.add_constraints(self.pcool_out[h] >= 0 for h in range(self.num_h))\n        mdl.add_constraints(\n            self.pheat_out[h] <= 4 * self.nset for h in range(self.num_h)\n        )\n        mdl.add_constraints(self.pheat_out[h] >= 0 for h in range(self.num_h))\n        mdl.add_constraints(\n            self.pheat_out[h] <= self.zheat[h] * bigM for h in range(self.num_h)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:142-162"
+    },
+    "1669": {
+        "file_id": 205,
+        "content": "Enforces balance between heating and cooling mode, adds constraints for maximum/minimum cooling and heating output, limits cooling output to 4 times the number of sets, ensures non-negative heat pump output, and limits heat output by the available heat source.",
+        "type": "comment"
+    },
+    "1670": {
+        "file_id": 205,
+        "content": "        )\n        mdl.add_constraints(\n            self.pcool_out[h] <= self.zcool[h] * bigM for h in range(self.num_h)\n        )\n        mdl.add_constraints(\n            self.zcool[h] + self.zheat[h] <= 1 for h in range(self.num_h)\n        )\n        # 30 for device lifetime (year), 120 for depth (meter) per subdevice\n        mdl.add_constraint(self.nianhua == self.length * self.set_price / 30)\n        mdl.add_constraint(self.length == self.nset * 120)\n    def Do_simulation(self, sol_run, periodh, consideer_history):\n        # calculate the temperature change\n        # this is not building model. this is calculating temperature change after optimization.\n        # q 正值为对外制冷。负值为对外值热。\n        rrp = []\n        length = sol_run.get_value(self.length)\n        pcool_out = sol_run.get_values(self.pcool_out)\n        pheat_out = sol_run.get_values(self.pheat_out)\n        self.q = [\n            1000 * (pcool_out[index] - pheat_out[index]) / length\n            for index in range(self.num_h)\n        ]\n        print(\"do simulation\")",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:163-187"
+    },
+    "1671": {
+        "file_id": 205,
+        "content": "This code defines a class with methods for defining and solving optimization constraints related to a soil heat pump system. The Do_simulation method calculates temperature change based on the optimized values.",
+        "type": "comment"
+    },
+    "1672": {
+        "file_id": 205,
+        "content": "        num_period = round(8760 / periodh)\n        for period in range(num_period):\n            self.qav[period] = (\n                sum(self.q[period * periodh : (period + 1) * periodh]) / periodh\n            )\n            # self.Tfav[period] = mdl.sum(self.T[(period) * 120:(period+1) * 120]) / 120\n        self.Tfav.resize((num_period, 1))\n        self.Tfav_1.resize((num_period, 1))\n        self.Tfav_2.resize((num_period, 1))\n        for period in range(num_period):\n            print(period)\n            self.qln_sumf[period] = sum(\n                self.qav[period + 1 - nindex] * np.log((nindex + 1) / (nindex))\n                for nindex in range(1, period + 1)\n            )\n            self.qln_sumb[period] = sum(\n                self.qav[period + 1 - nindex + num_period - 1]\n                * np.log((nindex + 1) / (nindex))\n                for nindex in range(period + 1, num_period)\n            )\n            if consideer_history == 1:\n                self.Tfav[period] = (\n                    self.k * (self.qln_sumf[period] + self.qln_sumb[period])",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:189-215"
+    },
+    "1673": {
+        "file_id": 205,
+        "content": "The code calculates the average heating demand and temperature over a given period and stores it in the respective arrays. It also calculates the logarithmic sum of heating demand for forward and backward periods and assigns them to specific arrays based on a consideration flag.",
+        "type": "comment"
+    },
+    "1674": {
+        "file_id": 205,
+        "content": "                    + self.qav[period] * self.Rb\n                    + self.Tff\n                )\n                self.Tfav_1[period] = self.k * (\n                    self.qln_sumf[period] + +self.qln_sumb[period]\n                )\n            else:\n                self.Tfav[period] = (\n                    self.k * (self.qln_sumf[period])\n                    + self.qav[period] * self.Rb\n                    + self.Tff\n                )\n                self.Tfav_1[period] = self.k * (self.qln_sumf[period])\n            self.Tfav_2[period] = self.qav[period] * self.Rb\n        for h in range(self.num_h):\n            self.T[h] = self.Tfav[math.floor(h / periodh)]\n        # 保存\n        # Tfav文件",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/SoilSource_new.py:216-235"
+    },
+    "1675": {
+        "file_id": 205,
+        "content": "Calculates average temperatures for heat pump system based on inputs, storing results in Tfav file.",
+        "type": "comment"
+    },
+    "1676": {
+        "file_id": 206,
+        "content": "/microgrid_base/heatpump_code_reference/chained_submodel.py",
+        "type": "filepath"
+    },
+    "1677": {
+        "file_id": 206,
+        "content": "The code imports pyomo library, creates a chained submodel with mutable parameters and constraints, defines variables, solves the optimization problem using CPLEX, and prints variable values.",
+        "type": "summary"
+    },
+    "1678": {
+        "file_id": 206,
+        "content": "from pyomo.environ import *\ndef abstractInitParam(initParam: dict):\n    return {None: {k: {None: v} for k, v in initParam.items()}}\nmodel = ConcreteModel()\nsubm_abs = AbstractModel()\nsubm_abs.a = Var()\n# immutable.\n# subm_abs.p1 = Param()\n# subm_abs.p2 = Param()\nsubm_abs.p1 = Param(mutable=True)\nsubm_abs.p2 = Param(mutable=True)\nsubm_abs.cons1 = Constraint(expr=subm_abs.a <= subm_abs.p1)\nsubm_abs.cons2 = Constraint(expr=subm_abs.a >= subm_abs.p2)\nmodel.sub = subm_abs.create_instance(\n    abstractInitParam({\"p2\": 10, \"p1\": 20}), report_timing=True\n)\nprint(\"================================\")\nsub2 = subm_abs.create_instance(\n    abstractInitParam({\"p2\": -10, \"p1\": 10}), report_timing=True\n)\nmodel.sub2 = sub2\nprint(\"================================\")\nmodel.sub3 = sub2.clone()\nmodel.sub3.p1.set_value(30)\nmodel.sub3.p2.set_value(-30)\n# inherited?\n# still printing timing?\nmodel.a = Var(bounds=(-10, 5))\nsubm_concrete = ConcreteModel()\nsubm_concrete.a = Var(bounds=(10, 20))\nmodel.subm_concrete = subm_concrete\n# obj_expr =  model.subm_concrete.a + model.a",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/chained_submodel.py:1-41"
+    },
+    "1679": {
+        "file_id": 206,
+        "content": "Code imports pyomo library and defines a chained submodel with mutable parameters and constraints. It creates instances of the model, clones and modifies them, and defines variables and a concrete model for comparison.",
+        "type": "comment"
+    },
+    "1680": {
+        "file_id": 206,
+        "content": "obj_expr = model.sub.a + model.sub2.a + model.subm_concrete.a + model.a + model.sub3.a\nmodel.obj = Objective(expr=obj_expr, sense=minimize)\nsolv = SolverFactory(\"cplex\")\nret = solv.solve(model, tee=True)\nprint(ret)\nprint()\nfor c in model.sub.a, model.sub2.a, model.sub3.a, model.subm_concrete.a, model.a:\n    print(\"val?\", value(c))\n    print(\"name?\", c.name)  # sub.a, sub2.a, subm_concrete.a, a\n    print()",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/chained_submodel.py:42-55"
+    },
+    "1681": {
+        "file_id": 206,
+        "content": "This code sets up an optimization problem with multiple variables from different submodels. It solves the problem using CPLEX solver and prints the values of each variable along with their names.",
+        "type": "comment"
+    },
+    "1682": {
+        "file_id": 207,
+        "content": "/microgrid_base/heatpump_code_reference/example.py",
+        "type": "filepath"
+    },
+    "1683": {
+        "file_id": 207,
+        "content": "This code uses CPLEX to solve a MIP problem, sets up variables and constraints, and handles potential errors before outputting the optimal solution and objective value.",
+        "type": "summary"
+    },
+    "1684": {
+        "file_id": 207,
+        "content": "# The MIP problem solved in this example is:\n#\n#   Maximize  x1 + 2 x2 + 3 x3 + x4\n#   Subject to\n#      - x1 +   x2 + x3 + 10 x4 <= 20\n#        x1 - 3 x2 + x3         <= 30\n#               x2      - 3.5x4  = 0\n#   Bounds\n#        0 <= x1 <= 40\n#        0 <= x2\n#        0 <= x3\n#        2 <= x4 <= 3\n#   Integers\n#       x4\nimport cplex\nfrom cplex.exceptions import CplexError\n# 首先实现定义各参数，包括变量和变量约束等\n# 用来在之后方便地添加到优化器里面\n# obj 指的是objective 意为目标，\n# 也就是要优化的目标（函数x1 + 2 x2 + 3 x3 + x4 的最小值）的系数\nmy_obj = [1.0, 2.0, 3.0, 1.0]\n# ub Upper Bound，上界，分别表示x1,x2,x3,x4的上界，infinity就是无穷大\n# （计算机类无穷大是有穷的，所以这个数可以事先修改为一个很大的数如 cplex.infinity = 2147483647\nmy_ub = [40.0, cplex.infinity, cplex.infinity, 3.0]\n# lb Lower Bound，下界，同上理\nmy_lb = [0.0, 0.0, 0.0, 2.0]\n# 变量类型，详见https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/refpythoncplex/html/cplex._internal._subinterfaces.VarTypes-class.html\n# ctrlF搜索Class Variables即可\n# 分别表示4各变量的变量类型，C表示Continuous 连续值（浮点数），I表示Integer\nmy_ctype = \"CCCI\"\n# 给4个变量起个名字\nmy_colnames = [\"x1\", \"x2\", \"x3\", \"x4\"]",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/example.py:1-39"
+    },
+    "1685": {
+        "file_id": 207,
+        "content": "This code imports the Cplex library and sets up the necessary parameters for a MIP (Mixed Integer Program) problem. It defines the objective coefficients, upper and lower bounds, variable types, and variable names for 4 decision variables.",
+        "type": "comment"
+    },
+    "1686": {
+        "file_id": 207,
+        "content": "# 约束规则\n# rows是约束集的左值，数组类型\n# 每一个元素为一条约束规则，也为一个数组类型，包含2个元素，前者为约束变量的名称列表，后者为系数关系\nmy_rows = [\n    [[\"x1\", \"x2\", \"x3\", \"x4\"], [-1.0, 1.0, 1.0, 10.0]],\n    [[\"x1\", \"x2\", \"x3\"], [1.0, -3.0, 1.0]],\n    [[\"x2\", \"x4\"], [1.0, -3.5]],\n]\n# rhs是约束规则集的右值\nmy_rhs = [20.0, 30.0, 0.0]\n# 约束规则集的左右值关系，详见https://www.ibm.com/support/knowledgecenter/SSSA5P_12.9.0/ilog.odms.cplex.help/refcallablelibrary/cpxapi/getsense.html\n# L表示小于等于，E表示等于\nmy_sense = \"LLE\"\n# 给各条约束规则起名字\nmy_rownames = [\"r1\", \"r2\", \"r3\"]\ntry:\n    # 实例化一个cplex优化器\n    prob = cplex.Cplex()\n    # 求解的目标为目标函数的最小值\n    prob.objective.set_sense(prob.objective.sense.maximize)\n    # 添加变量：变量在目标函数里的系数，变量的上下界，变量类型，名称\n    prob.variables.add(\n        obj=my_obj, lb=my_lb, ub=my_ub, types=my_ctype, names=my_colnames\n    )\n    # 添加约束：约束左值，等式/不等式符号，右值，名称\n    prob.linear_constraints.add(\n        lin_expr=my_rows, senses=my_sense, rhs=my_rhs, names=my_rownames\n    )\n    # 求解\n    prob.solve()\n    # 显示最优情况下的变量值\n    x = prob.solution.get_values()\n    print(x)\n    # 显示最优情况下的目标值\n    objective_value = prob.solution.get_objective_value()",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/example.py:41-85"
+    },
+    "1687": {
+        "file_id": 207,
+        "content": "This code is creating a linear programming problem using the CPLEX optimizer. It sets up constraints and variables, specifies their bounds, coefficients, and names, then solves the problem and prints the optimal solution and objective value.",
+        "type": "comment"
+    },
+    "1688": {
+        "file_id": 207,
+        "content": "    print(objective_value)\nexcept CplexError as exc:\n    print(exc)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/example.py:86-90"
+    },
+    "1689": {
+        "file_id": 207,
+        "content": "This code segment catches a CplexError and prints the exception for debugging purposes. If no error occurs, it displays the objective value.",
+        "type": "comment"
+    },
+    "1690": {
+        "file_id": 208,
+        "content": "/microgrid_base/heatpump_code_reference/plot_arr.py",
+        "type": "filepath"
+    },
+    "1691": {
+        "file_id": 208,
+        "content": "This code plots temperature data and saves the figure with a specific title in the \"fig\" directory, using a list to create legends for each row of the data. The x-axis label is set as \"Time/h\", y-axis label as \"Power/kW\", and the font size can be adjusted.",
+        "type": "summary"
+    },
+    "1692": {
+        "file_id": 208,
+        "content": "# import docplex\n# from docplex.mp.model import Model\n# import pandas as pd\n# import numpy as np\nimport matplotlib.pyplot as plt\nfrom matplotlib import style\nfrom result_processlib import Value\nclass IGESPlot(object):\n    def __init__(self, sol):\n        self.sol = sol\n    # n 行向量\n    def plot_list(self, arr, legend_title, title_content):\n        value = Value(self.sol)\n        if isinstance(arr, list):\n            xlen = len(arr)\n            if isinstance(arr[0], list):\n                ylen = len(arr[0])\n            else:\n                ylen = 1\n        else:\n            xlen = 1\n        print(\"xlen:\", xlen, \" ylen:\", ylen)\n        wide = 4\n        # 全部为0的时候就不显示\n        index = 1\n        title2 = list()\n        index = 0\n        for row in range(0, xlen):\n            arrtemp: list = value.value(arr[row])\n            flag = 0\n            for col in range(0, ylen):\n                if arrtemp[col] >= 1 or arrtemp[col] <= -1:\n                    flag = 1\n            if flag == 0:\n                # 全部为0\n                np_ = 0",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/plot_arr.py:1-40"
+    },
+    "1693": {
+        "file_id": 208,
+        "content": "Class IGESPlot initializes with a solution object.\nMethod plot_list: plots a list of data, checks if it is a 2D or 1D array, and only shows non-zero values.",
+        "type": "comment"
+    },
+    "1694": {
+        "file_id": 208,
+        "content": "            else:\n                # print(arrtemp)\n                plt.plot(arrtemp)\n                # print('index:', index, ' row:', row)\n                title2.append(legend_title[row])\n                print(\"row:\", row)\n                index = index + 1\n        plt.xlabel(\"Time/h\")\n        plt.ylabel(\"Power/kW\")\n        # plt.set(gca, 'Fontsize', 20)\n        plt.legend(title2)\n        plt.title(title_content)\n        plt.savefig(\"fig/\" + title_content + \".png\")",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/plot_arr.py:41-54"
+    },
+    "1695": {
+        "file_id": 208,
+        "content": "This code plots temperature data and saves the figure with a specific title in the \"fig\" directory. It uses a list to create legends for each row of the data, and sets the x-axis label as \"Time/h\" and y-axis label as \"Power/kW\". The font size is not explicitly set but can be adjusted.",
+        "type": "comment"
+    },
+    "1696": {
+        "file_id": 209,
+        "content": "/microgrid_base/heatpump_code_reference/print_profile.py",
+        "type": "filepath"
+    },
+    "1697": {
+        "file_id": 209,
+        "content": "This code imports pstats module, creates a Stats object from 'profile.bin' file, filters and sorts the stats, then prints the resulting statistics.",
+        "type": "summary"
+    },
+    "1698": {
+        "file_id": 209,
+        "content": "import pstats\n# from pstats import SortKey\np = pstats.Stats('profile.bin')\nstats = p.strip_dirs().sort_stats(2)\nstats.print_stats()",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/print_profile.py:1-5"
+    },
+    "1699": {
+        "file_id": 209,
+        "content": "This code imports pstats module, creates a Stats object from 'profile.bin' file, filters and sorts the stats, then prints the resulting statistics.",
+        "type": "comment"
+    }
+}

@@ -1,0 +1,536 @@
+{
+    "1000": {
+        "file_id": 129,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/read_lp_and_solve_copt.cmd",
+        "type": "filepath"
+    },
+    "1001": {
+        "file_id": 129,
+        "content": "This code calls \"copt_cmd\" to read an MPS file named \"converted.mps\" and perform various operations: \n1) \"feasrelax\" operation for feasibility analysis, \n2) \"optimize\" operation for solving the optimization problem, \n3) optional extra \"optimize\" and \"exit\" commands to finish the process.",
+        "type": "summary"
+    },
+    "1002": {
+        "file_id": 129,
+        "content": "copt_cmd -c \"readmps converted.mps; feasrelax\"\n@REM copt_cmd -c \"readmps converted.mps; optimize\"\n@REM copt_cmd -c \"readmps converted.mps; optimize; exit\"",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/read_lp_and_solve_copt.cmd:1-3"
+    },
+    "1003": {
+        "file_id": 129,
+        "content": "This code calls \"copt_cmd\" to read an MPS file named \"converted.mps\" and perform various operations: \n1) \"feasrelax\" operation for feasibility analysis, \n2) \"optimize\" operation for solving the optimization problem, \n3) optional extra \"optimize\" and \"exit\" commands to finish the process.",
+        "type": "comment"
+    },
+    "1004": {
+        "file_id": 130,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py",
+        "type": "filepath"
+    },
+    "1005": {
+        "file_id": 130,
+        "content": "This code uses Pyomo and constraints to generate a task execution sequence, resolves dependencies with a solver, and checks for circular dependencies before worker startup.",
+        "type": "summary"
+    },
+    "1006": {
+        "file_id": 130,
+        "content": "# virtually run interdependent tasks, generate the execution sequence\nfrom pyomo.environ import *\ndef resolv_task_deps(task_tree: list[dict], solver_name: str = \"cplex\"):\n    model = ConcreteModel()\n    lateinit_constraints = []\n    tasknames = set()\n    depnames = set()\n    for elem in task_tree:\n        name = elem.get(\"name\")\n        deps = elem.get(\"deps\", [])\n        deps = set(deps)\n        if name not in tasknames:\n            tasknames.add(name)\n        else:\n            raise Exception(f\"Redefinition of task <{name}> dependencies: {repr(deps)}\")\n        setattr(model, name, Var(domain=Integers))\n        for dep in deps:\n            depnames.add(dep)\n            lateinit_constraints.append((name, dep))\n    if not depnames.issubset(tasknames):\n        raise Exception(\"Have unmet dependencies: %s\" % depnames.difference(tasknames))\n    for index, (name, dep) in enumerate(lateinit_constraints):\n        setattr(\n            model,\n            f\"constraint_{index}\",\n            Constraint(expr=getattr(model, name) <= getattr(model, dep) - 1),",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py:1-29"
+    },
+    "1007": {
+        "file_id": 130,
+        "content": "This code generates an execution sequence for interdependent tasks by creating a Pyomo model and defining constraints based on task dependencies. It raises exceptions for task redefinition and unmet dependencies, ensuring valid input.",
+        "type": "comment"
+    },
+    "1008": {
+        "file_id": 130,
+        "content": "        )\n    model.obj = Objective(expr=0, sense=minimize)\n    solver = SolverFactory(solver_name)\n    ret = solver.solve(model, tee=True)\n    normalTCs = [\n        TerminationCondition.globallyOptimal,\n        TerminationCondition.locallyOptimal,\n        TerminationCondition.feasible,\n        TerminationCondition.optimal,\n    ]\n    if (TC := ret.solver.termination_condition) not in normalTCs:\n        raise Exception(\n            \"Dependency resolution failed.\\nSolver termination condition: \" + TC\n        )\n    else:\n        priority_map = {}\n        for tn in tasknames:\n            task_priority = value(getattr(model, tn))\n            priority_map[tn] = task_priority\n            print(f\"{tn}:\\t{task_priority}\")\n        return priority_map\ndef get_task_seq(task_tree: list[dict], solver_name: str = \"cplex\"):\n    pm = resolv_task_deps(task_tree, solver_name)\n    if isinstance(pm, dict) and pm != {}:\n        seq = list(pm.items())\n        seq.sort(key=lambda x: -x[1])\n        seq = [x[0] for x in seq]\n        print(f\"Task exec sequence: {', '.join(seq)}\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py:30-61"
+    },
+    "1009": {
+        "file_id": 130,
+        "content": "This code is resolving task dependencies and determining the execution sequence for tasks in a task tree. It uses a solver to determine task priorities based on certain conditions, and raises an exception if the solver's termination condition is not within the expected range of normal termination conditions. The function `resolv_task_deps` returns a priority map which is then used to generate the task execution sequence in ascending order by priority, and this sequence is printed out.",
+        "type": "comment"
+    },
+    "1010": {
+        "file_id": 130,
+        "content": "        return seq\nif __name__ == \"__main__\":\n    task_tree = [\n        {\"name\": \"task1\", \"deps\": [\"task2\", \"task3\"]},\n        {\"name\": \"task2\", \"deps\": [\"task4\"]},\n        {\"name\": \"task4\"},\n        {\"name\": \"task3\"},\n    ]\n    # task_tree += [ # circular dependency. you might want to use translation tools to identify issue.\n    #     {\"name\": \"task5\", \"deps\": [\"task6\"]},\n    #     {\"name\": \"task6\", \"deps\": [\"task7\"]},\n    #     {\"name\": \"task7\", \"deps\": [\"task5\"]},\n    # ]\n    seq = get_task_seq(task_tree)\n# this verification shall be performed before our worker ever starts up.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/resolve_task_dependency.py:62-78"
+    },
+    "1011": {
+        "file_id": 130,
+        "content": "The code defines a list of tasks with dependencies and checks for any circular dependency issues. The goal is to obtain the sequence in which the tasks should be executed, ensuring no circular dependencies are present. This verification is crucial before the worker starts up to avoid potential errors.",
+        "type": "comment"
+    },
+    "1012": {
+        "file_id": 131,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py",
+        "type": "filepath"
+    },
+    "1013": {
+        "file_id": 131,
+        "content": "The code defines a function that generates all possible energy type and port combinations, checks for idle adders, and validates inputs/outputs. It visualizes the result using a dictionary and rich library.",
+        "type": "summary"
+    },
+    "1014": {
+        "file_id": 131,
+        "content": "# you can delegate the dynamic topo checking to pypy. might be more efficient.\n# target output: STATUS_LIST\n\"\"\"\n[\n    [['electricity', ['input', 'output', 'input']]],\n    [['electricity', ['output', 'output', 'input']]],\n    [['electricity', ['idle', 'output', 'input']]],\n    [['electricity', ['output', 'idle', 'input']]],\n    [['electricity', ['input', 'output', 'idle']]],\n    [['electricity', ['idle', 'idle', 'idle']]],\n]\n\"\"\"\n# objective: use render_params to get the result\n########################## IMPLEMENTATION ##########################\nimport itertools\ndef get_all_combinations(portNameToPortPossibleStates, energyTypeToPortNames, adderNameToAdderPortNames):\n    port_name_to_possible_energy_types = {}\n    for k,vlist in energyTypeToPortNames.items():\n        for v in vlist:\n            if v not in port_name_to_possible_energy_types.keys():\n                port_name_to_possible_energy_types[v] = [k]\n            port_name_to_possible_energy_types[v].append(k)\n    adder_name_list = list(adderNameToAdderPortNames.keys())",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py:1-31"
+    },
+    "1015": {
+        "file_id": 131,
+        "content": "This code defines a function `get_all_combinations` that takes in three dictionaries and returns a list of possible energy types and port combinations based on the input parameters. It first creates a dictionary of possible energy types for each port, then generates all possible combinations using itertools.",
+        "type": "comment"
+    },
+    "1016": {
+        "file_id": 131,
+        "content": "    possible_simutaneous_adder_energy_types = set()\n    adder_name_to_possible_adder_energy_types = {}\n    for adder_name, _port_name_list in adderNameToAdderPortNames.items():\n        paet = set()\n        for pn in _port_name_list:\n            ets = port_name_to_possible_energy_types[pn]\n            paet.update(ets)\n        adder_name_to_possible_adder_energy_types[adder_name] = paet\n    possible_simutaneous_adder_energy_types = []\n    possible_simutaneous_adder_energy_types = list(itertools.product(*adder_name_to_possible_adder_energy_types.values()))\n    result = []\n    # get `possible_adder_energy_types` from prolog?\n    for simutaneous_adder_energy_types in possible_simutaneous_adder_energy_types:\n        simutaneous_state = []\n        # all idle, otherwise at least one input one output\n        aet_to_ps_l = []\n        for adder_index, aet in enumerate(simutaneous_adder_energy_types):\n            sasp = []\n            adder_name = adder_name_list[adder_index]\n            _port_name_list = adderNameToAdderPortNames[adder_name]",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py:34-59"
+    },
+    "1017": {
+        "file_id": 131,
+        "content": "This code calculates possible simultaneous adder energy types for a microgrid and generates combinations of these energies. It then iterates through each combination to determine if all adders are idle or if there is at least one input and output. The result is stored in the 'result' list.",
+        "type": "comment"
+    },
+    "1018": {
+        "file_id": 131,
+        "content": "            psl = []\n            for pn in _port_name_list:\n                ppet = port_name_to_possible_energy_types[pn]\n                pps = portNameToPortPossibleStates[pn]\n                if aet in ppet:\n                    ps = pps\n                else:\n                    assert 'idle' in pps\n                    ps = ['idle']\n                psl.append(ps)\n            for elem in itertools.product(*psl):\n                if all([e == 'idle' for e in elem]) or ('input' in elem and 'output' in elem):\n                    sasp.append([aet, elem])\n            aet_to_ps_l.append(sasp)\n        for elem in itertools.product(*aet_to_ps_l):\n            simutaneous_state.append(elem)\n        result.extend(simutaneous_state)\n    return result\n########################## VISUALIZATION ##########################\nportNameToPortPossibleStates = {\n    \"bat_port1\": [\"idle\", \"input\", \"output\"],\n    \"generator_port1\": [\n        \"idle\",\n        \"input\",\n    ],\n    \"load_port1\": [\"idle\", \"output\"],\n}\nenergyTypeToPortNames = {\n    \"electricity\": [\"bat_port1\", \"generator_port1\", \"load_port1\"]",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py:60-92"
+    },
+    "1019": {
+        "file_id": 131,
+        "content": "This code generates all possible states for given energy types and port names, considering the possible energy types and states of each port. It appends these simultaneous states to a list and returns it as the result. The provided visualization dictionary shows possible states for different ports and energy types.",
+        "type": "comment"
+    },
+    "1020": {
+        "file_id": 131,
+        "content": "}\ndeviceNameToPortNames = {\n    \"battery1\": [\"bat_port1\"],\n    \"generator1\": [\"generator_port1\"],\n    \"load1\": [\"load_port1\"],\n}\nadderNameToAdderPortNames = {\n    \"adder1\": [\"bat_port1\", \"generator_port1\", \"load_port1\"]\n}\nresult = get_all_combinations(portNameToPortPossibleStates, energyTypeToPortNames, adderNameToAdderPortNames)\nimport rich\nrich.print(result)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/rewrite_prolog_as_python.py:93-108"
+    },
+    "1021": {
+        "file_id": 131,
+        "content": "This code defines a dictionary for device names and their corresponding port names, another one for adder names and their corresponding port names. It then calls the `get_all_combinations` function with these dictionaries as arguments and prints the result using rich library.",
+        "type": "comment"
+    },
+    "1022": {
+        "file_id": 132,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/run_docplex.cmd",
+        "type": "filepath"
+    },
+    "1023": {
+        "file_id": 132,
+        "content": "This code sets up an environment for running a Python script named \"docplex_conflict_refiner.py\" using Conda and redirects output without capturing it. The \"send_ctrl_c.py\" is used to pipe control-C signals to the script.",
+        "type": "summary"
+    },
+    "1024": {
+        "file_id": 132,
+        "content": "@REM python send_ctrl_c.py | conda run -n docplex --live-stream --no-capture-output python docplex_conflict_refiner.py\n@REM python send_ctrl_c.py\nconda run -n docplex --live-stream --no-capture-output python docplex_conflict_refiner.py",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/run_docplex.cmd:1-3"
+    },
+    "1025": {
+        "file_id": 132,
+        "content": "This code sets up an environment for running a Python script named \"docplex_conflict_refiner.py\" using Conda and redirects output without capturing it. The \"send_ctrl_c.py\" is used to pipe control-C signals to the script.",
+        "type": "comment"
+    },
+    "1026": {
+        "file_id": 133,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro",
+        "type": "filepath"
+    },
+    "1027": {
+        "file_id": 133,
+        "content": "This code defines microgrid components, energy sources, and functions for checking element existence and verifying device statuses in Prolog.",
+        "type": "summary"
+    },
+    "1028": {
+        "file_id": 133,
+        "content": "% :- use_module(library(clpfd)).\nport(光伏发电_0_电接口).\nport(光伏发电_2_电接口).\nport(柴油_4_燃料接口).\nport(柴油发电_6_电接口).\nport(柴油发电_6_燃料接口).\nport(变流器_9_电输入).\nport(变流器_9_电输出).\nport(变压器_12_电输入).\nport(变压器_12_电输出).\nport(电负荷_15_电接口).\nport(锂电池_17_电接口).\nport(双向变流器_22_线路端).\nport(双向变流器_22_储能端).\ninput_port(柴油发电_6_燃料接口).\ninput_port(变流器_9_电输入).\ninput_port(变压器_12_电输入).\ninput_port(变压器_12_电输出).\ninput_port(电负荷_15_电接口).\ninput_port(锂电池_17_电接口).\ninput_port(双向变流器_22_线路端).\ninput_port(双向变流器_22_储能端).\noutput_port(光伏发电_0_电接口).\noutput_port(光伏发电_2_电接口).\noutput_port(柴油_4_燃料接口).\noutput_port(柴油发电_6_电接口).\noutput_port(变流器_9_电输出).\noutput_port(变压器_12_电输入).\noutput_port(变压器_12_电输出).\noutput_port(锂电池_17_电接口).\noutput_port(双向变流器_22_线路端).\noutput_port(双向变流器_22_储能端).\nidle_port(光伏发电_0_电接口).\nidle_port(光伏发电_2_电接口).\nidle_port(柴油_4_燃料接口).\nidle_port(柴油发电_6_电接口).\nidle_port(柴油发电_6_燃料接口).\nidle_port(变流器_9_电输入).\nidle_port(变流器_9_电输出).\nidle_port(变压器_12_电输入).\nidle_port(变压器_12_电输出).\nidle_port(电负荷_15_电接口).\nidle_port(锂电池_17_电接口).\nidle_port(双向变流器_22_线路端).\nidle_port(双向变流器_22_储能端).\ndevice(锂电池).\ndevice(双向变流器).\ndevice(光伏发电).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro:2-55"
+    },
+    "1029": {
+        "file_id": 133,
+        "content": "This code defines various ports, input/output/idle ports, and devices in a microgrid system. It includes ports for solar PVs, diesel generators, transformers, battery storage, and bidirectional converters. These definitions will be used to represent the components of the microgrid in subsequent code.",
+        "type": "comment"
+    },
+    "1030": {
+        "file_id": 133,
+        "content": "device(变流器).\ndevice(柴油发电).\ndevice(变压器).\ndevice(柴油).\ndevice(电负荷).\ndevice(DEVICE_NAME):- device(DEVICE_TYPE), call(DEVICE_TYPE, DEVICE_NAME).\n光伏发电(光伏发电_0).\n光伏发电(光伏发电_2).\n柴油(柴油_4).\n柴油发电(柴油发电_6).\n变流器(变流器_9).\n变压器(变压器_12).\n电负荷(电负荷_15).\n锂电池(锂电池_17).\n双向变流器(双向变流器_22).\nport_mapping(光伏发电_0, 光伏发电_0_电接口).\nport_mapping(光伏发电_2, 光伏发电_2_电接口).\nport_mapping(柴油_4, 柴油_4_燃料接口).\nport_mapping(柴油发电_6, 柴油发电_6_电接口).\nport_mapping(柴油发电_6, 柴油发电_6_燃料接口).\nport_mapping(变流器_9, 变流器_9_电输入).\nport_mapping(变流器_9, 变流器_9_电输出).\nport_mapping(变压器_12, 变压器_12_电输入).\nport_mapping(变压器_12, 变压器_12_电输出).\nport_mapping(电负荷_15, 电负荷_15_电接口).\nport_mapping(锂电池_17, 锂电池_17_电接口).\nport_mapping(双向变流器_22, 双向变流器_22_线路端).\nport_mapping(双向变流器_22, 双向变流器_22_储能端).\nenergy(柴油).\nenergy(电).\n电(光伏发电_0_电接口).\n电(光伏发电_2_电接口).\n电(柴油发电_6_电接口).\n电(变流器_9_电输入).\n电(变流器_9_电输出).\n电(变压器_12_电输入).\n电(变压器_12_电输出).\n电(电负荷_15_电接口).\n电(锂电池_17_电接口).\n电(双向变流器_22_线路端).\n电(双向变流器_22_储能端).\n柴油(柴油_4_燃料接口).\n柴油(柴油发电_6_燃料接口).\nlist_member(X,[X|_]).\nlist_member(X,[_|TAIL]) :- list_member(X, TAIL).\nall_satisfy_constraint([], _).\nall_satisfy_constraint([H|T], Constraint) :-",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro:56-128"
+    },
+    "1031": {
+        "file_id": 133,
+        "content": "This code defines devices and their ports, energy sources, and constraints. It includes generators like photovoltaic (光伏发电), engines such as diesel (柴油), transformers (变压器), battery (锂电池), bidirectional converter (双向变流器), load (电负荷), and ports for their interfaces. The code also includes the energy sources for devices like diesel (柴油) and electricity (电). Additionally, there is a function to check if an element exists in a list using recursion: list_member/2. Another function all_satisfy_constraint/2 checks if each element in a list satisfies a given constraint.",
+        "type": "comment"
+    },
+    "1032": {
+        "file_id": 133,
+        "content": "    call(Constraint, H),\n    all_satisfy_constraint(T, Constraint).\nall_with_same_type(PORT_LIST, ENERGY_TYPE) :- energy(ENERGY_TYPE), all_satisfy_constraint(PORT_LIST, ENERGY_TYPE).\nport_status(PORT, input) :- input_port(PORT).\nport_status(PORT, output):- output_port(PORT).\nport_status(PORT, idle):- idle_port(PORT).\ninput_status(STATUS) :- STATUS = input.\noutput_status(STATUS) :- STATUS = output.\nidle_status(STATUS) :- STATUS = idle.\napply_list([], [], _).\napply_list([INP], [RET], FUNC) :- call(FUNC, INP, RET).\napply_list([INP|INP_TAIL], [RET|RET_TAIL], FUNC) :- apply_list(INP_TAIL, RET_TAIL, FUNC), call(FUNC, INP, RET).\nport_status_list(PORT, STATUS) :- apply_list(PORT, STATUS, port_status).\nadder(adder19, [光伏发电_0_电接口, 光伏发电_2_电接口, 柴油发电_6_电接口, 变流器_9_电输入]).\nadder(adder21, [变流器_9_电输出, 双向变流器_22_线路端, 变压器_12_电输入]).\nadder(adder_1, [双向变流器_22_储能端, 锂电池_17_电接口]).\nadder(adder_2, [柴油_4_燃料接口, 柴油发电_6_燃料接口]).\nadder(adder_3, [电负荷_15_电接口, 变压器_12_电输出]).\nadder_port_status(ADDER, [ENERGY_TYPE|[STATUS_LIST]]) :- \n    adder(ADDER, PORT_LIST),",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro:129-155"
+    },
+    "1033": {
+        "file_id": 133,
+        "content": "This code defines various port and adder status functions, using Prolog to apply a list of ports to their respective status. It also includes definitions for different types of adders, each with their associated port lists. The code is likely part of a larger system that involves microgrids, energy management, or electrical systems.",
+        "type": "comment"
+    },
+    "1034": {
+        "file_id": 133,
+        "content": "    all_satisfy_constraint(PORT_LIST, port),\n    all_with_same_type(PORT_LIST, ENERGY_TYPE),\n    port_status_list(PORT_LIST, STATUS_LIST),\n    (\n        list_member(STATUS_X, STATUS_LIST), list_member(STATUS_Y, STATUS_LIST),STATUS_X=input, STATUS_Y = output;\n        all_satisfy_constraint(STATUS_LIST, idle_status)\n    ).\nadder_port_all_status(ADDER, ALL_STATUS):-\n    findall(STATUS, adder_port_status(ADDER, STATUS), ALL_STATUS).\nadder_port_status_list(ADDER_LIST, ADDER_STATUS_LIST) :- apply_list(ADDER_LIST, ADDER_STATUS_LIST, adder_port_status).\n% to prove a topology is ok:\n% prove every device is ok in which adder combination\n% prove device in relation is ok in which adder combination\n% prove that there exists and only exists one such adder combination\n% adder_type_combination, device_1_ok(adder_type_combination), device_2_ok(adder_type_combination),...\n% device_1_and_2_ok(adder_type_combination)...",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/sample_prolog.pro:156-175"
+    },
+    "1035": {
+        "file_id": 133,
+        "content": "This code defines predicates for checking the status of ports and devices in a microgrid topology. It finds all possible port statuses, generates a list of adder-specific device statuses, and proves that each device is okay in every adder combination to ensure a valid topology.",
+        "type": "comment"
+    },
+    "1036": {
+        "file_id": 134,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_get_relaxed_sol.cmd",
+        "type": "filepath"
+    },
+    "1037": {
+        "file_id": 134,
+        "content": "Executes SCIP solver with constraints from 'converted.mps', limits time to 30 seconds and sets it to find only one solution, optimizes the model, writes relaxed solution to 'relaxed_scip.sol', then quits.",
+        "type": "summary"
+    },
+    "1038": {
+        "file_id": 134,
+        "content": "scip -c \"read converted.mps\" -c \"set limits solutions 1\" -c \"set limits time 30\" -c \"change minuc\" -c \"optimize\" -c \"write solution relaxed_scip.sol\" -c \"quit\"",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_get_relaxed_sol.cmd:1-1"
+    },
+    "1039": {
+        "file_id": 134,
+        "content": "Executes SCIP solver with constraints from 'converted.mps', limits time to 30 seconds and sets it to find only one solution, optimizes the model, writes relaxed solution to 'relaxed_scip.sol', then quits.",
+        "type": "comment"
+    },
+    "1040": {
+        "file_id": 135,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py",
+        "type": "filepath"
+    },
+    "1041": {
+        "file_id": 135,
+        "content": "The code imports pyscipopt's Model class and provides a framework for solving integer programming problems using SCIP solver, with input/output file handling and debugging features. It allows users to define models, constraints, objectives, and retrieve solutions.",
+        "type": "summary"
+    },
+    "1042": {
+        "file_id": 135,
+        "content": "from pyscipopt import Model\nmodel = Model(\"Example\")  # model name is optional\nprint(dir(model))\n# ['__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__ne__', '__new__', '__pyx_vtable__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '_addGenNonlinearCons', '_addLinCons', '_addNonlinearCons', '_addQuadCons', '_freescip', 'activateBenders', 'addBendersSubproblem', 'addCons', 'addConsAnd', 'addConsCardinality', 'addConsCoeff', 'addConsIndicator', 'addConsLocal', 'addConsNode', 'addConsOr', 'addConsSOS1', 'addConsSOS2', 'addConsXor', 'addConss', 'addCut', 'addObjoffset', 'addPoolCut', 'addPyCons', 'addRowDive', 'addSol', 'addVar', 'addVarLocks', 'addVarSOS1', 'addVarSOS2', 'addVarToRow', 'appendVarSOS1', 'appendVarSOS2', 'applyCutsProbing', 'backtrackProbing', 'branchVar', 'branchVarVal', 'ca",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:1-6"
+    },
+    "1043": {
+        "file_id": 135,
+        "content": "Code imports the pyscipopt Model class and creates a new model named \"Example\". The dir() function is then used to print all attributes of the created model. These attributes include functions for adding constraints, variables, solving, and other operations related to the SCIP optimization solver.",
+        "type": "comment"
+    },
+    "1044": {
+        "file_id": 135,
+        "content": "cheRowExtensions', 'calcChildEstimate', 'calcNodeselPriority', 'catchEvent', 'catchRowEvent', 'catchVarEvent', 'checkBendersSubproblemOptimality', 'checkQuadraticNonlinear', 'checkSol', 'chgLhs', 'chgReoptObjective', 'chgRhs', 'chgRowLhsDive', 'chgRowRhsDive', 'chgVarBranchPriority', 'chgVarLb', 'chgVarLbDive', 'chgVarLbGlobal', 'chgVarLbNode', 'chgVarLbProbing', 'chgVarObjDive', 'chgVarObjProbing', 'chgVarType', 'chgVarUb', 'chgVarUbDive', 'chgVarUbGlobal', 'chgVarUbNode', 'chgVarUbProbing', 'computeBestSolSubproblems', 'constructLP', 'count', 'createChild', 'createCons', 'createEmptyRowSepa', 'createEmptyRowUnspec', 'createPartialSol', 'createProbBasic', 'createSol', 'data', 'delCons', 'delConsLocal', 'delVar', 'disablePropagation', 'dropEvent', 'dropRowEvent', 'dropVarEvent', 'enableReoptimization', 'endDive', 'endProbing', 'epsilon', 'feasFrac', 'feastol', 'fixVar', 'fixVarProbing', 'flushRowExtensions', 'frac', 'freeBendersSubproblems', 'freeProb', 'freeReoptSolve', 'freeSol', 'fr",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:6-6"
+    },
+    "1045": {
+        "file_id": 135,
+        "content": "This code appears to be a list of function names in Python, possibly from the SciPy library or similar optimization package. Many of the functions reference 'Benders', 'SEPA', and 'Reoptimization' which suggests they are related to Decomposition and Reoptimization algorithms. Some functions also refer to 'Sol', suggesting it deals with solution management. However, without more context it is difficult to give a comprehensive understanding of what this code does.",
+        "type": "comment"
+    },
+    "1046": {
+        "file_id": 135,
+        "content": "eeTransform', 'from_ptr', 'getActivity', 'getBendersAuxiliaryVar', 'getBendersSubproblem', 'getBendersVar', 'getBestChild', 'getBestLeaf', 'getBestNode', 'getBestSibling', 'getBestSol', 'getBestboundNode', 'getCondition', 'getConss', 'getCurrentNode', 'getCutEfficacy', 'getCutLPSolCutoffDistance', 'getDepth', 'getDualMultiplier', 'getDualSolVal', 'getDualbound', 'getDualboundRoot', 'getDualfarkasLinear', 'getDualsolLinear', 'getGap', 'getLPBInvARow', 'getLPBInvRow', 'getLPBasisInd', 'getLPBranchCands', 'getLPColsData', 'getLPObjVal', 'getLPRowsData', 'getLPSolstat', 'getLhs', 'getLocalEstimate', 'getNBestSolsFound', 'getNBinVars', 'getNChildren', 'getNConss', 'getNCountedSols', 'getNCuts', 'getNCutsApplied', 'getNFeasibleLeaves', 'getNInfeasibleLeaves', 'getNIntVars', 'getNLPCols', 'getNLPIterations', 'getNLPRows', 'getNLPs', 'getNLeaves', 'getNLimSolsFound', 'getNNlRows', 'getNNodes', 'getNReaders', 'getNSepaRounds', 'getNSiblings', 'getNSols', 'getNSolsFound', 'getNTotalNodes', 'getN",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:6-6"
+    },
+    "1047": {
+        "file_id": 135,
+        "content": "This code appears to be part of a larger program and contains various methods for a Scip solver. It handles different aspects such as activity, Benders subproblems, branching nodes, cut efficacy, constraints, LP solutions, dual multipliers, bounds, linear programs, and more. The methods seem to help optimize the Scip solver's performance by providing various functionalities to manage data, make decisions, and update information throughout the solving process.",
+        "type": "comment"
+    },
+    "1048": {
+        "file_id": 135,
+        "content": "Vars', 'getNlRowActivityBounds', 'getNlRowSolActivity', 'getNlRowSolFeasibility', 'getNlRows', 'getObjVal', 'getObjective', 'getObjectiveSense', 'getObjlimit', 'getObjoffset', 'getOpenNodes', 'getParam', 'getParams', 'getPresolvingTime', 'getPrimalbound', 'getProbName', 'getProbingDepth', 'getPseudoBranchCands', 'getReadingTime', 'getRhs', 'getRowActivity', 'getRowDualSol', 'getRowLPActivity', 'getRowLinear', 'getRowNumIntCols', 'getRowObjParallelism', 'getRowParallelism', 'getSlack', 'getSlackVarIndicator', 'getSolObjVal', 'getSolVal', 'getSols', 'getSolvingTime', 'getStage', 'getStatus', 'getTermsQuadratic', 'getTotalTime', 'getTransformedCons', 'getTransformedVar', 'getVal', 'getValsLinear', 'getVarLbDive', 'getVarRedcost', 'getVarUbDive', 'getVars', 'hideOutput', 'inProbing', 'inRepropagation', 'includeBenders', 'includeBendersDefaultCuts', 'includeBenderscut', 'includeBranchrule', 'includeConshdlr', 'includeCutsel', 'includeDefaultPlugins', 'includeEventhdlr', 'includeHeur', 'incl",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:6-6"
+    },
+    "1049": {
+        "file_id": 135,
+        "content": "This code belongs to a Python file and appears to be part of a larger program. It contains various methods for interacting with a simulation or optimization platform, such as retrieving objective values, getting parameter settings, and managing variables. The specific purpose and functionality would depend on the context in which this code is used.",
+        "type": "comment"
+    },
+    "1050": {
+        "file_id": 135,
+        "content": "udeNodesel', 'includePresol', 'includePricer', 'includeProp', 'includeReader', 'includeRelax', 'includeSepa', 'infinity', 'initBendersDefault', 'interruptSolve', 'isCutEfficacious', 'isEQ', 'isFeasEQ', 'isFeasIntegral', 'isFeasNegative', 'isFeasZero', 'isGE', 'isGT', 'isInfinity', 'isLE', 'isLPSolBasic', 'isLT', 'isNLPConstructed', 'isObjChangedProbing', 'isZero', 'lpiGetIterations', 'newProbingNode', 'optimize', 'presolve', 'printBestSol', 'printCons', 'printNlRow', 'printRow', 'printSol', 'printStatistics', 'printVersion', 'propagateProbing', 'readParams', 'readProblem', 'readSol', 'readSolFile', 'redirectOutput', 'releaseRow', 'repropagateNode', 'resetParam', 'resetParams', 'restartSolve', 'rowGetNNonz', 'separateSol', 'setBendersSubproblemIsConvex', 'setBoolParam', 'setCharParam', 'setCheck', 'setEmphasis', 'setEnforced', 'setHeuristics', 'setInitial', 'setIntParam', 'setLogfile', 'setLongintParam', 'setMaximize', 'setMinimize', 'setObjIntegral', 'setObjective', 'setObjlimit', 'set",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:6-6"
+    },
+    "1051": {
+        "file_id": 135,
+        "content": "Code snippet contains various functions related to SCIP (Solving Constraint Integer Programs) solver, which are used for presolve, propagation, reading parameters and problem, setting objectives, handling solutions, printing statistics and best solutions, interrupting solve, and more. These functions are used for solving integer programming problems using the SCIP solver.",
+        "type": "comment"
+    },
+    "1052": {
+        "file_id": 135,
+        "content": "Param', 'setParams', 'setParamsCountsols', 'setPresolve', 'setProbName', 'setRealParam', 'setRelaxSolVal', 'setRemovable', 'setSeparating', 'setSolVal', 'setStringParam', 'setupBendersSubproblem', 'solveBendersSubproblem', 'solveConcurrent', 'solveDiveLP', 'solveProbingLP', 'startDive', 'startProbing', 'tightenVarLb', 'tightenVarLbGlobal', 'tightenVarUb', 'tightenVarUbGlobal', 'to_ptr', 'trySol', 'updateBendersLowerbounds', 'updateNodeLowerbound', 'version', 'writeBestSol', 'writeBestTransSol', 'writeLP', 'writeName', 'writeParams', 'writeProblem', 'writeSol', 'writeStatistics', 'writeTransSol']\n# help(model.readProblem)\nproblem_fpath = \"no_bound.nl\"\n# problem_fpath = \"no_bound.lp\"\nmodel.readProblem(problem_fpath)\n# x = model.addVar(\"x\")\n# y = model.addVar(\"y\", vtype=\"INTEGER\")\n# model.setObjective(x + y)\n# model.addCons(2*x - y*y >= 0)\nmodel.optimize()\nsol = model.getBestSol()\n# print(sol)\n# breakpoint()\n# {'t_x0': 10.0, 't_x1': 100000.00000000001, 't_x2': 0.0, 't_x3': 0.0}\nmodel.writeSol(sol, \"no_bound_scip.sol\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:6-21"
+    },
+    "1053": {
+        "file_id": 135,
+        "content": "The code demonstrates how to read a problem from an input file, set up a model with variables x and y (integer type), define an objective function and constraint, optimize the model, obtain the best solution, and write it to an output file. The code also includes debugging features such as print statements and breakpoints for testing and troubleshooting.",
+        "type": "comment"
+    },
+    "1054": {
+        "file_id": 135,
+        "content": "# print(\"x: {}\".format(sol[x]))\n# print(\"y: {}\".format(sol[y]))",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/scip_persistent.py:22-23"
+    },
+    "1055": {
+        "file_id": 135,
+        "content": "Printing the solution values of variables x and y for debugging purposes.",
+        "type": "comment"
+    },
+    "1056": {
+        "file_id": 136,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py",
+        "type": "filepath"
+    },
+    "1057": {
+        "file_id": 136,
+        "content": "The code solves MILP problems using CPLEX, clones it for relaxation and compares results before recording in a dictionary and printing.",
+        "type": "summary"
+    },
+    "1058": {
+        "file_id": 136,
+        "content": "# define a milp problem, convert integer variables into reals, solve it as lp\nfrom pyomo.environ import *\ndef getModelSolution(model: ConcreteModel):\n    solution = {}\n    for v in model.component_data_objects(ctype=Var, active=True, descend_into=True):\n        varName = v.name\n        val = value(v, exception=None)\n        if val is not None:\n            solution[varName] = val\n        else:\n            return None\n    return solution\ndomainDelegationTable = {\n    \"Integers\": Reals,\n    \"NonNegativeIntegers\": NonNegativeReals,\n    \"NonPositiveIntegers\": NonPositiveReals,\n    \"Boolean\": Reals,\n}\ndomainDelegationBoundsTable = {\"Boolean\": (0, 1)}\nfrom contextlib import contextmanager\n@contextmanager\ndef simplexDelegationContext(model: ConcreteModel):\n    \"\"\"\n    This context manager is used to delegate the domain and bounds of integer variables to the reals.\n    Delegation will be cancelled if exiting the manager.\n    \"\"\"\n    delegationRestoreTable = {}\n    for v in model.component_data_objects(Var, active=True):\n        varName = v.name",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py:1-39"
+    },
+    "1059": {
+        "file_id": 136,
+        "content": "This code defines a function to solve a MILP problem by converting integer variables into reals and solving it as an LP. It also creates context managers for delegating the domain and bounds of integer variables to reals.",
+        "type": "comment"
+    },
+    "1060": {
+        "file_id": 136,
+        "content": "        domainName = v.domain.name\n        lb, ub = v.lb, v.ub\n        if domainName in domainDelegationTable.keys():\n            delegationRestoreTable[varName] = {\n                \"domain\": v.domain,\n                \"lb\": v.lb,\n                \"ub\": v.ub,\n            }\n            v.domain = domainDelegationTable[domainName]\n            if domainName in domainDelegationBoundsTable.keys():\n                domain_lb, domain_ub = domainDelegationBoundsTable[domainName]\n                if lb is None:\n                    lb = domain_lb\n                if ub is None:\n                    ub = domain_ub\n                v.setlb(max(lb, domain_lb))\n                v.setub(min(ub, domain_ub))\n    try:\n        yield\n    finally:\n        # recover model variable domain & bounds.\n        for v in model.component_data_objects(Var, active=True):\n            varName = v.name\n            if varName in delegationRestoreTable.keys():\n                restoreInfo = delegationRestoreTable[varName]\n                v.setlb(restoreInfo[\"lb\"])",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py:40-65"
+    },
+    "1061": {
+        "file_id": 136,
+        "content": "The code is handling variable delegation within the model. It stores the original domain and bounds of variables before delegating them to specified domains, and restores these values after the delegation. This allows for temporary changes in variable domains without losing their original information.",
+        "type": "comment"
+    },
+    "1062": {
+        "file_id": 136,
+        "content": "                v.setub(restoreInfo[\"ub\"])\n                v.domain = restoreInfo[\"domain\"]\n        del delegationRestoreTable\nsolver = SolverFactory(\"cplex\")\ndef solver_solve(model):\n    ret = solver.solve(model, tee=True)\n    sol = getModelSolution(model)\n    return ret, sol\nmodel = ConcreteModel()\nmodel.a = Var(domain=Integers, bounds=(-0.5, 5.5))\nmodel.b = Var(domain=Boolean, bounds=(0.3, 1.1))  # feasible, if value(model.b) == 1\nmodel.o = Objective(expr=model.a + model.b, sense=maximize)\n# model.o = Objective(expr=model.a + model.b, sense=minimize)\nmodel.c = Constraint(expr=model.a >= model.b)\nret = solver_solve(model)\nmodel_clone = model.clone()\n# this works identically to our context manager.\nTransformationFactory(\"core.relax_integrality\").apply_to(model_clone)\n# working\nret_clone = solver_solve(model_clone)\nwith simplexDelegationContext(model):\n    # not working\n    ret_delegated = solver_solve(model)\nret_after = solver_solve(model)\nresults = {\n    \"ret\": ret,\n    \"ret_clone\": ret_clone,\n    \"ret_delegated\": ret_delegated,",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py:66-107"
+    },
+    "1063": {
+        "file_id": 136,
+        "content": "This code defines a model with variables and constraints, solves it using a CPLEX solver, clones the model, applies a relaxation transformation to the clone, solves both models again, and then tries to solve one of the models within a delegation context. It records the results for each case.",
+        "type": "comment"
+    },
+    "1064": {
+        "file_id": 136,
+        "content": "    \"ret_after\": ret_after,\n}\nimport rich\nfor res_name, res in results.items():\n    ret, sol = res\n    print(\"result name:\", res_name)\n    rich.print(res)\n    print(sol)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_as_simplex.py:108-117"
+    },
+    "1065": {
+        "file_id": 136,
+        "content": "The code retrieves results from a dictionary, where keys are \"result name\" and values are tuples containing the result and solution. It then prints the result name, the rich formatted result using Rich library, and the solution.",
+        "type": "comment"
+    },
+    "1066": {
+        "file_id": 137,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_miniature_ies_system.py",
+        "type": "filepath"
+    },
+    "1067": {
+        "file_id": 137,
+        "content": "The code showcases solving an IES system using CPLEX or SWI-Prolog, discusses diagnosing unsatisfiability issues, and offers time-sliced system building. It skips a miniature system check due to difficulty and lack of direct relation to the model. The code filters state frames based on type, eliminates impossible states, checks loads at maximum state, and verifies using two sets of checks before emitting possible state frames.",
+        "type": "summary"
+    },
+    "1068": {
+        "file_id": 137,
+        "content": "# demo on how to solve a miniatured ies system with cplex, swipl (clpqr) or something else.\n# you can use constant objective in cplex or 'once/1' in prolog to check if model is solveable.\n# bonus: in cplex you can use feasopt to relax port status constraints and diagnose the cause, while in swipl you can only transform it yourself to minimize the violation.\n# in real model you should relax the adder constraints\n# this check is after the isomorphism check. it will not eliminate multiple energy type sets of adders\n# since miniature system is hard to build, and not directly related to underlying model, let's just skip it.\n# we only build time sliced systems at this time, since this is related to the actual model, easier for investigation.\nfpath = \"isomorphic_topo_status.pkl\"\n# 1. miniature system check (skipped)\n#   cplex\n# 2. time sliced system check\n#   cplex\n# 3. build and solve the model\n#   cplex\n# if the final solution has failed, we will perform feasopt to check which case is unsatisfiable, which case is missing and which case does not exist in existing state set.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_miniature_ies_system.py:1-25"
+    },
+    "1069": {
+        "file_id": 137,
+        "content": "The code provides a demo on how to solve a miniature IES system using CPLEX or SWI-Prolog. It also suggests methods for diagnosing the cause of unsatisfiability in case of failure and discusses building time-sliced systems for easier investigation. However, the miniature system check is skipped as it's hard to build and not directly related to the underlying model.",
+        "type": "comment"
+    },
+    "1070": {
+        "file_id": 137,
+        "content": "# to ensure solveability, we elimitate the initial soc limit of lithium battery model. \n# for some model, only output port ranges will be acquired, like load, PV, lithium battery and diesel generator\n# for models like grid, diesel, we make sure any state is valid for them \n# steps:\n# 1. filter state frame list\n#     if state frame has load port at input state, iteratively try to make one load running at maximum rate\n#     if w/o any load port at input state, just enforce the directions (minimum positive/maximum negative value)\n#     eliminate impossible states\n# 2. check on remained state frame list\n#     check if all loads has maximum state, exit if not\n#     check with 2 sets of verifiers again, exit if not passed verification\n# 3. collect result\n#     emit final possible state frames\nimport pickle\nwith open(fpath, \"rb\") as f:\n    data = pickle.load(f)\nprint(\"data:\", data)\n# from pyomo.environ import *\n# solver = SolverFactory('cplex')\n# for state_frame in state_frame_list:\n#     ...",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/solve_miniature_ies_system.py:27-57"
+    },
+    "1071": {
+        "file_id": 137,
+        "content": "Code filters state frames based on model type, eliminates impossible states, checks all loads at maximum state, and verifies with two sets of checks before emitting final possible state frames.",
+        "type": "comment"
+    },
+    "1072": {
+        "file_id": 138,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue.py",
+        "type": "filepath"
+    },
+    "1073": {
+        "file_id": 138,
+        "content": "This Windows-compatible code imports necessary libraries and defines a ForkingPickler class for pickling objects. It suggests using Celery instead of provided libraries. The code initializes a RedisHuey instance with two tasks, \"task_success\" and \"task_fail,\" which retry up to three times and have a 3-second timeout.",
+        "type": "summary"
+    },
+    "1074": {
+        "file_id": 138,
+        "content": "import time\nimport os\n# it is best to use linux.\nif os.name == \"nt\":\n    import dill\n    import multiprocessing.reduction as mred\n    class ForkingPickler(dill.Pickler):\n        \"\"\"Pickler subclass used by multiprocessing.\"\"\"\n        _extra_reducers = {}\n        _copyreg_dispatch_table = mred.copyreg.dispatch_table\n        def __init__(self, *args):\n            super().__init__(*args)\n            self.dispatch_table = self._copyreg_dispatch_table.copy()\n            self.dispatch_table.update(self._extra_reducers)\n        @classmethod\n        def register(cls, type, reduce):\n            \"\"\"Register a reduce function for a type.\"\"\"\n            cls._extra_reducers[type] = reduce\n        @classmethod\n        def dumps(cls, obj, protocol=None):\n            buf = mred.io.BytesIO()\n            cls(buf, protocol).dump(obj)\n            return buf.getbuffer()\n        loads = dill.loads\n    mred.ForkingPickler = ForkingPickler\n# warning! celery is more stable than these libs.\nfrom huey import RedisHuey\nimport func_timeout\nimport retrying",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue.py:1-38"
+    },
+    "1075": {
+        "file_id": 138,
+        "content": "The code is a Windows-compatible version of the task_queue.py file, which imports necessary libraries such as time, os, dill, and multiprocessing.reduction, and defines a ForkingPickler class for pickling objects across processes. It also suggests using Celery instead of these libraries due to its stability.",
+        "type": "comment"
+    },
+    "1076": {
+        "file_id": 138,
+        "content": "# do not use SqliteHuey\nhuey = RedisHuey(port=6380)\n# lambda decorator is evil.\n# timeout_func = lambda timeout: (lambda func: func_timeout(timeout=timeout, func=func))\n@huey.task()\n@retrying.retry(stop_max_attempt_number=3) # usually this setup is not for our debugging tasks.\n@func_timeout.func_set_timeout(3)\ndef task_success():\n    print(\"running task success\")\n    time.sleep(1)\n    print(\"end running task success\")\n@huey.task()\n@retrying.retry(stop_max_attempt_number=3)\n@func_timeout.func_set_timeout(3)\ndef task_fail():\n    print(\"running task fail\")\n    time.sleep(7)\n    print(\"end running task fail\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue.py:39-61"
+    },
+    "1077": {
+        "file_id": 138,
+        "content": "The code initializes a RedisHuey instance and defines two tasks: \"task_success\" and \"task_fail\". The \"task_success\" task prints a message, sleeps for 1 second, and then ends. The \"task_fail\" task prints a message, sleeps for 7 seconds, and then ends. Both tasks are set to retry up to three times, and have a timeout of 3 seconds.",
+        "type": "comment"
+    },
+    "1078": {
+        "file_id": 139,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_test.py",
+        "type": "filepath"
+    },
+    "1079": {
+        "file_id": 139,
+        "content": "Code imports functions `task_fail` and `task_success` from the `task_queue` module, initializes an empty list `rlist`, and checks if there are any callbacks. It then assigns results of calling `task_fail()` and `task_success()` to variable `r`.",
+        "type": "summary"
+    },
+    "1080": {
+        "file_id": 139,
+        "content": "# rq huey taskiq tasktiger\nfrom task_queue import task_fail, task_success\nrlist = []\n# is there any callback?\nr = task_fail()\nr = task_success()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_test.py:1-7"
+    },
+    "1081": {
+        "file_id": 139,
+        "content": "Code imports functions `task_fail` and `task_success` from the `task_queue` module, initializes an empty list `rlist`, and checks if there are any callbacks. It then assigns results of calling `task_fail()` and `task_success()` to variable `r`.",
+        "type": "comment"
+    },
+    "1082": {
+        "file_id": 140,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_worker.cmd",
+        "type": "filepath"
+    },
+    "1083": {
+        "file_id": 140,
+        "content": "This code is running the Huey consumer to process tasks in the task_queue.huey using Python.",
+        "type": "summary"
+    },
+    "1084": {
+        "file_id": 140,
+        "content": "python -m huey.bin.huey_consumer -k process task_queue.huey",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/task_queue_worker.cmd:1-1"
+    },
+    "1085": {
+        "file_id": 140,
+        "content": "This code is running the Huey consumer to process tasks in the task_queue.huey using Python.",
+        "type": "comment"
+    },
+    "1086": {
+        "file_id": 141,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_arithmatic_prolog.py",
+        "type": "filepath"
+    },
+    "1087": {
+        "file_id": 141,
+        "content": "Code is using PrologMQI and PrologThread from swiplserver to query a Prolog program \"arithmatic_prolog.pro\". It queries the once(solve(X)) and once(solve_false(X)) predicates and prints the results, indicating whether the problem is solvable or not.",
+        "type": "summary"
+    },
+    "1088": {
+        "file_id": 141,
+        "content": "from swiplserver import PrologMQI, PrologThread\nprolog_file_path = \"arithmatic_prolog.pro\"\nimport rich\nwith PrologMQI() as mqi:\n    with mqi.create_thread() as prolog_thread:\n        prolog_thread.query(f'[\"{prolog_file_path}\"].')\n        # result = prolog_thread.query(f\"solve(X).\")\n        # check solveable?\n        result = prolog_thread.query(f\"once(solve(X)).\") # to quit early.\n        # result = prolog_thread.query(f\"solve(X).\")\n        # result_false = prolog_thread.query(f\"solve_false(X).\")\n        result_false = prolog_thread.query(f\"once(solve_false(X)).\") # still False.\n        rich.print(result)\n        rich.print(result_false) # nothing returned.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_arithmatic_prolog.py:1-16"
+    },
+    "1089": {
+        "file_id": 141,
+        "content": "Code is using PrologMQI and PrologThread from swiplserver to query a Prolog program \"arithmatic_prolog.pro\". It queries the once(solve(X)) and once(solve_false(X)) predicates and prints the results, indicating whether the problem is solvable or not.",
+        "type": "comment"
+    },
+    "1090": {
+        "file_id": 142,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query.pro",
+        "type": "filepath"
+    },
+    "1091": {
+        "file_id": 142,
+        "content": "The code defines three facts about a dog: it is a pet, an animal, and cute.",
+        "type": "summary"
+    },
+    "1092": {
+        "file_id": 142,
+        "content": "dog(pet).\ndog(animal).\ndog(cute).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query.pro:1-3"
+    },
+    "1093": {
+        "file_id": 142,
+        "content": "The code defines three facts about a dog: it is a pet, an animal, and cute.",
+        "type": "comment"
+    },
+    "1094": {
+        "file_id": 143,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query_prolog.py",
+        "type": "filepath"
+    },
+    "1095": {
+        "file_id": 143,
+        "content": "This code imports the PrologMQI module and defines a file path and query. It then creates a thread in the PrologMQI context, executes the Prolog file, queries the database with the provided query asynchronously, and continuously fetches the query results until there are no more results. The fetched results are printed to the console.",
+        "type": "summary"
+    },
+    "1096": {
+        "file_id": 143,
+        "content": "from swiplserver import PrologMQI\nprolog_file_path = 'test_iterative_query.pro'\n# query = 'member(X, [a,b,c])'\nquery = 'dog(X)'\nwith PrologMQI() as mqi:\n    with mqi.create_thread() as prolog_thread:\n        prolog_thread.query(f'[\"{prolog_file_path}\"].')\n        # obj = prolog_thread.query(query)\n        prolog_thread.query_async(query, find_all=False)\n        while True:\n            result = prolog_thread.query_async_result()\n            if result is None:\n                break\n            else:\n                print('fetched result:', result)\n# fetched result: [{'X': 'pet'}]\n# fetched result: [{'X': 'animal'}]\n# fetched result: [{'X': 'cute'}]",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_iterative_query_prolog.py:1-22"
+    },
+    "1097": {
+        "file_id": 143,
+        "content": "This code imports the PrologMQI module and defines a file path and query. It then creates a thread in the PrologMQI context, executes the Prolog file, queries the database with the provided query asynchronously, and continuously fetches the query results until there are no more results. The fetched results are printed to the console.",
+        "type": "comment"
+    },
+    "1098": {
+        "file_id": 144,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/test_method_registry.py",
+        "type": "filepath"
+    },
+    "1099": {
+        "file_id": 144,
+        "content": "The text describes a MethodRegistry class for managing methods, part of a decorator registry, which collects caller frame functions and adds them if they have specific decorators. A MethodRegistry object is created with the name \"mw\" to store and manage methods, and a dummy method is registered using @failsafe_methods.register decorator.",
+        "type": "summary"
+    }
+}

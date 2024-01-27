@@ -1,0 +1,15 @@
+{
+    "summary": "The code imports pyomo library, creates a chained submodel with mutable parameters and constraints, defines variables, solves the optimization problem using CPLEX, and prints variable values.",
+    "details": [
+        {
+            "comment": "Code imports pyomo library and defines a chained submodel with mutable parameters and constraints. It creates instances of the model, clones and modifies them, and defines variables and a concrete model for comparison.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/chained_submodel.py\":0-40",
+            "content": "from pyomo.environ import *\ndef abstractInitParam(initParam: dict):\n    return {None: {k: {None: v} for k, v in initParam.items()}}\nmodel = ConcreteModel()\nsubm_abs = AbstractModel()\nsubm_abs.a = Var()\n# immutable.\n# subm_abs.p1 = Param()\n# subm_abs.p2 = Param()\nsubm_abs.p1 = Param(mutable=True)\nsubm_abs.p2 = Param(mutable=True)\nsubm_abs.cons1 = Constraint(expr=subm_abs.a <= subm_abs.p1)\nsubm_abs.cons2 = Constraint(expr=subm_abs.a >= subm_abs.p2)\nmodel.sub = subm_abs.create_instance(\n    abstractInitParam({\"p2\": 10, \"p1\": 20}), report_timing=True\n)\nprint(\"================================\")\nsub2 = subm_abs.create_instance(\n    abstractInitParam({\"p2\": -10, \"p1\": 10}), report_timing=True\n)\nmodel.sub2 = sub2\nprint(\"================================\")\nmodel.sub3 = sub2.clone()\nmodel.sub3.p1.set_value(30)\nmodel.sub3.p2.set_value(-30)\n# inherited?\n# still printing timing?\nmodel.a = Var(bounds=(-10, 5))\nsubm_concrete = ConcreteModel()\nsubm_concrete.a = Var(bounds=(10, 20))\nmodel.subm_concrete = subm_concrete\n# obj_expr =  model.subm_concrete.a + model.a"
+        },
+        {
+            "comment": "This code sets up an optimization problem with multiple variables from different submodels. It solves the problem using CPLEX solver and prints the values of each variable along with their names.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/chained_submodel.py\":41-54",
+            "content": "obj_expr = model.sub.a + model.sub2.a + model.subm_concrete.a + model.a + model.sub3.a\nmodel.obj = Objective(expr=obj_expr, sense=minimize)\nsolv = SolverFactory(\"cplex\")\nret = solv.solve(model, tee=True)\nprint(ret)\nprint()\nfor c in model.sub.a, model.sub2.a, model.sub3.a, model.subm_concrete.a, model.a:\n    print(\"val?\", value(c))\n    print(\"name?\", c.name)  # sub.a, sub2.a, subm_concrete.a, a\n    print()"
+        }
+    ]
+}

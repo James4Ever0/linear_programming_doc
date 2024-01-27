@@ -1,0 +1,544 @@
+{
+    "1700": {
+        "file_id": 210,
+        "content": "/microgrid_base/heatpump_code_reference/profile_code.py",
+        "type": "filepath"
+    },
+    "1701": {
+        "file_id": 210,
+        "content": "The code imports necessary libraries, defines functions for profiling and model building, removes an existing file, profiles the model_build function using cProfile, prints \"after run\", writes profiling information to a log file named \"profile.log\"",
+        "type": "summary"
+    },
+    "1702": {
+        "file_id": 210,
+        "content": "# to run code faster:\n# conda create -n pypy -c conda-forge pypy\nimport cProfile\n# import re\nprint(\"before run\")\ndef subfunc():\n    val = 0\n    for i in range(100):\n        val += i\n    return val\ndef test():\n    while True:\n        subfunc()\nimport func_timeout\nimport os\nfpath = \"profile.bin\"\nfrom ForthGK_CLASS_new2 import *\ndef model_build():\n    mdl = Model(\"test_model\")\n    num_h = 24\n    cool_max, cool_min, heat_max, heat_min = 20000, 10000, 20000, 10000\n    set_price = 20\n    ele_price = [1] * 24\n    dev = ForthGK(\n        num_h, mdl, cool_max, cool_min, heat_max, heat_min, set_price, ele_price\n    )\n    dev.cons_register(mdl)\ndef profile():\n    os.system(f\"rm {fpath}\")\n    # cProfile.run(\"test()\", filename=fpath)\n    cProfile.run(\"model_build()\", filename=fpath)\n    # cProfile.run('re.compile(\"foo|bar\")')\n    print(\"after run\")\nprofile() # run this indefinitely\n# tout = 20\n# print(\"timeout in %d seconds...\" % tout)\n# try:\n#     func_timeout.func_timeout(tout, profile)\n# except func_timeout.FunctionTimedOut:\n#     pass",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/profile_code.py:1-55"
+    },
+    "1703": {
+        "file_id": 210,
+        "content": "Code imports necessary libraries and defines functions for profiling and model building. It removes an existing file, profiles the model_build function using cProfile, and then prints \"after run\". The code also includes a commented-out section for testing a regular expression compilation with cProfile and a try/except block for timeouts.",
+        "type": "comment"
+    },
+    "1704": {
+        "file_id": 210,
+        "content": "# except Exception as e:\n#     raise e\nimport pstats\n# from contextlib import redirect_stderr\nlog_fpath = \"profile.log\"\nwith open(log_fpath, \"w+\") as f:\n    # with redirect_stderr(f):\n    p = pstats.Stats(fpath,stream=f)\n    p.strip_dirs().sort_stats(2).print_stats()\n# os.system(f\"type {log_fpath}\")\nprint('write to:', log_fpath)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/profile_code.py:56-68"
+    },
+    "1705": {
+        "file_id": 210,
+        "content": "This code writes profiling information to a file named \"profile.log\". It redirects standard error (stderr) to the specified file, creates a pstats object from the file contents, and then prints the statistics in a sorted format, excluding directory paths. The log file location is displayed as 'write to: profile.log'.",
+        "type": "comment"
+    },
+    "1706": {
+        "file_id": 211,
+        "content": "/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py",
+        "type": "filepath"
+    },
+    "1707": {
+        "file_id": 211,
+        "content": "This code defines a piecewise objective function model using Pyomo, sets variables and constraints, and minimizes the sum of 'c' multiplied by 'y', while considering bounds and conditions. It enables fast execution time by creating an instance with timing report enabled for each constraint in the set model I.",
+        "type": "summary"
+    },
+    "1708": {
+        "file_id": 211,
+        "content": "# abstract2piece.py\n# Similar to abstract2.py, but the objective is now c times x to the fourth power\nfrom pyomo.environ import *\nimport time\nstart_time = time.time()\nmodel = AbstractModel()\nmodel.I = Set()\nmodel.J = Set()\nTopx = 6.1  # range of x variables\nmodel.a = Param(model.I, model.J)\nmodel.b = Param(model.I)\nmodel.c = Param(model.J)\n# the next line declares a variable indexed by the set J\nmodel.x = Var(model.J, domain=NonNegativeReals, bounds=(0, Topx))\nmodel.y = Var(model.J, domain=NonNegativeReals)\n# to avoid warnings, we set breakpoints at or beyond the bounds\nPieceCnt = 100\nbpts = []\nfor i in range(PieceCnt + 2):\n    bpts.append(float((i * Topx) / PieceCnt))\ndef f4(model, j, xp):\n    # we not need j, but it is passed as the index for the constraint\n    return xp**4\nmodel.ComputeObj = Piecewise(\n    model.J, model.y, model.x, pw_pts=bpts, pw_constr_type='EQ', f_rule=f4\n)\ndef obj_expression(model):\n    return summation(model.c, model.y)\nmodel.OBJ = Objective(rule=obj_expression)\ndef ax_constraint_rule(model, i):",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py:1-46"
+    },
+    "1709": {
+        "file_id": 211,
+        "content": "The code defines an abstract model for a piecewise objective function using the Pyomo library. It sets up variables, parameters, and constraints, and then creates a piecewise expression to compute the objective value. The objective is to minimize the sum of parameters 'c' multiplied by each variable 'y', given certain bounds and conditions.",
+        "type": "comment"
+    },
+    "1710": {
+        "file_id": 211,
+        "content": "    # return the expression for the constraint for i\n    return sum(model.a[i, j] * model.x[j] for j in model.J) >= model.b[i]\n# the next line creates one constraint for each member of the set model.I\nmodel.AxbConstraint = Constraint(model.I, rule=ax_constraint_rule)\nend_time = time.time()\nprint('taking time:', end_time-start_time)\n# this is fast.\n# taking time: 0.0009999275207519531\ninstance = model.create_instance(report_timing=True)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py:47-58"
+    },
+    "1711": {
+        "file_id": 211,
+        "content": "This code defines a constraint for each member of the set model.I and creates an instance with timing report enabled, resulting in fast execution time.",
+        "type": "comment"
+    },
+    "1712": {
+        "file_id": 212,
+        "content": "/microgrid_base/heatpump_code_reference/pyomo_piecewise_set_concrete.py",
+        "type": "filepath"
+    },
+    "1713": {
+        "file_id": 212,
+        "content": "This code imports necessary libraries and defines a concrete model. It creates a set with values [1, 2] and variables x and y corresponding to the set. The code then defines a piecewise function pw using the variables x and y with specific points and rules. The code comments indicate valid and invalid ways of defining variables and functions for the model.",
+        "type": "summary"
+    },
+    "1714": {
+        "file_id": 212,
+        "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.I = Set(initialize=[1,2])\nmodel.x = Var(model.I) # valid\n# model.y = Var([2,3]) # invalid\nmodel.y = Var([1,2]) # valid\n# model.y = Var(model.I)\nmodel.pw = Piecewise([1,2], model.y,model.x, pw_pts=[1,2], f_rule=[2,1], pw_constr_type='EQ',unbounded_domain_var=True) # valid\n# model.pw = Piecewise(model.I, model.y,model.x, pw_pts=[1,2], f_rule=[2,1], pw_constr_type='EQ',unbounded_domain_var=True) # valid",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/pyomo_piecewise_set_concrete.py:1-12"
+    },
+    "1715": {
+        "file_id": 212,
+        "content": "This code imports necessary libraries and defines a concrete model. It creates a set with values [1, 2] and variables x and y corresponding to the set. The code then defines a piecewise function pw using the variables x and y with specific points and rules. The code comments indicate valid and invalid ways of defining variables and functions for the model.",
+        "type": "comment"
+    },
+    "1716": {
+        "file_id": 213,
+        "content": "/microgrid_base/heatpump_code_reference/result_processlib.py",
+        "type": "filepath"
+    },
+    "1717": {
+        "file_id": 213,
+        "content": "This code defines a class called \"Value\" that takes a solution object as input. It has a method \"value()\" which returns the value of a variable based on its type, supporting various data types including integers, floats, lists of variables, and numpy arrays. It handles different types of variables and ensures proper handling of solution values.",
+        "type": "summary"
+    },
+    "1718": {
+        "file_id": 213,
+        "content": "import docplex\n# from docplex.mp.model import Model\nimport numpy\nclass Value(object):\n    def __init__(self, sol):\n        self.sol = sol\n    def value(self, x):\n        if isinstance(x, int):\n            return x\n        elif isinstance(x, float):\n            print(\"float\")\n            return x\n        elif isinstance(x, list) and isinstance(x[0], docplex.mp.dvar.Var):\n            return self.sol.get_values(x)\n        elif isinstance(x, docplex.mp.dvar.Var):\n            return self.sol.get_value(x)\n        elif isinstance(x, list) and isinstance(x[0], int):\n            return x\n        elif isinstance(x, list) and isinstance(x[0], float):\n            return x\n        elif isinstance(x, numpy.ndarray):\n            return x\n        else:\n            print(\"type error\")\n            return None",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/result_processlib.py:1-30"
+    },
+    "1719": {
+        "file_id": 213,
+        "content": "This code defines a class called \"Value\" that takes a solution object as input. It has a method \"value()\" which returns the value of a variable based on its type, supporting various data types including integers, floats, lists of variables, and numpy arrays. It handles different types of variables and ensures proper handling of solution values.",
+        "type": "comment"
+    },
+    "1720": {
+        "file_id": 214,
+        "content": "/microgrid_base/heatpump_code_reference/run_profile.cmd",
+        "type": "filepath"
+    },
+    "1721": {
+        "file_id": 214,
+        "content": "The code runs two different profiles of a Python script named \"profile_code.py\" using two separate conda environments: \"pypy\" and \"docplex\". The \"--live-stream\" and \"--no-capture-output\" flags are used to stream the output in real time without capturing it.",
+        "type": "summary"
+    },
+    "1722": {
+        "file_id": 214,
+        "content": "@REM conda run -n pypy --live-stream --no-capture-output pypy profile_code.py\nconda run -n docplex --live-stream --no-capture-output python profile_code.py",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/run_profile.cmd:1-2"
+    },
+    "1723": {
+        "file_id": 214,
+        "content": "The code runs two different profiles of a Python script named \"profile_code.py\" using two separate conda environments: \"pypy\" and \"docplex\". The \"--live-stream\" and \"--no-capture-output\" flags are used to stream the output in real time without capturing it.",
+        "type": "comment"
+    },
+    "1724": {
+        "file_id": 215,
+        "content": "/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py",
+        "type": "filepath"
+    },
+    "1725": {
+        "file_id": 215,
+        "content": "The code defines two classes with tracing methods for calling class methods and printing caller information, and calls the \"call\" method on an object.",
+        "type": "summary"
+    },
+    "1726": {
+        "file_id": 215,
+        "content": "import inspect\n# TODO: iterate components like piecewise functions, iterative constraints, indexed variables and bound each component to the line of code which creates them\ndef trace_frame_till_condition(frame, cond):\n    if not cond(frame):\n        return frame\n    else:\n        return trace_frame_till_condition(frame.f_back, cond)\nclass SelfContainedCallerTracer(object):\n    \"\"\"\n    This class is used to trace calls to methods of a class.\n    It is used to trace calls to methods of a class that are not\n    called from other methods of the same class.\n    \"\"\"\n    def __init__(self):\n        self.cond = lambda f: isinstance(f.f_locals.get(\"self\", None), self.__class__)\n    def call(self):\n        called_by = inspect.currentframe()\n        # you can trace more info like the instance attributes of the caller\n        called_by = trace_frame_till_condition(called_by, self.cond)\n        # print(dir(called_by))\n        # print(called_by)\n        # breakpoint()\n        print(\"-\" * 60)\n        print(f\"method {self.__class__.__name__}.call called_by:\", called_by)",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py:1-29"
+    },
+    "1727": {
+        "file_id": 215,
+        "content": "This code defines a class for tracing calls to methods in the same class that are not called from other methods within the class. The trace includes information about the caller's instance attributes and prints this information when the method is called.",
+        "type": "comment"
+    },
+    "1728": {
+        "file_id": 215,
+        "content": "        print(\n            \"file\",\n            repr(called_by.f_code.co_filename) + \",\",\n            \"line\",\n            called_by.f_lineno,\n        )\n        print(\"caller:\", called_by.f_code.co_name)\n        # print(\"-\"*60)\n    def self_call(self):\n        self.call()\n# TODO: make sure child classes are somehow working properly\n# TODO: using metaclass?\nclass ChildClass(SelfContainedCallerTracer):\n    def __init__(self):\n        sclass = SelfContainedCallerTracer\n        non_magic_method_names = [n for n in dir(sclass) if not n.startswith(\"__\")]\n        self.cond = lambda f: f.f_code.co_name in non_magic_method_names\n    def some_other(self):\n        self.self_call()\n    def just_call(self):\n        self.call()\ndef call1():\n    instance = SelfContainedCallerTracer()\n    instance.call()\n    instance.self_call()\ndef call2():\n    instance = ChildClass()\n    instance.some_other()\n    instance.call()\n    instance.just_call()\n    instance.self_call()\nif __name__ == \"__main__\":\n    call1()\n    call2()\n    obj = SelfContainedCallerTracer()",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py:30-77"
+    },
+    "1729": {
+        "file_id": 215,
+        "content": "This code defines two classes: SelfContainedCallerTracer and ChildClass. The SelfContainedCallerTracer class traces the caller of its methods, printing file, line number, and method name. It also has a self_call() method that calls the trace() method. ChildClass inherits from SelfContainedCallerTracer and adds a just_call() method. Two functions call methods on instances of both classes.",
+        "type": "comment"
+    },
+    "1730": {
+        "file_id": 215,
+        "content": "    obj.call()",
+        "type": "code",
+        "location": "/microgrid_base/heatpump_code_reference/self_contained_class_which_trace_the_caller.py:78-78"
+    },
+    "1731": {
+        "file_id": 215,
+        "content": "The line of code calls the \"call\" method on an object (obj). This suggests that the method is part of a class, and its purpose may involve triggering some action or behavior associated with the object.",
+        "type": "comment"
+    },
+    "1732": {
+        "file_id": 216,
+        "content": "/microgrid_base/ies_optim.py",
+        "type": "filepath"
+    },
+    "1733": {
+        "file_id": 216,
+        "content": "This code imports necessary functions from two different modules, \"log_utils\" and \"ies_optim_legacy\". The \"logger_print\" function is imported to handle logging operations while the \"*\" symbol after \"ies_optim_legacy\" imports all functions present in that module. This suggests that these functions will be used for optimization tasks related to IES (Intelligent Energy Systems).",
+        "type": "summary"
+    },
+    "1734": {
+        "file_id": 216,
+        "content": "from log_utils import logger_print\nfrom ies_optim_legacy import *",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim.py:1-3"
+    },
+    "1735": {
+        "file_id": 216,
+        "content": "This code imports necessary functions from two different modules, \"log_utils\" and \"ies_optim_legacy\". The \"logger_print\" function is imported to handle logging operations while the \"*\" symbol after \"ies_optim_legacy\" imports all functions present in that module. This suggests that these functions will be used for optimization tasks related to IES (Intelligent Energy Systems).",
+        "type": "comment"
+    },
+    "1736": {
+        "file_id": 217,
+        "content": "/microgrid_base/ies_optim_legacy.py.j2",
+        "type": "filepath"
+    },
+    "1737": {
+        "file_id": 217,
+        "content": "The code is a microgrid optimization program with data validation and features like macros, constraints, price models, initialization, class definitions, repetition avoidance, efficient handling of complex piecewise functions, solar panel efficiency optimization, renewable energy consumption management, device constraints consideration, transmission line decay handling, error handling, cost estimation, device limit management, and simulation results.",
+        "type": "summary"
+    },
+    "1738": {
+        "file_id": 217,
+        "content": "{# TODO: replace string in templates with literal objects #}\nfrom log_utils import logger_print\nfrom pyomo_environ import *\nfrom typing import cast, Optional\nfrom config import *\nfrom pydantic import ValidationError\nimport cmath\nfrom copy import deepcopy\nimport copy\nfrom error_utils import ErrorManager\n# input: negative\n# output: positive\n# IO: Real\nimport numpy as np\nimport math\n{% set loadEnergyConsumptionRateAndPriceModelUnitMapping = {\n    \"电负荷\": (\"kW\", \"元/kWh\"),\n    \"氢负荷\": (\"kg\", \"元/kg\")\n}%}\n    {# \"氢负荷\": (\"kg/hour\", \"元/kg\") #}\n# TODO: use StrEnum (3rd party library) to replace literals in data validation and control flows.\n# TODO: implement unit conversion of device info in another file with separate datamodels (another template) instead of explicit conversion in this template (create that first (skeleton) to suppress type check error)\n# ref: https://pypi.org/project/StrEnum/\n{% macro IsIterable(it)%}hasattr({{it}}, \"__iter__\"){% endmacro %}\ndef getattr_with_ellipsis_fallback(obj, attrName, default=cmath.nan):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:1-28"
+    },
+    "1739": {
+        "file_id": 217,
+        "content": "This code is a part of a larger program related to microgrid optimization. It imports several modules and classes, defines constants and functions. The code uses templates for data validation, unit conversion, and control flows, but has TODO comments to implement StrEnum for literals and separate data models in another template.",
+        "type": "comment"
+    },
+    "1740": {
+        "file_id": 217,
+        "content": "    val = getattr(obj, attrName, default)\n    if val is ...:\n        val = default\n    return val\n{% macro applyMacroWithSingleParam(_macro, paramList) %}\n    {% for param in paramList%}\n{{_macro(param)}}\n    {% endfor%}\n{% endmacro%}\n{# VAR_INIT_AS_ZERO = \"VAR_INIT_AS_ZERO\" #}\nimport os\n# TODO: 典型日 最终输出结果需要展开为8760\n# TODO: add more \"bounds\" to variables\n# TODO: call external processor/parser to handle DSL, simplify expressions.\n{# optional comment flag for our stepwise refactor. #}\n{%set SO = namespace(class_name=\"\")%}\n{% set 设计规划 = \"if self.计算参数.计算类型 == '设计规划'\"%}\n{% set 仿真模拟 = \"if self.计算参数.计算类型 == '仿真模拟'\"%}\n{% set 秒 = 'if self.计算参数.计算步长 == \"秒\"'%}\n{% set 小时 = 'if self.计算参数.计算步长 == \"小时\"'%}\n{# {% set needStorageDecayCompensation=true%} #}\n{% macro stepwise_flag(class_name, flag_name) %}{% if SO.class_name == class_name %}{{' STEPWISE FLAG [{}] '.format(flag_name).center(40, \"#\") }}{% endif %}{% endmacro %}\nfrom typing import Dict, List, Tuple, Union, Callable\nfrom pydantic import conlist, conint, confloat, constr",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:29-55"
+    },
+    "1741": {
+        "file_id": 217,
+        "content": "This code snippet appears to be part of a larger program related to microgrid optimization and simulations. It includes functions, variables, and comments indicating areas for further development and improvement in the codebase. The code also defines macros for handling parameters and includes imports for data types and packages for Pydantic library.",
+        "type": "comment"
+    },
+    "1742": {
+        "file_id": 217,
+        "content": "from constants import *\n{# consider to type check all variable operations #}\n{# cast such type to all variables, to forbid 'var * var' #}\nimport pyomo.core.base\nimport parse\nfrom export_format_units import *\n{% set IndexedVar = \"pyomo.core.base.var.IndexedVar\" %}\n{% set GeneralVarData = \"pyomo.core.base.var._GeneralVarData\" %}\n{# forbid untyped code. #}\n{# mark as pyright global config. #}\n{# also for mypy #}\n{% set normal_str = \"constr(min_length=1)\"%}\n{% set non_neg_float = \"confloat(ge=0)\"%}\n{% set pos_float = \"confloat(gt=0)\"%}\n{% set non_neg_int = \"conint(ge=0)\"%}\n{% set pos_int = \"conint(gt=0)\"%}\n{% macro qstr(mstr)%}\"{{mstr}}\"{%endmacro%}\n{% macro import_type_fallback(symbol)%}\ntry:\n    from typing import {{symbol}}\nexcept:\n    from typing_extensions import {{symbol}}\n{% endmacro %}\n{{import_type_fallback(\"Literal\")}}\n{# \ntry:\n    from typing import Annotated\nexcept:\n    from typing_extensions import Annotated #}\n{# from typing import Tuple #}\n{% macro double_check_setattr(obj, attrName, val) %}\nassert getattr({{obj}},{{attrName}}, None) is None, f\"错误: 不能设置两次相同的变量名称\\n重复变量: { {{attrName}} }\"",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:56-89"
+    },
+    "1743": {
+        "file_id": 217,
+        "content": "This code is performing type checking and ensuring that all variable operations are properly typed. It uses pyright global configuration, imports necessary types from typing or typing_extensions, and includes functions for different data types such as non-negative integers and floats. The code also includes a macro double_check_setattr to prevent setting the same variable twice.",
+        "type": "comment"
+    },
+    "1744": {
+        "file_id": 217,
+        "content": "{{obj}}.__setattr__({{attrName}}, {{val}})\n{% endmacro %}\nimport rich\nfrom pydantic import BaseModel, Field, validator\n# the main code for computing.\n# currently just compute microgrid\n# three computation modes:\n{# shall you define more string literals in enum class, and more pydantic models, union types.#}\n{# from functools import lru_cache #}\n{# item count is for list, length is for string.#}\n{% macro tuple_type_construct(l, t) %}{{\", \".join([t]*l)}}{% endmacro %}\n{% macro PLField(tuple_name,tuple_size_literal,elem_name, description)%}\n{% set elem_type = elem_name%}\n{% if elem_name == \"价格\"%}\n    {% set elem_type = \"float\"%}\n{% endif%}\n    {{tuple_name}}:Tuple[{{tuple_type_construct(constants[tuple_size_literal], elem_type)}}] = Field(title = f\"长度为{{'{'+tuple_size_literal+'}'}}的{{elem_name}}数组\", description = \"{{description}}\")\n{% endmacro%}\n{# {% macro item_constraint(l)%}min_item = {{l}}, max_item= {{l}}{% endmacro%} #}\n{# ##########[PINT START]########## #}\n{# import pint #}\nfrom unit_utils import (\n    unitFactorCalculator,",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:90-117"
+    },
+    "1745": {
+        "file_id": 217,
+        "content": "The code snippet is defining macros for creating Pydantic models and importing necessary libraries for microgrid computation. It also includes a function to construct tuple types based on provided literals, and defines constraints for unit conversion using the `pint` library.",
+        "type": "comment"
+    },
+    "1746": {
+        "file_id": 217,
+        "content": "    ureg,\n    standard_units,\n    getSingleUnitConverted,\n    multiplyWithUnit\n)\n{# ##########[PINT END]########## #}\n### 计价模型 ###\nimport math\n# 函数参数: (power, time_in_day)\n# 阶梯电价: 容量下限从0开始\n# TODO: 每个月的都不同 #\ndef 计算年化率(_贴现率, 寿命):\n    # 默认贴现率单位为%\n    if _贴现率 <= 0 or 寿命 <= 0:\n        {# self.年化率 = 1/Life #}\n        年化率 = 0 # 仿真模拟的时候 用于去除和年化率有关的目标\n    else:\n        贴现率 = _贴现率/100\n        年化率_CT = (1+贴现率) ** 寿命\n        年化率 = (贴现率*年化率_CT)/(年化率_CT - 1) \n    return 年化率\n{% set 电价单位 = \"元/kWh\"%}\n{% set 电价单位描述 = \"单位: 元/kWh\"%}\n{% macro getFee() %}\n    def getFee(self, power:float, time_in_day:float) -> float:\n{% endmacro%}\n{% macro getMonthIndexFromTimeInDay()%}\n        current_day_index = time_in_day//每天小时数\n        month_index = convertDaysToMonth(current_day_index)\n{% endmacro%}\n{% macro getCurrentTimeFromTimeInDay()%}\n        current_time = math.floor(time_in_day%每天小时数)\n{% endmacro%}\n{% macro returnElectricPrice() %}\n        # unit: [currency]/[time]\n        # 万元/h\n        return self.convert(price*power)\n{% endmacro%}\n{% macro getFeeWrapper()%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:118-163"
+    },
+    "1747": {
+        "file_id": 217,
+        "content": "This code defines a pricing model for energy consumption, with functions to calculate the annual rate, get the fee per unit of power consumed, and convert prices between different units. It also includes functions to determine the current day index and time from the total hours consumed, as well as converting the electricity price into a specified unit.",
+        "type": "comment"
+    },
+    "1748": {
+        "file_id": 217,
+        "content": "{{getFee()}}\n{{caller()}}\n{{ returnElectricPrice() }}\n{% endmacro %}\nfrom functools import lru_cache\nclass 价格转换:\n    @staticmethod\n    @lru_cache(maxsize=1)\n    def getMagnitude():\n        magnitude, _ = unitFactorCalculator(ureg, standard_units, \"{{电价单位}}\")\n        return magnitude\n    @staticmethod\n    def convert(value):\n        # convert to standard unit\n        magnitude = 价格转换.getMagnitude()\n        ret = value * magnitude\n        return ret\n{% for k, v in loadEnergyConsumptionRateAndPriceModelUnitMapping.items() %}\n    {% set energyType = k.strip('负荷') %}\n    {% set unit = v[1] %}\nclass 常数{{energyType}}价(BaseModel, 价格转换):\n    Price:{{pos_float}} = Field(title = \"{{energyType}}价\", description = \"{{unit}}\")\n{% call getFeeWrapper() %}\n        price = self.Price\n{% endcall %}\n{% endfor %}\nmonth_days = [31] * 每年月数\nmonth_days[1] = 28\nmonth_days[4 - 1] = month_days[6 - 1] = month_days[9 - 1] = month_days[11 - 1] = 30\nassert sum(month_days) == 每年天数\ndef convertMonthToDays(month_index:int):\n    {# cursor = month_index -1 #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:164-201"
+    },
+    "1749": {
+        "file_id": 217,
+        "content": "Code calculates electric prices based on the energy type and converts values to standard units. It then creates a model for each energy type with its corresponding price, considering leap years, and provides a function to convert months to days.",
+        "type": "comment"
+    },
+    "1750": {
+        "file_id": 217,
+        "content": "    assert month_index in range({{每年月数}})\n    ret = sum(month_days[:month_index])\n    return ret\ndef convertDaysToMonth(day_index:float):\n    acc_days = 0\n    for month_cursor, days_in_month in enumerate(month_days):\n        acc_days += days_in_month\n        if acc_days >= day_index:\n            return month_cursor\n    {# if day_index <365:\n        return month_cursor+1 #}\n    raise Exception(\"Invalid day index:\", day_index)\nclass 分月电价(BaseModel, 价格转换):\n    {# PriceList:Tuple[{{tuple_type_construct(每年月数, \"float\")}}] = Field(title = f\"长度为{每年月数}的价格数组\", description = \"{{电价单位描述}}\") #}\n{{PLField(\"PriceList\", \"每年月数\", \"价格\", 电价单位描述)}}\n{%call getFeeWrapper()%}\n{{getMonthIndexFromTimeInDay()}}\n        price = self.PriceList[month_index]\n{% endcall%}\nclass 分时电价(BaseModel, 价格转换):\n    {# PriceList: Tuple[{{tuple_type_construct(每天小时数, \"float\")}}] = Field(title = f\"长度为{每天小时数}的价格数组\", description = \"{{电价单位描述}}\") #}\n{{PLField(\"PriceList\", \"每天小时数\", \"价格\", 电价单位描述)}}\n{# \n    @validator(\"PriceList\")\n    def checkPriceList(cls, val):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:202-230"
+    },
+    "1751": {
+        "file_id": 217,
+        "content": "The code defines two classes, `分月电价` (MonthlyPrice) and `分时电价` (HourlyPrice), which inherit from the `BaseModel` and `价格转换` classes. They both have a `PriceList` field containing a tuple of prices for each month or hour in a year. The code also includes utility functions such as `convertDaysToMonth` to get the month index given a day index, and `getFeeWrapper` for fee calculation.",
+        "type": "comment"
+    },
+    "1752": {
+        "file_id": 217,
+        "content": "        assert len(val) == 24\n        return val #}\n{%call getFeeWrapper()%}\n{{getCurrentTimeFromTimeInDay()}}\n        price = self.PriceList[current_time]\n{% endcall%}\nclass 分时分月电价(BaseModel, 价格转换):\n    {# PriceStruct:Tuple[{{tuple_type_construct(每年月数, \"分时电价\")}}] = Field(title = f\"长度为{每年月数}的分时电价数组\", description = \"{{电价单位描述}}\") #}\n{{PLField(\"PriceStruct\", \"每年月数\", \"分时电价\", 电价单位描述)}}\n{# {%call getFeeWrapper()%} #}\n{{ getFee()}}\n{{getMonthIndexFromTimeInDay()}}\n        _分时电价 = self.PriceStruct[month_index]\n        ret = _分时电价.getFee(power,time_in_day)\n        return ret\n{# {{getCurrentTimeFromTimeInDay()}} #}\n        {# price = _分时电价.PriceList[current_time]\n{% endcall%} #}\nclass 计价阶梯(常数电价):\n    LowerLimit : {{non_neg_float}} = Field(title = \"功率下限\")\nclass 阶梯电价(BaseModel):\n    PriceStruct: conlist(计价阶梯, min_items=1) = Field(title = \"长度不定的计价阶梯列表\", description = \"{{电价单位描述}}\")\n    @validator(\"PriceStruct\")\n    def checkPriceStruct(cls, v: List[计价阶梯]):\n        v.sort(key = lambda x: x.LowerLimit)\n        assert v[0].LowerLimit == 0",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:231-261"
+    },
+    "1753": {
+        "file_id": 217,
+        "content": "This code defines a pricing model for time-of-day and day-ahead energy prices. It uses tuples to represent the pricing data, with each tuple containing hourly prices for a specific month. The code also includes fee wrappers and calculates charges based on power usage and time in the day. Additionally, it defines a tiered pricing model using constant prices and has a lower limit for each tier.",
+        "type": "comment"
+    },
+    "1754": {
+        "file_id": 217,
+        "content": "        return v\n{{getFee()}}\n        for index, elem in enumerate(self.PriceStruct):\n            if elem.LowerLimit <= power:\n                if index+1 == len(self.PriceStruct) or self.PriceStruct[index+1].LowerLimit >= power:\n                    return elem.getFee(power, time_in_day)\n        logger_print(self)\n        raise Exception(\"Unable to get electricity price with power:\", power)\nclass 分时阶梯电价(BaseModel):\n    {# PriceStructList:Tuple[{{tuple_type_construct(每天小时数, \"阶梯电价\")}}] = Field(title = f\"长度为{每天小时数}的阶梯电价列表\", description = \"{{电价单位描述}}\") #}\n{{PLField(\"PriceStructList\", \"每天小时数\", \"阶梯电价\", 电价单位描述)}}\n{{getFee()}}\n        current_time = math.floor(time_in_day%每天小时数)\n        mPriceStruct = self.PriceStructList[current_time]\n        result = mPriceStruct.getFee(power, time_in_day)\n        return result\n{% set load_types = ['电', '氢']%}\n{% set load_class_names = []%}\n{% for load_type in load_types%}\n{% do load_class_names.append(load_type+\"负荷\")%}\n{% endfor%}\n{% set input_types = ['柴油'] %}\n{% macro sum_reduce(seq)%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:262-289"
+    },
+    "1755": {
+        "file_id": 217,
+        "content": "The code defines a class for daytime step-wise electricity pricing with hourly rate structures and handles exceptions when unable to get the electricity price. It also calculates the fee based on the current time and power. The code is related to energy loads like electric and hydro, and input types include diesel.",
+        "type": "comment"
+    },
+    "1756": {
+        "file_id": 217,
+        "content": " sum({{seq}})\n{# functools.reduce(sequence={{seq}}, function = lambda x,y: x+y) #}\n{% endmacro%}\n{% macro init_super_class(class_name) %}\n    def __init__(self, PD:dict, mw: ModelWrapper, 计算参数实例: 计算参数, 设备ID: {{ class_name }}ID, 设备信息: {{ class_name }}信息):\n        super().__init__(PD=PD, mw=mw, 计算参数实例=计算参数实例, ID = 设备ID.ID)\n        self.设备ID = 设备ID\n        self.设备信息 = 设备信息\n{% endmacro %}\n{% macro port_variable_define(class_name) %}\n        ##### PORT VARIABLE DEFINITION ####\n        self.ports = {}\n        {% for port_name, port_type in 设备接口集合[class_name] %}\n        {% if port_type.endswith(\"输入输出\") or class_name in ['变压器', \"传输线\"]%}\n        {% set mt = \"Reals\" %}\n        {% elif port_type.endswith(\"输入\") %}\n        {# {% set mt = \"NegativeReals\"%} #}\n        {% set mt = \"NonPositiveReals\"%}\n        {% elif port_type.endswith(\"输出\") %}\n        {% set mt = \"NonNegativeReals\"%}\n        {% endif %}\n        self.PD[self.设备ID.{{port_name}}] = self.ports['{{port_name}}'] = self.{{port_name}} = self.变量列表(\"{{port_name}}\", within={{mt}})",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:290-315"
+    },
+    "1757": {
+        "file_id": 217,
+        "content": "This code defines macros for defining device classes, initializing super classes, and port variable definitions. The macros use Jinja templates to generate Python code for instantiating objects with specific attributes and functionality. This code is used in the context of microgrid optimization.",
+        "type": "comment"
+    },
+    "1758": {
+        "file_id": 217,
+        "content": "        \"\"\"\n        类型: {{port_type}}\n        \"\"\"\n        {% endfor %}\n{% endmacro %}\n{%macro expand_unit_conversion(mdigit, exceptionList=[])%}\n        {% if mdigit[4] == 1 or mdigit[0] in exceptionList%}\n        self.{{ mdigit[0] }}: float = 设备信息.{{ mdigit[0] }}\n        \"\"\"\n        名称: {{ mdigit[1] }}\n        单位: {{ mdigit[2] }}\n        \"\"\"\n        {%else%}\n        self.{{ mdigit[0] }}: float = 设备信息.{{ mdigit[0] }} * {{ mdigit[4]}}\n        \"\"\"\n        名称: {{ mdigit[1] }}\n        单位: {{ mdigit[3] }} <- {{ mdigit[2] }}\n        \"\"\"\n        {% endif %}\n        assert self.{{ mdigit[0] }} >=0\n{%endmacro%}\n{% set 时间步长参数='self.计算参数.时间参数'%}\n{# {% set 时间步长参数='self.计算参数.时间参数()'%} #}\n{# {% set 时间步长参数='(1 if self.计算参数.计算步长 == \"小时\" else 3600)'%} #}\n{% set 单向变电器列表 = ['变压器', '变流器']%}\n{%set 设备参数例外列表 = [\"PowerDeltaLimit\", \"RatedWindSpeed\", \"MaxWindSpeed\", \"MinWindSpeed\", \"BatteryDeltaLimit\", \"BatteryStorageDecay\", \"DeltaLimit\"]%}\n# 8760 hours of data\n# several days of data to compute a year\n# 7200 seconds. simulation\n# device parameters would be the same.",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:316-353"
+    },
+    "1759": {
+        "file_id": 217,
+        "content": "This code is defining a macro that expands unit conversion for device parameters, handling exceptions and assertions. It also sets variables such as the time step parameter and device parameter exception list. The code also mentions the concept of 8760 hours of data, several days of data to compute a year, and 7200 seconds for simulation purposes.",
+        "type": "comment"
+    },
+    "1760": {
+        "file_id": 217,
+        "content": "# load and environment might change.\n# so for every device the will change.\n# iterate through all device-port pairs, then retrieve attributes from another dict.\n# string, digits, tables.\n# you can dump and load from json.\n{# \nclass 加法器ID(BaseModel):\n    输入:int\n    输出:int\n    输入输出: int #}\n{# {% for super_class, class_name, mstrs, mdigits, mtables in 设备库 %} #}\ndef quicksum_indexed_var(indexed_var):\n    if isinstance(indexed_var,list):\n        return sum(indexed_var)\n    return sum(indexed_var.values())\n#############\n# Device ID #\n#############\nfrom pydantic import validator\nclass 设备ID(BaseModel):\n    ID: {{non_neg_int}} = Field(title = \"设备ID\", description = '从拓扑图节点ID获取')\n{% for class_name in 设备接口集合.keys()%}\nclass {{class_name}}ID(设备ID):\n    {% for port_name, port_type in 设备接口集合[class_name]%}\n    {{ port_name }}: {{non_neg_int}} = Field(title = \"{{ port_name }}ID\", description = \"接口类型: {{ port_type }}\")\n    \"\"\"\n    类型: {{ port_type }}\n    \"\"\"\n    {% endfor %}\n{% endfor %}\n###############\n# Device Info #\n###############\n{% set deviceBaseIdentifiers = [",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:355-398"
+    },
+    "1761": {
+        "file_id": 217,
+        "content": "The code defines a base class `设备ID` and subclasses for each device type, which inherit from it. These classes have attributes representing the device ID and port IDs for each interface type. The `quicksum_indexed_var` function sums values from an indexed variable, either as a list or its values. The code also uses variables and functions from elsewhere in the codebase.",
+        "type": "comment"
+    },
+    "1762": {
+        "file_id": 217,
+        "content": "    \"设备名称\",\n]%}\n{% set deviceOptionalIdentifiers = [\n    \"生产厂商\",\n    \"设备型号\",\n]%}\n{% set deviceIdentifiers = deviceBaseIdentifiers + deviceOptionalIdentifiers %}\nclass 设备基础信息(BaseModel):\n{% for i in deviceBaseIdentifiers%}\n    {{i}}: {{normal_str}} = Field(title = \"{{i}}\")\n{# \n    subtype_hidden: Union[None, str] = Field(\n        default=None, title=\"节点原次类型\", description=\"内部变量，不要填写\"\n    )\n     #}\n    def toStandard(self, attr:str):\n        className = self.__class__.__name__\n        with ErrorManager(default_error = f\"Instance data:\\n{self.dict()}\\nError converting attribute '{attr}' of class '{className}'\"):\n            schema = self.schema()\n            props = schema['properties']\n            attr_alias_dict = {k: v.get('title', None) for k,v in props.items()}\n            attrName= attr if attr in props.keys() else attr_alias_dict[attr]\n            assert attrName, f\"Cannot find attribute name in class '{className}' with query '{attr}'\"\n            val = copy.deepcopy(getattr(self, attrName))\n            if val is None:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:399-426"
+    },
+    "1763": {
+        "file_id": 217,
+        "content": "This code defines a `DeviceInfo` class with device base and optional identifiers. It also includes a `toStandard` method that converts the instance data to a standard format by mapping attribute names and handling nonexistent attributes. The method uses ErrorManager for error handling and deep copy for safe attribute retrieval.",
+        "type": "comment"
+    },
+    "1764": {
+        "file_id": 217,
+        "content": "                logger_print(\"Warning: Attribute '{attr}' of class '{className}' is None. Using zero instead.\")\n                return 0\n            desc = props[attr]['description']\n            val_units = desc.replace(\"：\", \":\").split(\":\")[-1].strip()\n            units = []\n            for i, unit in enumerate(val_units.replace(\"，\", \",\").split(\",\")):\n                u = unit.strip()\n                if u:\n                    units.append(u)\n            varNames = attrName.replace(\"-\",\"_\").split(\"_\")\n            assert len(varNames) == len(units), f\"units length ({units}) does not match varname length ({varNames}).\\nfailed to parse unit for: {className}.{attrName}\"\n            assert len(units)>0, f\"{className}.{attrName} does not have unit definition\"\n            crlist = []\n            for val_unit in units:\n                ConversionRate, StandardUnit = unitFactorCalculator(ureg, standard_units, val_unit)\n                logger_print(f\"Converting param {varNames[i]} at {className}.{attrName}: {val_unit} -> {StandardUnit} (magnitude: {ConversionRate})\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:427-448"
+    },
+    "1765": {
+        "file_id": 217,
+        "content": "This code is logging a warning for a None attribute, using zero as a placeholder. It then extracts unit information from the description and checks if it matches the variable name length. Afterwards, it iterates through units, calculating conversion rates and converting variables accordingly.",
+        "type": "comment"
+    },
+    "1766": {
+        "file_id": 217,
+        "content": "                crlist.append(ConversionRate)\n            len_varNames = len(varNames)\n            if not {{ IsIterable('val') }}:\n                assert len_varNames == 1, f\"input value {val} failed to match shape of class {className}.{attrName} (len: {len_varNames})\"\n                ret_val = val*crlist[0]\n            elif not {{ IsIterable('val[0]') }} :\n                assert len_varNames == 1, f\"input value {val} failed to match shape of class {className}.{attrName} (len: {len_varNames})\"\n                ret_val = [v*crlist[0] for v in val]\n            else:\n                # verify shape here.\n                ret_val = []\n                for it in val:\n                    assert len(it) == len_varNames, f\"input value {it} failed to match shape of class {className}.{attrName} (len: {len_varNames})\"\n                    ret_val.append([it[i]*crlist[i] for i in range(len_varNames)])\n            return ret_val\n{% endfor %}\nclass 设备信息(设备基础信息):\n{% for i in deviceOptionalIdentifiers%}\n    {{i}}: {{normal_str}} = Field(title = \"{{i}}\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:449-471"
+    },
+    "1767": {
+        "file_id": 217,
+        "content": "Code snippet performs conversion rate calculation based on the shape of input values. It appends ConversionRate to crlist and checks if val has a single element or not. If it does, it asserts that the length of varNames is 1 and multiplies val by crlist[0]. If val has multiple elements, it iterates over them and checks if their lengths match len_varNames. It then calculates the conversion rates for each element and appends them to ret_val. Finally, the class defines device information with optional identifiers, creating fields for each identifier with a normal string data type.",
+        "type": "comment"
+    },
+    "1768": {
+        "file_id": 217,
+        "content": "{% endfor %}\n{# 设备特有类型 #}\nfrom enum import auto\nimport sys\n{# \nif sys.version_info >= (3,11):\n    from enum import StrEnum\nelse:\n    from strenum import StrEnum #}\nfrom strenum import StrEnum\nclass 风力发电类型(StrEnum):\n    变桨 = auto()\n    定桨 = auto()\n    标幺值 = auto()\nclass 油耗规划算法(StrEnum):\n    平均= auto()\n    最佳= auto()\nclass 新能源消纳约束(StrEnum):\n    无 = auto()\n    惩罚代价 = auto()\n    限制消纳率 = auto()\nclass 负荷类型(StrEnum):\n    Normal = auto()\n    Punished = auto()\n    Flexible = auto()\n    Interruptable = auto()\n    InterruptableAndFlexible = auto()\nclass Direction(StrEnum):\n    Directed = auto()\n    Bidirectional = auto()\n{% set NonLoadDeviceDict = {} %}\n{# 不是标准单位 #}\n{% set gasEmissionUnit = \"kg/L\" %}\n{% set fuelEmissionUnits = {} %}\n{% for gas in [\n        \"CO2\",\n        \"NOX\",\n        \"SO2\"\n    ]\n%}\n    {% do fuelEmissionUnits.update({gas: gasEmissionUnit}) %}\n{% endfor %}\n{% set 燃料能源相关数据默认单位 = {\n    '柴油': {\n        \"Price\": \"万元/L\",\n        \"热值\": \"kWh/L\",\n        }\n    }\n%}\n{%set RenewableEnergyDevices = ['风力发电', '光伏发电']%}\n{% for key in 燃料能源相关数据默认单位.keys()%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:473-533"
+    },
+    "1769": {
+        "file_id": 217,
+        "content": "This code defines several enumeration classes, including WindPowerTypes, FuelConsumptionPlanningAlgorithms, RenewableEnergyDevices, and others. It also sets default unit conversions for various fuels and renewable energy devices.",
+        "type": "comment"
+    },
+    "1770": {
+        "file_id": 217,
+        "content": "    {% do 燃料能源相关数据默认单位[key].update(fuelEmissionUnits) %}\n{% endfor %}\n{% for super_class, class_name, mstrs, mdigits, mtables in 设备库 %}\n    {% do NonLoadDeviceDict.update({class_name: (super_class, mstrs, mdigits, mtables)})%}\n{% endfor %}\n{% for class_name in 设备接口集合.keys() %}\nclass {{class_name}}信息({{\"设备基础信息\" if class_name not in NonLoadDeviceDict.keys() else \"设备信息\"}}):\n    {% if class_name not in NonLoadDeviceDict.keys() %}\n        {% if class_name in load_class_names %}\n        {% set energyConsumptionRateUnit = loadEnergyConsumptionRateAndPriceModelUnitMapping[class_name][0] %}\n        {% set priceModelUnit = loadEnergyConsumptionRateAndPriceModelUnitMapping[class_name][1] %}\n    LoadType: 负荷类型 = Field(default = 负荷类型.Normal, title = \"负荷类型\", description = f\"可选: {', '.join(负荷类型.__members__.keys())}\")\n    # 正数\n    PunishmentRate: confloat(ge=0) = Field(default = 0, title = \"惩罚系数\", description=\"单位: {{priceModelUnit}}\")\n    \"\"\"\n    单位: {{priceModelUnit}}\n    \"\"\"\n    Pmin : confloat(ge = 0) = Field(default = 0,title = \"负荷功率最小值\", description = \"单位: {{energyConsumptionRateUnit}}\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:534-555"
+    },
+    "1771": {
+        "file_id": 217,
+        "content": "This code is initializing data structures for a microgrid simulation. It updates the fuel emission units, creates dictionaries for device classes, and defines a class with fields such as LoadType, PunishmentRate, and Pmin. The code also sets default values and provides descriptions for each field. The code utilizes various data structures and constants to organize and store information about different devices and their properties.",
+        "type": "comment"
+    },
+    "1772": {
+        "file_id": 217,
+        "content": "    \"\"\"\n    单位: {{energyConsumptionRateUnit}}\n    \"\"\"\n    Pmax : confloat(ge = 0) = Field(default = 0,title = \"负荷功率最大值\", description = \"单位: {{energyConsumptionRateUnit}}\")\n    \"\"\"\n    单位: {{energyConsumptionRateUnit}}\n    \"\"\"\n    @validator('Pmax')\n    def validate_Pmax(cls, v, values):\n        if values.get('LoadType', None) in [负荷类型.Flexible, 负荷类型.InterruptableAndFlexible]:\n            p_min = values.get('Pmin', 0)\n            assert v >= p_min, f\"Pmax must be greater than or equal to Pmin\\nGiven: Pmax={v}, Pmin={p_min}\"\n        return v\n    EnergyConsumption: List[{{non_neg_float}}] = Field(title = '耗能功率表', description='单位: {{energyConsumptionRateUnit}}')\n    \"\"\"\n    单位: {{energyConsumptionRateUnit}}\n    {# In this way it will be timescale independent. #}\n    \"\"\"\n    {% if class_name in ['电负荷']%}\n    MaxEnergyConsumption: Union[None, {{pos_float}}] = Field(default = None, title = \"最大消耗功率\", description = '单位: {{energyConsumptionRateUnit}}')\n    \"\"\"\n    单位: {{energyConsumptionRateUnit}}\n    {# 用于电负荷 典型日计算 #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:556-582"
+    },
+    "1773": {
+        "file_id": 217,
+        "content": "This code defines a class for a load (possibly electrical) with fields such as Pmax, LoadType, and EnergyConsumption. It also has a validator function to ensure that Pmax is greater than or equal to Pmin if the LoadType is Flexible or InterruptableAndFlexible. The MaxEnergyConsumption field is optional for loads of type '电负荷' (which might be 'electric load' in English), and is used for typical day calculations. The code also mentions energy consumption rates in terms of a unit, possibly Watts or kWh.",
+        "type": "comment"
+    },
+    "1774": {
+        "file_id": 217,
+        "content": "    \"\"\"\n    {% endif %}\n            {% if class_name in [\"电负荷\"]%}\n    PriceModel: Union[常数电价, 阶梯电价, 分时电价, 分时阶梯电价, 分月电价, 分时分月电价] = Field(title = '计价模型', description='单位: {{priceModelUnit}}')\n            {% elif class_name in ['氢负荷']%}\n    PriceModel: 常数氢价 = Field(title = '计价模型', description='单位: {{priceModelUnit}}')\n            {% else %}\n                {% error(\"未找到'{}'的计价模型\".format(class_name)) %}\n            {% endif %}\n        {% else %}\n            {% if class_name in 燃料能源相关数据默认单位.keys() %}\n                {% for attrName, defaultUnit in 燃料能源相关数据默认单位[class_name].items()%}\n    {{ attrName}} : Tuple[{{pos_float}}, {{normal_str}}] = Field(title = \"{{attrName}}\", description=\"格式: [数值,单位]\")\n    \"\"\"\n    格式: [数值,单位]\n    \"\"\"\n                {% endfor%}\n    class DefaultUnits:\n                {% for attrName, defaultUnit in 燃料能源相关数据默认单位[class_name].items()%}\n        {{attrName}} = \"{{defaultUnit}}\"\n                {%endfor%}\n            {% else%}\n                {% error(\"未知负荷信息类型:\", class_name)%}\n            {% endif%}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:583-608"
+    },
+    "1775": {
+        "file_id": 217,
+        "content": "This code defines different price models and default units for various load types. For '电负荷' (electric load), it has multiple pricing options, while '氢负荷' (hydrogen load) uses a constant hydrogen price. If the load type is not recognized, an error is thrown. For fuel-related loads, default units are defined using a loop.",
+        "type": "comment"
+    },
+    "1776": {
+        "file_id": 217,
+        "content": "        {% endif%}\n    {% else %}\n        {% set super_class, mstrs, mdigits, mtables = NonLoadDeviceDict[class_name] %}\n        {# special variables for non-load device info #}\n        {# {% if class_name in ['锂电池']%} #}\n    {# needStorageDecayCompensation : bool = Field(default=True, title = \"是否允许可变存储衰减补偿\", description = \"开启后存储衰减补偿将可变，反之存储衰减补偿等于存储衰减\") #}\n        {% if class_name in ['电解槽'] %}\n    StartupCountLimit: Optional[int] = Field(default = None, title = \"启动次数限制\", description = \"默认为null\")\n    LHVHydrogen:float = Field(default = 33.3, title = \"氢气热值\", description = \"单位: kWh/kg\")\n    \"\"\"\n    单位: kWh/kg\n    \"\"\"\n        {% elif class_name in ['传输线'] %}\n    Optimize: bool = Field(default = False, title =\"是否优化线径\", description = \"若选是，根据电负荷峰值确定传输电功率; 选否，则输入给定传输电功率值\")\n    U:confloat(gt=0) = Field(title = \"传输电压\", description = \"单位: V\")\n    \"\"\"\n    单位: V\n    \"\"\"\n    Rho:confloat(gt=0) = Field(title = \"传输线电阻率\", description = \"单位: Ω*m\")\n    \"\"\"\n    单位: Ω*m\n    \"\"\"\n    GivenAveragePower:confloat(gt = 0) = Field(title = '平均功率', description = \"单位: kW\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:609-631"
+    },
+    "1777": {
+        "file_id": 217,
+        "content": "Code segment includes definitions for various device classes, with specific properties and default values set based on the class. For example, if the device is a \"电解槽\", it has a StartupCountLimit and LHVHydrogen property, while a \"传输线\" has an Optimize, U, Rho, and GivenAveragePower property. The code uses Field() from pydantic library to define these properties with default values and descriptions.",
+        "type": "comment"
+    },
+    "1778": {
+        "file_id": 217,
+        "content": "    \"\"\"\n    单位: kW\n    \"\"\"\n    GivenMaxPower:confloat(gt = 0) = Field(title = '峰值功率', description = \"单位: kW\")\n    \"\"\"\n    单位: kW\n    \"\"\"\n    Pwire_Asec_Pr: List[Tuple[confloat(gt=0), confloat(gt=0), confloat(gt=0)]] = Field(title = \"传输电功率上限-截面积-单位长度价格\", description=\"单位：kW，mm2，万元/km\")\n    \"\"\"\n    Pwire（传输电功率上限）\n    单位：kW\n    Asec（截面积）\n    单位：mm2\n    Pr（单位长度价格）\n    单位：万元/km\n    \"\"\"\n        {% elif class_name in RenewableEnergyDevices%}\n    RenewableEnergyConsumptionConstraint: 新能源消纳约束 = Field(default = 新能源消纳约束.无, title= \"新能源消纳约束\", description = \"无、惩罚代价、限制消纳率\" )\n    RenewableEnergyConsumptionPunishmentRate: confloat(ge=0) = Field(default=0, title = \"新能源消纳约束惩罚代价\", description = \"单位: 元/kWh\")\n    \"\"\"\n    单位: 元/kWh\n    \"\"\"\n    RenewableEnergyConsumptionRate: confloat(ge=0, le=100) = Field(default=0, title = \"新能源消纳率\",description = \"单位: percent\")\n    \"\"\"\n    单位: percent\n    \"\"\"\n    @validator(\"RenewableEnergyConsumptionPunishmentRate\")\n    def validate_RenewableEnergyConsumptionPunishmentRate(cls, v, values):\n        if values.get('RenewableEnergyConsumptionConstraint', 新能源消纳约束.无) == 新能源消纳约束.惩罚代价:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:632-663"
+    },
+    "1779": {
+        "file_id": 217,
+        "content": "This code defines the fields for the `GivenMaxPower`, `Pwire_Asec_Pr`, `RenewableEnergyConsumptionConstraint`, `RenewableEnergyConsumptionPunishmentRate`, and `RenewableEnergyConsumptionRate` in a class. The `Pwire_Asec_Pr` field stores the transmission power limit, cross-sectional area, and per-unit length price for different sections. The `RenewableEnergyConsumptionConstraint`, `RenewableEnergyConsumptionPunishmentRate`, and `RenewableEnergyConsumptionRate` fields define the constraints, punishment rate, and consumption rate for renewable energy. The code also includes a validator function for the `RenewableEnergyConsumptionPunishmentRate` field to check its value based on the `RenewableEnergyConsumptionConstraint`.",
+        "type": "comment"
+    },
+    "1780": {
+        "file_id": 217,
+        "content": "            assert v>0, f\"不合理的惩罚代价：{v}\"\n        return v\n            {% if class_name in ['风力发电'] %}\n    machineType: 风力发电类型 = Field(default=风力发电类型.变桨, title = '选择风力发电类型', description = \"定桨、变桨（默认）、标幺值\")\n    normalizedPower: Union[None, List[float]]= Field(default=None, title=\"风力发电标幺值\", description = \"空或数组(典型日长度为24,全年逐时长度为8760,秒级长度为7200)\")\n            {%endif%}\n        {% elif class_name in ['柴油发电', '燃气发电机']%}\n    {# 机组年运行时间约束:bool (若选否，变量约束不创建，变量为自由变量，降低计算量)  #}\n    {# unitAnnualOperatingTimeConstraint:bool #}\n    {# {{cws(\"Unit annual operating time constraint\")}}:bool=Field(default = False, title=\"机组年运行时间约束\", description=\"若选否，变量约束不创建，变量为自由变量，降低计算量\") #}\n    unitAnnualOperatingTimeConstraint:bool=Field(default = False, title=\"机组年运行时间约束\", description=\"若选否，变量约束不创建，变量为自由变量，降低计算量\")\n    {# 机组年运行时间最高限值，单位：次。 #}\n    maximumAnnualOperatingTimeLimitOfTheUnit:conint(ge=0)=Field(default=0, title=\"机组年运行时间最高限值\", description=\"单位：小时\")\n    {# {{cws(\"Maximum annual operating time limit of the unit\")}}:bool=Field(default = False, title=\"机组年运行时间最高限值\", description=\"单位：次\") #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:664-677"
+    },
+    "1781": {
+        "file_id": 217,
+        "content": "This code segment defines fields for different machine types, including wind and diesel generators. It sets default values and provides titles and descriptions for each field to assist the user. The \"normalizedPower\" field is specific to wind turbines, storing a list of typical daily, yearly, or second-level normalized power values. For diesel and gas generators, it includes an optional annual operating time constraint and maximum limit of operation.",
+        "type": "comment"
+    },
+    "1782": {
+        "file_id": 217,
+        "content": "    {# 考虑机组启动费用:bool(若选否，变量约束不创建，变量为自由变量，降低计算量) #}\n    considerUnitStartUpCosts:bool=Field(default = False, title=\"考虑机组启动费用\", description=\"若选否，变量约束不创建，变量为自由变量，降低计算量\")\n    {# 机组单次启动费用，单位：元/次 #}\n    unitSingleStartupCost:conint(ge=0) =Field(default =0, title=\"机组单次启动费用\", description=\"单位：元/次\")\n    {# 机组规划算法选择 (平均油耗规划算法或者最佳油耗规划算法)。 #}\n    unitPlanningAlgorithmSelection: 油耗规划算法=Field(default =油耗规划算法.平均 ,title=\"机组规划算法选择\", description=\"平均/最佳\")\n    {# 平均负载率: (如果是平均油耗规划算法，需要填写，否则默认为空） #}\n    averageLoadRate : confloat(ge=0, le=100) = Field(default =0, title=\"平均负载率\", description=\"单位：percent\")\n            {% elif class_name in ['变压器'] %}\n    direction: Direction = Field(default= Direction.Directed, title = \"单双向模式\",description=\"默认为单向\")\n        {% endif %} \n        {% set visited_fields = [] %}\n        {% for psc, mstr in mstrs %}\n            {%if mstr not in deviceIdentifiers %}\n                {% if mstr not in visited_fields %}\n                    {% do visited_fields.append(mstr) %}\n    {{ mstr }}: {{normal_str}} = Field(title = \"{{mstr}}\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:678-694"
+    },
+    "1783": {
+        "file_id": 217,
+        "content": "This code defines several fields including whether to consider unit start-up costs, the unit single start-up cost (in Chinese), and the unit planning algorithm selection. It also includes options for average and best load rate calculations based on the planning algorithm choice. Additionally, it handles bi-directional transformers and sets visited fields to avoid repeating the same field definition.",
+        "type": "comment"
+    },
+    "1784": {
+        "file_id": 217,
+        "content": "                {% endif%}\n            {% endif%}\n        {% endfor %}\n        {% for psc, mdigit in mdigits %}\n            {% set mstr = mdigit[0]%}\n            {% if mstr not in visited_fields%}\n                {% do visited_fields.append(mstr)%}\n    {{ mstr }}: {{non_neg_float}} = Field(title = \"{{mdigit[1]}}\", description =   \"名称: {{ mdigit[1] }}\\n单位: {{ mdigit[2] }}\")\n    \"\"\"\n    名称: {{ mdigit[1] }}\n    单位: {{ mdigit[2] }}\n    \"\"\"\n                {% if mdigit[2] == 'percent'%}\n                {# {% do percent_fields.append(mdigit[1])%} #}\n    @validator({{repr(mstr)}})\n    {# @validator({{validate_params}}) #}\n    def validate_{{mstr}}_for_percent_warning(cls, value):\n        warning_msg = None\n        field_name = {{repr(mstr)}}\n        if value <= ies_env.PERCENT_WARNING_THRESHOLD:\n            warning_msg = f\"Field '{field_name}' (value: {value}; unit: percent) passed to class '{cls.__name__}' is less than or equal to {ies_env.PERCENT_WARNING_THRESHOLD}\"\n        if warning_msg is not None:\n            if ies_env.UNIT_WARNING_AS_ERROR:",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:695-719"
+    },
+    "1785": {
+        "file_id": 217,
+        "content": "This code is generating a field in a class with title and description, and defining a validator function for specific fields when their unit is 'percent'. It appends the field names to a list and checks if the value is less than or equal to a threshold. If it is, it generates a warning message. The purpose of this code is to ensure that percent values passed to the class are not too low.",
+        "type": "comment"
+    },
+    "1786": {
+        "file_id": 217,
+        "content": "                {# raise ValidationError(warning_msg) #}\n                raise Exception(warning_msg)\n            else:\n                logger_print(warning_msg)\n        return value\n                {%endif%}\n            {% endif%}\n        {% endfor %}\n        {% for psc, main, sub in mtables %}\n            {% set mtable=(main, sub)%}\n            {% set mstr = mtable[0][0]+\"_\"+mtable[1][0] %}\n            {% if mstr not in visited_fields%}\n                {% do visited_fields.append(mstr)%}\n    {{ mstr}} : List[Tuple[{{pos_float}},{{non_neg_float}}]] = Field(title = \"{{ mtable[0][1]}}_{{ mtable[1][1]}}\", description=   \"{{ mtable[0][0]}}: {{ mtable[0][1]}}\\n单位: {{ mtable[0][2]}}\\n{{ mtable[1][0]}}: {{ mtable[1][1]}}\\n单位: {{ mtable[1][2]}}\")\n    \"\"\"\n    {{ mtable[0][0]}}: {{ mtable[0][1]}}\n    单位: {{ mtable[0][2]}}\n    {{ mtable[1][0]}}: {{ mtable[1][1]}}\n    单位: {{ mtable[1][2]}}\n    \"\"\"\n            {%endif%}\n        {% endfor %}\n    {# validators #}\n        {%if class_name in ['风力发电']%}\n    @validator(\"RatedPower\")",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:720-749"
+    },
+    "1787": {
+        "file_id": 217,
+        "content": "This code defines a field in a class and handles exceptions for invalid input. It creates a field with a title and description, and adds it to the list of visited fields. The code also includes a validator for the \"RatedPower\" attribute when the class name is \"风力发电\".",
+        "type": "comment"
+    },
+    "1788": {
+        "file_id": 217,
+        "content": "    def checkRatedPower(cls, v, values):\n        CutoutPower = values.get('CutoutPower', None)\n        if CutoutPower is None:\n            # instead of Exception, which will make pydantic panic!\n            raise ValidationError(\"风力发电没有传入切出功率\")\n        else:\n            assert CutoutPower <= v, f\"切出功率({CutoutPower})必须小于额定功率({v})\" \n        return v\n        {% endif %}\n        {# {% if percent_fields != []%}\n            {% set validate_params = \"\"%}\n            {% for field_name in percent_fields%}\n                {% set validate_params = validate_params + repr(field_name)+ \",\"%}\n            {%endfor%} #}\n        {# @validator({{validate_params}})\n        def validate_percent_fields(cls, value):\n            warning_msg = None\n            if value <= ies_env.PERCENT_WARNING_THRESHOLD:\n                warning_msg = f\"value '{value}' at field '{field_name}' passed to class '{cls.__name__}'\"\n            if warning_msg is not None:\n                if ies_env.UNIT_WARNING_AS_ERROR:\n                    raise Exception(warning_msg)",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:750-772"
+    },
+    "1789": {
+        "file_id": 217,
+        "content": "The code defines a function `checkRatedPower` which checks if the CutoutPower is provided and asserts that it should be less than or equal to the rated power. It also includes a validator for percent fields, validating their values against thresholds and raising exceptions if necessary.",
+        "type": "comment"
+    },
+    "1790": {
+        "file_id": 217,
+        "content": "                else:\n                    logger_print(warning_msg)\n            return value #}\n        {# {% endif %} #}\n    {% endif %}\n{% endfor %}\n####################\n# model definition #\n####################\n{# from pyomo.environ import * #}\n{# from pyomo.core.expr.sympy_tools import sympyify_expression, sympy2pyomo_expression #}\nfrom sympy.polys.polytools import Poly\nimport re\nfrom sympy import sympify\n# taking too long. recursion.\nfrom progressbar import progressbar\n{# \ndef find_parentheses(s):\n    stack = []\n    result = [] # EIPList\n    for i, c in enumerate(progressbar(s)):\n        if c == '(':\n            stack.append(i) # 记录左括号的位置\n        elif c == ')':\n            if stack: # 如果栈不为空\n                start = stack.pop() # 弹出最近的左括号位置\n                if not stack: # 如果栈为空，说明找到了一个最外层的括号对\n                    result.append(s[start:i+1]) # 将括号对加入结果列表\n    return result #}\nfrom expr_utils import getExprStrParsedToExprList\n{# mystr = '(1,2,3), (((1+2),2),5,(6,7)) 23'\nlogger_print(find_parentheses(mystr)) #}\ndef withBanner(banner: str = \"\"):",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:773-811"
+    },
+    "1791": {
+        "file_id": 217,
+        "content": "This code is using regular expressions to find and extract parentheses from a given string. It uses the \"find_parentheses\" function to identify the start and end positions of each parenthesis pair, then appends them to a list. The list of parentheses is returned as the final result.",
+        "type": "comment"
+    },
+    "1792": {
+        "file_id": 217,
+        "content": "    def decorator(func):\n        def inner_func(*args, **kwargs):\n            logger_print(f\"_____________{banner}_____________\")\n            val = func(*args, **kwargs)\n            logger_print(f\"_____________{banner}_____________\")\n            return val\n        return inner_func\n    return decorator\n@withBanner(\"ERROR LOG\")\ndef examineSubExprDegree(expr):\n    data = str(expr)\n    exprlist = getExprStrParsedToExprList(data)\n    {# logger_print(\"SPLITING EXPR\")\n    expr_repr = str(expr)\n    regex = re.compile(r'(\\[\\d+\\])')\n    subs = regex.findall(expr_repr)\n    subs = set(subs)\n    for sub in subs:\n        num = sub.strip(\"[\").strip(\"]\")\n        expr_repr = expr_repr.replace(sub, f\"_Array\")\n    EIPList = find_parentheses(expr_repr)\n    elems_in_parentheses = set(EIPList)\n    EIPMAP = {e: f'EIP_{i}' for i, e in enumerate(elems_in_parentheses)}\n    EIPMAP_REV = {v:k for k,v in EIPMAP.items()}\n    for EIP, EIP_CODE in EIPMAP.items():\n        expr_repr = expr_repr.replace(EIP, EIP_CODE)\n    subexpr_strs = expr_repr.replace(\"-\", \"+ -\").split(\"+\") #}",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:812-842"
+    },
+    "1793": {
+        "file_id": 217,
+        "content": "This code defines a decorator function that logs the execution of wrapped functions and returns their results. It then uses this decorator to create another function, examineSubExprDegree, which processes an expression string by splitting it into sub-expressions within parentheses and replacing them with unique identifiers. The processed string is stored in expr_repr for further manipulation.",
+        "type": "comment"
+    },
+    "1794": {
+        "file_id": 217,
+        "content": "    logger_print(\"ANALYSING TERMS\")\n    for subexpr in progressbar(exprlist):\n        {# subexpr_str = subexpr_str.strip()\n        if len(subexpr_str) == 0:\n            continue\n        for k,v in EIPMAP_REV.items():\n            subexpr_str = subexpr_str.replace(k,v)\n        subexpr = sympify(subexpr_str) #}\n        subpoly = Poly(subexpr)\n        subpoly_deg = subpoly.total_degree()\n        if subpoly_deg not in [0,1]:\n            logger_print()\n            logger_print(\"Abnormal subexpression poly degree:\", subpoly_deg)\n            # recover expression representation\n            {# subexpr_pyomo = sympy2pyomo_expression(subexpr, objmap)\n            subexpr_pyomo_repr = str(subexpr_pyomo) #}\n            logger_print(\"Abnormal expression:\", subexpr)\n            {# logger_print(\"Abnormal expression:\", subexpr_pyomo_repr) #}\n    logger_print()\nfrom collections import defaultdict\n{% macro initSubmodelRelatedTranslationTable(attrName)%}\n        self._{{attrName}} = \"default{{pascalize(attrName)}}\"\n        self.",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:843-867"
+    },
+    "1795": {
+        "file_id": 217,
+        "content": "The code checks the polynomial degree of each subexpression in a list and raises an error if the degree is not 0 or 1. If such a case occurs, it logs a warning message with the abnormal subexpression and its Pyomo representation. The code uses SymPy to convert expressions to polynomials, calculate degrees, and convert back to Pyomo expressions. It also defines a macro for initializing a translation table attribute in a class.",
+        "type": "comment"
+    },
+    "1796": {
+        "file_id": 217,
+        "content": "varNameTo{{pascalize(attrName)}} = cast(Dict[str, str], defaultdict(lambda: \"unknown{{pascalize(attrName)}}\"))\n        self.{{attrName}}ToVarName = cast(Dict[str, List[str]], defaultdict(lambda: []))\n        self.{{attrName}}ToVarName.update({self._{{attrName}}: []})\n        {# self.{{attrName}}ToVarName: Dict[str, List[str]] = {self._{{attrName}}: []} #}\n{% endmacro%}\n{% macro setupSubmodelRelatedProperty(attrName)%}\n    def set{{pascalize(attrName)}}(self, {{attrName}}:str):\n        assert isinstance({{attrName}}, str), f\"{{attrName}} must be a string!\\n{{attrName}}: {repr({{attrName}})}\"\n        assert len({{attrName}})>=1, \"zero length {{attrName}} submitted.\"\n        {{attrName}} = {{attrName}}.strip()\n        self._{{attrName}} = {{attrName}}\n        self.{{attrName}}ToVarName[{{attrName}}] = self.{{attrName}}ToVarName.get({{attrName}}, []) \n    def get{{pascalize(attrName)}}(self):\n        return self._{{attrName}}\n    {{attrName}} = property(fset=set{{pascalize(attrName)}}, fget=get{{pascalize(attrName)}})",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:867-881"
+    },
+    "1797": {
+        "file_id": 217,
+        "content": "This code defines a macro for creating setter and getter methods for an attribute, along with initializing a dictionary mapping the attribute to a list of variable names. It also includes assertions to ensure that the input is a non-empty string.",
+        "type": "comment"
+    },
+    "1798": {
+        "file_id": 217,
+        "content": "{% endmacro%}\n{% macro modifySubmodelRelatedTranslationTable(attrName)%}\n        self.varNameTo{{pascalize(attrName)}}[name] = self.{{attrName}}\n        self.{{attrName}}ToVarName\n        self.{{attrName}}ToVarName[self.{{attrName}}].append(name)\n        self.keyword_processor.add_keyword(name)\n{% endmacro%}\n{% macro dynamicProperty(attrName)%}\n{% set getter=attrName+\"Getter\"%}\n{% set setter=attrName+\"Setter\"%}\n    def {{getter}}(self):\n        return self._{{attrName}}\n    def {{setter}}(self, val):\n        self._{{attrName}} = val\n    {{attrName}} = property(fget = {{getter}}, fset = {{setter}})\n{% endmacro%}\n{% set submodelRelatedAttrs = ['submodelName', 'submodelClassName'] %}\n{% set objectiveRelatedAttrs = ['obj', 'obj_expr'] %}\nimport flashtext\nclass SharedParams(BaseModel):\n    典型日: bool\n    计算步长: Literal[\"小时\", '秒']\n    计算类型: Literal['仿真模拟', '设计规划']\n    计算目标: Literal['经济','环保','经济_环保']\nclass InputParams(SharedParams):\n{# class InputParams(BaseModel): #}\n    calcParamList: List\n    {# calcTarget: str #}\n    {# 典型日",
+        "type": "code",
+        "location": "/microgrid_base/ies_optim_legacy.py.j2:882-914"
+    },
+    "1799": {
+        "file_id": 217,
+        "content": "This code is defining two classes, SharedParams and InputParams. SharedParams contains common parameters for both calculations and inputs. InputParams inherits from SharedParams and adds calcParamList as an attribute representing a list of calculation parameters, and calcTarget to store the computation target (economic, environmental, or economic-environmental). The code also uses macros to modify submodel-related attributes and define dynamic properties. It utilizes Flashtext for keyword processing and defines literal types for certain attributes.",
+        "type": "comment"
+    }
+}

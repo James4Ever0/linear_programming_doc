@@ -1,0 +1,10 @@
+{
+    "summary": "This line sets the GENERATED_MOCK environment variable to True and runs the \"reload.sh\" script using bash, potentially loading a pre-generated mock configuration for testing or debugging purposes.",
+    "details": [
+        {
+            "comment": "This line sets the GENERATED_MOCK environment variable to True and runs the \"reload.sh\" script using bash, potentially loading a pre-generated mock configuration for testing or debugging purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/synth_mock_reload.sh\":0-0",
+            "content": "env GENERATED_MOCK=True bash reload.sh"
+        }
+    ]
+}

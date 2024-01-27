@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the \"random\" library in Python and assigns it to the variable \"rand\". It then generates a random value between 0 and 10 using the \"choice\" function from the \"random\" library, and stores it in the variable \"val\". Finally, it prints the value of \"val\" on the console.",
+    "details": [
+        {
+            "comment": "This code imports the \"random\" library in Python and assigns it to the variable \"rand\". It then generates a random value between 0 and 10 using the \"choice\" function from the \"random\" library, and stores it in the variable \"val\". Finally, it prints the value of \"val\" on the console.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/erglang_test/mytest.er\":0-2",
+            "content": "rand = pyimport \"random\"\nval!= rand.choice! 0..10\nprint! val!"
+        }
+    ]
+}

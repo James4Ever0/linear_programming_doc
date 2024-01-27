@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the necessary modules and creates a Jinja2 environment with strict undefined handling, then renders a template named 'template.j2' with the name 'John Doe' and finally prints the rendered output.",
+    "details": [
+        {
+            "comment": "The code imports the necessary modules and creates a Jinja2 environment with strict undefined handling, then renders a template named 'template.j2' with the name 'John Doe' and finally prints the rendered output.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_neverundefined/test_strict.py\":0-14",
+            "content": "from jinja2 import Environment, FileSystemLoader, StrictUndefined\n# Create Jinja2 environment with the extension\nenv = Environment(\n    loader=FileSystemLoader('.'),\n    undefined=StrictUndefined,\n    extensions=['jinja2.ext.do']\n)\n# Render the template\ntemplate = env.get_template('template.j2')\nrendered = template.render(name='John Doe')\n# Print the rendered output\nprint(rendered)"
+        }
+    ]
+}

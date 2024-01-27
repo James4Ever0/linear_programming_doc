@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary modules, sets a template path, creates an environment with Jinja2's FileSystemLoader, retrieves the template, renders it with test data, and logs the resulting script using logger_print.",
+    "details": [
+        {
+            "comment": "This code imports necessary modules, sets a template path, creates an environment with Jinja2's FileSystemLoader, retrieves the template, renders it with test data, and logs the resulting script using logger_print.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/macro_test.py\":0-10",
+            "content": "from log_utils import logger_print\ntemplate_path = \"macro_test.j2\"\nfrom jinja2 import Environment, FileSystemLoader\nenv = Environment(loader=FileSystemLoader(\"./\"))\ntpl = env.get_template(template_path)\nscript = tpl.render(test=\"test_string\")\nlogger_print(script)"
+        }
+    ]
+}

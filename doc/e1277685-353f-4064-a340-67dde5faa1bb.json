@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a Python function that acts as a fixture, which is used in pytest framework for testing purposes. The fixture returns the string \"FIXTURE VAL\". It also demonstrates how to import fixtures from other places using \"autouse\" method.",
+    "details": [
+        {
+            "comment": "This code defines a Python function that acts as a fixture, which is used in pytest framework for testing purposes. The fixture returns the string \"FIXTURE VAL\". It also demonstrates how to import fixtures from other places using \"autouse\" method.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_common_fixtures.py\":0-11",
+            "content": "# how to import fixtures from other places? \"autouse\"?\nimport pytest\n@pytest.fixture\ndef my_fixture():\n    \"\"\"\n    A fixture function that returns a string value.\n    Returns:\n        str: The string value \"FIXTURE VAL\".\n    \"\"\"\n    return \"FIXTURE VAL\""
+        }
+    ]
+}

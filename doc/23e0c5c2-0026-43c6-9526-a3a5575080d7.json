@@ -1,0 +1,10 @@
+{
+    "summary": "This code creates an archive named \"archive.7z\" and removes any existing file with the same name, finds all files with extensions \".py\", \".j2\", \".json\", or \".txt\", and uses 7-zip (7z) to add each file found to the new \"archive.7z\".",
+    "details": [
+        {
+            "comment": "This code creates an archive named \"archive.7z\" and removes any existing file with the same name, finds all files with extensions \".py\", \".j2\", \".json\", or \".txt\", and uses 7-zip (7z) to add each file found to the new \"archive.7z\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/packup.sh\":0-2",
+            "content": "archive_name=archive.7z\nrm -rf $archive_name\nfind . | grep -E \".+(py|j2|json|txt)\\$\" | xargs -Iabc 7z a $archive_name abc"
+        }
+    ]
+}

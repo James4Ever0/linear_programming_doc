@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the Highs solver from highspy library, reads a MPS file into the solver, runs the optimization, and prints the model status.",
+    "details": [
+        {
+            "comment": "This code imports the Highs solver from highspy library, reads a MPS file into the solver, runs the optimization, and prints the model status.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/highspy_solve.py\":0-6",
+            "content": "import highspy\nh = highspy.Highs()\nfilename = 'exported.mps'\nh.readModel(filename)\nh.run()\nprint('Model ', filename, ' has status ', h.getModelStatus())"
+        }
+    ]
+}

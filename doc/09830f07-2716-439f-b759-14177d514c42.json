@@ -1,0 +1,10 @@
+{
+    "summary": "This code adds a registry value for the \"Command Processor\" key to run the startup.cmd file located at D:\\project\\jubilant-adventure\\startup.cmd upon system startup.",
+    "details": [
+        {
+            "comment": "This code adds a registry value for the \"Command Processor\" key to run the startup.cmd file located at D:\\project\\jubilant-adventure\\startup.cmd upon system startup.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cmd_startup.reg\":0-3",
+            "content": "Windows Registry Editor Version 5.00\n[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Command Processor]\n\"AutoRun\"=D:\\project\\jubilant-adventure\\startup.cmd"
+        }
+    ]
+}

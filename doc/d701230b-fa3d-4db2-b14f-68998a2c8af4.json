@@ -1,0 +1,15 @@
+{
+    "summary": "The code loads and converts a neural network model, applies hard-tanh activation to weights, generates test data, performs forward propagation, and verifies results.",
+    "details": [
+        {
+            "comment": "The code loads a saved neural network model and converts its weights and biases to numpy arrays. It then applies the hard-tanh activation function to the layers' weights, but it's noted as destructive (changes original data). The code generates sample input data for testing and applies forward propagation through the layers, multiplying inputs with layer weights and adding biases.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/neural_network_loading_convert_to_numpy_matrix.py\":0-40",
+            "content": "from neural_network_demo import model, input_layer, hidden_layer, output_layer\nimport numpy as np\nmodel_save_path = \"model.pt\"\nimport torch\nmodel.load_state_dict(torch.load(model_save_path))\nmodel.eval()\nlayers = [input_layer, hidden_layer, output_layer]\nbias_list = [layer.bias.detach().numpy() for layer in layers]\nweight_list = [layer.weight.detach().numpy() for layer in layers]\n# what about the hard-tanh?\ndef hard_tanh(numpy_array: np.ndarray):  # destructive!\n    numpy_array[np.where(numpy_array < -1)] = -1\n    numpy_array[np.where(numpy_array > 1)] = 1\n    return numpy_array  # you can discard it anyway.\nlayer_depth = len(layers)\nsample_size = 100\nimport random\nfrom linearization_config import *\ntest_xy_vals = [\n    [random.uniform(x_lb, x_ub), random.uniform(y_lb, y_ub)] for _ in range(sample_size)\n]\nfor x_val, y_val in test_xy_vals:\n    input_val = np.array([x_val, y_val]).reshape(1, -1)\n    for i in range(layer_depth):\n        # breakpoint()\n        input_val = np.matmul(input_val, weight_list[i].T)\n        input_val += bias_list[i].reshape(1, -1)"
+        },
+        {
+            "comment": "This code snippet applies the hard_tanh activation function to input values except for the last layer, and then checks the output by passing x_val and y_val through a z_func. The results are printed for verification.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/neural_network_loading_convert_to_numpy_matrix.py\":41-48",
+            "content": "        if i != layer_depth - 1:\n            input_val = hard_tanh(input_val)\n    # check the output.\n    answer = z_func(x_val, y_val)\n    print(\"XY VALS:\", x_val, y_val)\n    print(input_val, answer)\n    print()"
+        }
+    ]
+}

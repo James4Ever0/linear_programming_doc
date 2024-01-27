@@ -1,0 +1,15 @@
+{
+    "summary": "The code defines a class `Dog` and a function `some_random_method`. It also includes global variables `global_var2` and `global_var` and notes on pdoc. The script sets var_1 and var_2, then prints \"finished\" upon completion.",
+    "details": [
+        {
+            "comment": "The code defines a class `Dog` and a function `some_random_method`. The `Dog` class has attributes `name` and `friends`, and a method `bark` that can be called with an optional `loud` parameter. The `some_random_method` takes three parameters, one required and two optional, and does not return anything. Global variables `global_var2` and `global_var` are defined outside the function scope. The code also includes a comment mentioning pdoc and its differences from pdoc3, as well as some formatted text indicating possible notes in the docstring.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/example_docstring.py\":0-51",
+            "content": "\"\"\"\na \u72d7 that will bark.\n\"\"\"\nfrom typing import List\n# pdoc is different than pdoc3.\n# where's the search box?\nglobal_var2 = None\n\"\"\"\nsome other global variable\n\"\"\"\nglobal_var = None\n\"\"\"\nsome global variable2 _Default to None_\n\"\"\"\ndef some_random_method(param_1:str,param_2, kw_param_1=None) -> None:\n    #: Documentation comment for class_variable\n    #: spanning over three lines.\n    \"\"\"_just a random method_\n    Args:\n        param_1 (str): _parameter at position 1_\n        param_2 (str): _parameter at position 2_\n        kw_param_1 (Any, optional): _keyword parameter 1_.  NO LATEX SUPPORT?\n    Return:\n        Nothing returned.\n    Note:\n        Extra Notes?\n        ```\n        import os\n        os.system(\"ls -lth\")\n        ```\n    \"\"\"\nclass Dog:\n    \"\"\"dog class\"\"\"\n    name: str\n    \"\"\"The name of our dog.\"\"\"\n    friends: List[\"Dog\"]\n    \"\"\"The friends of our dog.\"\"\"\n    def __init__(self, name: str):\n        \"\"\"Make a Dog without any friends (yet).\"\"\"\n        self.name = name\n        self.friends = []\n    def bark(self, loud: bool = True):"
+        },
+        {
+            "comment": "This code snippet appears to be a placeholder or skeleton for a Python script. It starts by providing a docstring, marked with triple quotes (\"*woof*\"), which can be used to describe the purpose of the script. The main functionality is defined within the if __name__ == \"__main__\": block. Inside this block, two variables are set: var_1 to None and var_2 to 1. Finally, when the program finishes executing, it prints \"finished\" as an indicator that the execution is complete.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/example_docstring.py\":52-61",
+            "content": "        \"\"\"*woof*\"\"\"\nif __name__ == \"__main__\":\n    \"\"\"main job goes here\"\"\"\n    var_1 = None\n    \"\"\"variable 1 set to None\"\"\"\n    var_2 = 1\n    \"\"\"var 2 set to 1\"\"\"\n    print(\"finished\")\n    \"\"\"denote we are finished\"\"\""
+        }
+    ]
+}

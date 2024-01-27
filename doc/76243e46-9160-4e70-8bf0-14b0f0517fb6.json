@@ -1,0 +1,10 @@
+{
+    "summary": "This code runs two shell scripts for initializing and updating Conda packages, specifically cplex and docplex.",
+    "details": [
+        {
+            "comment": "This code runs two shell scripts for initializing and updating Conda packages, specifically cplex and docplex.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_update_conda.sh\":0-1",
+            "content": "bash init_update_conda_cplex.sh\nbash init_update_conda_docplex.sh"
+        }
+    ]
+}

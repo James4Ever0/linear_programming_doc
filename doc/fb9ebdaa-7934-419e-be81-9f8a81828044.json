@@ -1,0 +1,15 @@
+{
+    "summary": "The code sets up an optimization model using Pyomo, defines a ConcreteModel with variables x and y, creates model c1 with objective function z, imports necessary libraries, and solves the model using the \"mindtpy\" solver.",
+    "details": [
+        {
+            "comment": "Code imports necessary libraries and defines a ConcreteModel with variables x, y, and z. Variable x has bounds (0 to 1) and variable y has bounds (0 to 2\u03c0. Model c1 is defined as z equals x times sin(y).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pyomo_test_solve_nonlinear_cplex.py\":0-35",
+            "content": "# no enviroment tweaks. (will not work at all) just create shim for scoop.\n# MINLP open source solvers:\n# https://pyomo.readthedocs.io/en/stable/contributed_packages/mindtpy.html\n# SHOT\n# https://projects.coin-or.org/Couenne\n# https://projects.coin-or.org/Bonmin\n# from pyomo.contrib.simplemodel import SimpleModel\nfrom math import pi  # do not use `sin` from here!\n# pip install pyomocontrib_simplemodel\nfrom pyomo.environ import *  # different approaches gives different import paths. may not always share all solvers.\n# from pyomo.core.expr import current as EXPR\n# from pyomo.core import ConcreteModel, Var, Objective, minimize, sin\nfrom pyomo.environ import units as u\nu.load_definitions_from_file(\"currency_units.txt\")\nmodel = ConcreteModel()\nx_ub = 0\nx_lb = 3\nx_ub/=1000\nx_lb/=1000\nmodel.x = Var(bounds=(x_ub,x_lb))\nmodel.y = Var(bounds=(0, 2 * pi))\nmodel.z = Var()\n# convert_result =  u.convert(model.x, to_units=u.m)\n# print(\"CONVERT RESULT:\",convert_result)\n# model.x = model.x*convert_result\nmodel.c1 = Constraint(expr=model.z == model.x * sin(model.y))"
+        },
+        {
+            "comment": "The code imports the necessary libraries and sets up an optimization model using Pyomo. It then uses a SolverFactory to specify the solver to be used, in this case \"mindtpy\". The solve method is called on the model, specifying the MIP and NLP solvers to be used, and displaying the objective function and variable values after solving.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pyomo_test_solve_nonlinear_cplex.py\":37-53",
+            "content": "# from pyomo.opt import SolverFactory # not good!\nmodel.obj = Objective(expr=model.z, sense=minimize)\nopt = SolverFactory(\"mindtpy\")  # <- this thing does not support.\nopt.solve(model, mip_solver=\"cplex\",\n        #   nlp_solver=\"SHOT\",\n          nlp_solver=\"ipopt\",\n        #  Error: value SHOT not in domain ['ipopt', 'appsi_ipopt', 'gams', 'baron']\n          tee=True)\nmodel.obj.display()\nmodel.x.display()\nmodel.y.display()\nmodel.z.display()\nbreakpoint()"
+        }
+    ]
+}

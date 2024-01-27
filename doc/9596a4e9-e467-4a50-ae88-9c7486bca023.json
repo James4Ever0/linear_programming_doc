@@ -1,0 +1,10 @@
+{
+    "summary": "This Python code simulates the motion of a pendulum using the scipy library's solve_ivp function. It defines the pendulum dynamics in the pendulum() function, sets initial conditions and time span, includes an external torque as M(t), solves the system of ODEs with RK45 method, and plots the resulting angular deflections and velocities over time.",
+    "details": [
+        {
+            "comment": "This Python code simulates the motion of a pendulum using the scipy library's solve_ivp function. It defines the pendulum dynamics in the pendulum() function, sets initial conditions and time span, includes an external torque as M(t), solves the system of ODEs with RK45 method, and plots the resulting angular deflections and velocities over time.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/pendulum.py\":0-27",
+            "content": "from scipy.integrate import solve_ivp\nimport numpy as np\nimport matplotlib.pyplot as plt\nl = 1.0                             # length [m]\nm = 1.0                             # mass [kg]\ng = 9.81                            # gravitational acceleration [m/s\u00b2]\ndef pendulum(t, u, M):\n    \u03b8, \u03c9 = u\n    return [\u03c9, -3*g/(2*l)*np.sin(\u03b8) + 3/(m*l**2)*M(t)]\n\u03b80 = 0.01                          # initial angular deflection [rad]\n\u03c90 = 0.0                            # initial angular velocity [rad/s]\nu0 = [\u03b80, \u03c90]                       # initial state vector\nt_span = (0.0, 10.0)                # time interval\nM = lambda t: 0.1*np.sin(t)         # external torque [Nm], function\nsol = solve_ivp(lambda t, y: pendulum(t, y, M), t_span, u0, method='RK45')\nangular_deflections = sol.y[0]\nangular_velocities = sol.y[1]\nplt.plot(sol.t, angular_deflections, label='\u03b8 [rad]')\nplt.plot(sol.t, angular_velocities, label='\u03c9 [rad/s]')\nplt.xlabel('t')\nplt.legend()\nplt.show()"
+        }
+    ]
+}

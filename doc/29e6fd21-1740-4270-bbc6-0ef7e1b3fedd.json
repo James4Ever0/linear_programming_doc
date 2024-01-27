@@ -1,0 +1,10 @@
+{
+    "summary": "Iterates through each power wire value, selects the one closest to given maximum power and assigns it as chosen index and difference.",
+    "details": [
+        {
+            "comment": "Iterates through each power wire value, selects the one closest to given maximum power and assigns it as chosen index and difference.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/test_pwire_select.py\":0-10",
+            "content": "Pwire_arr = [1,20,100]\nGivenMaxPower = 20\nind = -1\ndis = -1\nfor _ind, val in enumerate(Pwire_arr):\n    _dis = val - GivenMaxPower\n    if _dis >= 0:\n        if dis < 0 or dis > _dis:\n            dis = _dis\n            ind = _ind\nprint(ind,dis)"
+        }
+    ]
+}

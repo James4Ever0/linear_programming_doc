@@ -1,0 +1,20 @@
+{
+    "summary": "The code linearly approximates nonlinear multivariate functions in an IES modeling framework, including test cases for energy systems and visualization tools. It is part of a larger testing scenario or suite used to test the project's directory structure.",
+    "details": [
+        {
+            "comment": "This code explains the methodology behind linearizing nonlinear multivariate functions in an IES modeling framework. It covers two approaches: analytical and sample-based, with dependencies preparation instructions and a demo command to run for testing purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/README.md\":0-42",
+            "content": "# IES modeling\n## linearization of nonlinear multivariate functions\nno matter how we try to linearize nonlinear functions, we need to know the input ranges.\n### analytical\nfirst taylor series expansion around given input ranges, then using piecewise function as approximation, finally using multivariate linearization trick to introduce intermediate variables.\nthe trick:\n$$xy=z$$\nconvert to\n$$y_1^2 - y_2^2 = z$$\nwhere\n$$y_1 = \\frac{x+y}{2}$$\n$$y_2 = \\frac{x-y}{2}$$\n### sample based\nfirst sample some data points around the given mesh space, then use either neural networks or multivariate piecewise transformation by `pyomo`\n## dependencies preparation\npython==3.7\ninstall `cplex` and `docplex` from IBM CPLEX Studio installation directory, run `python setup.py install` under the corresponding folders (total 2 folders)\ninstall remaining dependencies via `pip install -r requirements.txt`\n## current state\nrudimentary IES modeling, or framework only IES modeling\n## execute these commands for demo\n```bash\npython cpExample.py # a huge demo"
+        },
+        {
+            "comment": "Running the provided Python scripts will execute test cases for the energy system, warm water heating system, and cold water cooling system respectively. The codebase consists of modules for prototype systems, topology visualization, data logging utilities, resource data, and device count printing. Configuration parameters are also included.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/README.md\":43-62",
+            "content": "python mini_ies_system.py # electricity only\npython mini_heat_system.py # warm water heating\npython mini_refrigeration_system.py # cold water cooling\n```\n## file contents\n|filename | content|\n|-- | -- |\n|integratedEnergySystemPrototypes.py | prototypes of IES systems, define internal constraints, device IO and utils|\n|system_topology_utils.py |visualize system topology|\n|mini_data_log_utils.py| high level wrapper to check model validity, solve model, print parameters and save plots|\n|jinan_changqing-hour.dat| first two columns for intensity of illumination, last two for wind speed|\n|mini_ies_test.py| electricity only test |\n|mini_heat_system.py | heating system test|\n|mini_refrigeration_system.py | cooling system test|\n|result_processlib.py| utils for extracting values from model solution|\n|demo_utils.py|getting resource data and common devices from default parameters, for `cpExample.py`|\n|data_visualize_utils.py|printing solution parameters, device count, and objectives, plotting and saving graphs|\n|config.py| common model parameters|"
+        },
+        {
+            "comment": "This code snippet is copying the file \"Example.py\" and overwriting the destination file with the same name. The comment suggests that it is part of a large test scenario or suite, likely used for testing purposes in the context of the project's directory structure.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/README.md\":63-63",
+            "content": "|cpExample.py|a huge test|"
+        }
+    ]
+}

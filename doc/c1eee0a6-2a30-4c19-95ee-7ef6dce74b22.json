@@ -1,0 +1,10 @@
+{
+    "summary": "Infinite loop, continuously printing \"OUTPUT\" every second using the time module.",
+    "details": [
+        {
+            "comment": "Infinite loop, continuously printing \"OUTPUT\" every second using the time module.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/test_buffer.py\":0-4",
+            "content": "import time\nwhile True:\n    time.sleep(1)\n    print(\"OUTPUT\")"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "summary": "This code reads JSON files, identifies unique prefixes and creates a markdown table for device parameters using pandas DataFrame. The results are printed or saved to file 'f3'.",
+    "details": [
+        {
+            "comment": "This code reads JSON files, extracts component information and checks if there are any unique prefixes for the components. It prints the unique prefixes found in the JSON data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_config2.py\":0-29",
+            "content": "sources = [\"cloudpss_optim_config2.json\", \"cloudpss_simulation_config2.json\"]\n# sources_curl_get = ['cloudpss_optim.mjson','cloudpss_simu.mjson']\n# must place all components on the graph to get the data.\n# like: https://ies.cloudpss.net:8201/editor/getComponentForHeat/?id=157\n# or: getComponentForCPS\n# but not all components are HeatComponents\n# id is coming from the json containing svg.\nimport json\nimport pandas as pd\n# question: convert pandas dataframe to markdown table.\nfor source in sources:\n    with open(source, \"r\", encoding=\"utf-8\") as f:\n        data = json.loads(f.read())\n    components = data[\"component\"]\n    existing_keys = []\n    for key, val in components.items():\n        key_prefix = key.replace(\"-\", \"_\").split(\"_\")[0]\n        if key_prefix not in [\"defaultApp\"] + existing_keys:\n            existing_keys.append(key_prefix)\n            print(key_prefix)\n            # val_prefix=val\n            # if val_prefix not in ['defaultApp']+existing_vals:\n            #     existing_vals.append(val_prefix)"
+        },
+        {
+            "comment": "This code creates a markdown table for each input type of a device's parameters and prints it. It uses a pandas DataFrame to format the table, and possibly writes the data to a file.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_config2.py\":30-53",
+            "content": "            #     print(val_prefix)\n            # shall create this table for every device.\n            params = val[\"param\"]\n            input_types = list(params.keys())\n            for input_type in input_types:\n                component_info = []\n                input_data = params[input_type]\n                for k, v in input_data[\"params\"].items():\n                    valDict = {\"ID\": k}\n                    # valDict ={\"InputType\": input_type,\"ID\": k}\n                    valDict.update({k0: v0 for k0, v0 in v.items()})\n                    component_info.append(valDict)\n                df = pd.DataFrame(component_info)\n                print(f\"Data Input {input_type} in {key_prefix}:\")\n                # print(df.to_string(index=False))\n                markdown_table = df.to_markdown(index=False)\n                print(markdown_table)\n            # component_info.append({\"ID\": key, \"Name\":val.get(\"name\"),\"Type\": val.get(\"type\"), \"Thutype\": val.get(\"thutype\")})\n# with open('cloudpss_file.json', 'w+') as f3:"
+        },
+        {
+            "comment": "Saving data in JSON format to file 'f3'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_config2.py\":54-54",
+            "content": "#     json.dump(data, f3)"
+        }
+    ]
+}

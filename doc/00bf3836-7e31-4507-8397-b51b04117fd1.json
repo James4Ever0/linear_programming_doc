@@ -1,0 +1,10 @@
+{
+    "summary": "Code snippet assigns value of variable 'b' to variable 'a'.",
+    "details": [
+        {
+            "comment": "Code snippet assigns value of variable 'b' to variable 'a'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_undefined.py\":0-0",
+            "content": "a = b"
+        }
+    ]
+}

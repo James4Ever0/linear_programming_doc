@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a Tmux session named \"fastapi_tmuxp\" with multiple windows and panes. Each pane runs different commands, including running FastAPI server templates, celery worker, RabbitMQ server, Redis server, and htop for monitoring the server.",
+    "details": [
+        {
+            "comment": "This code defines a Tmux session named \"fastapi_tmuxp\" with multiple windows and panes. Each pane runs different commands, including running FastAPI server templates, celery worker, RabbitMQ server, Redis server, and htop for monitoring the server.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/fastapi_tmuxp.yml\":0-12",
+            "content": "session_name: fastapi_tmuxp\nwindows:\n  - window_name: dev window\n    layout: tiled\n    panes:\n      - env NO_PYTHON_TYPECHECK=\"True\" conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output env python fastapi_server_template.py\n      # - conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output env python fastapi_server_template.py | tee -a logs/fastapi.log\n      # - conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output python fastapi_server_template.py\n      # - celery -A fastapi_celery_server worker --pool=prefork --concurrency=1\n      - env PATH=\"$PATH${CPLEX_DIR}\" NO_PYTHON_TYPECHECK=\"True\" conda run -n ${CONDA_ENV_NAME} --live-stream --no-capture-output python fastapi_celery_server.py\n      - rabbitmq-server\n      - redis-server --port 6380\n      - htop # monitor server"
+        }
+    ]
+}

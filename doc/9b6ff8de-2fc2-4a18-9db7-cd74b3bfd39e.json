@@ -1,0 +1,10 @@
+{
+    "summary": "This code performs a mock reload of a microgrid server, deletes previous logs, and extracts release files. It also creates a new directory for history logs and moves the extracted files to the \"logs\" folder. Finally, it runs two scripts in a mock environment and switches to config.py for another mock reload.",
+    "details": [
+        {
+            "comment": "This code performs a mock reload of a microgrid server, deletes previous logs, and extracts release files. It also creates a new directory for history logs and moves the extracted files to the \"logs\" folder. Finally, it runs two scripts in a mock environment and switches to config.py for another mock reload.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/mock_reload.sh\":0-14",
+            "content": "# mkdir history_logs\n# mv microgrid_server_release/server/logs history_logs\n# rm -rf microgrid_server_release\n# 7z x release.7z\n# cd microgrid_server_release\n# cd init\n# bash init.sh\n# cd ..\n# cd server\n# # mkdir logs\n# mv /root/history_logs logs\n# env MOCK='1' bash fastapi_tmuxp.sh windows\n# env MOCK='1' bash reload.sh\n# switch to config.py\nenv MOCK_TEST='1' bash reload.sh"
+        }
+    ]
+}

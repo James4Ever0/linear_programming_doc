@@ -1,0 +1,10 @@
+{
+    "summary": "Creates a CP model and solver, defines variables 'a' to 'f', adds constraints, solves the model using the solver, and prints the status and objective value.",
+    "details": [
+        {
+            "comment": "Creates a CP model and solver, defines variables 'a' to 'f', adds constraints, solves the model using the solver, and prints the status and objective value.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/or_tools_cp_sat.py\":0-17",
+            "content": "from ortools.sat.python import cp_model\n# https://github.com/google/or-tools/issues/973\nmodel = cp_model.CpModel()\nsolver = cp_model.CpSolver()\na = model.NewIntVar(0,15, 'a')\nb = model.NewIntVar(0,15, 'b')\nc = model.NewIntVar(0,15, 'c')\nd = model.NewIntVar(0,15, 'd')\ne = model.NewBoolVar('e')\nf = model.NewIntervalVar(0,10,10,'f')\nmodel.AddMaxEquality(d, [a,b,c]).OnlyEnforceIf(e)\nstatus = solver.Solve(model)\nprint(status)\nprint(solver.ObjectiveValue())"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code creates a Pyomo model with variables and constraints, then solves it using CPLEX solver. The code also attempts to apply transformations to make the model linear but is unsuccessful due to nonlinearity in some constraints.",
+    "details": [
+        {
+            "comment": "This code creates a Pyomo model with variables and constraints, then solves it using CPLEX solver. The code also attempts to apply transformations to make the model linear but is unsuccessful due to nonlinearity in some constraints.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/transform_tests.py\":0-33",
+            "content": "from pyomo.environ import *\nmodel = ConcreteModel()\nmodel.a = Var()\nmodel.b = Var(bounds = (-10,10))\nmodel.c = Var()\nmodel.con1 = Constraint(expr = model.a <=model.b)\nmodel.con2 = Constraint(expr = model.a >=model.c)\nmodel.con3 = Constraint(expr = model.c >=-20)\nmodel.con4 = Constraint(expr = model.c <=20)\nmodel.nl_con = Constraint(expr = model.b * model.c >=10) # not convex?\n# model.nl_con = Constraint(expr = model.a * model.b * model.c >=10)\nmodel.obj = Objective(expr = 0, sense=minimize)\n# TransformationFactory('core.tighten_constraints_from_vars').apply_to(model)\n# not working.\nprint(model.a.bounds)\nprint(model.c.bounds)\n# TransformationFactory('contrib.induced_linearity').apply_to(model)\n# new_model = TransformationFactory('core.radix_linearization').create_using(model) # this is python2 code. you need to replace 'iter...' with '...'\n# not working!\nsolver = SolverFactory(\"cplex\")\n# solver.solve(new_model)\nsolver.solve(model, tee=True)\nm = model\nprint('a:',m.a())\nprint('b:',m.b())\nprint('c:',m.c())"
+        }
+    ]
+}

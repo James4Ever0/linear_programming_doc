@@ -1,0 +1,10 @@
+{
+    "summary": "This code demonstrates the usage of Enum, Literal, and Pydantic to define constants, enforce type checking, and validate input data. It defines an enumeration class \"a\" with values RED, GREEN, BLUE, and creates a Pydantic model \"A\" with an attribute \"a0\" that must be one of the enum values. The code performs type checks, asserts, and validations while logging output for debugging purposes.",
+    "details": [
+        {
+            "comment": "This code demonstrates the usage of Enum, Literal, and Pydantic to define constants, enforce type checking, and validate input data. It defines an enumeration class \"a\" with values RED, GREEN, BLUE, and creates a Pydantic model \"A\" with an attribute \"a0\" that must be one of the enum values. The code performs type checks, asserts, and validations while logging output for debugging purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/enum_class_as_literal_type.py\":0-39",
+            "content": "from log_utils import logger_print\n# from enum import StrEnum\n# a = StrEnum('Color', ['RED', 'GREEN', 'BLUE'])\nfrom enum import Enum\n# a = Enum('Color', ['RED', 'GREEN', 'BLUE'])\nfrom typing import Literal\nl: Literal[\"a\", \"b\"] = \"b\"\nif isinstance(l, \"c\"):\n    logger_print(\"never executed\")\nclass a(Enum):\n    RED = \"red\"\n    GREEN = \"green\"\n    BLUE = \"blue\"\nb: a = a.BLUE  # Color.BLUE\nlogger_print(b, type(b))\n# will be converted into lower case.\n# assert (b == 'blue2') # false\nassert b == \"blue\"  # true\nif b == a.GREEN:\n    logger_print(\"NEVER EXECUTE\")\nfrom pydantic import BaseModel\nclass A(BaseModel):\n    a0: a\ndata = A(a0=\"blue\")  # though static type error, still working\n# data = A(a0 = \"blue2\") # validation error.\n# data = A(a0 = a['BLUE']) # working\nlogger_print(\"data\", data, data.a0)"
+        }
+    ]
+}

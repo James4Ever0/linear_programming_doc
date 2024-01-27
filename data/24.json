@@ -1,0 +1,545 @@
+{
+    "2400": {
+        "file_id": 268,
+        "content": "    output_path, template_path = code_and_template_path(\"type_utils\")\n    render_params = {}\n    deviceTypeTriplets = []\n    deviceTypes = []\n    energyTypes = set()\n    port_verifier_lookup_table = {}\n    conjugate_port_verifier_constructor_lookup_table = {}\n    def assert_is_nonempty_dict(d):\n        assert isinstance(d, dict)\n        assert d != {}\n    能流方向翻译表 = dict(进=\"input\", 出=\"output\")\n    def 能流方向翻译(能流方向):\n        directions = []\n        if 能流方向:\n            for 方向 in 能流方向.strip():\n                if 方向 in 能流方向翻译表.keys():\n                    directions.append(能流方向翻译表[方向])\n                else:\n                    raise Exception(\"不存在的方向:\" + 方向)\n        return directions\n    def portDefToEnergyTypes(portDef: dict):\n        eTypes = []\n        _细分类型 = portDef[\"细分类型\"]\n        _基本类型 = portDef[\"基本类型\"]\n        candidates = _基本类型 if _细分类型 is None else _细分类型\n        if candidates is None:\n            raise Exception(\"No candidates\")\n            # breakpoint()\n        for t in candidates.split(\"/\"):\n            # if isinstance(t, list):",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:288-324"
+    },
+    "2401": {
+        "file_id": 268,
+        "content": "The code defines functions for asserting non-empty dictionaries, translating flow directions, and retrieving energy types from a port definition. It also handles cases where candidates or refinements are not specified correctly. The code appears to be related to data validation and translation in the context of a microgrid system.",
+        "type": "comment"
+    },
+    "2402": {
+        "file_id": 268,
+        "content": "            #     if set(t) == set(['醇', '乙', '二']): breakpoint()\n            # logger_print('t:', t, type(t))\n            t_resolved = 解析基本类型(t)\n            eTypes.extend(t_resolved)\n        logger_print(eTypes)\n        return eTypes\n    for fpath, dat in {\n        TYPE_UTILS_MICROGRID_PORTS: TYPE_UTILS_MICROGRID_PORTS_DATA,\n        TYPE_UTILS_EXTRA_PORTS: TYPE_UTILS_EXTRA_PORTS_DATA,  # TODO: add synthetic data here.\n        TYPE_UTILS_SPECIAL_PORTS: TYPE_UTILS_SPECIAL_PORTS_DATA,\n    }.items():\n        logger_print(\"Parsing:\", fpath)\n        # dat = load_json(fpath + \".json\")\n        # breakpoint()\n        for devType, devDict in dat.items():\n            logger_print(\"parsing devType:\", devType)\n            assert_is_nonempty_dict(devDict)\n            for devSubType, devDef in devDict.items():\n                assert devSubType != \"null\"\n                assert len(devSubType) > 0\n                logger_print(\"parsing devSubType:\", devSubType)\n                deviceTypes.append(devSubType)\n                ports = devDef[\"ports\"]",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:325-348"
+    },
+    "2403": {
+        "file_id": 268,
+        "content": "This code loads and parses various device types from multiple data files, checks the non-empty status of each dictionary, extracts the sub-type for each device, and appends it to a list called 'deviceTypes'. The code also breaks if the set of 't' equals {'醇', '乙', '二'}, logs messages, and defines various constants related to microgrid ports.",
+        "type": "comment"
+    },
+    "2404": {
+        "file_id": 268,
+        "content": "                assert_is_nonempty_dict(ports)\n                requiredPortFrontendNameToPortPossibleStates = {}\n                requiredPortFrontendNameToEnergyTypes = {}\n                device_port_verifier_lookup_table = {}\n                for portName, portDef in ports.items():\n                    requiredPortFrontendNameToPortPossibleStates[portName] = [\n                        \"idle\"\n                    ] + 能流方向翻译(portDef[\"能流方向\"])\n                    requiredPortFrontendNameToEnergyTypes[\n                        portName\n                    ] = portDefToEnergyTypes(portDef)\n                    cond_segment_list = []\n                    必有工况 = portDef[\"必有工况\"]\n                    if 必有工况:\n                        for item in 必有工况.split(\"/\"):\n                            cond_segment = 必有工况转定义[item]\n                            cond_segment_list.append(cond_segment)\n                    verifier_definition = \" or \".join(\n                        [\n                            f\"logFailedRule({cond_segment}, '#{_i} (port, {portName}, {devSubType})')\"",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:349-372"
+    },
+    "2405": {
+        "file_id": 268,
+        "content": "This code asserts that the 'ports' dictionary is not empty, and then initializes three dictionaries to store information about port states, energy types, and creates a lookup table for device-port verifiers. It iterates through each port in the 'ports' dictionary, adding its frontend name, possible states (including \"idle\"), and energy types. It also checks if there are mandatory operating conditions specified for each port and builds a verification condition segment list accordingly. The final result is joined with \"or\" connectors to create a verifier definition string.",
+        "type": "comment"
+    },
+    "2406": {
+        "file_id": 268,
+        "content": "                            for _i, cond_segment in enumerate(cond_segment_list)\n                        ]\n                        # [f\"({cond_segment})\" for cond_segment in cond_segment_list]\n                    )\n                    if verifier_definition:\n                        device_port_verifier_lookup_table[\n                            portName\n                        ] = f\"lambda conds: {verifier_definition}\"\n                if device_port_verifier_lookup_table:\n                    port_verifier_lookup_table[\n                        devSubType\n                    ] = device_port_verifier_lookup_table\n                for _, etypes in requiredPortFrontendNameToEnergyTypes.items():\n                    for energyType in etypes:\n                        energyTypes.add(energyType)\n                _conjugate_verifiers = AppendableDict()\n                # _conjugate_verifiers = {}\n                rule_list = devDef[\"rules\"]\n                requirement_list = devDef[\"requirements\"]\n                port_names = tuple(ports.keys())",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:373-397"
+    },
+    "2407": {
+        "file_id": 268,
+        "content": "This code creates a lookup table for device port verifiers based on the given condition segments and device subtype. It also adds energy types from requiredPortFrontendNameToEnergyTypes to the list, and initializes an _conjugate_verifiers dictionary.",
+        "type": "comment"
+    },
+    "2408": {
+        "file_id": 268,
+        "content": "                # tuple of port names\n                # \"lambda cond0, cond1: ...\"\n                for rule in rule_list:\n                    k, v = parse_rule(rule)\n                    _conjugate_verifiers.append(k, v)\n                    # _conjugate_verifiers[k] = _conjugate_verifiers.get(k, []) + [v]\n                has_optional_port_rule = False\n                for requirement in requirement_list:\n                    k, v, t = parse_requirement(requirement, port_names)\n                    # k, v, t = parse_requirement(requirement)\n                    if t == 可选连接:\n                        has_optional_port_rule = True\n                        # k = port_names\n                    _conjugate_verifiers.append(k, v)\n                    # _conjugate_verifiers[k] = _conjugate_verifiers.get(k, []) + [v]\n                if not has_optional_port_rule:\n                    v = generate_optional_connectivity_rule(port_names, [])\n                    k = port_names\n                    _conjugate_verifiers.append(k, v)",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:398-420"
+    },
+    "2409": {
+        "file_id": 268,
+        "content": "This code generates a list of verifiers for microgrid components based on provided rules and requirements. It checks if there is a rule for optional ports, and if not, it generates one. The list of verifiers is stored in the _conjugate_verifiers dictionary.",
+        "type": "comment"
+    },
+    "2410": {
+        "file_id": 268,
+        "content": "                conjugate_verifiers = {}\n                for k, v in _conjugate_verifiers.items():\n                    lambda_params = \", \".join(\n                        make_param_list(\"cond\") + make_param_list(\"etype\")\n                    )\n                    v = \" and \".join(\n                        [\n                            f\"logFailedRule({_v}, '#{_i} (conjugate, ({', '.join(k)}), {devSubType})')\"\n                            for _i, _v in enumerate(v)\n                        ]\n                    )\n                    # v = \" and \".join([f\"({_v})\" for _v in v])\n                    v = f\"lambda {lambda_params}: {v}\"\n                    conjugate_verifiers[k] = v\n                if conjugate_verifiers:\n                    for k in conjugate_verifiers.keys():\n                        for e_k in k:\n                            assert (\n                                e_k in ports.keys()\n                            ), f\"found nonexistant key {e_k} at device {devSubType}\"\n                    conjugate_verifiers_repr = \", \".join(",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:422-444"
+    },
+    "2411": {
+        "file_id": 268,
+        "content": "The code creates a dictionary of conjugate verifiers by iterating through _conjugate_verifiers. It generates lambda functions for each verifier, using the key and its elements to create the function's parameters. The code then checks if there are any conjugate verifiers and asserts that the keys exist in the ports dictionary.",
+        "type": "comment"
+    },
+    "2412": {
+        "file_id": 268,
+        "content": "                        [f\"{repr(k)}: {v}\" for k, v in conjugate_verifiers.items()]\n                    )\n                    conjugate_verifiers_repr = f\"{{{conjugate_verifiers_repr}}}\"\n                    conjugate_verifiers_constructor = f\"lambda port_kind_to_port_name: {{tuple([port_kind_to_port_name[it] for it in k]): v for k, v in {conjugate_verifiers_repr}.items()}}\"\n                    conjugate_port_verifier_constructor_lookup_table[\n                        devSubType\n                    ] = conjugate_verifiers_constructor\n                deviceTypeTriplets.append(\n                    (\n                        devSubType,\n                        requiredPortFrontendNameToPortPossibleStates,\n                        requiredPortFrontendNameToEnergyTypes,\n                    )\n                )\n    render_params[\"deviceTypeTriplets\"] = deviceTypeTriplets\n    render_params[\"deviceTypes\"] = deviceTypes\n    render_params[\"energyTypes\"] = list(energyTypes)\n    # breakpoint()\n    render_params[\"port_verifier_lookup_table\"] = port_verifier_lookup_table",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:445-466"
+    },
+    "2413": {
+        "file_id": 268,
+        "content": "Creates a dictionary of verifiers for different port kinds, adds the dictionary to the lookup table based on device subtype, and updates render_params with the new information.",
+        "type": "comment"
+    },
+    "2414": {
+        "file_id": 268,
+        "content": "    render_params[\n        \"conjugate_port_verifier_constructor_lookup_table\"\n    ] = conjugate_port_verifier_constructor_lookup_table\n    load_render_and_format(\n        template_path,\n        output_path,\n        render_params=render_params,\n        banner=\"GENERATING TYPE UTILS\",\n    )",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:467-476"
+    },
+    "2415": {
+        "file_id": 268,
+        "content": "This code sets the \"conjugate_port_verifier_constructor_lookup_table\" in render_params and then calls a function called load_render_and_format with template_path, output_path, and additional parameters. The banner argument is set to \"GENERATING TYPE UTILS\".",
+        "type": "comment"
+    },
+    "2416": {
+        "file_id": 269,
+        "content": "/microgrid_base/report_template.md.j2",
+        "type": "filepath"
+    },
+    "2417": {
+        "file_id": 269,
+        "content": "This code generates a report template for microgrid calculations. It includes sections for system diagrams, results visualization, input data, and output data. The report is dynamically generated based on the provided topo_graph_list, data_dict_list, input_data, and output_data.",
+        "type": "summary"
+    },
+    "2418": {
+        "file_id": 269,
+        "content": "# 计算报告\n## 系统图\n{% for i, topo_graph in enumerate(topo_graph_list) %}\n### 拓扑图{{i}}\n<iframe src='{{topo_graph}}'></iframe>\n{% endfor %}\n## 结果可视化\n{% for i, data_dict in enumerate(data_dict_list) %}\n### 结果{{i}}\n    {% for k, v in data_dict.items() %}\n#### {{k}}\n{{v}}\n    {% endfor %}\n{% endfor %}\n## 输入数据\n```json\n{{input_data}}\n```\n## 输出数据\n```json\n{{output_data}}\n```",
+        "type": "code",
+        "location": "/microgrid_base/report_template.md.j2:1-35"
+    },
+    "2419": {
+        "file_id": 269,
+        "content": "This code generates a report template for microgrid calculations. It includes sections for system diagrams, results visualization, input data, and output data. The report is dynamically generated based on the provided topo_graph_list, data_dict_list, input_data, and output_data.",
+        "type": "comment"
+    },
+    "2420": {
+        "file_id": 270,
+        "content": "/microgrid_base/setup_docker.sh",
+        "type": "filepath"
+    },
+    "2421": {
+        "file_id": 270,
+        "content": "This script removes selected packages, updates package lists, installs necessary dependencies, adds Docker GPG key, configures Docker repository, and installs Docker CE, CLI, Containerd, and plugins for Buildx and Compose.",
+        "type": "summary"
+    },
+    "2422": {
+        "file_id": 270,
+        "content": "for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done\nsudo apt-get update\nsudo apt-get install ca-certificates curl gnupg\nsudo install -m 0755 -d /etc/apt/keyrings\ncurl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg\nsudo chmod a+r /etc/apt/keyrings/docker.gpg\necho \\\n  \"deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \\\n  \"$(. /etc/os-release && echo \"$VERSION_CODENAME\")\" stable\" | \\\n  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null\nsudo apt-get update\nsudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+        "type": "code",
+        "location": "/microgrid_base/setup_docker.sh:1-17"
+    },
+    "2423": {
+        "file_id": 270,
+        "content": "This script removes selected packages, updates package lists, installs necessary dependencies, adds Docker GPG key, configures Docker repository, and installs Docker CE, CLI, Containerd, and plugins for Buildx and Compose.",
+        "type": "comment"
+    },
+    "2424": {
+        "file_id": 271,
+        "content": "/microgrid_base/shared_datamodels.py",
+        "type": "filepath"
+    },
+    "2425": {
+        "file_id": 271,
+        "content": "Class \"ConflictRefinerParams\" defines parameters for conflict resolution, including model file path, output file path, resolution method (cplex or docplex), and timeout. The output path must be a non-existing file and not a directory.",
+        "type": "summary"
+    },
+    "2426": {
+        "file_id": 271,
+        "content": "from log_utils import logger_print\nfrom pydantic import Field, BaseModel, validator\ntry:\n    from typing import Literal\nexcept:\n    from typing_extensions import Literal\nimport os\nclass ConflictRefinerParams(BaseModel):\n    model_path: str = Field(title=\"'.lp' model file path\")\n    output: str = Field(title=\"conflict analysis output file path\")\n    config: Literal[\"cplex\", \"docplex\"] = Field(\n        default=\"cplex\",\n        title=\"conflict resolution method, can be one of ['cplex', 'docplex']\",\n    )\n    timeout: float = Field(default=5, title=\"timeout in seconds, default is 5 seconds\")\n    @validator(\"output\")\n    def validate_output(cls, val):\n        dirname = os.path.dirname(val)\n        assert os.path.isdir(\n            dirname\n        ), f\"output directory does not exist!\\noutput path: {val}\"\n        assert not os.path.isdir(\n            val\n        ), f\"output path shall not be an existing directory!\\noutput path: {val}\"\n        return val",
+        "type": "code",
+        "location": "/microgrid_base/shared_datamodels.py:1-30"
+    },
+    "2427": {
+        "file_id": 271,
+        "content": "Class \"ConflictRefinerParams\" defines parameters for conflict resolution, including model file path, output file path, resolution method (cplex or docplex), and timeout. The output path must be a non-existing file and not a directory.",
+        "type": "comment"
+    },
+    "2428": {
+        "file_id": 272,
+        "content": "/microgrid_base/solve_model.py",
+        "type": "filepath"
+    },
+    "2429": {
+        "file_id": 272,
+        "content": "This code imports modules, sets up a microgrid simulation environment, uses CPLEX optimization to solve models, verifies feasibility, calculates objectives, updates tables and plots data for devices, handles missing values, logs information, and prepares constraints for economic or environmental targets.",
+        "type": "summary"
+    },
+    "2430": {
+        "file_id": 272,
+        "content": "from log_utils import logger_print\nimport cmath\nimport datetime\nimport json\nimport os\nimport tempfile\nfrom typing import Any, Dict, List, Tuple, Union, cast\nfrom constants import Solver\nimport pandas as pd\nfrom beartype import beartype\nfrom constants import *  # pylance issue: unrecognized var names\nfrom debug_utils import *\nfrom error_utils import ErrorManager\n# finding every integer feasible solution\n# ref: https://www.ibm.com/support/pages/obtaining-solution-values-each-time-cplex-finds-integer-solution\nfrom log_utils import (\n    log_dir,\n    logger_print,\n    pretty_format_excinfo_context,\n    timezone,\n    logger_traceback,\n)\n# TODO: save model as .lp & .mps format\n# import pyomo_patch  # type: ignore\n# TODO: invoke conflict refiner everytime each submodel is built, once conflict is found.\n# TODO: deactivate one to all objective functions\n# TODO: cache function input/output to redis for faster response\n# TODO: profile code performance\n# TODO: partial deletion/elastic filter\n# TODO: finding maximum feasible subset (maxFS) instead of IIS",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:1-35"
+    },
+    "2431": {
+        "file_id": 272,
+        "content": "This code snippet appears to be a collection of notes for future improvements and functionality additions to an existing Python program. The code imports various modules and functions from different libraries and files, including log_utils, constants, debug_utils, and error_utils. It also includes references to potential TODOs such as saving the model in different formats, invoking a conflict refiner, deactivating objective functions, caching input/output data in Redis, profiling performance, partial deletion/elastic filtering, and finding maximum feasible subsets instead of independent IIS. The code is likely part of an ongoing project with continuous improvement and optimization in mind.",
+        "type": "comment"
+    },
+    "2432": {
+        "file_id": 272,
+        "content": "from pyomo_environ import *\n# from ies_optim import 规划结果详情,规划方案概览\ntry:\n    from typing import Literal\nexcept:\n    from typing_extensions import Literal\nfrom pydantic import BaseModel\nfrom enum import IntEnum\nfrom export_format_validate import *  # pylance issue: multiple star import (false positive)\nfrom ies_optim import InputParams, ModelWrapper\n# from pyomo.util.infeasible import log_infeasible_constraints\n# TODO: add pareto plot, change data structure of solution result object.\nimport shutil\nREQUIRED_BINARIES = [Solver.cplex, \"swipl\"]\nif ies_env.FAILSAFE:\n    REQUIRED_BINARIES.append(Solver.ipopt)\n    REQUIRED_BINARIES.append(Solver.scip)\nwith ErrorManager(default_error=\"Not all required binaries were found.\") as em:\n    for b in REQUIRED_BINARIES:\n        if shutil.which(b) is None:\n            em.append(\"Binary %s not found in PATH.\" % b)\nEXPORT_FORMAT_FPATH = os.path.join(os.path.dirname(__file__), \"export_format.json\")\nwith open(EXPORT_FORMAT_FPATH, \"r\") as f:\n    dt = json.load(f)\n    simulationResultColumns = dt[\"仿真结果\"][\"ALL\"]",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:36-71"
+    },
+    "2433": {
+        "file_id": 272,
+        "content": "The code imports necessary libraries and checks for required binary files in the PATH. It then loads simulation result column names from a JSON file. This code is likely setting up the environment and configuration for running simulations or solving models.",
+        "type": "comment"
+    },
+    "2434": {
+        "file_id": 272,
+        "content": "    simulationResultColumns = [\n        e if type(e) == str else e[0] for e in simulationResultColumns\n    ]\nFRONTEND_SIM_PARAM_TRANS_FPATH = os.path.join(\n    os.path.dirname(__file__), \"frontend_sim_param_translation.json\"\n)\nwith open(FRONTEND_SIM_PARAM_TRANS_FPATH, \"r\") as f:\n    FSPT = json.load(f)\nfrom pandas import DataFrame\nfrom topo_check import 拓扑图\n###\ndef 导出结果表_格式化(\n    结果表: DataFrame, 字符串表头: List[str], 翻译表: Dict[str, str], columns: List[str]\n) -> Tuple[\n    List[Dict[str, Union[float, int, str]]],\n    DataFrame,\n    List[Dict[str, Union[float, int, str]]],\n]:\n    结果表_导出 = pd.DataFrame([v for _, v in 结果表.items()], columns=columns)\n    # use \"inplace\" otherwise you have to manually assign return values.\n    结果表_导出.fillna({elem: \"\" for elem in 字符串表头}, inplace=True)\n    结果表_导出.fillna(\n        cmath.nan, inplace=True\n    )  # default \"nan\" or \"null\" replacement, compatible with type \"float\"\n    结果表_未翻译 = 结果表_导出.to_dict(orient=\"records\")\n    结果表_导出 = translateDataframeHeaders(结果表_导出, 翻译表)\n    结果表_导出.head()\n    # 仿真结果表_导出, 仿真结果表_格式化 = 导出结果表_格式化(仿真结果表,仿真结果字符串表头,FSPT)",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:72-106"
+    },
+    "2435": {
+        "file_id": 272,
+        "content": "The code defines a function that takes a DataFrame (resultTable) and formats it by replacing null values with \"nan\" and filling missing string headers. It also translates the header names using a dictionary (FSPT). The formatted result is returned as two separate DataFrames: 结果表_导出 with translated header names, and 结果表_未翻译 with untranslated headers.",
+        "type": "comment"
+    },
+    "2436": {
+        "file_id": 272,
+        "content": "    # export_table = 仿真结果表.to_html()\n    # may you change the format.\n    结果表_格式化 = 结果表_导出.to_dict(orient=\"records\")\n    return 结果表_未翻译, 结果表_导出, 结果表_格式化\nfrom networkx.readwrite import json_graph\ndef calcParamListToMDictList(calcParamList: List):\n    mDictList = []\n    for calcParam in calcParamList:\n        devs, adders, graph_data, G = calcParam\n        mDict = json_graph.node_link_data(G)\n        mDictList.append(mDict)\n    return mDictList\n###\ndef mDictListToCalcParamList(mDictList: List):\n    calcParamList = []\n    for md in mDictList:\n        topo_load = 拓扑图.from_json(md)  # static method, consistency checked\n        # print_with_banner(topo_load, \"图对象\")\n        # how to check error now?\n        # all connected?\n        # topo_load.check_consistency()  # may not need to be checked twice, or you can modify some flag for skipping.\n        ## COMPUTE THIS GRAPH ##\n        # use devs, adders\n        graph_data = topo_load.get_graph_data()\n        # print_with_banner(graph_data, \"图元数据\")\n        # objective is contained in the graph data.",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:107-141"
+    },
+    "2437": {
+        "file_id": 272,
+        "content": "This code appears to be part of a larger program that involves network graphs. It defines two functions: `calcParamListToMDictList` and `mDictListToCalcParamList`. The first function converts a list of calculation parameters into a list of machine-readable dictionaries, while the second function does the reverse operation. The code also imports necessary libraries and uses static methods for network graph consistency checks.",
+        "type": "comment"
+    },
+    "2438": {
+        "file_id": 272,
+        "content": "        # so all we need to pass to the compute function are: devs, adders, graph_data\n        devs = topo_load.get_all_devices()\n        adders = topo_load.get_all_adders()\n        calcParam = (devs, adders, graph_data, topo_load.G)\n        calcParamList.append(calcParam)\n    return calcParamList\ndef translateDataframeHeaders(df: DataFrame, translationTable: Dict[str, str]):\n    df_dict = df.to_dict()\n    # breakpoint()\n    df_dict_translated = {translationTable[k]: v for k, v in df_dict.items()}\n    ret = DataFrame(df_dict_translated)\n    return ret\n# obj_expr = 0\nfrom copy import deepcopy\nfrom ies_optim import ModelWrapperContext, compute\nSOLVER_LOG_FNAME = \"solver.log\"\n# disable io_options.\ndef solve_model(\n    mw: ModelWrapper,\n    obj_expr,\n    sense=minimize,\n    # io_options=dict()\n):\n    OBJ = mw.Objective(expr=obj_expr, sense=sense)\n    transformDisjunctiveModel(mw.model)  # right before solving\n    solved = False\n    with SolverFactory(Solver.cplex) as solver:\n        # try:\n        # io_options = dict() # disable unicode variables.",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:142-180"
+    },
+    "2439": {
+        "file_id": 272,
+        "content": "The code imports necessary libraries and defines a function called \"solve_model\" which takes in a ModelWrapper object, an objective expression (obj_expr), and a sense of optimization (default is minimize). The function transforms the model and uses CPLEX solver to solve it. The solved result is stored in the variable \"solved\".",
+        "type": "comment"
+    },
+    "2440": {
+        "file_id": 272,
+        "content": "        # io_options = dict(symbolic_solver_labels=True)\n        # BUG: OOM\n        solver.options[\"timelimit\"] = 60 * 24  # solver timeout: 24 minutes.\n        solver.options[\"tune display\"] = 3\n        solver.options[\"sifting display\"] = 2\n        solver.options[\"mip display\"] = 5\n        solver.options[\"barrier display\"] = 2\n        if ies_env.THREAD_COUNT:\n            solver.options[\"threads\"] = ies_env.THREAD_COUNT\n        # disable this option to prevent OOM.\n        # solver.options[\"read fileencoding\"] = \"utf-8\"\n        logger_print(\">>>SOLVING<<<\")\n        # results = solver.solve(mw.model, tee=True, keepfiles= True)\n        # results = solver.solve(mw.model, tee=True, options = dict(mipgap=0.01, emphasis_numerical='y'))\n        timestamp = getTimestampForFilename()\n        with tempfile.TemporaryDirectory() as solver_log_dir:\n            solver_log = os.path.join(solver_log_dir, SOLVER_LOG_FNAME)\n            with modelSolvedTestContext(mw.model) as check_solved:\n                results = solver.solve(",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:181-201"
+    },
+    "2441": {
+        "file_id": 272,
+        "content": "This code sets solver options for time limit, display settings, and threads. It also includes comments about disabling an option to prevent OOM errors. The code then logs a message about solving the model and uses temporary directories for log files. Finally, it checks if the solved model is correct using a context manager.",
+        "type": "comment"
+    },
+    "2442": {
+        "file_id": 272,
+        "content": "                    mw.model,\n                    tee=True,\n                    # io_options=io_options,\n                    logfile=solver_log,\n                )\n                solved = check_solved()\n            logger_print(\"SOLVED?\", solved)\n            logger_print(\"SOLVER RESULTS?\")\n            logger_print(results)\n            if not solved:\n                # translation could be extremely slow for large models. you have been warned.\n                solved = rescue(mw, solver, timestamp, solver_log, results)\n        if solved:\n            logger_print(\"OBJ:\", value(OBJ))\n    return solved\nfrom failsafe_utils import solve_failsafe\ndef rescue(mw, solver, timestamp, solver_log, results):\n    solved = False\n    # TODO: make this into background tasks, which will not raise exception and stop failsafe routines\n    # TODO: prevent solver log get recycled\n    try:\n        if ies_env.INFEASIBILITY_DIAGNOSTIC:\n            os.mkdir(\n                solver_log_dir_with_timestamp := os.path.join(\n                    log_dir, f\"infeasibility_diagnostic_{timestamp}\"",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:202-233"
+    },
+    "2443": {
+        "file_id": 272,
+        "content": "The code is calling a solver to solve a model. If the model is not solved, it attempts a rescue operation using a failsafe function. The results of the solution are logged and checked for feasibility. If unsuccessful, the code creates a separate directory for storing infeasibility diagnostic logs.",
+        "type": "comment"
+    },
+    "2444": {
+        "file_id": 272,
+        "content": "                )\n            )\n            shutil.move(\n                solver_log,\n                solver_log_new := os.path.join(\n                    solver_log_dir_with_timestamp, SOLVER_LOG_FNAME\n                ),\n            )\n            analyzeInfeasibility(\n                mw,\n                solver,\n                solver_log_new,\n                results,\n                solver_log_dir_with_timestamp,\n            )\n    except Exception as e:\n        if ies_env.FAILSAFE:\n            logger_traceback()\n        else:\n            raise e\n    if ies_env.FAILSAFE:\n        failsafe_logdir = os.path.join(log_dir, f\"failsafe_{timestamp}\")\n        os.mkdir(failsafe_logdir)\n        solved = solve_failsafe(mw, failsafe_logdir)\n    return solved\nimport sys\ndef getTimestampForFilename():\n    timestamp = (\n        str(datetime.datetime.now(timezone))\n        .replace(\" \", \"_\")\n        .replace(\"-\", \"_\")\n        .replace(\".\", \"_\")\n        .replace(\":\", \"_\")\n        .replace(\"+\", \"_\")\n    )\n    return timestamp\nfrom plot_utils import plotMultipleTopologies",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:234-278"
+    },
+    "2445": {
+        "file_id": 272,
+        "content": "This code block is responsible for solving the microgrid model and handling potential exceptions that may occur during the process. If a failure occurs, it either logs a traceback or raises the exception. If the FAILSAFE environment variable is set to True, it will solve the failsafe model in a designated directory. The code also includes a function for getting a timestamp to be used in file names and a plotMultipleTopologies function from the plot_utils module.",
+        "type": "comment"
+    },
+    "2446": {
+        "file_id": 272,
+        "content": "def analyzeInfeasibility(\n    mw: ModelWrapper, solver, solver_log, results, solver_log_dir_with_timestamp\n):\n    with ErrorManager(default_error=\"Solver does not have solution.\") as em:\n        # TODO: plot the model.\n        os.mkdir(\n            plot_output_dir := os.path.join(\n                solver_log_dir_with_timestamp, \"topology_plots\"\n            )\n        )\n        mDictList = calcParamListToMDictList(\n            mw.inputParams.calcParamList\n        )  # [(devs, adders, graph_data, topo_load.G), ...]\n        plotMultipleTopologies(dict(mDictList=mDictList), plot_output_dir)\n        analyzeSolverResults(results, em)\n        lp_filepath = os.path.join(solver_log_dir_with_timestamp, \"model.lp\")\n        # TODO: export input parameters.\n        # BUG: unserializable object 'Graph' found\n        # input_params_filepath = os.path.join(\n        #     solver_log_dir_with_timestamp, \"input_params.json\"\n        # )\n        # with open(input_params_filepath, \"w+\") as f:\n        #     content = json.dumps(mw.inputParams.dict(), ensure_ascii=False, indent=4)",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:281-305"
+    },
+    "2447": {
+        "file_id": 272,
+        "content": "This function analyzes the infeasibility of a model by creating topology plots, analyzing solver results, and potentially exporting input parameters. It uses the ErrorManager class to handle any potential errors. However, there is an unresolved issue related to exporting unserializable objects 'Graph'.",
+        "type": "comment"
+    },
+    "2448": {
+        "file_id": 272,
+        "content": "        #     f.write(content)\n        exported_model = ExportedModel(mw.model, lp_filepath)\n        export_model_smap = exported_model.smap\n        solver_model_smap = mw.model.solutions.symbol_map[solver._smap_id]\n        if not cplex_refine_model_and_display_info(\n            mw,\n            lp_filepath,\n            solver_log_dir_with_timestamp,\n            export_model_smap,\n            # word_counter,\n        ):\n            em.append(\"No conflicts found by cplex.\")\n        # solver_log_new = os.path.join(\n        #     solver_log_dir_with_timestamp, os.path.basename(solver_log)\n        # )\n        # shutil.move(solver_log, solver_log_new)\n        em.append(\"\")\n        em.append(\"Solver log saved to: \" + solver_log)\n        em.append(\"Model saved to: \" + lp_filepath)\n        # em.append(\"Input params saved to: \" + input_params_filepath)\n        translateFileUsingSymbolMap(lp_filepath, export_model_smap)\n        # BUG: solver_log not found (in temp)\n        # translate_and_append(solver_log_new, solver_model_smap)",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:306-336"
+    },
+    "2449": {
+        "file_id": 272,
+        "content": "Writes exported model to file, checks for conflicts using CPLEX, saves solver log and model files with symbol maps, and translates the LP file using the symbol map.",
+        "type": "comment"
+    },
+    "2450": {
+        "file_id": 272,
+        "content": "        translateFileUsingSymbolMap(solver_log, solver_model_smap)\n        # after translation, begin experiments.\n        checkIOUDirectory = os.path.join(solver_log_dir_with_timestamp, \"checkIOU\")\n        os.mkdir(checkIOUDirectory)\n        checkInfeasibleOrUnboundedModel(mw, solver, checkIOUDirectory)\ndef analyzeSolverResults(results, em: ErrorManager):\n    if results is not None:\n        try:\n            checkResult = checkIfSolverHasSolvedModel(results)\n            status = checkResult.status\n            em.append(status)\n            TC = status.terminationCondition\n            SS = status.solverStatus\n            if TC in IOUTerminationConditions:\n                ...\n            if TC not in normalTCs:\n                em.append(f\"abnormal termination condition: {TC}\")\n            if SS not in normalSSs:\n                em.append(f\"abnormal solver status: {TC}\")\n        except:\n            em.append(\"exception while processing solver results\")\n            with pretty_format_excinfo_context(*sys.exc_info()) as formatted:",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:337-361"
+    },
+    "2451": {
+        "file_id": 272,
+        "content": "This code analyzes solver results and checks for abnormal termination conditions and solver status. If any abnormality is found, it appends the relevant information to the ErrorManager object. The code also creates a checkIOU directory before calling a function to perform experiments related to checking infeasible or unbounded models.",
+        "type": "comment"
+    },
+    "2452": {
+        "file_id": 272,
+        "content": "                em.append(formatted)\nclass CalcStruct(BaseModel):\n    calcTargetLUT: Dict\n    devInstDictList: List[Dict]\n    PDList: List[Dict]\n    timeParamList: List[Union[float, int]]\n    graph_data_list: List\n    targetType: str\n    extra_data_list: List\ndef targetTypeAsTargetName(targetType: str):\n    targets = targetType.split(\"_\")\n    if len(targets) == 1:\n        return f\"{targets[0]}性最优\"\n    elif len(targets) == 2:\n        return \"多目标最优\"\n    else:\n        raise Exception(\"Invalid targetType: {}\".format(targetType))\ndef getCalcStruct(mw: ModelWrapper, mCalcParamList: list, 典型日, 计算步长, 计算类型):\n    calcParamList = deepcopy(mCalcParamList)\n    # calcParamList = cast(tuple, deepcopy(mCalcParamList))\n    calcTargetLUT = {\n        \"经济\": 0,\n        \"环保\": 0,\n        \"compensation\": 0,\n    }\n    devInstDictList = []\n    PDList = []\n    timeParamList = []\n    graph_data_list = []\n    extra_data_list = []\n    targetType = calcParamList[0][2][\"计算目标\"]  # graph_data @ elem_0\n    for calc_id, (devs, adders, graph_data, topo_G) in enumerate(calcParamList):",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:362-402"
+    },
+    "2453": {
+        "file_id": 272,
+        "content": "The code defines a class `CalcStruct` and two functions: `targetTypeAsTargetName()` and `getCalcStruct()`. `targetTypeAsTargetName()` converts the target type string to a formatted name. `getCalcStruct()` takes a model wrapper, calculation parameters list, typical day, computation step, and computation type as input, initializes various lists and dictionaries for calculation structure, and sets the target type from the first element of the calculation parameter list.",
+        "type": "comment"
+    },
+    "2454": {
+        "file_id": 272,
+        "content": "        典型日ID = calc_id\n        if 典型日:\n            assert 计算步长 == \"小时\", f\"典型日计算步长异常: {计算步长}\"\n            graph_data[\"典型日ID\"] = 典型日ID\n            timeParam = 每天小时数 * len(graph_data[\"典型日代表的日期\"])\n        else:\n            timeParam = 每年小时数 if 计算步长 == \"小时\" else 秒级仿真小时数  # how many hours?\n        # timeParam /= 每年小时数  # TODO: eliminate invalid results due to timeParam\n        timeParamList.append(timeParam)\n        obj_exprs, devInstDict, PD, extra_data = compute(\n            # obj_exprs, devInstDict, PD = compute(\n            devs,\n            adders,\n            graph_data,\n            topo_G,\n            mw,\n        )  # single instance.\n        # TODO: show & plot compensation\n        compensation_expr = (\n            0\n            if ies_env.ADDER_ERROR_COMPENSATION == \"none\"\n            else extra_data[\"adder_error_total\"][\n                f\"{ies_env.ADDER_ERROR_COMPENSATION}_error\"\n            ]\n        )\n        (\n            financial_obj_expr,\n            financial_dyn_obj_expr,\n            environment_obj_expr,",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:403-434"
+    },
+    "2455": {
+        "file_id": 272,
+        "content": "The code snippet calculates the time parameter based on whether a typical day is provided or not, and appends it to the timeParamList. It then calls the 'compute' function with various parameters and variables, which returns objective expressions (obj_exprs), device instances dictionary (devInstDict), power demand (PD), and extra data. Lastly, it calculates the compensation expression based on the adder error compensation setting.",
+        "type": "comment"
+    },
+    "2456": {
+        "file_id": 272,
+        "content": "        ) = obj_exprs\n        # handle weights in objectives\n        obj_time_param = 1 if not 典型日 else len(graph_data[\"典型日代表的日期\"])\n        calcTargetLUT[\"环保\"] += environment_obj_expr * obj_time_param\n        calcTargetLUT[\"经济\"] += (\n            financial_obj_expr if 计算类型 == \"设计规划\" else financial_dyn_obj_expr\n        ) * obj_time_param\n        calcTargetLUT[\"compensation\"] += compensation_expr\n        devInstDictList.append(devInstDict)\n        PDList.append(PD)\n        graph_data_list.append(graph_data)\n        extra_data_list.append(extra_data)\n    ret = CalcStruct(\n        calcTargetLUT=calcTargetLUT,\n        devInstDictList=devInstDictList,\n        PDList=PDList,\n        timeParamList=timeParamList,\n        graph_data_list=graph_data_list,\n        targetType=targetType,\n        extra_data_list=extra_data_list,\n    )\n    return ret\ndef add_with_nan(v0, v1):\n    if pd.isna(v0):\n        return v1\n    elif pd.isna(v1):\n        return v0\n    else:\n        return v0 + v1\ndef 合并结果表(结果, 结果表: dict, 设备模型实例, 不可累加表头: List[str]):",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:435-472"
+    },
+    "2457": {
+        "file_id": 272,
+        "content": "This code block calculates objectives and appends results to dictionaries, lists, and a return object for later use. It also includes utility functions for handling missing values and merging result tables. The code handles different objective types and weights, and appends the calculated values to corresponding categories in the `calcTargetLUT`. It then prepares other data structures for returning the results.",
+        "type": "comment"
+    },
+    "2458": {
+        "file_id": 272,
+        "content": "    之前结果 = deepcopy(结果表.get(设备模型实例, None))\n    if 之前结果 == None:\n        结果表[设备模型实例] = 结果.dict()\n    else:\n        # TODO: deal with \"nan\"\n        结果表[设备模型实例] = {\n            k: add_with_nan(v, 之前结果[k]) for k, v in 结果.dict().items() if k not in 不可累加表头\n        }\n# TODO: unit test\ndef fetchResult(solved: bool, ret: CalcStruct, 典型日):\n    if solved:\n        # try:\n        仿真结果表 = {}\n        规划结果详情表 = {}\n        出力曲线字典 = {}  # 设备ID: 设备出力曲线\n        创建出力曲线模版 = lambda: [\n            0 for _ in range(每年小时数)\n        ]  # 1d array, placed when running under typical day mode.\n        @beartype\n        def 填充出力曲线(\n            出力曲线模版: List[Union[float, int]],\n            典型日出力曲线: List[Union[int, float]],\n            典型日代表的日期: List[int],\n        ):\n            assert len(出力曲线模版) == 每年小时数, f\"Actual: {len(出力曲线模版)}\"\n            logger_print(典型日出力曲线)  # ANY? please use \"beartype.\n            assert len(典型日出力曲线) == 每天小时数, f\"Actual: {len(典型日出力曲线)}\"\n            for day_index in 典型日代表的日期:\n                出力曲线模版[day_index * 每天小时数 : (day_index + 1) * 每天小时数] = 典型日出力曲线",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:473-506"
+    },
+    "2459": {
+        "file_id": 272,
+        "content": "This code defines a function `fetchResult` that fetches the results from a solved model and updates the simulation and planning result tables. It also creates a function `填充出力曲线` to fill in the output curves for each device. The code uses a deepcopy of the previous results, checks if they are None, and then updates the result table accordingly. It also performs assertions on the lengths of the output curve templates and typical day outputs.",
+        "type": "comment"
+    },
+    "2460": {
+        "file_id": 272,
+        "content": "            return 出力曲线模版\n        仿真结果不可累加表头 = [*(仿真结果字符串表头 := [\"元件名称\", \"元件类型\", \"设备型号\"]), \"设备台数\"]\n        规划结果详情不可累加表头 = [\n            *(\n                规划结果详情字符串表头 := [\n                    \"元件名称\",\n                    \"型号\",\n                ]\n            ),\n            \"数量\",\n        ]\n        for index, devInstDict in enumerate(\n            ret.devInstDictList\n        ):  # 多个典型日 多个相同拓扑结构的计算图对应的设备模型字典\n            graph_data = ret.graph_data_list[index]\n            典型日代表的日期 = graph_data[\"典型日代表的日期\"]\n            timeParam = ret.timeParamList[index]\n            # timeParam = 24 * len(典型日代表的日期) if 典型日 else (8760 if 计算步长 == \"小时\" else 2)\n            # # TODO: fix inconsistent timeParam.\n            # timeParam /= 8760\n            for devId, devInst in devInstDict.items():\n                devClassName = devInst.__class__.__name__.strip(\"模型\")\n                # devClassHiddenName = devInst.设备信息.subtype\n                # devClassHiddenName = devInst.设备信息.subtype_hidden\n                # where you convert the units.\n                # devName = devInst.设备信息.设备名称",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:507-534"
+    },
+    "2461": {
+        "file_id": 272,
+        "content": "This code retrieves the output curve template, simulation results non-cumulative header, and planning result details non-cumulative header from a list of dictionaries containing device information. It then iterates through each device instance for each typical day and calculates the time parameter based on the number of typical days. It also extracts the device class name, which can be used later in the code for further processing.",
+        "type": "comment"
+    },
+    "2462": {
+        "file_id": 272,
+        "content": "                结果类 = globals()[f\"{devClassName}仿真结果\"]  # 一定有的\n                出力曲线类 = globals().get(f\"{devClassName}出力曲线\", None)\n                _仿真结果 = 结果 = 结果类.export(devInst, timeParam)\n                # 结果.元件类型 = devClassName\n                # 结果['元件类型'] = devClassName\n                # 结果['元件类型'] = devClassHiddenName\n                _规划结果详情 = 规划结果详情.export(devInst, _仿真结果, timeParam)\n                # _规划结果详情[] = devClassHiddenName\n                # use this as input for planning data export export\n                # 仿真结果表.append(结果.dict())\n                # 之前结果 = deepcopy(仿真结果表.get(devInst, None))\n                # 之前规划结果 = deepcopy(规划结果表.get(devInst, None))\n                合并结果表(结果, 仿真结果表, devInst, 仿真结果不可累加表头)\n                合并结果表(_规划结果详情, 规划结果详情表, devInst, 规划结果详情不可累加表头)\n                # if 之前结果 == None:\n                #     仿真结果表[devInst] = 结果.dict()\n                # else:\n                #     仿真结果表[devInst] = {\n                #         k: v + 之前结果[k]\n                #         for k, v in 结果.dict().items()",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:535-555"
+    },
+    "2463": {
+        "file_id": 272,
+        "content": "This code is creating a simulation result object and exporting it. It also merges the simulation results with existing data, handling cases where there are no previous results. The code uses different classes for the simulation results and output curves, and checks if they exist in the global scope. It also handles non-accumulative table headers for easier data comparison.",
+        "type": "comment"
+    },
+    "2464": {
+        "file_id": 272,
+        "content": "                #         if k not in 仿真结果不可累加表头\n                #     }\n                if 出力曲线类:\n                    出力曲线 = 出力曲线类.export(devInst, timeParam)\n                    logger_print(\"EXPORTING:\", 出力曲线类.__name__)\n                    # logger_print(\"EXPORTING:\", 出力曲线类.__name__.replace(devClassName, devClassHiddenName))\n                    logger_print(\"DATA:\")\n                    logger_print(出力曲线)\n                    if 典型日:\n                        if 出力曲线字典.get(devId, None) is None:\n                            出力曲线字典[devId] = {\n                                k: 创建出力曲线模版()\n                                for k in 出力曲线.dict().keys()\n                                if k not in [\"元件名称\"]\n                            }\n                        mdict = deepcopy(出力曲线字典[devId])\n                        出力曲线字典.update(\n                            {\n                                devId: {\n                                    k: 填充出力曲线(mdict[k], v, 典型日代表的日期)\n                                    if isinstance(v, list)",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:556-577"
+    },
+    "2465": {
+        "file_id": 272,
+        "content": "This code appears to be part of a larger program related to microgrid simulation. It exports output curves, updates an existing dictionary with data for each device and day, and handles missing or None values in the exported output curve data. The code also performs deep copy operations and uses a `deepcopy` function from the `copy` module. Additionally, it appears that there are some commented lines of code suggesting changes to the logger print statement.",
+        "type": "comment"
+    },
+    "2466": {
+        "file_id": 272,
+        "content": "                                    else v\n                                    for k, v in 出力曲线.dict().items()\n                                }\n                            }\n                        )\n                    else:\n                        出力曲线字典.update({devId: 出力曲线.dict()})\n        # ############################\n        # 仿真结果表_导出 = pd.DataFrame([v for _, v in 仿真结果表.items()], columns=columns)\n        # # use \"inplace\" otherwise you have to manually assign return values.\n        # 仿真结果表_导出.fillna({elem: \"\" for elem in 仿真结果字符串表头}, inplace=True)\n        # 仿真结果表_导出.fillna(\n        #     cmath.nan, inplace=True\n        # )  # default \"nan\" or \"null\" replacement, compatible with type \"float\"\n        # 仿真结果表_导出 = translateDataframeHeaders(仿真结果表_导出, FSPT)\n        # logger_print()\n        # logger_print(出力曲线字典)\n        # logger_print()\n        # 仿真结果表_导出.head()\n        # # 仿真结果表_导出, 仿真结果表_格式化 = 导出结果表_格式化(仿真结果表,仿真结果字符串表头,FSPT)\n        # # export_table = 仿真结果表.to_html()\n        # # may you change the format.",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:578-599"
+    },
+    "2467": {
+        "file_id": 272,
+        "content": "Code snippet updates the output curve dictionary based on a specific device ID, creates a DataFrame from simulation results, replaces NaN values with empty strings and complex numbers, translates headers using FSPT, logs information, and displays the table header.",
+        "type": "comment"
+    },
+    "2468": {
+        "file_id": 272,
+        "content": "        # 仿真结果表_格式化 = 仿真结果表_导出.to_dict(orient=\"records\")\n        ############################\n        logger_print()\n        logger_print(出力曲线字典)\n        logger_print()\n        # breakpoint()\n        仿真结果表_未翻译, _, 仿真结果表_格式化 = 导出结果表_格式化(\n            仿真结果表, 仿真结果字符串表头, FSPT, simulationResultColumns\n        )\n        # 仿真结果表_未翻译, _, 仿真结果表_格式化 = 导出结果表_格式化(仿真结果表, 仿真结果字符串表头, FSPT, 仿真结果.schema()['required'])\n        # breakpoint()\n        规划结果详情表_未翻译, _, 规划结果详情表_格式化 = 导出结果表_格式化(\n            规划结果详情表,\n            规划结果详情字符串表头,\n            规划结果详情.get_translation_table(),\n            规划结果详情.schema()[\"required\"],\n        )\n        simulationResultList = [仿真结果.parse_obj(e) for e in 仿真结果表_格式化]\n        planningResultList = [规划结果详情.parse_obj(e) for e in 规划结果详情表_未翻译]\n        # return 出力曲线字典, 仿真结果表_格式化\n        出力曲线列表 = []\n        for devId, content_dict in 出力曲线字典.items():\n            deviceName = ret.devInstDictList[0][devId].设备信息.设备名称\n            deviceType = ret.devInstDictList[0][devId].__class__.__name__.strip(\"模型\")\n            # deviceHiddenType = ret.devInstDictList[0][devId].设备信息.subtype",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:600-625"
+    },
+    "2469": {
+        "file_id": 272,
+        "content": "This code converts simulation results and planning results into formatted tables, parses them into lists of Pydantic objects, and generates a list of output curves. It also logs information using the logger function and interacts with device information from ret.devInstDictList[0].",
+        "type": "comment"
+    },
+    "2470": {
+        "file_id": 272,
+        "content": "            # deviceHiddenType = ret.devInstDictList[0][devId].设备信息.subtype_hidden\n            elem = {\"name\": deviceName, \"plot_list\": []}\n            for abbr, val in content_dict.items():\n                if abbr in [\"元件名称\", \"时间\"]:\n                    continue\n                # plotName = f\"{deviceHiddenType}{abbr}曲线\"\n                plotName = f\"{deviceType}{abbr}曲线\"\n                # plotName = f\"{deviceType}{abbr}出力曲线\"\n                # xData = content_dict[\"时间\"]\n                # override xData.\n                # xData = [f'{e}时' for e in range(len(val))]\n                xData = list(range(len(val)))\n                yData = val\n                subElem = {\n                    \"name\": plotName,\n                    \"abbr\": abbr,\n                    \"data\": {\"x\": xData, \"y\": yData},\n                }\n                elem[\"plot_list\"].append(subElem)\n            出力曲线列表.append(elem)\n        return dict( # TODO: locate and log the error around the problematic adders, and connected devices\n            performanceDataList=出力曲线列表,",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:626-647"
+    },
+    "2471": {
+        "file_id": 272,
+        "content": "This code is iterating through a dictionary and generating plot data for each key-value pair, except \"元件名称\" and \"时间\". It appends these plots to an output list of performance data. The plots are named using the device type and abbreviation, with xData representing the index range and yData representing the values associated with each abbreviation. Finally, it returns a dictionary containing the list of plot data as \"performanceDataList\".",
+        "type": "comment"
+    },
+    "2472": {
+        "file_id": 272,
+        "content": "            simulationResultTable=仿真结果表_格式化,\n            objectiveResult=dict(\n                financialObjective=value(ret.calcTargetLUT[\"经济\"]),\n                environmentalObjective=value(ret.calcTargetLUT[\"环保\"]),\n                adderError=value(ret.calcTargetLUT[\"compensation\"]),\n            ),\n            planningResultTable=规划结果详情表_格式化,\n            planningSummary=规划方案概览.export(\n                planningResultList,\n                simulationResultList,\n                FSPT,\n                totalAnnualFee=value(ret.calcTargetLUT[\"经济\"]),\n                planType=targetTypeAsTargetName(ret.targetType),\n            ).translate(),\n        )\n        # except:\n        #     import traceback\n        #     traceback.print_exc()\n    return None\n## assume we have multiobjective here.\nclass DualObjectiveRange(BaseModel):\n    min_finance: float\n    fin_env: float\n    env_finance: float\n    min_env: float\ndef prepareConstraintRangesFromDualObjectiveRange(\n    DOR: DualObjectiveRange, target: Union[Literal[\"fin\"], Literal[\"env\"]]",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:648-681"
+    },
+    "2473": {
+        "file_id": 272,
+        "content": "This code segment defines a class DualObjectiveRange and a function prepareConstraintRangesFromDualObjectiveRange, which takes a dual objective range as input, and target (fin or env) to prepare constraint ranges from the input range. The code also initializes simulationResultTable, objectiveResult, planningResultTable, and planningSummary for storing the results of simulations.",
+        "type": "comment"
+    },
+    "2474": {
+        "file_id": 272,
+        "content": "):\n    # min_finance, fin_env = 0, 3\n    # env_finance, min_env = 1, 1\n    # DOR.min_finance, DOR.fin_env = 0, 3\n    # DOR.env_finance, DOR.min_env = 1, 1\n    import numpy as np\n    if target == \"fin\":\n        a, b = DOR.min_finance, DOR.env_finance\n    elif target == \"env\":\n        a, b = DOR.min_env, DOR.fin_env\n    else:\n        raise Exception(\"Unsupported target:\", target)\n    if a == b:\n        raise Exception(\"Unable to perform multiobjective search.\")\n    elif a > b:\n        a, b = b, a\n    # a is smaller than b.\n    fin_points = np.linspace(a, b, num=11)\n    # remove last point to avoid duplicated results.\n    # total range count: 9\n    fin_points = fin_points[:-1]\n    # shall you remove one point.\n    constraint_ranges = list(zip(fin_points[:-1].tolist(), fin_points[1:].tolist()))\n    for fin_start, fin_end in constraint_ranges:\n        logger_print(f\"{fin_start} <= {target.upper()} <= {fin_end}\")  # constraint\n        # min env under this condition. recalculate.\n    return constraint_ranges\ndef solve_model_and_fetch_result(",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:682-714"
+    },
+    "2475": {
+        "file_id": 272,
+        "content": "The code sets up the minimum and maximum values for two targets - 'fin' and 'env'. It checks if these values are equal, and raises an exception if they are. If the first target value is smaller than the second, it swaps them. Then, it creates a numpy array of 11 evenly spaced points between the two target ranges, excluding the last point to avoid duplication. It converts this list into a tuple of lists and returns these constraint ranges. The logger prints each constraint range in the format: \"{fin_start} <= {target.upper()} <= {fin_end}\"",
+        "type": "comment"
+    },
+    "2476": {
+        "file_id": 272,
+        "content": "    calcParamList: List,\n    calcTarget: str,\n    典型日,\n    计算步长,\n    计算类型,\n    rangeDict: Union[None, Dict] = None,\n    needResult: bool = True,\n    additional_constraints: Dict = {},\n):\n    targetNameMappings = dict(\n        abbr=dict(经济=\"fin\", 环保=\"env\"), full=dict(经济=\"finance\", 环保=\"env\")\n    )\n    inputParams = InputParams(\n        calcParamList=calcParamList,\n        计算目标=calcTarget,\n        典型日=典型日,\n        计算步长=计算步长,\n        计算类型=计算类型,\n        rangeDict=rangeDict,\n        needResult=needResult,\n        additional_constraints=additional_constraints,\n    )\n    with ModelWrapperContext(inputParams) as mw:\n        ret = getCalcStruct(mw, calcParamList, 典型日, 计算步长, 计算类型)\n        for expr_name, constraints in additional_constraints.items():\n            expr = ret.calcTargetLUT[expr_name]\n            min_const = constraints.get(\"min\", None)\n            max_const = constraints.get(\"max\", None)\n            if min_const:\n                mw.Constraint(expr >= min_const)\n            if max_const:\n                mw.Constraint(expr <= max_const)",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:715-746"
+    },
+    "2477": {
+        "file_id": 272,
+        "content": "This function takes input parameters for calculation such as calcParamList, calcTarget, typical day, and computation step size. It creates an InputParams object with these inputs, then uses ModelWrapperContext to perform calculations. It gets the CalcStruct result and adds additional constraints from additional_constraints dictionary, using min and max values to create model constraints if present.",
+        "type": "comment"
+    },
+    "2478": {
+        "file_id": 272,
+        "content": "        obj_expr = ret.calcTargetLUT[calcTarget]\n        compensation_expr = ret.calcTargetLUT[\"compensation\"]\n        solved = solve_model(\n            mw, obj_expr + compensation_expr * ies_env.ADDER_ERROR_WEIGHT\n        )\n        # solved = solve_model(mw, obj_expr+compensation_expr)\n        # logger_print(\"compensation:\", value(compensation_expr))\n        # compensation_val = value(compensation_expr)\n        # breakpoint()\n        result = None\n        if solved:\n            if rangeDict is not None:\n                rangeDict[f\"min_{targetNameMappings['full'][calcTarget]}\"] = value(\n                    ret.calcTargetLUT[calcTarget]\n                )\n                for key in targetNameMappings[\"full\"].keys():\n                    if key != calcTarget:\n                        rangeDict[\n                            f\"{targetNameMappings['abbr'][calcTarget]}_{targetNameMappings['full'][key]}\"\n                        ] = value(ret.calcTargetLUT[key])\n            if needResult:\n                result = fetchResult(solved, ret, 典型日)  # use 'ret' to prepare result.",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:748-769"
+    },
+    "2479": {
+        "file_id": 272,
+        "content": "This code calculates the target and adds compensation to the objective expression before solving the model. If solved, it updates the range dictionary with calculated values for different targets and prepares a result using the 'ret' object.",
+        "type": "comment"
+    },
+    "2480": {
+        "file_id": 272,
+        "content": "        return solved, result, rangeDict\n# if sys.argv[-1] in [\"-f\", \"--full\"]:\ndef solveModelFromCalcParamList(\n    calcParamList: List,\n    DEBUG: bool = False,  # replaced by poly degree based verification.\n) -> List:\n    assert len(calcParamList) >= 1\n    # breakpoint()\n    firstParam_graphparam = calcParamList[0][2]\n    典型日 = firstParam_graphparam[\"典型日\"]\n    计算步长 = firstParam_graphparam[\"计算步长\"]\n    计算类型 = firstParam_graphparam[\"计算类型\"]\n    计算目标 = firstParam_graphparam[\"计算目标\"]\n    if 典型日:\n        assert len(calcParamList) >= 1  # 允许单典型日计算\n        # assert len(calcParamList) > 1\n    else:\n        assert len(calcParamList) == 1\n    # 测试全年8760,没有典型日\n    resultList = []\n    commonParams = dict(典型日=典型日, 计算步长=计算步长, 计算类型=计算类型)\n    # try:\n    if 计算目标 in [\"经济\", \"环保\"]:\n        solved, result, _ = solve_model_and_fetch_result(\n            calcParamList, 计算目标, rangeDict={}, **commonParams\n        )\n        if result:\n            resultList.append(result)\n    else:\n        # breakpoint()\n        rangeDict = {}\n        solved, fin_result, rangeDict = solve_model_and_fetch_result(",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:770-806"
+    },
+    "2481": {
+        "file_id": 272,
+        "content": "The code defines a function `solveModelFromCalcParamList` that takes a list of calculation parameters, and returns the solved results. The function checks if the computation is for a typical day or for the whole year. It then appends the calculated result to a list if applicable. If the computation target is economic or environmental, it calls another `solve_model_and_fetch_result` function with specific parameters and appends the returned result if it exists.",
+        "type": "comment"
+    },
+    "2482": {
+        "file_id": 272,
+        "content": "            calcParamList, \"经济\", rangeDict=rangeDict, **commonParams\n        )\n        # breakpoint()\n        if rangeDict != {} and solved:\n            solved, env_result, rangeDict = solve_model_and_fetch_result(\n                calcParamList, \"环保\", rangeDict=rangeDict, **commonParams\n            )\n            # breakpoint()\n            if solved:\n                # breakpoint()\n                DOR = DualObjectiveRange.parse_obj(rangeDict)\n                ### 检验经济环保是否互相影响 ###\n                if DOR.fin_env == DOR.min_env:\n                    # 环境不影响经济 返回最小经济结果\n                    return [fin_result]\n                elif DOR.env_finance == DOR.min_finance:\n                    # 经济不影响环境 返回最小环保结果\n                    return [env_result]\n                constraint_ranges = prepareConstraintRangesFromDualObjectiveRange(\n                    DOR, target=\"env\"  # add some more paremeters.\n                )\n                for env_start, env_end in constraint_ranges:\n                    # for fin_start, fin_end in constraint_ranges:",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:807-831"
+    },
+    "2483": {
+        "file_id": 272,
+        "content": "The code solves two models, one for economic and another for environmental impact. If the impacts do not affect each other, it returns the minimum result from either model. It then prepares constraint ranges based on the dual objective range provided.",
+        "type": "comment"
+    },
+    "2484": {
+        "file_id": 272,
+        "content": "                    additional_constraints = {\n                        #     \"经济\": {\"min\": fin_start, \"max\": fin_end}\n                        \"环保\": {\"min\": env_start, \"max\": env_end}\n                    }\n                    solved, result, _ = solve_model_and_fetch_result(\n                        calcParamList,\n                        \"经济\",\n                        rangeDict=None,\n                        **commonParams,\n                        additional_constraints=additional_constraints\n                        # calcParamList, \"环保\", None, additional_constraints = additional_constraints\n                    )\n                    if solved:\n                        if result:\n                            resultList.append(result)\n        #### LOOP OF PREPARING SOLUTION ####\n    # except:\n    #     import traceback\n    #     traceback.print_exc()\n    #     #         breakpoint()  # you need to turn off these breakpoints in release.\n    #     # breakpoint()\n    logger_print(\"SOLVER WORKER END.\")\n    return resultList",
+        "type": "code",
+        "location": "/microgrid_base/solve_model.py:832-855"
+    },
+    "2485": {
+        "file_id": 272,
+        "content": "This code solves a model with additional economic and environmental constraints, appends the solution to resultList, and logs \"SOLVER WORKER END\" upon completion.",
+        "type": "comment"
+    },
+    "2486": {
+        "file_id": 273,
+        "content": "/microgrid_base/synth_mock_reload.sh",
+        "type": "filepath"
+    },
+    "2487": {
+        "file_id": 273,
+        "content": "This line sets the GENERATED_MOCK environment variable to True and runs the \"reload.sh\" script using bash, potentially loading a pre-generated mock configuration for testing or debugging purposes.",
+        "type": "summary"
+    },
+    "2488": {
+        "file_id": 273,
+        "content": "env GENERATED_MOCK=True bash reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/synth_mock_reload.sh:1-1"
+    },
+    "2489": {
+        "file_id": 273,
+        "content": "This line sets the GENERATED_MOCK environment variable to True and runs the \"reload.sh\" script using bash, potentially loading a pre-generated mock configuration for testing or debugging purposes.",
+        "type": "comment"
+    },
+    "2490": {
+        "file_id": 274,
+        "content": "/microgrid_base/test/Makefile",
+        "type": "filepath"
+    },
+    "2491": {
+        "file_id": 274,
+        "content": "The code sets up environment variables and defines execution methods for different OS types. It uses conda environments, with tests run using bash scripts or Python scripts via pytest. The Makefile contains test commands for multiple scripts and rules for generating files needed by these tests.",
+        "type": "summary"
+    },
+    "2492": {
+        "file_id": 274,
+        "content": "# PLATFORM := $(shell python -c \"import os; print(os.name)\")\n# ifeq (${PLATFORM}, )\n# PLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\n# endif\n# ifeq (${PLATFORM}, nt)\n# OS_TYPE = windows\n# else\n# OS_TYPE = macos\n# endif\n# PYTHON_ENV = -X utf8=1\n# ifeq (${OS_TYPE}, macos)\n# CONDA_ENV = rosetta\n# PYTHON = /usr/bin/python3\n# else\n# CONDA_ENV = cplex\n# PYTHON = python ${PYTHON_ENV}\n# endif\n# CONDA = conda run -n ${CONDA_ENV} --live-stream --no-capture-output\nifeq (${OS_TYPE}, macos)\nMAIN_EXEC=bash run_test.sh\nelse\n# MAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=no\nMAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys\n# MAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# MAIN_EXEC=${CONDA} python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys test_model.py\nendif\n# main: run_test.sh test_model.py common_fixtures.py stepwise\nmain: run_test.sh test_model.py test_export.py test_failsafe.py common_fixtures.py",
+        "type": "code",
+        "location": "/microgrid_base/test/Makefile:2-35"
+    },
+    "2493": {
+        "file_id": 274,
+        "content": "The code sets up environment variables for different operating systems and defines the execution method based on OS type. It uses conda environments (rosetta or cplex) and specifies the main executable as a bash script, or a combination of Python scripts using pytest. The purpose is to run tests on various microgrid models.",
+        "type": "comment"
+    },
+    "2494": {
+        "file_id": 274,
+        "content": "\tenv VAR_INIT_AS_ZERO=1 ${MAIN_EXEC} test_export.py\n\t${MAIN_EXEC} test_model.py\n\t${PYTHON} test_failsafe.py\nt_export:\n\t${MAIN_EXEC} test_export.py\nt_model:\n\t${MAIN_EXEC} test_model.py\nt_failsafe:\n\t${PYTHON} test_failsafe.py\ntest_model.py: generate_test_model.py test_model.py.j2\n\t${PYTHON} $<\ncommon_fixtures.py.tmp test_export.py: dev_info_tmp_gen.py common_fixtures.py.j2 test_export.py.j2 ../export_format_validate.py\n\t${PYTHON} $<\n# stepwise: runtime_override_stepwise.py\n# \t${PYTHON} $< -t\n# \t${CONDA} python ${PYTHON_ENV} $< -t",
+        "type": "code",
+        "location": "/microgrid_base/test/Makefile:36-57"
+    },
+    "2495": {
+        "file_id": 274,
+        "content": "This Makefile contains test commands for three Python scripts: test_export.py, test_model.py, and test_failsafe.py. It also includes rules to generate test_model.py from another file (generate_test_model.py), and common_fixtures.py.tmp from dev_info_tmp_gen.py, common_fixtures.py.j2, and test_export.py.j2. Additionally, there is a commented stepwise rule for runtime_override_stepwise.py.",
+        "type": "comment"
+    },
+    "2496": {
+        "file_id": 275,
+        "content": "/microgrid_base/test/circular_import_a.py",
+        "type": "filepath"
+    },
+    "2497": {
+        "file_id": 275,
+        "content": "This code imports and prints variable 'b' from circular_import_b.py, sets variable 'a' to 1.",
+        "type": "summary"
+    },
+    "2498": {
+        "file_id": 275,
+        "content": "a = 1\nfrom circular_import_b import b\nprint(b)",
+        "type": "code",
+        "location": "/microgrid_base/test/circular_import_a.py:1-5"
+    },
+    "2499": {
+        "file_id": 275,
+        "content": "This code imports and prints variable 'b' from circular_import_b.py, sets variable 'a' to 1.",
+        "type": "comment"
+    }
+}

@@ -1,0 +1,15 @@
+模型名称：
+    柴油模型
+常量：
+    Price
+    热值 (MJ/L) # if bracket is ahead of any symbols (not function name!), treat it content as unit specification
+    CO2 (kg/L) # unit annotation shall not be shown more than once.
+    NOX "kg/L" # provide unit inference to unannotated symbols. default unit to any unannotated symbol is "one"
+    SO2 (kg/L)
+变量列表：
+    >| 燃料接口
+约束:
+    平均消耗率 = avg(燃料接口) # or: average
+    年化费用 (万元/年) = 平均消耗率 * Price * 每年小时数 # global constant: 8760
+    # this shall be unit conversion problem, like: dollar/hour -> dollar/year
+    总成本年化 = 年化费用

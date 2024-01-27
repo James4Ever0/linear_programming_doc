@@ -1,0 +1,10 @@
+{
+    "summary": "This Dockerfile updates the microgrid base, installs required packages and libraries using init scripts, sets up environment variables, and copies necessary files to the workspace. The ADDITIONAL_SUFFIX_ARGS argument is used to export additional files and folders. Logs are stored in /root/microgrid/server/logs.",
+    "details": [
+        {
+            "comment": "This Dockerfile updates the microgrid base, installs required packages and libraries using init scripts, sets up environment variables, and copies necessary files to the workspace. The ADDITIONAL_SUFFIX_ARGS argument is used to export additional files and folders. Logs are stored in /root/microgrid/server/logs.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/Dockerfile_update\":0-31",
+            "content": "FROM microgrid_docplex:latest\nARG BASH=/bin/bash\nARG MICROGRID_DIR=./jubilant-adventure2/microgrid_base\nWORKDIR /root\nCOPY ${MICROGRID_DIR}/init_solver.sh .\nRUN ${BASH} init_solver.sh\nCOPY ${MICROGRID_DIR}/requirements_docplex.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_docplex.sh .\nRUN ${BASH} init_update_conda_docplex.sh\nCOPY ${MICROGRID_DIR}/requirements_docker_launch.txt .\nCOPY ${MICROGRID_DIR}/requirements.txt .\nCOPY ${MICROGRID_DIR}/init_update_conda_cplex.sh .\nRUN ${BASH} init_update_conda_cplex.sh\n# finally we run this.\nCOPY ${MICROGRID_DIR}/init_apt_environ.sh .\nRUN ${BASH} init_apt_environ.sh\n# we copy files to our workspace\n# COPY ${MICROGRID_DIR}${ADDITIONAL_SUFFIX} /root/microgrid_server\n# to export it, use it as --build-arg, you must write the below line:\nARG ADDITIONAL_SUFFIX_ARGS\nRUN mkdir -p /root/microgrid/server/logs\n# ENV ADDITIONAL_SUFFIX $ADDITIONAL_SUFFIX_ARGS\nCOPY ${MICROGRID_DIR}${ADDITIONAL_SUFFIX_ARGS} /root/microgrid\n# RUN echo ${ADDITIONAL_SUFFIX_ARGS}"
+        }
+    ]
+}

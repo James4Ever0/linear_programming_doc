@@ -1,0 +1,10 @@
+{
+    "summary": "The code is importing the \"Model\" class from the \"docplex.mp.model\" module and creating a new model object named \"model\" for testing purposes, with a breakpoint set to pause execution.",
+    "details": [
+        {
+            "comment": "The code is importing the \"Model\" class from the \"docplex.mp.model\" module and creating a new model object named \"model\" for testing purposes, with a breakpoint set to pause execution.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/check_non_convex_quadratic_constraint_in_model.py\":0-4",
+            "content": "# how to find that thing?\nfrom docplex.mp.model import Model\nmodel = Model('test_model')\nbreakpoint()"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This command is running a Python documentation generator, pdoc, to serve the generated HTML documentation on localhost at port 8021. It will generate docs for three Python files - integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py.",
+    "details": [
+        {
+            "comment": "This command is running a Python documentation generator, pdoc, to serve the generated HTML documentation on localhost at port 8021. It will generate docs for three Python files - integratedEnergySystemPrototypes.py, demo_utils.py, and cpExample.py.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/host_document.cmd\":0-0",
+            "content": "pdoc --http 0.0.0.0:8021 integratedEnergySystemPrototypes.py demo_utils.py cpExample.py"
+        }
+    ]
+}

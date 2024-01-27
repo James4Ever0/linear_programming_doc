@@ -1,0 +1,10 @@
+{
+    "summary": "Installing necessary libraries (coin-or-cbc, scip, ipopt) in a conda environment named \"cplex\" for solving optimization problems.",
+    "details": [
+        {
+            "comment": "Installing necessary libraries (coin-or-cbc, scip, ipopt) in a conda environment named \"cplex\" for solving optimization problems.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_solver.sh\":0-0",
+            "content": "conda install -n cplex -c conda-forge -y coin-or-cbc scip ipopt"
+        }
+    ]
+}

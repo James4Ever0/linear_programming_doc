@@ -1,0 +1,10 @@
+{
+    "summary": "This code installs DOCPLEX package using pip in a conda environment named \"docplex\" from the PyPI mirror at Tsinghua University, with the requirements specified in \"requirements_docplex.txt\". The \"--live-stream\" and \"--no-capture-output\" options are used to provide real-time updates during the installation process.",
+    "details": [
+        {
+            "comment": "This code installs DOCPLEX package using pip in a conda environment named \"docplex\" from the PyPI mirror at Tsinghua University, with the requirements specified in \"requirements_docplex.txt\". The \"--live-stream\" and \"--no-capture-output\" options are used to provide real-time updates during the installation process.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/init_update_conda_docplex.sh\":0-0",
+            "content": "conda run -n docplex --live-stream --no-capture-output pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_docplex.txt"
+        }
+    ]
+}

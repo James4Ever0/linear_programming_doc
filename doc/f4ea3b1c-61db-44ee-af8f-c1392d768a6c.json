@@ -1,0 +1,15 @@
+{
+    "summary": "This code creates shims for Node.js executables, such as node and npm, by setting their paths to the corresponding versions and copying the pandoc.exe file. It effectively creates a shim named \"npx\" for Node.js in the specified directory.",
+    "details": [
+        {
+            "comment": "This code creates shims for various Node.js executables (node, npm, tsc, openapi, and npx) by setting their paths to the corresponding versions. It copies the pandoc.exe file as a destination for each shim's execution path in the specified directory.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/create_shim_for_nodejs.ps1\":0-16",
+            "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/node.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\node.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/node.exe\nNew-Item -Path C:/Users/ss/scoop/shims/npm.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\npm.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/npm.exe\nNew-Item -Path C:/Users/ss/scoop/shims/tsc.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\bin\\tsc.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/tsc.exe\nNew-Item -Path C:/Users/ss/scoop/shims/openapi.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\bin\\openapi.cmd'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/openapi.exe\nNew-Item -Path C:/Users/ss/scoop/shims/npx.shim -Value 'path = C:\\ProgramData\\scoop\\apps\\nodejs\\19.7.0\\npx.cmd'"
+        },
+        {
+            "comment": "This code is copying the pandoc.exe file from C:/Users/ss/scoop/shims to C:/Users/ss/scoop/shims/npx.cmd, effectively creating a shim named \"npx\" for Node.js.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/create_shim_for_nodejs.ps1\":17-17",
+            "content": "Copy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/npx.cmd"
+        }
+    ]
+}

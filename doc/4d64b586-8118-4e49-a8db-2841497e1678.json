@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a macro \"mtest\" that takes three arguments (a, b, c), initializes an empty list, appends the first argument to the list, and returns the current state of the list. The macro is then called without passing any arguments, resulting in an error as it expects at least one argument.",
+    "details": [
+        {
+            "comment": "This code defines a macro \"mtest\" that takes three arguments (a, b, c), initializes an empty list, appends the first argument to the list, and returns the current state of the list. The macro is then called without passing any arguments, resulting in an error as it expects at least one argument.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_neverundefined/template.j2\":1-8",
+            "content": "{% macro mtest(a, b, c) %}\nhappy song\n{% set s = [] %}\n{% do s.append(a) %}\n{{ s }}\n{% endmacro %}\n{{ mtest() }}"
+        }
+    ]
+}

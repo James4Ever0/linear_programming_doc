@@ -1,0 +1,15 @@
+{
+    "summary": "The code imports necessary libraries, defines functions for profiling and model building, removes an existing file, profiles the model_build function using cProfile, prints \"after run\", writes profiling information to a log file named \"profile.log\"",
+    "details": [
+        {
+            "comment": "Code imports necessary libraries and defines functions for profiling and model building. It removes an existing file, profiles the model_build function using cProfile, and then prints \"after run\". The code also includes a commented-out section for testing a regular expression compilation with cProfile and a try/except block for timeouts.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/profile_code.py\":0-54",
+            "content": "# to run code faster:\n# conda create -n pypy -c conda-forge pypy\nimport cProfile\n# import re\nprint(\"before run\")\ndef subfunc():\n    val = 0\n    for i in range(100):\n        val += i\n    return val\ndef test():\n    while True:\n        subfunc()\nimport func_timeout\nimport os\nfpath = \"profile.bin\"\nfrom ForthGK_CLASS_new2 import *\ndef model_build():\n    mdl = Model(\"test_model\")\n    num_h = 24\n    cool_max, cool_min, heat_max, heat_min = 20000, 10000, 20000, 10000\n    set_price = 20\n    ele_price = [1] * 24\n    dev = ForthGK(\n        num_h, mdl, cool_max, cool_min, heat_max, heat_min, set_price, ele_price\n    )\n    dev.cons_register(mdl)\ndef profile():\n    os.system(f\"rm {fpath}\")\n    # cProfile.run(\"test()\", filename=fpath)\n    cProfile.run(\"model_build()\", filename=fpath)\n    # cProfile.run('re.compile(\"foo|bar\")')\n    print(\"after run\")\nprofile() # run this indefinitely\n# tout = 20\n# print(\"timeout in %d seconds...\" % tout)\n# try:\n#     func_timeout.func_timeout(tout, profile)\n# except func_timeout.FunctionTimedOut:\n#     pass"
+        },
+        {
+            "comment": "This code writes profiling information to a file named \"profile.log\". It redirects standard error (stderr) to the specified file, creates a pstats object from the file contents, and then prints the statistics in a sorted format, excluding directory paths. The log file location is displayed as 'write to: profile.log'.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/profile_code.py\":55-67",
+            "content": "# except Exception as e:\n#     raise e\nimport pstats\n# from contextlib import redirect_stderr\nlog_fpath = \"profile.log\"\nwith open(log_fpath, \"w+\") as f:\n    # with redirect_stderr(f):\n    p = pstats.Stats(fpath,stream=f)\n    p.strip_dirs().sort_stats(2).print_stats()\n# os.system(f\"type {log_fpath}\")\nprint('write to:', log_fpath)"
+        }
+    ]
+}

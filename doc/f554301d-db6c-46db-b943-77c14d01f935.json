@@ -1,0 +1,15 @@
+{
+    "summary": "This code plots non-zero values from an array and labels the axes 'Time/h' and 'Power/kW'. It creates a legend, saves the figure with title_content name in 'fig/' directory, and initializes with solution (sol).",
+    "details": [
+        {
+            "comment": "Class IGESPlot initializes with a solution (sol) and plots a list of values. The plot_list method takes an array and plots its contents if any value is not equal to 0. It checks the dimensions of the array, prints xlen and ylen, creates a title based on legend_title and title_content, and only plots non-zero values.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/plot_arr.py\":0-39",
+            "content": "# import docplex\n# from docplex.mp.model import Model\n# import pandas as pd\n# import numpy as np\nimport matplotlib.pyplot as plt\nfrom matplotlib import style\nfrom result_processlib import Value\nclass IGESPlot(object):\n    def __init__(self, sol):\n        self.sol = sol\n    # n \u884c\u5411\u91cf\n    def plot_list(self, arr, legend_title, title_content):\n        value = Value(self.sol)\n        if isinstance(arr, list):\n            xlen = len(arr)\n            if isinstance(arr[0], list):\n                ylen = len(arr[0])\n            else:\n                ylen = 1\n        else:\n            xlen = 1\n        print('xlen:',xlen,' ylen:',ylen)\n        wide = 4\n        # \u5168\u90e8\u4e3a0\u7684\u65f6\u5019\u5c31\u4e0d\u663e\u793a\n        index = 1\n        title2 = list()\n        index = 0\n        for row in range(0, xlen):\n            arrtemp: list = value.value(arr[row])\n            flag = 0\n            for col in range(0, ylen):\n                if arrtemp[col] >= 1 or arrtemp[col] <= -1:\n                    flag = 1\n            if flag == 0:\n                # \u5168\u90e8\u4e3a0\n                np_ = 0"
+        },
+        {
+            "comment": "This code plots an array of data (arrtemp) and labels the x-axis as 'Time/h' and y-axis as 'Power/kW'. It creates a legend based on the row number and saves the figure with the title_content name in the 'fig/' directory.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/plot_arr.py\":40-53",
+            "content": "            else:\n                #print(arrtemp)\n                plt.plot(arrtemp)\n                #print('index:', index, ' row:', row)\n                title2.append(legend_title[row])\n                print('row:',row)\n                index = index + 1\n        plt.xlabel('Time/h')\n        plt.ylabel('Power/kW')\n        # plt.set(gca, 'Fontsize', 20)\n        plt.legend(title2)\n        plt.title(title_content)\n        plt.savefig('fig/'+title_content+'.png')"
+        }
+    ]
+}

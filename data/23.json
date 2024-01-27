@@ -1,0 +1,542 @@
+{
+    "2300": {
+        "file_id": 258,
+        "content": "        }\n    )\nMETA_TRANSLATION_TABLE = {\n    \"设计规划\": \"DesignParams\",\n    \"仿真模拟\": \"SimulationParams\",\n    \"设备选型\": \"DeviceModel\",\n}\nadd_range_translation(META_TRANSLATION_TABLE, \"安装面积\", \"Area\")\nadd_range_translation(META_TRANSLATION_TABLE, \"安装台数\", \"DeviceCount\")\n# you may copy this from the table, not parsing it though.\n# you need to check for units.\n# output_data = {\"unit_conversion\", \"\"}\noutput_data = {}  # category -> device_name -> {设备参数, 设计规划, 仿真模拟}\ndef getUnitConverted(val_name, val_unit):\n    base_classes = TRANSLATION_TABLE[val_name]\n    has_exception = False\n    _val_unit = val_unit\n    if _val_unit:\n        _val_unit = translateUnit(_val_unit)\n    for base_class in base_classes:\n        default_unit = BASE_CLASS_TO_UNIT_TABLE[base_class]\n        # iterate through all base classes.\n        val_unit = _val_unit\n        has_exception, val_unit = getSingleUnitConverted(\n            default_unit=default_unit, val_unit=val_unit\n        )\n        if has_exception:\n            continue\n        elif val:\n            # get factor:",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:335-377"
+    },
+    "2301": {
+        "file_id": 258,
+        "content": "This code defines a dictionary for translating Chinese names to English ones and adds ranges for \"安装面积\" (Area) and \"安装台数\" (DeviceCount). It initializes an empty dictionary for the output data, then populates it with device parameters, design, and simulation data based on the input values and their corresponding units. The code also checks if there is a unit exception and translates the unit accordingly using the getSingleUnitConverted function.",
+        "type": "comment"
+    },
+    "2302": {
+        "file_id": 258,
+        "content": "            logger_print(\"TRANS {} -> {}\".format(val_name, base_class))  # [PS]\n            mag, standard = unitFactorCalculator(ureg, standard_units, val_unit)\n            # logger_print(\"STANDARD:\", standard)\n            # logger_print(\"MAGNITUDE TO STANDARD:\", mag)\n            has_exception = False\n            return has_exception, (base_class, val_unit, mag, standard)\n    return True, (None, None, None, None)  # has_exception, uc\ndef getValueParam(uc, val_name):\n    (base_class, val_unit, mag, standard) = uc\n    vparam = [\n        base_class,\n        val_name,\n        val_unit,\n        standard,\n        mag,\n    ]  # to list. instead of tuple, for serialization\n    # vparam = (base_class, val_name, val_unit, standard, mag)\n    return vparam\ndef wrapper_uc_vp(val_name, val_unit):\n    has_exception, uc = getUnitConverted(val_name, val_unit)\n    if has_exception:\n        raise Exception(f\"No compatibie unit found for {val_name} with unit {val_unit}\")\n    vparam = getValueParam(uc, val_name)\n    return vparam",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:378-405"
+    },
+    "2303": {
+        "file_id": 258,
+        "content": "This code defines a function to convert a value's unit and name into a standard format. It uses the function `unitFactorCalculator` to calculate the magnitude and standard unit of the value in question. If an exception occurs during unit conversion, it raises an Exception. The `getValueParam` function returns the base class, value name, original unit, standard unit, and magnitude as a list for serialization purposes. Finally, the `wrapper_uc_vp` function gets the unit-converted values and formats them into a list before returning it.",
+        "type": "comment"
+    },
+    "2304": {
+        "file_id": 258,
+        "content": "for key in keys:\n    logger_print(data[key].keys())\n    # val_list = data[key]\n    output_data[key] = {}\n    # logger_print(key)\n    # breakpoint()\n    for subkey in data[key].keys():\n        # missing!\n        # if subkey == '传输线':  breakpoint()\n        output_data[key][subkey] = {\"设备参数\": [], \"设计规划\": [], \"仿真模拟\": []}\n        val_list = data[key][subkey]\n        # logger_print(val_list)\n        logger_print(\"____\" * 10 + \"[{}-{}]\".format(key, subkey))\n        meta_type = None\n        for index, val in enumerate(val_list):\n            val_is_table = data_is_excel[key][subkey][\n                index\n            ]  # TODO: USE THIS VALUE TO CHECK IF IS TABLE! (also the data format)\n            logger_print(\"____\" * 10)\n            from unit_utils import unitCleaner\n            val = unitCleaner(val)\n            logger_print(val)\n            if val in CHAR_TYPE:\n                logger_print(\"CHAR_TYPE\")\n                output_data[key][subkey][\"设备参数\"].append(val)\n            elif val in META_TYPE or val in SKIP_TYPE:",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:408-434"
+    },
+    "2305": {
+        "file_id": 258,
+        "content": "The code is iterating over keys in a data dictionary and then over subkeys within each key. It checks the value of '传输线' and creates an output_data dictionary if it exists. The code then checks if the value is a character type, meta type or skip type before appending to appropriate lists in the output_data dictionary.",
+        "type": "comment"
+    },
+    "2306": {
+        "file_id": 258,
+        "content": "                logger_print(\"META_TYPE\")\n                meta_type = val\n                # appending values, presumed.\n                if meta_type in SKIP_TYPE:\n                    params = {\"设计规划\": [], \"仿真模拟\": []}\n                    ## 设计规划\n                    dkey = \"设计规划\"\n                    # extra\n                    if subkey in [\"变压器\"]:\n                        params[dkey].append(wrapper_uc_vp(\"功率因数\", \"one\"))\n                        params[dkey].append(wrapper_uc_vp(\"变压器冗余系数\", \"one\"))\n                    # override\n                    if subkey in [\"锂电池\"]:\n                        params[dkey].append(wrapper_uc_vp(\"初始SOC\", \"percent\"))\n                        params[dkey].append(\"循环边界条件\")\n                        params[dkey].append(wrapper_uc_vp(\"最大设备容量\", \"kWh\"))  # 总容量\n                        params[dkey].append(\n                            wrapper_uc_vp(\"最小设备容量\", \"kWh\")\n                        )  # from excel.\n                    elif subkey in [\"光伏发电\"]:  # solar power.\n                        params[dkey].append(wrapper_uc_vp(\"最大安装面积\", \"m2\"))",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:435-455"
+    },
+    "2307": {
+        "file_id": 258,
+        "content": "This code is appending values based on the type of simulation and subkey. It adds specific parameters for certain subkeys, such as transformer power factor and transformer redundancy coefficient. For lithium batteries, it includes initial state of charge (SOC), loop boundary conditions, maximum battery capacity, and minimum battery capacity. For solar power, it adds the maximum installation area.",
+        "type": "comment"
+    },
+    "2308": {
+        "file_id": 258,
+        "content": "                        params[dkey].append(\n                            wrapper_uc_vp(\"最小安装面积\", \"m2\")\n                        )  # from excel.\n                    elif subkey in [\"传输线\"]:  # transfer lines, pipes\n                        params[dkey].append(wrapper_uc_vp(\"长度\", \"km\"))\n                    else:\n                        params[dkey].append(wrapper_uc_vp(\"最大安装台数\", \"台\"))\n                        params[dkey].append(wrapper_uc_vp(\"最小安装台数\", \"台\"))\n                    ## 仿真模拟\n                    dkey = \"仿真模拟\"\n                    # extra\n                    if subkey in [\"变压器\"]:\n                        params[dkey].append(wrapper_uc_vp(\"功率因数\", \"one\"))\n                    # override\n                    if subkey in [\"传输线\"]:\n                        params[dkey].append(wrapper_uc_vp(\"长度\", \"km\"))\n                    elif subkey in [\"锂电池\"]:\n                        params[dkey].append(wrapper_uc_vp(\"初始SOC\", \"percent\"))\n                        params[dkey].append(wrapper_uc_vp(\"设备容量\", \"kWh\"))\n                    else:",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:456-476"
+    },
+    "2309": {
+        "file_id": 258,
+        "content": "This code is part of a function that takes input parameters, interprets them based on the subkey, and appends unit conversions to a list for each key. It handles cases such as \"最小安装面积\", \"传输线\", and \"变压器\". For \"仿真模拟\", it appends \"功率因数\" if the subkey is \"变换器\". It overrides previous appends for \"传输线\" and appends \"长度\" with unit \"km\". For \"锂电池\", it adds \"初始SOC\" and \"设备容量\" with units \"percent\" and \"kWh\" respectively. The code is likely written in Python, considering the usage of \"append\" and list handling.",
+        "type": "comment"
+    },
+    "2310": {
+        "file_id": 258,
+        "content": "                        params[dkey].append(wrapper_uc_vp(\"安装台数\", \"台\"))\n                    params[\"设计规划\"].append(\"设备选型\")  # you may set the calculation mode.\n                    params[\"仿真模拟\"].append(\"设备选型\")\n                    output_data[key][subkey].update(params)\n                    logger_print(params)\n                    # str? -> str\n                    # tuple -> number with unit\n                    # dict -> table\n                    # breakpoint()\n            else:\n                # begin to parse it.\n                if val in COMMENT_TYPE:\n                    continue\n                from unit_utils import unitParser\n                result = unitParser(val)\n                if result:\n                    val_name, val_unit = (\n                        result[\"val_name\"].strip(),\n                        result[\"val_unit\"].strip(),\n                    )\n                else:\n                    val_name = val\n                    val_unit = None\n                if meta_type in SKIP_TYPE:\n                    # TODO: checking metadata.",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:477-507"
+    },
+    "2311": {
+        "file_id": 258,
+        "content": "This code is parsing input data, handling units and names. It updates a dictionary with parameters and logs the information. It skips certain types of metadata for further checking.",
+        "type": "comment"
+    },
+    "2312": {
+        "file_id": 258,
+        "content": "                    continue\n                elif val_name in TRANSLATION_TABLE.keys():\n                    has_exception, uc = getUnitConverted(val_name, val_unit)\n                    # base_classes = TRANSLATION_TABLE[val_name]\n                    # has_exception = False\n                    # for base_class in base_classes:\n                    #     default_unit = BASE_CLASS_TO_UNIT_TABLE[base_class]\n                    #     # iterate through all base classes.\n                    #     logger_print(\"DEFAULT UNIT:\", default_unit)\n                    #     default_unit_real = ureg.Unit(default_unit)\n                    #     default_unit_compatible = ureg.get_compatible_units(\n                    #         default_unit_real\n                    #     )\n                    #     logger_print(\"TRANS {} -> {}\".format(val_name, base_class))\n                    #     if val_unit:\n                    #         for (\n                    #             trans_source_unit,\n                    #             trans_target_unit,",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:508-525"
+    },
+    "2313": {
+        "file_id": 258,
+        "content": "Continuing the loop if val_name is already in TRANSLATION_TABLE keys. If not, gets the converted unit (has_exception and uc) from getUnitConverted function. Iterates through all base classes for val_name and checks compatibility of default_unit with val_unit. Logs DEFAULT UNIT and TRANS messages.",
+        "type": "comment"
+    },
+    "2314": {
+        "file_id": 258,
+        "content": "                    #         ) in UNIT_TRANSLATION_TABLE.items():\n                    #             val_unit = val_unit.replace(\n                    #                 trans_source_unit, trans_target_unit\n                    #             )\n                    #         # parse this unit!\n                    #     else:\n                    #         val_unit = default_unit\n                    #         logger_print(\"USING DEFAULT UNIT\")\n                    #     logger_print(\"UNIT\", val_unit)\n                    #     unit = ureg.Unit(val_unit)\n                    #     compatible_units = ureg.get_compatible_units(val_unit)\n                    #     # logger_print(\"COMPATIBLE UNITS\", compatible_units)\n                    #     if not default_unit_compatible == compatible_units:\n                    #         has_exception = True\n                    #         logger_print(\n                    #             \"Unit {} not compatible with default unit {}\".format(\n                    #                 val_unit, default_unit",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:526-542"
+    },
+    "2315": {
+        "file_id": 258,
+        "content": "The code checks the value unit and replaces it with the target unit in UNIT_TRANSLATION_TABLE. If no translation is found, it uses the default_unit and logs a message. It then creates a ureg Unit object from val_unit, retrieves compatible units, and compares them to default_unit_compatible. If not equal, it sets has_exception to True and logs an incompatibility message.",
+        "type": "comment"
+    },
+    "2316": {
+        "file_id": 258,
+        "content": "                    #             )\n                    #         )\n                    #         continue\n                    #     else:\n                    #         # get factor:\n                    #         mag, standard = unitFactorCalculator(\n                    #             ureg, standard_units, val_unit\n                    #         )\n                    #         logger_print(\"STANDARD:\", standard)\n                    #         logger_print(\"MAGNITUDE TO STANDARD:\", mag)\n                    #         has_exception = False\n                    #         break\n                    if has_exception:\n                        raise Exception(\n                            f\"No compatibie unit found for {val_name} (unit: {val_unit}, {key}, {subkey})\"\n                        )\n                        # raise Exception(f\"No compatibie unit found for {val_unit}\")\n                    else:\n                        v_param = getValueParam(uc, val_name)\n                        if val_is_table:\n                            (_, _, _, standard) = uc",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:543-563"
+    },
+    "2317": {
+        "file_id": 258,
+        "content": "This code block checks for compatible units and handles exceptions if no unit is found. If a unit exception occurs, it raises an Exception with the relevant information. It also retrieves a value parameter and handles table values differently.",
+        "type": "comment"
+    },
+    "2318": {
+        "file_id": 258,
+        "content": "                            logger_print(\"TABLE VALUE:\", val_name, standard)\n                            table_format = get_table_format(  # 基本上都是负载率\n                                val_name, standard\n                            )  # unit vs\n                            t_name, t_unit = table_format\n                            has_exception, t_uc = getUnitConverted(t_name, t_unit)\n                            if has_exception:\n                                raise Exception(\n                                    \"No table format found for:\", val_name, val_unit\n                                )\n                            t_param = getValueParam(t_uc, t_name)\n                            new_param = {\"MAIN\": v_param, \"SUB\": t_param}\n                            # new_param = {v_param: t_param}\n                            # (name, original_name, original_unit, standard_unit, magnitude)\n                        else:\n                            # normal values.\n                            new_param = v_param\n                        output_data[key][subkey][\"设备参数\"].append(new_param)",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:564-585"
+    },
+    "2319": {
+        "file_id": 258,
+        "content": "This code snippet retrieves a table format for the given value name and standard unit, converts it if necessary, and adds it to the output data. If no table format is found, an exception is raised. If there is no need for table formatting, it simply appends the normal value to the output data.",
+        "type": "comment"
+    },
+    "2320": {
+        "file_id": 258,
+        "content": "                else:\n                    raise Exception(\"Unknown Value:\", val, key, subkey)\nlogger_print()\nlogger_print(output_data)\n# write documents for api?\n# or just a whole bunch of generated documents inserted into places?\nwith open(output_path, \"w+\") as f:\n    f.write(json.dumps(output_data, indent=4, ensure_ascii=False))\nlogger_print(\"SAVED TO:\", output_path)",
+        "type": "code",
+        "location": "/microgrid_base/parse_units_and_names.py:586-598"
+    },
+    "2321": {
+        "file_id": 258,
+        "content": "Code is handling unknown values by raising an exception and logging the information. It then writes JSON formatted data to a specified file path, while logging the file save location.",
+        "type": "comment"
+    },
+    "2322": {
+        "file_id": 259,
+        "content": "/microgrid_base/passwords_template.py",
+        "type": "filepath"
+    },
+    "2323": {
+        "file_id": 259,
+        "content": "This code imports the logger_print function from log_utils module and initializes an empty string variable named redis_password.",
+        "type": "summary"
+    },
+    "2324": {
+        "file_id": 259,
+        "content": "from log_utils import logger_print\nredis_password = \"\"",
+        "type": "code",
+        "location": "/microgrid_base/passwords_template.py:1-3"
+    },
+    "2325": {
+        "file_id": 259,
+        "content": "This code imports the logger_print function from log_utils module and initializes an empty string variable named redis_password.",
+        "type": "comment"
+    },
+    "2326": {
+        "file_id": 260,
+        "content": "/microgrid_base/plot_utils.py",
+        "type": "filepath"
+    },
+    "2327": {
+        "file_id": 260,
+        "content": "The code reads and parses microgrid topology data, creates a node list, generates a graph displaying devices and connections by type, and plots multiple topologies. This is done using the input file path, data variable, and plotMultipleTopologies function, while logging information with logger_print.",
+        "type": "summary"
+    },
+    "2328": {
+        "file_id": 260,
+        "content": "from pyecharts.charts import Graph\nfrom pyecharts.options import InitOpts\nimport json\nfrom log_utils import logger_print\nextract_data_key = \"mDictList\"\ndef plotSingleTopology(data: dict, output_path: str, index=0):\n    devices = data[extract_data_key][index][\"nodes\"]\n    connections = data[extract_data_key][index][\"links\"]\n    categories = [{}, {\"name\": \"设备\"}, {\"name\": \"母线\"}, {\"name\": \"锚点\"}, {\"name\": \"其他\"}]\n    # 创建节点列表\n    nodes = []\n    for device in devices:\n        if device[\"type\"] == \"设备\":\n            device[\"name\"] = f\"{device['subtype']} {device.get('id')}\"\n            device[\"symbol\"] = \"diamond\"\n            device[\"symbolSize\"] = [100, 30]\n            device[\"category\"] = 1\n        elif device[\"type\"] == \"母线\":\n            device[\"name\"] = f\"{device['type']} {device.get('id')}\"\n            device[\"symbol\"] = \"circle\"\n            device[\"symbolSize\"] = 50\n            device[\"category\"] = 2\n        elif device[\"type\"] == \"锚点\":\n            device[\"name\"] = f\"{device['port_name']} {device.get('id')}\"\n            device[\"symbol\"] = \"pin\"",
+        "type": "code",
+        "location": "/microgrid_base/plot_utils.py:1-30"
+    },
+    "2329": {
+        "file_id": 260,
+        "content": "This code reads and parses a dictionary containing topology data of a microgrid. It extracts information about devices, connections, and their types to create a list of nodes with specific attributes like symbol, size, and category. The extracted data is then utilized in further steps for plotting the topology.",
+        "type": "comment"
+    },
+    "2330": {
+        "file_id": 260,
+        "content": "            device[\"symbolSize\"] = 40\n            device[\"category\"] = 3\n        else:\n            device[\"name\"] = f\"{device['type']} {device.get('id')}\"\n            device[\"symbol\"] = \"roundRect\"\n            device[\"symbolSize\"] = [50, 5]\n            device[\"category\"] = 4\n        nodes.append(device)\n    # 创建连接线列表\n    links = []\n    for connection in connections:\n        connection[\"symbol\"] = [\"arrow\"]\n        connection[\"lineStyle\"] = {\"width\": 2}\n        links.append(connection)\n    graph = Graph(init_opts=InitOpts(height=\"900px\", width=\"1000px\", bg_color=\"white\"))\n    graph.add(\"\", nodes, links, repulsion=1000, categories=categories)\n    logger_print(f\"graph #{index} saved to {output_path}\")\n    graph.render(output_path)\nimport os\ndef plotMultipleTopologies(data: dict, output_dir: str):\n    for i in range(len(data[extract_data_key])):\n        output_path = os.path.join(output_dir, f\"plot_{i}.html\")\n        plotSingleTopology(data, output_path, i)\ndef plotMultipleTopologiesFromFile(input_path: str, output_dir: str):",
+        "type": "code",
+        "location": "/microgrid_base/plot_utils.py:31-61"
+    },
+    "2331": {
+        "file_id": 260,
+        "content": "Creates a graph of microgrid devices and connections, categorized by device type.",
+        "type": "comment"
+    },
+    "2332": {
+        "file_id": 260,
+        "content": "    logger_print(f\"plotting topologies from file '{input_path}'\")\n    with open(input_path, \"r\") as f:\n        data = json.loads(f.read())\n    plotMultipleTopologies(data, output_dir)",
+        "type": "code",
+        "location": "/microgrid_base/plot_utils.py:62-65"
+    },
+    "2333": {
+        "file_id": 260,
+        "content": "Reading the file at input_path and loading data into variable 'data' for plotting topologies using function 'plotMultipleTopologies'. The logger_print is logging information about the plot.",
+        "type": "comment"
+    },
+    "2334": {
+        "file_id": 261,
+        "content": "/microgrid_base/prolog_gen.pro.j2",
+        "type": "filepath"
+    },
+    "2335": {
+        "file_id": 261,
+        "content": "The code defines functions for energy types, microgrid system logic, and list manipulation in Prolog, focusing on adder port statuses and lists. It creates \"adder\" entities, checks their energy type and port status consistency, and provides functions to determine overall status and all possible statuses for each adder using findall.",
+        "type": "summary"
+    },
+    "2336": {
+        "file_id": 261,
+        "content": ":- use_module(library(clpfd)).\n{% set state_to_ports = {\"input\":[], \"output\":[], \"idle\": []}%}\n{% set possible_states = [\"input\", \"output\", \"idle\"] %}\n{% for portName, portPossibleStates in portNameToPortPossibleStates.items()%}\nport({{portName}}).\n    {% for state in possible_states%}\n        {% if state in portPossibleStates%}\n            {% do state_to_ports[state].append(portName)%}\n        {% endif%}\n    {% endfor%}\n{% endfor %}\n{% for state, portNames in state_to_ports.items()%}\n    {% for portName in portNames%}\n{{state}}_port({{portName}}).\n    {% endfor%}\n{% endfor%}\n{% for deviceType in deviceTypes %}\ndevice({{deviceType}}).\n{% endfor %}\ndevice(DEVICE_NAME):- device(DEVICE_TYPE), call(DEVICE_TYPE, DEVICE_NAME).\n{% for deviceType, deviceNames in deviceTypeToDeviceNames.items()%}\n    {% for deviceName in deviceNames%}\n{{deviceType}}({{deviceName}}).\n    {% endfor%}\n{% endfor%}\n{% for deviceName, devicePortNames in deviceNameToPortNames.items()%}\n    {% for devicePortName in devicePortNames%}\nport_mapping({{deviceName}}, {{devicePortName}}).",
+        "type": "code",
+        "location": "/microgrid_base/prolog_gen.pro.j2:1-36"
+    },
+    "2337": {
+        "file_id": 261,
+        "content": "Defines and initializes Prolog entities such as ports, states, devices, and device port mappings using CLP(FD) library.",
+        "type": "comment"
+    },
+    "2338": {
+        "file_id": 261,
+        "content": "    {% endfor%}\n{% endfor%}\n{% for energyType in energyTypes%}\nenergy({{energyType}}).\n{% endfor%}\n{% for energyType, portNames in energyTypeToPortNames.items()%}\n    {% for portName in portNames %}\n{{energyType}}({{portName}}).\n    {% endfor%}\n{% endfor%}\nlist_member(X,[X|_]).\nlist_member(X,[_|TAIL]) :- list_member(X, TAIL).\nall_satisfy_constraint([], _).\nall_satisfy_constraint([H|T], Constraint) :-\n    call(Constraint, H),\n    all_satisfy_constraint(T, Constraint).\nall_with_same_type(PORT_LIST, ENERGY_TYPE) :- energy(ENERGY_TYPE), all_satisfy_constraint(PORT_LIST, ENERGY_TYPE).\nport_status(PORT, input) :- input_port(PORT).\nport_status(PORT, output):- output_port(PORT).\nport_status(PORT, idle):- idle_port(PORT).\ninput_status(STATUS) :- STATUS = input.\noutput_status(STATUS) :- STATUS = output.\nidle_status(STATUS) :- STATUS = idle.\napply_list([], [], _).\napply_list([INP], [RET], FUNC) :- call(FUNC, INP, RET).\napply_list([INP|INP_TAIL], [RET|RET_TAIL], FUNC) :- apply_list(INP_TAIL, RET_TAIL, FUNC), call(FUNC, INP, RET).",
+        "type": "code",
+        "location": "/microgrid_base/prolog_gen.pro.j2:37-72"
+    },
+    "2339": {
+        "file_id": 261,
+        "content": "This code defines functions to handle energy types, ports, and statuses in a microgrid system. It also includes logic for list manipulation and applies lists using a function.",
+        "type": "comment"
+    },
+    "2340": {
+        "file_id": 261,
+        "content": "port_status_list(PORT, STATUS) :- apply_list(PORT, STATUS, port_status).\n{% for adderName, adderPortNames in adderNameToAdderPortNames.items()%}\nadder({{adderName}}, {{ '[{}]'.format(', '.join(adderPortNames)) }}).\n{% endfor%}\nadder_port_status(ADDER, [ENERGY_TYPE|[STATUS_LIST]]) :- \n    adder(ADDER, PORT_LIST),\n    all_satisfy_constraint(PORT_LIST, port),\n    all_with_same_type(PORT_LIST, ENERGY_TYPE),\n    port_status_list(PORT_LIST, STATUS_LIST),\n    (\n        list_member(STATUS_X, STATUS_LIST), list_member(STATUS_Y, STATUS_LIST),STATUS_X=input, STATUS_Y = output;\n        all_satisfy_constraint(STATUS_LIST, idle_status)\n    ).\nadder_port_all_status(ADDER, ALL_STATUS):-\n    findall(STATUS, adder_port_status(ADDER, STATUS), ALL_STATUS).\nadder_port_status_list(ADDER_LIST, ADDER_STATUS_LIST) :- apply_list(ADDER_LIST, ADDER_STATUS_LIST, adder_port_status).",
+        "type": "code",
+        "location": "/microgrid_base/prolog_gen.pro.j2:74-93"
+    },
+    "2341": {
+        "file_id": 261,
+        "content": "The code defines functions related to adder port statuses and lists. It creates an \"adder\" for each set of adder ports, then checks if all ports have the same energy type and are either both input or both output. The \"adder_port_status\" function sets the overall status of the adder based on the individual port statuses. \"adder_port_all_status\" and \"adder_port_status_list\" use findall to gather all possible statuses for each adder.",
+        "type": "comment"
+    },
+    "2342": {
+        "file_id": 262,
+        "content": "/microgrid_base/pyomo_environ.py",
+        "type": "filepath"
+    },
+    "2343": {
+        "file_id": 262,
+        "content": "Imports necessary libraries and defines two functions: checkDisjunctive() checks if a model is disjunctive, transformDisjunctiveModel() transforms a model to bigM if it's disjunctive.",
+        "type": "summary"
+    },
+    "2344": {
+        "file_id": 262,
+        "content": "import pyomo_patch\nfrom pyomo.environ import *\nfrom pyomo.gdp import *\nfrom config import ies_env\ndef checkDisjunctive(model: ConcreteModel):\n    for _ in model.component_data_objects(ctype=Disjunct):\n        return True\n    return False\ndef transformDisjunctiveModel(model, bigM=1e8):\n    is_disjunctive = checkDisjunctive(model)\n    if is_disjunctive:\n        TransformationFactory(\"gdp.bigm\").apply_to(model, bigM=bigM)\n    return is_disjunctive",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_environ.py:1-17"
+    },
+    "2345": {
+        "file_id": 262,
+        "content": "Imports necessary libraries and defines two functions: checkDisjunctive() checks if a model is disjunctive, transformDisjunctiveModel() transforms a model to bigM if it's disjunctive.",
+        "type": "comment"
+    },
+    "2346": {
+        "file_id": 263,
+        "content": "/microgrid_base/pyomo_patch.py",
+        "type": "filepath"
+    },
+    "2347": {
+        "file_id": 263,
+        "content": "This patch adds strict inequality support in Pyomo, ensures backward compatibility, and introduces a custom writing functionality for _BlockData class. A TODO note suggests potential bug in \"io_options\" handling.",
+        "type": "summary"
+    },
+    "2348": {
+        "file_id": 263,
+        "content": "from log_utils import logger_print\n# from log_utils import logger_print\nimport pyomo\n# import pyomo.core.base.block as block\n# block._BlockData2 = block._BlockData\n# del block._BlockData\n# TODO: add support for unicode export \"*.lp\" files in `solve_model.py`\nassert (pyomo_version := pyomo.__version__) == (\n    expected_pyomo_version := \"6.5.0\"\n), f\"Expected Pyomo version: {expected_pyomo_version}\\nActual: {pyomo_version}\"\n######## SUPPRESS STRICT INEQUALITY PATCH #########\n# from pyomo.environ import *\n# from pyomo_environ import *\n# star-import this python file to avoid issues with direct imports.\ndef strict_setter(self, val):\n    ...\ndef strict_getter(self):\n    return False\nimport pyomo.core.expr.relational_expr\nInEq = pyomo.core.expr.relational_expr.InequalityExpression\nsetattr(InEq, \"_strict_setter\", strict_setter)\nsetattr(InEq, \"_strict_getter\", strict_getter)\nInEq._strict = property(fget=InEq._strict_getter, fset=InEq._strict_setter)\nInEq.strict = InEq._strict\n######## SUPPRESS STRICT INEQUALITY PATCH #########",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_patch.py:1-42"
+    },
+    "2349": {
+        "file_id": 263,
+        "content": "This code patch aims to suppress strict inequality in Pyomo, a mathematical modeling language. It defines the `strict_setter` and `strict_getter` functions, applies them to the `InEq` class from `pyomo.core.expr.relational_expr`, and adds a new property called `_strict` to the class. This patch ensures compatibility with other parts of the codebase that expect strict inequality behavior.",
+        "type": "comment"
+    },
+    "2350": {
+        "file_id": 263,
+        "content": "# # monkey patching class method is easier than class inheritance & shadowing.\n# def write(self, filename=None, format=None, solver_capability=None, io_options={}):\n#     \"\"\"\n#     Write the model to a file, with a given format.\n#     \"\"\"\n#     #\n#     # Guess the format if none is specified\n#     #\n#     if (filename is None) and (format is None):\n#         # Preserving backwards compatibility here.\n#         # The function used to be defined with format='lp' by\n#         # default, but this led to confusing behavior when a\n#         # user did something like 'model.write(\"f.nl\")' and\n#         # expected guess_format to create an NL file.\n#         format = block.ProblemFormat.cpxlp\n#     if filename is not None:\n#         try:\n#             _format = block.guess_format(filename)\n#         except AttributeError:\n#             # End up here if an ostream is passed to the filename argument\n#             _format = None\n#         if format is None:\n#             if _format is None:\n#                 raise ValueError(",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_patch.py:45-68"
+    },
+    "2351": {
+        "file_id": 263,
+        "content": "The code is performing monkey patching on the \"write\" function to handle writing the model to a file. If no filename or format is specified, it will guess the format using block.guess_format(). This method ensures backward compatibility and handles potential confusion by not automatically setting the format to 'lp'. It also accounts for cases where an ostream is passed as the filename argument.",
+        "type": "comment"
+    },
+    "2352": {
+        "file_id": 263,
+        "content": "#                     \"Could not infer file format from file name '%s'.\\n\"\n#                     \"Either provide a name with a recognized extension \"\n#                     \"or specify the format using the 'format' argument.\" % filename\n#                 )\n#             else:\n#                 format = _format\n#         elif format != _format and _format is not None:\n#             block.logger.warning(\n#                 \"Filename '%s' likely does not match specified \"\n#                 \"file format (%s)\" % (filename, format)\n#             )\n#     problem_writer = block.WriterFactory(format)\n#     if problem_writer is None:\n#         raise ValueError(\n#             \"Cannot write model in format '%s': no model \"\n#             \"writer registered for that format\" % str(format)\n#         )\n#     if solver_capability is None:\n#         def solver_capability(x):\n#             return True\n#     # TODO: fix a bug over io_options\n#     while True:\n#         if \"io_options\" in io_options.keys():\n#             io_options = io_options[\"io_options\"]",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_patch.py:69-95"
+    },
+    "2353": {
+        "file_id": 263,
+        "content": "This code snippet is handling the file writing functionality for a model using Pyomo. It checks if the filename matches the specified format or not, and raises an error if no writer is registered for the provided format. If \"io_options\" exists in the input dictionary, it assigns its value to the variable io_options. However, there's a TODO note indicating that there might be a bug related to handling of \"io_options\".",
+        "type": "comment"
+    },
+    "2354": {
+        "file_id": 263,
+        "content": "#         else:\n#             break\n#     (filename, smap) = problem_writer(self, filename, solver_capability, io_options)\n#     smap_id = id(smap)\n#     if not hasattr(self, \"solutions\"):\n#         # This is a bit of a hack.  The write() method was moved\n#         # here from PyomoModel to support the solution of arbitrary\n#         # blocks in a hierarchical model.  However, we cannot import\n#         # PyomoModel at the beginning of the file due to a circular\n#         # import.  When we rearchitect the solution writers/solver\n#         # API, we should revisit this and remove the circular\n#         # dependency (we only need it here because we store the\n#         # SymbolMap returned by the writer in the solutions).\n#         from pyomo.core.base.PyomoModel import ModelSolutions\n#         self.solutions = ModelSolutions(self)\n#     self.solutions.add_symbol_map(smap)\n#     if block.is_debug_set(block.logger):\n#         block.logger.debug(\n#             \"Writing model '%s' to file '%s' with format %s\",",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_patch.py:96-117"
+    },
+    "2355": {
+        "file_id": 263,
+        "content": "The code checks if the \"solutions\" attribute exists in the object. If it doesn't exist, it imports PyomoModel and initializes a new ModelSolutions object with the current object as an attribute. Then, it adds the SymbolMap to the solutions and logs debug information about writing the model to a file.",
+        "type": "comment"
+    },
+    "2356": {
+        "file_id": 263,
+        "content": "#             self.name,\n#             str(filename),\n#             str(format),\n#         )\n#     return filename, smap_id\n# # from types import MethodType\n# # # to override instance methods.\n# block._BlockData.write = write\n# # block._BlockData.write = MethodType(write, block._BlockData)\n# # block._BlockData = BlockdataOverride",
+        "type": "code",
+        "location": "/microgrid_base/pyomo_patch.py:118-130"
+    },
+    "2357": {
+        "file_id": 263,
+        "content": "Code snippet overrides the `write` method of `_BlockData` class and assigns a new write function. This modification allows for custom writing functionality based on file name, format, and block name.",
+        "type": "comment"
+    },
+    "2358": {
+        "file_id": 264,
+        "content": "/microgrid_base/pyright_utils.py",
+        "type": "filepath"
+    },
+    "2359": {
+        "file_id": 264,
+        "content": "The code imports necessary libraries for version checking and error handling, defines error types and regex patterns, provides functions to check Pyright versions and errors, and includes a monkey-patched `run()` function for testing.",
+        "type": "summary"
+    },
+    "2360": {
+        "file_id": 264,
+        "content": "from log_utils import logger_print\nMIN_PYRIGHT_VERSION = \"1.1.317\"  # if lower than this version then raise exception.\npyright_errors = [\"reportImportCycles\", \"reportUndefinedVariable\"]\nerrorRegex = r\"^(.+?(?:{}).+)$\".format(\"|\".join(pyright_errors))\n# use `os.strerror` to translate os-specific error code obtained by `subprocess.run`\nimport parse\nimport re\ndef parse_version(version: str):\n    p = parse.parse(\"{x:d}.{y:d}.{z:d}\", version)\n    return [p[k] for k in \"xyz\"]\ndef check_version(current_version: str, minimum_version: str):\n    cp = parse_version(current_version)\n    mp = parse_version(minimum_version)\n    for cv, mv in zip(cp, mp):\n        if cv < mv:\n            return False\n    return True\nimport pyright\nfrom typing import Any, Union\nimport subprocess\n# monkey patch start\ndef run(\n    *args: str, **kwargs: Any\n) -> Union[\"subprocess.CompletedProcess[bytes]\", \"subprocess.CompletedProcess[str]\"]:\n    ROOT_CACHE_DIR = pyright.utils.get_cache_dir() / \"pyright-python\"\n    version = pyright.__pyright_version__",
+        "type": "code",
+        "location": "/microgrid_base/pyright_utils.py:1-37"
+    },
+    "2361": {
+        "file_id": 264,
+        "content": "This code imports necessary functions and libraries for version checking and error handling. It defines the minimum required Pyright version, specific error types to report, and a regex pattern for matching these errors. The code then provides two functions: `parse_version()` for parsing given versions into their component parts, and `check_version()` for comparing current and minimum version numbers. Finally, it includes a monkey-patched `run()` function that interacts with subprocess and caches the Pyright Python version in the specified cache directory.",
+        "type": "comment"
+    },
+    "2362": {
+        "file_id": 264,
+        "content": "    if not check_version(version, MIN_PYRIGHT_VERSION):\n        raise Exception(\n            f\"Pyright version {version} does not meet minimum version {MIN_PYRIGHT_VERSION}\\nPlease upgrade using `pip install -U pyright`\"\n        )\n    # current_version = pyright.node.get_pkg_version(pkg_dir / 'package.json')\n    # cache_dir = ROOT_CACHE_DIR / current_version\n    cache_dir = ROOT_CACHE_DIR / version\n    cache_dir.mkdir(exist_ok=True, parents=True)\n    pkg_dir = cache_dir / \"node_modules\" / \"pyright\"\n    script = pkg_dir / \"index.js\"\n    if not script.exists():\n        raise RuntimeError(f\"Expected CLI entrypoint: {script} to exist\")\n    result = pyright.node.run(\"node\", str(script), *args, **kwargs)\n    return result\npyright.cli.run = run\n# monkey patch end\n# short test.\nif __name__ == \"__main__\":\n    args = [\"../test_undefined.py\"]\n    # args = ['ies_optim.py']\n    kwargs = dict(capture_output=True)\n    run_result = pyright.cli.run(*args, capture_output=True, encoding=\"utf-8\")\n    import rich\n    logger_print(run_result)",
+        "type": "code",
+        "location": "/microgrid_base/pyright_utils.py:38-67"
+    },
+    "2363": {
+        "file_id": 264,
+        "content": "The code checks if the Pyright version meets the minimum requirement, then creates or updates a cache directory for Pyright, and runs the CLI entrypoint script if it exists. The code also includes a short test to run Pyright on some example files and display the result using rich library.",
+        "type": "comment"
+    },
+    "2364": {
+        "file_id": 264,
+        "content": "    # errorRegex = r\".+?reportUndefinedVariable.+\"\n    # if \"does not exist\" in run_result.stderr:\n    if run_result.stderr:\n        raise Exception(f\"Pyright error:\\n{run_result.stderr}\")\n    typeErrors = re.findall(errorRegex, run_result.stdout, re.MULTILINE)\n    # breakpoint()\n    logger_print(typeErrors)\n    assert typeErrors[0].endswith(\n        'test_undefined.py:1:5 - error: \"b\" is not defined (reportUndefinedVariable)'\n    )",
+        "type": "code",
+        "location": "/microgrid_base/pyright_utils.py:68-77"
+    },
+    "2365": {
+        "file_id": 264,
+        "content": "This code checks for Pyright errors, specifically undefined variables. If there are any defined in the stderr output, it raises an exception with the error message. It also retrieves type errors from the stdout using a regular expression and asserts that the first error is about \"b\" being undefined in \"test_undefined.py\".",
+        "type": "comment"
+    },
+    "2366": {
+        "file_id": 265,
+        "content": "/microgrid_base/reduce_demo_data_size.py",
+        "type": "filepath"
+    },
+    "2367": {
+        "file_id": 265,
+        "content": "The code loads a JSON file, applies two modifications functions to it (modifyValueIfNumber and modifyIfIsDeviceCount), then writes the modified data back to another JSON file. This process reduces the size of the original data by applying specific transformations.",
+        "type": "summary"
+    },
+    "2368": {
+        "file_id": 265,
+        "content": "from log_utils import logger_print\nfrom mock_utils import modifyValueIfNumber, modifyIfIsDeviceCount\nif __name__ == \"__main__\":\n    from json_utils import jsonApply\n    import json\n    with open(\"test_output_full_mock.json\", \"r\") as f:\n        json_obj = json.load(f)\n    applied_json_obj = jsonApply(json_obj, modifyValueIfNumber, modifyIfIsDeviceCount)\n    output_file = \"test_output_full_mock_reduced.json\"\n    with open(output_file, \"w+\") as f:\n        f.write(json.dumps(applied_json_obj, indent=4, ensure_ascii=False))",
+        "type": "code",
+        "location": "/microgrid_base/reduce_demo_data_size.py:1-15"
+    },
+    "2369": {
+        "file_id": 265,
+        "content": "The code loads a JSON file, applies two modifications functions to it (modifyValueIfNumber and modifyIfIsDeviceCount), then writes the modified data back to another JSON file. This process reduces the size of the original data by applying specific transformations.",
+        "type": "comment"
+    },
+    "2370": {
+        "file_id": 266,
+        "content": "/microgrid_base/reload.sh",
+        "type": "filepath"
+    },
+    "2371": {
+        "file_id": 266,
+        "content": "Checks if the APT cache file exists and updates it if necessary, then verifies if the apt is updated within 7 days. If not, it updates the apt packages and touches the cache file. If 7z is not installed, it installs it using apt-get. Finally, it unpacks the release archive, sets up the environment for the Docker launch, and runs the Docker launch script in the server directory.",
+        "type": "summary"
+    },
+    "2372": {
+        "file_id": 266,
+        "content": "APT_UPDATED=~/.apt_updated\n# you can use makefile instead.\nif test -f \"$APT_UPDATED\"; then\n    echo \"$APT_UPDATED exists.\"\nelse\n    echo \"$APT_UPDATED does not exist.\"\n    apt update && touch $APT_UPDATED\nfi\nif [ \"$(find $APT_UPDATED -mtime +7)\" ]; then\n    echo \"Haven't update apt for at least 7 days\"\n    rm $APT_UPDATED && apt update && touch $APT_UPDATED\nelse\n    echo \"Apt is updated\"\nfi\nif which docker; [ \"$?\" -ne 0 ]; then\n    echo \"7z not installed.\"\n    echo \"Setting up now.\"\n    apt install -y p7zip-full\nelse\n    echo \"7z already installed.\"\nfi\n# cp -R microgrid_server_release/server/logs history_logs\nrm -rf microgrid_server_release\n7z x release.7z\ncd microgrid_server_release\ncd init\n# pip3 install -r requirements_docker_launch.txt\n# bash init.sh\nbash init_docker_launch.sh\ncd ..\ncd server\n# mkdir logs\n# cp -R /root/history_logs logs\n# rm -rf logs\n# bash fastapi_tmuxp.sh windows\npython3 docker_launch.py",
+        "type": "code",
+        "location": "/microgrid_base/reload.sh:1-37"
+    },
+    "2373": {
+        "file_id": 266,
+        "content": "Checks if the APT cache file exists and updates it if necessary, then verifies if the apt is updated within 7 days. If not, it updates the apt packages and touches the cache file. If 7z is not installed, it installs it using apt-get. Finally, it unpacks the release archive, sets up the environment for the Docker launch, and runs the Docker launch script in the server directory.",
+        "type": "comment"
+    },
+    "2374": {
+        "file_id": 267,
+        "content": "/microgrid_base/render_and_packup_report.py",
+        "type": "filepath"
+    },
+    "2375": {
+        "file_id": 267,
+        "content": "This code checks for file existence and prepares paths, then generates a report, packs it into a .7z file named \"calculation_report.7z\", logs the file path, and copies it to its final location.",
+        "type": "summary"
+    },
+    "2376": {
+        "file_id": 267,
+        "content": "from log_utils import logger_print\nimport json\ndef load_json(filename):\n    with open(filename, \"r\") as f:\n        content = f.read()\n    return json.loads(content)\ninput_data_fpath = \"microgrid_topo_check_test_input.json\"\noutput_data_fpath = \"microgrid_test_output_full.json\"\ninput_data = load_json(input_data_fpath)\noutput_data = load_json(output_data_fpath)\nreport_output_path = \"report_output.md\"\nreport_template_path = f\"{report_output_path}.j2\"\nfrom jinja_utils import *\nimport tempfile, os\nimport shutil\nassert shutil.which(\"7z\") is not None, \"7z is not installed\"\npackup_file = \"calculation_report.7z\"\nif os.path.isfile(packup_file):\n    logger_print(\"removing old report file\")\n    os.remove(packup_file)\nelif os.path.exists(packup_file):\n    raise Exception(\n        'Unable to create file \"%s\" because of unknown entity occupying the path'\n        % packup_file\n    )\nbasepath = os.path.abspath(os.curdir)\ninput_data_fpath_full = os.path.join(basepath, input_data_fpath)\noutput_data_fpath_full = os.path.join(basepath, output_data_fpath)",
+        "type": "code",
+        "location": "/microgrid_base/render_and_packup_report.py:1-38"
+    },
+    "2377": {
+        "file_id": 267,
+        "content": "This code imports necessary functions and libraries, checks for file existence, prepares input and output paths, and ensures 7z is installed. It then proceeds to pack up the data into a .7z archive file named \"calculation_report.7z\".",
+        "type": "comment"
+    },
+    "2378": {
+        "file_id": 267,
+        "content": "template_path_abs = os.path.join(basepath, report_template_path)\npackup_file_full = os.path.join(basepath, packup_file)\nfrom plot_utils import plotMultipleTopologiesFromFile\nwith tempfile.TemporaryDirectory() as td:\n    os.chdir(td)\n    report_dir = \"report\"\n    os.mkdir(report_dir)\n    report_dir_full = os.path.join(td, report_dir)\n    plotMultipleTopologiesFromFile(input_data_fpath_full, report_dir)\n    shutil.copy(input_data_fpath_full, report_dir_full)\n    shutil.copy(output_data_fpath_full, report_dir_full)\n    render_params = dict(\n        input_data=input_data,\n        output_data=output_data,\n        topo_graph_list=[],\n        data_dict_list={},\n    )\n    load_render_and_format(\n        template_path_abs,\n        report_output_path,\n        render_params=render_params,\n        banner=\"Rendering Markdown Report\",\n        needFormat=False,\n    )\n    os.system(f\"7z a {packup_file} {report_dir}\")\n    shutil.copy(packup_file, packup_file_full)\n    os.chdir(basepath)  # fix the occupation error.\nlogger_print(f\"Packed up at: {packup_file}\")",
+        "type": "code",
+        "location": "/microgrid_base/render_and_packup_report.py:39-70"
+    },
+    "2379": {
+        "file_id": 267,
+        "content": "This code generates a report and packs it up. It creates a temporary directory, changes the current working directory to that temp dir, makes a report directory within it, copies relevant files into it, renders the report using specified templates, and then packages the entire report into a .7z file. Finally, it copies the packed file to its final location and logs the file path.",
+        "type": "comment"
+    },
+    "2380": {
+        "file_id": 268,
+        "content": "/microgrid_base/render_type_utils.py",
+        "type": "filepath"
+    },
+    "2381": {
+        "file_id": 268,
+        "content": "The code manages microgrid systems using classes, dictionaries, and functions for rule handling and data validation. It loads device data, verifies conditions, builds segment lists, generates lookup tables, and initializes dictionaries for microgrid components before setting the \"conjugate_port_verifier_constructor_lookup_table\" and calling a function to generate type utilities.",
+        "type": "summary"
+    },
+    "2382": {
+        "file_id": 268,
+        "content": "from log_utils import logger_print\nfrom jinja_utils import *\nfrom type_def import *\nfrom parse_params import TYPE_UTILS_MICROGRID_PORTS, TYPE_UTILS_EXTRA_PORTS\nimport json\nfrom typing import Literal\nfrom constants import UNKNOWN\n互斥 = \"互斥\"\n冷热互斥 = \"冷热互斥\"\nUNKNOWN_REPR = repr(UNKNOWN)\n可选连接 = \"可选连接\"\n关联连接 = \"关联连接\"\n至少连接 = \"至少连接\"\nclass AppendableDict(dict):\n    def __init__(self, *args, **kwargs):\n        super(AppendableDict, self).__init__(*args, **kwargs)\n    def append(self, key, value):\n        if key in self:\n            self[key].append(value)\n        else:\n            self[key] = [value]\ndef load_json(filename):\n    with open(filename, \"r\") as f:\n        return json.load(f)\ndef load_type_utils_json_with_added_suffix(fpath):\n    fpath += \".json\"\n    logger_print(\"Loading:\", fpath)\n    dat = load_json(fpath)\n    return dat\nTYPE_UTILS_MICROGRID_PORTS_DATA = load_type_utils_json_with_added_suffix(\n    TYPE_UTILS_MICROGRID_PORTS\n)\nTYPE_UTILS_EXTRA_PORTS_DATA = load_type_utils_json_with_added_suffix(\n    TYPE_UTILS_EXTRA_PORTS",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:1-47"
+    },
+    "2383": {
+        "file_id": 268,
+        "content": "The code imports necessary libraries and functions, defines a class and functions for handling types and connection options. It loads type utilities JSON data for microgrid and extra ports.",
+        "type": "comment"
+    },
+    "2384": {
+        "file_id": 268,
+        "content": ")\n# import rich\n# logger_print(TYPE_UTILS_EXTRA_PORTS_DATA)\n# # exit()\n# breakpoint()\nTYPE_UTILS_SPECIAL_PORTS = \"<type_utils_special_ports>\"\nANY = \"/\".join(基本类型.__members__.keys())\nTYPE_UTILS_SPECIAL_PORTS_DATA = {\n    \"特殊元件\": {\n        \"单向线\": {\n            \"ports\": {\n                \"输入接口\": {\n                    \"info\": None,\n                    \"细分类型\": None,\n                    \"基本类型\": ANY,\n                    \"能流方向\": \"进\",\n                    \"必有工况\": None,\n                },\n                \"输出接口\": {\n                    \"info\": None,\n                    \"细分类型\": None,\n                    \"基本类型\": ANY,\n                    \"能流方向\": \"出\",\n                    \"必有工况\": None,\n                },\n            },\n            \"rules\": [\"输入接口 进 -> 输出接口 出\", \"输出接口 出 -> 输入接口 进\"],\n            \"requirements\": [],\n        },\n        \"互斥元件\": {\n            \"ports\": {\n                \"互斥接口A\": {\n                    \"info\": None,\n                    \"细分类型\": None,\n                    \"基本类型\": ANY,\n                    \"能流方向\": \"进出\",\n                    \"必有工况\": None,",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:48-86"
+    },
+    "2385": {
+        "file_id": 268,
+        "content": "This code defines special ports for various components in a microgrid system, including unidirectional and mutual exclusive components. It also specifies their input/output ports, basic types, flow directions, and optional requirements.",
+        "type": "comment"
+    },
+    "2386": {
+        "file_id": 268,
+        "content": "                },\n                \"互斥接口B\": {\n                    \"info\": None,\n                    \"细分类型\": None,\n                    \"基本类型\": ANY,\n                    \"能流方向\": \"进出\",\n                    \"必有工况\": None,\n                },\n                \"外部接口\": {\n                    \"info\": None,\n                    \"细分类型\": None,\n                    \"基本类型\": ANY,\n                    \"能流方向\": \"进出\",\n                    \"必有工况\": None,\n                },\n            },\n            \"rules\": [\n                \"互斥接口A 进 -> 互斥接口B 空闲; 外部接口 出\",\n                \"互斥接口A 出 -> 互斥接口B 空闲; 外部接口 进\",\n                \"互斥接口B 进 -> 互斥接口A 空闲; 外部接口 出\",\n                \"互斥接口B 出 -> 互斥接口A 空闲; 外部接口 进\",\n                \"外部接口 空闲 -> 互斥接口A 空闲; 互斥接口B 空闲\",\n            ],\n            \"requirements\": [],\n        },\n    }\n}\nconnectivity_check_header_prefixes = [可选连接, 关联连接, 至少连接]\n# if UNKNOWN then the port must not be connected\n__all__ = [\n    \"TYPE_UTILS_MICROGRID_PORTS_DATA\",\n    \"TYPE_UTILS_EXTRA_PORTS_DATA\",\n    \"TYPE_UTILS_MICROGRID_PORTS\",\n    \"TYPE_UTILS_EXTRA_PORTS\",",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:87-122"
+    },
+    "2387": {
+        "file_id": 268,
+        "content": "This code defines a dictionary containing information about microgrid ports and their connectivity rules. The 'rules' list outlines the conditions for connecting or disconnecting specific ports, while 'connectivity_check_header_prefixes' defines different types of connections. The '__all__' line specifies exported variables from this module.",
+        "type": "comment"
+    },
+    "2388": {
+        "file_id": 268,
+        "content": "    \"TYPE_UTILS_SPECIAL_PORTS\",\n    \"TYPE_UTILS_SPECIAL_PORTS_DATA\",\n]\nif __name__ == \"__main__\":\n    # def parse_leftover(leftover):\n    #     segments = leftover.split(\";\")\n    #     ret = []\n    #     for s in segments:\n    #         s = s.strip()\n    #         if s:\n    #             ret.append(s)\n    #     return ret\n    工况翻译 = dict(进=\"input\", 出=\"output\", 空闲=\"idle\")\n    必有工况转定义 = dict(\n        一直不工作=f\"set(conds).difference({{ 'idle', {UNKNOWN_REPR} }}) == set()\",\n        **{\n            k: f\"{repr(v)} in conds or {UNKNOWN_REPR} in conds\" for k, v in 工况翻译.items()\n        },\n    )\n    make_param_list = lambda e: [e + str(i) for i in range(len(k))]\n    makeRule = (\n        lambda c0, c1: f\"{c0} not in [{UNKNOWN_REPR}, 'idle']\"\n        if c1 is None\n        else f\"{c0} in [{UNKNOWN_REPR}, {repr(工况翻译[c1])}]\"\n    )\n    makeRuleWithoutUnknown = (\n        lambda c0, c1: f\"{c0} not in ['idle']\"\n        if c1 is None\n        else f\"{c0} in [{repr(工况翻译[c1])}]\"\n    )\n    def parse_rule_side(left_or_right: str):\n        left_or_right = left_or_right.strip()",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:123-157"
+    },
+    "2389": {
+        "file_id": 268,
+        "content": "This code defines several utility functions for parsing and manipulating rules related to ports and port conditions. It includes dictionaries for translating port conditions, defining rules for mandatory and optional operating conditions, generating parameter lists for rule construction, and parsing a rule side (left or right) by removing leading/trailing whitespaces.",
+        "type": "comment"
+    },
+    "2390": {
+        "file_id": 268,
+        "content": "        comps = left_or_right.split(\";\")\n        ret = []\n        for c in comps:\n            c = c.strip()\n            if len(c) > 0:\n                cs = c.split()\n                assert len(cs) >= 1, f\"invalid rule segment: {c}\"\n                assert len(cs) <= 2, f\"invalid rule segment: {c}\"\n                if len(cs) == 1:\n                    cs += [None]\n                ret.append(tuple(cs))\n        return ret\n    def parse_rule_key(content):\n        k = [c0 for c0, _ in content]\n        k = tuple(set(k))\n        return k\n    def replace_with_table(content, table):\n        ret = content\n        for k, v in table.items():\n            ret = ret.replace(k, v)\n        return ret\n    def replace_as_cond_or_etype(\n        rule_definition: str, rule_key: tuple[str], target: Literal[\"cond\", \"etype\"]\n    ):\n        translation_table = {k: f\"{target}{i}\" for i, k in enumerate(rule_key)}\n        ret = replace_with_table(rule_definition, translation_table)\n        return ret\n    def parse_rule(rule):\n        _, content = rule_parser(rule)",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:158-190"
+    },
+    "2391": {
+        "file_id": 268,
+        "content": "This code defines several functions for rule manipulation. It splits a rule into components, parses the rule key, replaces key with table values, and replaces keys as condition or event type. These functions can be used to process rule definitions in a microgrid system.",
+        "type": "comment"
+    },
+    "2392": {
+        "file_id": 268,
+        "content": "        _left, _right = content.split(\"->\")\n        left = parse_rule_side(_left)\n        right = parse_rule_side(_right)\n        k = parse_rule_key(left + right)\n        assert len(left) == 1, f\"abnormal rule because of multiple left side: {rule}\"\n        # v_left = makeRule(*left[0])\n        v_left = makeRuleWithoutUnknown(*left[0])\n        v_right = \", \".join([makeRule(*r) for r in right])\n        v = f\"all([{v_right}]) if {v_left} else True\"\n        v = replace_as_cond_or_etype(v, k, \"cond\")\n        return k, v\n    def generate_optional_connectivity_rule(port_names, optional_port_names):\n        remained_et_params = [\n            f\"etype{i}\"\n            for i, pn in enumerate(port_names)\n            if pn not in optional_port_names\n        ]\n        v = \"True\"\n        if remained_et_params != []:\n            connectivity_check_rule_content = \", \".join(\n                [f\"{pn_et} != {UNKNOWN_REPR}\" for pn_et in remained_et_params]\n            )\n            v = f\"True if ies_env.UNCHECK_CONNECTIVITY_IN_DYNAMIC_TYPE_VERIFICATION else all([{connectivity_check_rule_content}])\"",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:191-214"
+    },
+    "2393": {
+        "file_id": 268,
+        "content": "This code defines a function to generate an optional connectivity rule for microgrid. It checks the etype of each port and returns True if all are not UNCHECK_CONNECTIVITY_IN_DYNAMIC_TYPE_VERIFICATION, or False otherwise. The function takes port names and optional_port_names as inputs and generates the rule accordingly.",
+        "type": "comment"
+    },
+    "2394": {
+        "file_id": 268,
+        "content": "            # v = f\"all([{connectivity_check_rule_content}])\"\n        return v\n    def parse_requirement(requirement, port_names):\n        header, _content = rule_parser(requirement)\n        content = parse_rule_side(_content)\n        k = parse_rule_key(content)\n        t = splited_header = (\n            None if not isinstance(header, str) else header.split(\"[\")[0]\n        )\n        exc = Exception(\"unknown header:\", header, \"content:\", content)\n        if header == 互斥:\n            v = \", \".join(\n                [f\"int({makeRuleWithoutUnknown(c0, c1)})\" for c0, c1 in content]\n            )\n            # v = \", \".join([f\"int({makeRule(c0, c1)})\" for c0, c1 in content])\n            v = f\"sum([{v}]) <= 1\"\n            v = replace_as_cond_or_etype(v, k, \"cond\")\n        elif header == 冷热互斥:\n            c0s = [c0 for c0, _ in content]\n            c0s = \", \".join(c0s)\n            enforce_heat_or_cold = (\n                lambda heat_or_cold: f\"all([{repr(heat_or_cold)} in it or it == {UNKNOWN_REPR} for it in [{c0s}]])\"",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:215-237"
+    },
+    "2395": {
+        "file_id": 268,
+        "content": "This code defines a function that parses and evaluates different types of requirements for microgrid components. It checks for connectivity, mutual exclusivity, and hot-cold mutex constraints in the given requirement string and returns an evaluated expression based on the rule type found.",
+        "type": "comment"
+    },
+    "2396": {
+        "file_id": 268,
+        "content": "            )\n            v = \" or \".join([enforce_heat_or_cold(e) for e in [\"冷\", \"热\"]])\n            v = replace_as_cond_or_etype(v, k, \"etype\")\n        elif (\n            # isinstance(header, str)\n            # and\n            splited_header\n            in connectivity_check_header_prefixes\n        ):\n            # port_candidates = [c0 for c0, _ in content]\n            # port_candidates = k\n            # skipped for now.\n            # use 'and' to join all together\n            et_param = \",\".join([f\"etype{i}\" for i in range(len(k))])\n            # et_param = \",\".join([f\"etype{i}\" for i in range(len(port_names))])\n            # if has optional ports, then do not add connectivity enforcement to all ports\n            if splited_header == 可选连接:  # we need to have the port list later\n                v = generate_optional_connectivity_rule(port_names, k)\n                k = port_names\n            elif splited_header == 关联连接:\n                v = f\"sum([int(it != {UNKNOWN_REPR}) for it in [{et_param}]]) in [0, {len(k)}]\"",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:238-258"
+    },
+    "2397": {
+        "file_id": 268,
+        "content": "The code checks the header of a content and performs different actions based on its value. If the header is a connectivity check, it generates rules for optional or mandatory connections between ports. The code also handles unknown values by considering them in the conditions for connection enforcement. It uses lists and joins to create strings representing conditions for each port.",
+        "type": "comment"
+    },
+    "2398": {
+        "file_id": 268,
+        "content": "            elif splited_header == 至少连接:  # 获得至少连接的接口数量\n                至少连接的接口数量 = int(header.split(\"[\")[-1].strip(\"]\"))\n                v = f\"sum([int(it != {UNKNOWN_REPR}) for it in [{et_param}]]) >= {至少连接的接口数量}\"\n            else:\n                raise exc\n        else:\n            raise exc\n        return k, v, t\n    def rule_parser(rule):\n        rule = rule.replace(\"：\", \":\").replace(\"；\", \";\")\n        segments = rule.split(\":\")\n        if len(segments) == 1:\n            header = None\n            leftover = segments[0]\n        elif len(segments) == 2:\n            header = segments[0].strip()\n            assert header, \"empty header at rule: %s\" % rule\n            leftover = segments[1]\n        else:\n            raise Exception(\n                \"Invalid segment count: %d\\nSegments: %s\"\n                % (len(segments), str(segments))\n            )\n        content = leftover.strip()\n        assert content, \"empty content at rule: %s\" % rule\n        # content = parse_leftover(leftover)\n        return header, content",
+        "type": "code",
+        "location": "/microgrid_base/render_type_utils.py:259-286"
+    },
+    "2399": {
+        "file_id": 268,
+        "content": "This code defines two functions, `render_type` and `rule_parser`, which seem to be part of a larger program for handling rules and rendering types. The `render_type` function takes in three parameters (k, v, t), splits the header based on certain conditions, and returns the key (k), value (v) with specific conditions applied, and the type (t). The `rule_parser` function parses a given rule string into a header and content components, ensuring they are not empty, and returns them as separate values.",
+        "type": "comment"
+    }
+}

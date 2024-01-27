@@ -1,0 +1,10 @@
+{
+    "summary": "This code downloads the OpenAPI JSON file from a local server at http://localhost:9870/openapi.json and saves it as \"openapi.json\" in the current directory.",
+    "details": [
+        {
+            "comment": "This code downloads the OpenAPI JSON file from a local server at http://localhost:9870/openapi.json and saves it as \"openapi.json\" in the current directory.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/download_openapi_json.sh\":0-0",
+            "content": "curl -O http://localhost:9870/openapi.json"
+        }
+    ]
+}

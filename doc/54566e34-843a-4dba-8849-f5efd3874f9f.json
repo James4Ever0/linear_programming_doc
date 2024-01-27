@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the mip library and applies \"deletion filter\" and \"additive/elastic filter\" for improving integer infeasibility solutions.",
+    "details": [
+        {
+            "comment": "The code imports the mip library and applies \"deletion filter\" and \"additive/elastic filter\" for improving integer infeasibility solutions.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/python_mip_conflict.py\":0-1",
+            "content": "import mip\n# use \"deletion filter\" & \"additive/elastic filter\" for iis solving."
+        }
+    ]
+}

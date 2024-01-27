@@ -1,0 +1,542 @@
+{
+    "1200": {
+        "file_id": 154,
+        "content": "    else:\n        logger_print(\"objective expression is non-linear.\")\nimport uuid\n# import weakref\nfrom contextlib import contextmanager\n@contextmanager\ndef solverOptionsContext(solver, _options: List[Tuple[str, float]] = []):\n    optionNames = []\n    optionNameToOldOptionValue = {}\n    def setSolverOption(optionName: str, optionValue):\n        optionName = optionName.strip()\n        if oldOptionValue := solver.options.get(optionName, None) is not None:\n            optionNameToOldOptionValue[optionName] = oldOptionValue\n        solver.options[optionName] = optionValue\n    def setSolverOptions(options: List[Tuple[str, float]]):\n        for optionName, optionValue in options:\n            setSolverOption(optionName, optionValue)\n    try:\n        setSolverOptions(_options)\n        yield setSolverOptions\n    finally:\n        for optionName in optionNames:\n            if optionName in optionNameToOldOptionValue.keys():\n                solver.options[optionName] = optionNameToOldOptionValue[optionName]\n            else:",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:573-605"
+    },
+    "1201": {
+        "file_id": 154,
+        "content": "This code defines a context manager function, \"solverOptionsContext\", that allows temporary modification of solver options during its execution. It maintains a list of option names and their corresponding old values, and updates the solver's options with new values provided. After the context management block is exited, it restores the previous option values. The function takes a solver instance and optional list of options as arguments.",
+        "type": "comment"
+    },
+    "1202": {
+        "file_id": 154,
+        "content": "                del solver.options[optionName]\n@contextmanager\ndef setBoundsContext(bound, model):\n    assert bound > 0, f\"bound must be positive.\\npassed: {bound}\"\n    all_bound_names = []\n    def setBounds(varObject):\n        bound_names = []\n        while len(bound_names) != 2:\n            name = str(uuid.uuid4()).replace(\"-\", \"_\")\n            if getattr(model, name, None) is None:\n                bound_names.append(f\"{name}\")\n        setattr(model, bound_names[0], Constraint(expr=varObject >= -bound))\n        setattr(model, bound_names[1], Constraint(expr=varObject <= bound))\n        # varObject.setlb(-bound)\n        # varObject.setub(bound)\n        all_bound_names.extend(bound_names)  # kinda like weakref?\n    # return (weakref.ref(c) for c in [lb_constraint, ub_constraint])\n    try:\n        yield setBounds\n    finally:\n        for bound_name in all_bound_names:\n            if getattr(model, bound_name, None) is not None:\n                delattr(model, bound_name)\nfrom violation_utils import modelScannerContext",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:606-635"
+    },
+    "1203": {
+        "file_id": 154,
+        "content": "This code defines a context manager function, `setBoundsContext`, that allows setting and removing bounds on a variable within the scope of a model. It creates unique bound names using UUIDs and adds constraints to ensure the variable stays within specified limits. The bounds are removed when the context manager is exited.",
+        "type": "comment"
+    },
+    "1204": {
+        "file_id": 154,
+        "content": "def solve_decompose_and_scan(\n    modelWrapper, solver, log_directory, banner, decompose=False\n):\n    cplex_log_dir = os.path.join(log_directory, f\"{banner}_cplex_log\")\n    os.mkdir(cplex_log_dir)\n    lp_filepath = os.path.join(log_directory, \"model.lp\")\n    # _, smap_id = modelWrapper.model.write(lp_filepath)\n    # smap = modelWrapper.model.solutions.symbol_map[smap_id]\n    lp_exported = ExportedModel(modelWrapper.model, lp_filepath)\n    cplex_refine_model_and_display_info(\n        modelWrapper, lp_filepath, cplex_log_dir, lp_exported.smap\n    )\n    # cplex_refine_model_and_display_info(modelWrapper, lp_filepath, cplex_log_dir, smap)\n    # TODO: add translate method to export model wrapper class\n    model = modelWrapper.model\n    obj_expr = modelWrapper.obj_expr\n    solved = solve_with_translated_log_and_statistics(\n        model, solver, log_directory, banner\n    )\n    if decompose:\n        if solved:\n            decomposeAndAnalyzeObjectiveExpression(\n                obj_expr,\n                modelWrapper.submodelNameToVarNames,",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:638-661"
+    },
+    "1205": {
+        "file_id": 154,
+        "content": "This function, solve_decompose_and_scan, takes a modelWrapper, solver, log_directory, and banner as input. It creates a directory for CPLEX logs, exports the model to an LP file, refines the model using CPLEX and displays information, and then solves the model with translated logs and statistics. If decompose is set to True, it decomposes and analyzes the objective expression when the solution is successful.",
+        "type": "comment"
+    },
+    "1206": {
+        "file_id": 154,
+        "content": "                modelWrapper.submodelClassNameToVarNames,\n                modelWrapper,\n            )\n            with modelScannerContext(model) as modelScanner:\n                report = modelScanner.report()\n                report_fpath = os.path.join(log_directory, \"report.txt\")\n                with open(report_fpath, \"w+\") as f:\n                    f.write(report)\nimport random\nfrom typing import Union\n# TODO: put \"obj\" & \"obj_expr\" into modelWrapper.\ndef checkInfeasibleOrUnboundedModel(\n    modelWrapper,\n    # obj,\n    # obj_expr,\n    solver,\n    log_directory: str,\n    timelimit: float = 10,\n    max_bound: float = 1e8,\n):\n    # TODO: set param input (deepcopy) as attribute of modelWrapper\n    model = modelWrapper.model\n    obj = modelWrapper.obj\n    obj_expr = modelWrapper.obj_expr\n    solver.options[\"timelimit\"] = timelimit\n    def default_solve_decompose_and_scan(banner, decompose=False):\n        return solve_decompose_and_scan(\n            modelWrapper, solver, log_directory, banner, decompose=decompose\n        )",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:662-696"
+    },
+    "1207": {
+        "file_id": 154,
+        "content": "The code defines a function called `checkInfeasibleOrUnboundedModel` that takes in a modelWrapper, solver, log_directory, timelimit, and max_bound as parameters. The function sets the timelimit option for the solver and calls the `solve_decompose_and_scan` function with default arguments to solve the model. It also writes the report to a file in the log directory. The obj and obj_expr attributes are set from the modelWrapper object.",
+        "type": "comment"
+    },
+    "1208": {
+        "file_id": 154,
+        "content": "    # phase 0: limit iteration and get premature solutions\n    # advanced start might be used along with other solvers.\n    # ref: https://www.ibm.com/docs/en/icos/12.9.0?topic=mip-starting-from-solution-starts\n    options: List[Tuple[str, Union[str, float]]] = [\n        # options: List[Tuple[str, float]] = [\n        (\"mip limits strongit\", 1),\n        (\"mip limits nodes\", 2e2),\n        (\"mip tolerances mipgap\", 1),  # mipgap\n        (\"mip tolerances absmipgap\", 1e8),\n        (\"dettimelimit\", 1e4),\n        (\"mip limits treememory\", 1e3),  # 300MB\n        (\"mip limits solutions\", 1),\n        (\"mip limits populate\", 2),\n        (\"mip strategy fpheur\", -1),\n        (\"sifting iterations\", 1e3),\n        (\"mip pool intensity\", 1),\n        (\"mip limits probetime\", 1e1),\n        (\"simplex limits iterations\", 1e4),\n        (\"mip limits repairtries\", 1e3),\n        (\"preprocessing relax\", 0),\n        (\"preprocessing reduce\", 0),\n        (\"randomseed\", random.randint(0, 1e10)),\n        (\"mip strategy presolvenode\", -1),",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:698-720"
+    },
+    "1209": {
+        "file_id": 154,
+        "content": "The code sets options for an optimization solver, limiting iteration and preventing premature solutions. It includes parameters like maximum nodes, mipgap tolerance, time limits, memory usage, heuristic strategy, and other advanced settings.",
+        "type": "comment"
+    },
+    "1210": {
+        "file_id": 154,
+        "content": "        (\"preprocessing presolve\", \"y\"),\n        # (\"preprocessing presolve\", 0),\n        (\"mip polishafter solutions\", 1),\n        (\"mip polishafter time\", 5),\n        (\"barrier limits iteration\", 1e3),\n        (\"barrier limits growth\", 1e5),\n        (\"network iterations\", 1e3),\n        (\"mip strategy probe\", 3),\n        (\"emphasis mip\", 4),  # feasibility first\n        (\"mip strategy search\", 1)  # disable dynamic search\n        # callbacks can be used in static search\n        # ref: https://www.ibm.com/docs/en/icos/12.9.0?topic=callbacks-where-query-are-called\n    ]\n    with solverOptionsContext(solver, options):\n        default_solve_decompose_and_scan(\n            \"limit_iteration\",\n            decompose=True,\n        )\n        # solve_decompose_and_scan(\n        #     modelWrapper,\n        #     solver,\n        #     log_directory,\n        #     \"limit_iteration\",\n        #     decompose=True,\n        # )\n    # phase 1: check if infeasible.\n    obj.deactivate()\n    # TODO: Constant objective detected, replacing with a placeholder to prevent solver failure.",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:721-751"
+    },
+    "1211": {
+        "file_id": 154,
+        "content": "This code sets various options for a solver, such as preprocessing presolve settings, MIP polish after solutions and time limits, barrier limits, network iteration settings, MIP strategy parameters, emphasis on MIP, and search type. It then uses the \"solverOptionsContext\" function to apply these options and activates the default_solve_decompose_and_scan method with decompose set to True. The objective is then deactivated.",
+        "type": "comment"
+    },
+    "1212": {
+        "file_id": 154,
+        "content": "    # model_name = \"null_objective\"\n    # modelWrapper.submodelName = model_name\n    # modelWrapper.submodelClassName = model_name\n    # model.debug_null_objective = Objective()\n    model.debug_null_objective = Objective(expr=0)\n    # model.debug_null_objective = Objective(expr=0, sense=minimize)\n    # solve_with_translated_log_and_statistics(\n    #     model, solver, log_directory, \"null_objective\"\n    # )  # we don't care about this solution. don't do analysis.\n    # solve_decompose_and_scan(modelWrapper, solver, log_directory, model_name)\n    default_solve_decompose_and_scan(\"null_objective\")\n    # phase 2: limit range of objective expression\n    # model.debug_obj_expr_bound = Var()\n    # model.debug_obj_expr_bound_constraint = Constraint(\n    #     expr=model.debug_obj_expr_bound == obj_expr\n    # )\n    # setBounds(model.debug_obj_expr_bound, max_bound)\n    # model.debug_obj_lb_constraint = Constraint(expr=obj_expr >= -max_bound)\n    # model.debug_obj_ub_constraint = Constraint(expr=obj_expr <= max_bound)",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:752-772"
+    },
+    "1213": {
+        "file_id": 154,
+        "content": "Code snippet initializes a null objective model, solves it without analysis, and sets limits for the objective expression's range. This is likely part of debugging utility functions in microgrid optimization modeling.",
+        "type": "comment"
+    },
+    "1214": {
+        "file_id": 154,
+        "content": "    model.debug_null_objective.deactivate()\n    obj.activate()\n    with setBoundsContext(max_bound, model) as setBounds:\n        setBounds(obj_expr)\n        # debug_bound_attrs = setBounds(obj_expr, max_bound, model)\n        default_solve_decompose_and_scan(\"bounded_objective\", decompose=True)\n        # solve_decompose_and_scan(\n        #     modelWrapper, solver, log_directory, \"bounded_objective\", decompose=True\n        # )\n    # solved = solve_with_translated_log_and_statistics(\n    #     model, solver, log_directory, \"bounded_objective\"\n    # )\n    # if solved:\n    #     decomposeAndAnalyzeObjectiveExpression(\n    #         obj_expr,\n    #         modelWrapper.submodelNameToVarNames,\n    #         modelWrapper.submodelClassNameToVarNames,\n    #         modelWrapper,\n    #     )\n    # this is not a persistent solver.\n    # ref: https://pyomo.readthedocs.io/en/stable/advanced_topics/persistent_solvers.html\n    # del model.debug_obj_expr_bound_constraint\n    # del model.debug_obj_expr_bound\n    # del debug_obj_ub_constraint_weakref()",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:774-800"
+    },
+    "1215": {
+        "file_id": 154,
+        "content": "The code deactivates a debug objective, activates the original objective, sets bounds context for an expression, solves it with decomposition and scanning, and if solved, decomposes and analyzes the objective expression. This is not a persistent solver.",
+        "type": "comment"
+    },
+    "1216": {
+        "file_id": 154,
+        "content": "    # del debug_obj_lb_constraint_weakref()\n    # for attrName in debug_bound_attrs:\n    #     delattr(model, attrName)\n    decomposed_obj_expr = decomposeExpression(obj_expr)\n    # var_bound_weakrefs = []\n    with setBoundsContext(max_bound, model) as setBounds:\n        for varName, varObject in decomposed_obj_expr.varNameToVarObject.items():\n            setBounds(varObject)\n        # var_lb_weakref, var_ub_weakref = setBounds(varObject, max_bound)\n        # var_bound_weakrefs.extend([var_lb_weakref, var_ub_weakref])\n        default_solve_decompose_and_scan(\n            \"bounded_objective_vars\",\n            decompose=True,\n        )\n        # solve_decompose_and_scan(\n        #     modelWrapper,\n        #     solver,\n        #     log_directory,\n        #     \"bounded_objective_vars\",\n        #     decompose=True,\n        # )\n    # for var_bound_weakref in var_bound_weakrefs:\n    #     del var_bound_weakref()\n# we need to change solver options to early abort execution.",
+        "type": "code",
+        "location": "/microgrid_base/debug_utils.py:801-829"
+    },
+    "1217": {
+        "file_id": 154,
+        "content": "This code segment is used to decompose an objective expression, set bounds on variables using a context manager, and then solve the model. It uses weak references for variable bounds and deletes them after solving to avoid side effects on the original model. The goal is to optimize the objective function within specified bounds, allowing for early abortion if necessary.",
+        "type": "comment"
+    },
+    "1218": {
+        "file_id": 155,
+        "content": "/microgrid_base/det_failsafe_reload.sh",
+        "type": "filepath"
+    },
+    "1219": {
+        "file_id": 155,
+        "content": "This code sets the environment variable DETERMINISTIC_FAILSAFE to True, and then executes the bash script failsafe_reload.sh. This seems to be initializing a deterministic failsafe mode for a microgrid base system.",
+        "type": "summary"
+    },
+    "1220": {
+        "file_id": 155,
+        "content": "env DETERMINISTIC_FAILSAFE=True bash failsafe_reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/det_failsafe_reload.sh:1-1"
+    },
+    "1221": {
+        "file_id": 155,
+        "content": "This code sets the environment variable DETERMINISTIC_FAILSAFE to True, and then executes the bash script failsafe_reload.sh. This seems to be initializing a deterministic failsafe mode for a microgrid base system.",
+        "type": "comment"
+    },
+    "1222": {
+        "file_id": 156,
+        "content": "/microgrid_base/det_synth_mock_reload.sh",
+        "type": "filepath"
+    },
+    "1223": {
+        "file_id": 156,
+        "content": "The code runs a bash script named synth_mock_reload.sh, setting the environment variable DETERMINISTIC_MOCK to True.",
+        "type": "summary"
+    },
+    "1224": {
+        "file_id": 156,
+        "content": "env DETERMINISTIC_MOCK=True bash synth_mock_reload.sh",
+        "type": "code",
+        "location": "/microgrid_base/det_synth_mock_reload.sh:1-1"
+    },
+    "1225": {
+        "file_id": 156,
+        "content": "The code runs a bash script named synth_mock_reload.sh, setting the environment variable DETERMINISTIC_MOCK to True.",
+        "type": "comment"
+    },
+    "1226": {
+        "file_id": 157,
+        "content": "/microgrid_base/device_whitelist.py",
+        "type": "filepath"
+    },
+    "1227": {
+        "file_id": 157,
+        "content": "The code is defining a whitelist of devices for the microgrid system, including various types such as diesel generators, solar panels, wind turbines, and more. The list consists of Chinese terms representing different energy sources and components.",
+        "type": "summary"
+    },
+    "1228": {
+        "file_id": 157,
+        "content": "from log_utils import logger_print\ndevice_whitelist = [\n    \"柴油\",\n    \"电负荷\",\n    \"光伏发电\",\n    \"风力发电\",\n    \"柴油发电\",\n    \"燃气发电机\",\n    \"锂电池\",\n    \"变压器\",\n    \"变流器\",\n    \"双向变流器\",\n    \"传输线\",\n    \"电解槽\",\n    \"氢负荷\",\n]",
+        "type": "code",
+        "location": "/microgrid_base/device_whitelist.py:1-17"
+    },
+    "1229": {
+        "file_id": 157,
+        "content": "The code is defining a whitelist of devices for the microgrid system, including various types such as diesel generators, solar panels, wind turbines, and more. The list consists of Chinese terms representing different energy sources and components.",
+        "type": "comment"
+    },
+    "1230": {
+        "file_id": 158,
+        "content": "/microgrid_base/diesel_topo_check.py",
+        "type": "filepath"
+    },
+    "1231": {
+        "file_id": 158,
+        "content": "The code initializes variables, creates a diesel generator object for microgrid design, checks topology, generates an EnergyFlowGraph, and calculates results and logs.",
+        "type": "summary"
+    },
+    "1232": {
+        "file_id": 158,
+        "content": "from log_utils import logger_print\nimport os\nos.environ[\"SKIP_ARGENV\"] = \"True\"\nos.environ[\"DOTENV\"] = \".test_microgrid_topo_env\"\nfrom config import *\n# import json\nfrom topo_check import *\nfrom ies_optim import *\nfrom export_format_validate import *\n# DEBUG = False\nDEBUG = True\ndata_fpath = \"./heatpump_code_reference/windspeed_and_illumination_8760.dat\"\nwindspeed = []  # m/s\nillumination = []  # W/m2 -> kW/m2\nwith open(data_fpath, \"r\") as f:\n    for line in f.readlines():\n        line = line.strip()\n        if line.startswith(\"#\"):\n            continue\n        dat = line.split()\n        if len(dat) == 4:\n            num_dat = [float(e) for e in dat]\n            windspeed.append(num_dat[3] + 4)\n            illumination.append(num_dat[1] / 1000)\nif DEBUG:\n    extraParams = dict(\n        典型日代表的日期=[1],\n        典型日=True,\n    )\n    datalen = 24\nelse:\n    extraParams = dict(\n        典型日=False,\n    )\n    datalen = 8760\na = [100] * datalen  # this is not random.\nalgoParam = 计算参数(\n    计算目标=\"经济\",\n    # 计算目标=\"经济_环保\",\n    # 计算目标=\"环保\",\n    计算步长=\"小时\",",
+        "type": "code",
+        "location": "/microgrid_base/diesel_topo_check.py:1-51"
+    },
+    "1233": {
+        "file_id": 158,
+        "content": "The code is reading wind speed and illumination data from a file, storing them in lists. The data represents hourly values for the year, and these will be used later in calculations. Depending on the DEBUG setting, it defines extraParams and datalen variables which are used in further calculations. It also initializes a list 'a' with 100 values repeated for each day of the year. Finally, it defines algoParam that specifies the calculation objective such as economic, environmental, or balanced, along with the time step for calculations.",
+        "type": "comment"
+    },
+    "1234": {
+        "file_id": 158,
+        "content": "    # 典型日代表的日期=[1, 2],\n    计算类型=\"设计规划\",\n    # 风速=windspeed,\n    # 光照=illumination,\n    风速=windspeed[:datalen],\n    光照=illumination[:datalen],\n    气温=a,\n    贴现率=9,\n    # 贴现率=0.1,\n    # 年利率=0.1,\n    **extraParams,\n).dict()\n# topo = 拓扑图()  # with structure?\ntopo = 拓扑图(**algoParam)  # with structure?\ndevParam = dict(生产厂商=\"Any\", 设备型号=\"Any\")\n# devParam = dict(生产厂商=\"Any\", 设备型号=\"Any\", 设备名称=\"Any\")\n柴油1 = 柴油(\n    topo,\n    param=柴油信息(\n        设备名称=\"Any\",\n        Price=(9.2, \"元/L\"),\n        热值=(9.1667, \"kWh/L\"),\n        CO2=(2.583, \"kg/L\"),\n        NOX=(0.01, \"kg/L\"),\n        SO2=(0.01, \"kg/L\"),\n    ).dict(),\n    # param=柴油信息(设备名称=\"Any\", Price=(10, \"L/元\"), 热值=(10, \"MJ/L\"), CO2=(10, \"kg/L\")).dict(),\n)\np1 = 柴油发电信息(\n    **devParam,\n    设备名称=\"柴油发电1\",\n    RatedPower=100,\n    unitPlanningAlgorithmSelection=油耗规划算法.最佳,\n    PowerDeltaLimit=0.3,\n    PowerStartupLimit=10,\n    CostPerMachine=6,\n    CostPerYearPerMachine=0.1,\n    VariationalCostPerWork=0.1,\n    Life=15,\n    BuildCostPerMachine=0.2,\n    BuildBaseCost=0,\n    DieselToPower_Load=[\n        (",
+        "type": "code",
+        "location": "/microgrid_base/diesel_topo_check.py:52-97"
+    },
+    "1235": {
+        "file_id": 158,
+        "content": "The code is creating an instance of a diesel generator and its information for a microgrid design. It uses typical weather data, topology parameters, and device details to calculate the optimal placement and performance of the diesel generator in the system. The code also considers factors like wind speed, illumination, temperature, and depreciation rates in the design process.",
+        "type": "comment"
+    },
+    "1236": {
+        "file_id": 158,
+        "content": "            0.13,\n            29,\n        ),\n        (\n            0.145,\n            36,\n        ),\n        (\n            0.164,\n            43,\n        ),\n        (\n            0.18,\n            50,\n        ),\n        (\n            0.19,\n            57,\n        ),\n        (\n            0.21,\n            64,\n        ),\n        (\n            0.224,\n            71,\n        ),\n        (\n            0.238,\n            79,\n        ),\n        (\n            0.26,\n            86,\n        ),\n        (\n            0.294,\n            93,\n        ),\n        (\n            0.365,\n            100,\n        ),\n    ],\n    DeviceCount=(c := 3),\n    # DeviceCount=10,\n    MaxDeviceCount=c,\n    MinDeviceCount=c,\n).dict()\n# breakpoint()\n柴油发电1 = 柴油发电(\n    topo,\n    param=p1,\n)\nLOAD_E = 电负荷(\n    topo,\n    param=电负荷信息(\n        **devParam,\n        设备名称=\"电负荷1\",\n        LoadType=负荷类型.Normal,\n        # LoadType=负荷类型.Flexible,\n        # Pmin=100,\n        # Pmax=500,\n        EnergyConsumption=[(100 * math.sin(i) + 300) * 0.3 for i in range(len(a))],\n        # EnergyConsumption=[400] * len(a),  # TODO: fix data retrieval bug",
+        "type": "code",
+        "location": "/microgrid_base/diesel_topo_check.py:98-165"
+    },
+    "1237": {
+        "file_id": 158,
+        "content": "This code defines a set of values for diesel generator parameters and creates a diesel generator object. It also sets the device count to 3 and creates a load object with a specific energy consumption pattern. The commented lines indicate possible alternative configurations for the load type and energy consumption values.",
+        "type": "comment"
+    },
+    "1238": {
+        "file_id": 158,
+        "content": "        PriceModel=常数电价(Price=1),\n    ).dict(),\n)\ndef 创建连接线(left, right):\n    连接线(topo, \"不可连接母线\", left, right)\n创建连接线(柴油1.燃料接口, 柴油发电1.燃料接口)\n创建连接线(柴油发电1.电接口, LOAD_E.电接口)\ntry:\n    topo.check_consistency()\nexcept Exception as e:\n    pass\nfrom fastapi_celery_functions import calculate_energyflow_graph_base\nimport os\nmdict = topo.to_json()\nimport json\nmdictList = [mdict]\n# breakpoint()  # error while reloading params\nEFG = EnergyFlowGraph(mDictList=mdictList, residualEquipmentLife=2)  # override default.\nwith open(\"diesel_topo_check_test_input.json\", \"w+\") as f:\n    json.dump(EFG.dict(), f)\nret = calculate_energyflow_graph_base(EFG.dict())\nlogger_print(ret)\nif ret:\n    with open(saved_path := \"diesel_test_output_full.json\", \"w+\") as f:\n        f.write(json.dumps(ret, ensure_ascii=False, indent=4))\n    logger_print(f\"dumped to: {saved_path}\")",
+        "type": "code",
+        "location": "/microgrid_base/diesel_topo_check.py:166-204"
+    },
+    "1239": {
+        "file_id": 158,
+        "content": "The code defines a function create_connection_line, creates connections between different interfaces, checks the consistency of the topology, generates an EnergyFlowGraph (EFG), writes it to a file, and then calculates and logs the result. The code is related to diesel fuel generation and the topology of the system.",
+        "type": "comment"
+    },
+    "1240": {
+        "file_id": 159,
+        "content": "/microgrid_base/docker_launch.py",
+        "type": "filepath"
+    },
+    "1241": {
+        "file_id": 159,
+        "content": "This code manages Docker images and containers, with functions for updates, stopping/pruning, and finding latest image versions. It builds, tags, updates Docker images, sets container settings, binds logs, attaches to running containers (non-Windows) while handling errors, exceptions, and providing Windows fixes.",
+        "type": "summary"
+    },
+    "1242": {
+        "file_id": 159,
+        "content": "from log_utils import logger_print\nfrom log_utils import DOCKER_IMAGE_TAG\nimport progressbar\nimport sys\nimport os\nimport easyprocess, func_timeout\nfrom typing import Tuple\nimport re\nimport datetime\nLATEST = \"latest\"\nDOCKER = \"docker\"\ndef docker_exec(cmd):\n    logger_print(\"executing docker command: {}\".format(cmd))\n    os.system(f\"{DOCKER} {cmd}\")\ndef parse_docker_image_builttime_and_get_timestamp(builttime: str):\n    no_letter_builttime, _ = re.subn(r\"[a-zA-Z]\", \"\", builttime)\n    no_letter_builttime = no_letter_builttime.strip()\n    time_format = r\"%Y-%m-%d %H:%M:%S %z\"\n    builttime_timeobj = datetime.datetime.strptime(no_letter_builttime, time_format)\n    builttime_timestamp = builttime_timeobj.timestamp()\n    return builttime_timestamp\nimport json\n# TODO: tag the final image with date & time\n# docker tag microgrid_docplex:<latest_version> microgrid_docplex:latest\nDOCKER_PROC_TIMEOUT = 15\nACCEPTED_DOCKER_ARCH = \"x86_64\"  # the only one.\n# hold, we may check the architecture.\ndef number_to_version(number: int):",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:1-40"
+    },
+    "1243": {
+        "file_id": 159,
+        "content": "The code imports necessary modules and defines functions for executing docker commands, parsing docker image build time, and handling the architecture. It also sets timeout values and a placeholder for tagging the final image with date and time.",
+        "type": "comment"
+    },
+    "1244": {
+        "file_id": 159,
+        "content": "    digit1 = number // 100  # extract the first digit (hundreds place)\n    digit2 = (number // 10) % 10  # extract the second digit (tens place)\n    digit3 = number % 10  # extract the third digit (ones place)\n    result = (digit1, digit2, digit3)\n    return result\ndef version_to_number(version: Tuple[int, int, int]):\n    number = 100 * version[0] + 10 * version[1] + version[2]\n    return number\ndef increment_version(prev_version: Tuple[int, int, int]):\n    ver_plain = version_to_number(prev_version)\n    ver_plain += 1\n    ver_new = number_to_version(ver_plain)\n    return ver_new\ndef get_image_hash(image_name):\n    dat = get_image_info(image_name)\n    image_hash = dat[\"ID\"]\n    return image_hash\ndef get_image_info(image_name):\n    cmd = f\"docker images --format json {image_name}\"\n    proc = easyprocess.EasyProcess(cmd).call()\n    stdout = proc.stdout\n    dat = json.loads(stdout)\n    return dat\ndef get_latest_builttime_of_image(image_basename):\n    latest_image_name = image_basename + f\":{LATEST}\"\n    dat = get_image_info(latest_image_name)",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:41-77"
+    },
+    "1245": {
+        "file_id": 159,
+        "content": "Extracts the three digits from a given number, converts a tuple of version into an integer and back to tuple with incremented value, retrieves image information using Docker command and returns the image hash, and gets the latest build time for a specified Docker image.",
+        "type": "comment"
+    },
+    "1246": {
+        "file_id": 159,
+        "content": "    builttime: str = dat[\"CreatedAt\"]\n    return builttime\nONE_HOUR = 3600\nONE_DAY = ONE_HOUR * 24\n# ONE_WEEK = ONE_DAY * 7\n# IMAGE_OUT_OF_DATE_THRESHOLD = ONE_WEEK\nIMAGE_OUT_OF_DATE_THRESHOLD = ONE_DAY\ndef check_if_latest_builttime_of_image_is_out_of_date(image_basename):\n    out_of_date = True\n    current_timestamp = datetime.datetime.now().timestamp()\n    latest_builttime = get_latest_builttime_of_image(image_basename)\n    latest_builttime_timestamp = parse_docker_image_builttime_and_get_timestamp(\n        latest_builttime\n    )\n    age = current_timestamp - latest_builttime_timestamp\n    if age > IMAGE_OUT_OF_DATE_THRESHOLD:\n        logger_print(\n            f\"image {image_basename} is out of date. latest builttime: {latest_builttime}\"\n        )\n    else:\n        out_of_date = False\n    return out_of_date\ndef call_cmd_with_timeout_and_return_proc(cmd, timeout=DOCKER_PROC_TIMEOUT):\n    proc = easyprocess.EasyProcess(cmd).call(timeout=timeout)\n    return proc\ndef check_if_docker_arch_acceptable():\n    cmd = \"docker info -f json\"",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:78-112"
+    },
+    "1247": {
+        "file_id": 159,
+        "content": "This code defines a function `check_if_latest_builttime_of_image_is_out_of_date` to determine if the latest build time of a Docker image is older than a specified threshold. The function calculates the age of the image by comparing the current timestamp with the latest build time, and returns True if the age exceeds the threshold (set as one day in this case). It also logs a message indicating whether the image is out of date or not.",
+        "type": "comment"
+    },
+    "1248": {
+        "file_id": 159,
+        "content": "    proc = call_cmd_with_timeout_and_return_proc(cmd)\n    obj = json.loads(proc.stdout)\n    arch = obj[\"Architecture\"]\n    if arch != ACCEPTED_DOCKER_ARCH:\n        raise Exception(\n            \"Unsupported architecture: %s (run under %s instead)\"\n            % (arch, ACCEPTED_DOCKER_ARCH)\n        )\ncheck_if_docker_arch_acceptable()\n\"\"\"\ncreate or import docker environment with scripts.\nyou may use Dockerfile.\n\"\"\"\n# TODO: replace with docker compose\n# TODO: put this into release archive\n# TODO: show both cli argument help\nimport docker\nfrom config_utils import getConfig\ndef killAndPruneAllContainers():\n    cmd = \"docker container ls\"\n    proc = call_cmd_with_timeout_and_return_proc(cmd)\n    # proc = easyprocess.EasyProcess(\"docker container ls -a\").call()\n    if proc.stdout:\n        lines = proc.stdout.split(\"\\n\")[1:]\n        container_ids = [line.split(\" \")[0] for line in lines]\n        for cid in progressbar.progressbar(container_ids):\n            cmd = f\"docker container kill {cid}\"\n            try:\n                func_timeout.func_timeout(2, os.system, args=(cmd,))",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:113-148"
+    },
+    "1249": {
+        "file_id": 159,
+        "content": "This code kills and prunes all Docker containers by listing them, iterating over their IDs, and executing the \"docker container kill\" command for each one. The code uses a progress bar for visual feedback during the process. It is wrapped in functions and may be used with other scripts or in different contexts.",
+        "type": "comment"
+    },
+    "1250": {
+        "file_id": 159,
+        "content": "            except func_timeout.FunctionTimedOut:\n                logger_print(\n                    f'timeout while killing container \"{cid}\".\\nmaybe the container is not running.'\n                )\n            # os.system(f\"docker container kill -s SIGKILL {cid}\")\n        os.system(\"docker container prune -f\")\n# from config import IESEnv\nfrom config_dataclasses import IESEnv, DockerLauncherConfig\nconfig = getConfig(DockerLauncherConfig)\n# breakpoint()\n# logger_print(config.reduce())\n# breakpoint()\nif config.TERMINATE_ONLY:\n    killAndPruneAllContainers()\n    logger_print(\"TERMINATE_ONLY is set. Exiting.\")\n    exit(0)\ndef recursive_split_path(path):\n    leftover, ret = os.path.split(path)\n    if ret != \"\":\n        yield ret\n    if leftover != \"\":\n        yield from recursive_split_path(leftover)\nclient = docker.from_env()\nabs_curdir = os.path.abspath(\".\")\npath_components_generator = recursive_split_path(abs_curdir)\nrel_curdir = next(path_components_generator)\nrel_pardir = next(path_components_generator)\nif sys.maxsize < 2**32:",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:149-186"
+    },
+    "1251": {
+        "file_id": 159,
+        "content": "This code is handling the termination of Docker containers. It's checking for a configuration flag to determine if it should only kill containers or also prune them. The code is using Docker SDK from_env() method to connect to Docker, and recursive_split_path() function to handle file paths. The sys.maxsize < 2**32 check seems unrelated.",
+        "type": "comment"
+    },
+    "1252": {
+        "file_id": 159,
+        "content": "    raise Exception(\"Your system is 32bit or lower, which Docker does not support.\")\ndockerfile_init_path = \"Dockerfile_init\"\ndockerfile_main_path = \"Dockerfile_main\"\ndockerfile_patch_path = \"Dockerfile_patch\"\ndockerfile_update_path = \"Dockerfile_update\"\ndockerfile_update_self_path = \"Dockerfile_update_self\"\nRELEASE_ENV = False\nif rel_curdir != \"microgrid_base\":\n    RELEASE_ENV = True\n    os.system(\n        f\"sed -i 's/jubilant-adventure2\\\\/microgrid_base/{rel_pardir}\\\\/init/g' {dockerfile_patch_path} {dockerfile_update_path}\",\n    )\n# client = docker.DockerClient(\n#     base_url=\"//./pipe/docker_engine\" if os.name == \"nt\" else \"unix://var/run/docker.sock\"\n# )\ndef build_image(image_tag, dockerfile_path, context_path):\n    global RELEASE_ENV\n    # if not RELEASE_ENV:\n    #     os.environ['ADDITIONAL_SUFFIX'] ='/microgrid_server_release' # copy files from release, don't straight from curdir because it is huge.\n    # env_additional_suffix = '' if RELEASE_ENV else 'env ADDITIONAL_SUFFIX=/microgrid_server_release' # copy files from release, don't straight from curdir because it is huge.",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:187-211"
+    },
+    "1253": {
+        "file_id": 159,
+        "content": "This code segment checks if the system is 32-bit or lower, raises an exception if true as Docker does not support it. It also updates Dockerfile paths based on the current directory and sets the release environment flag accordingly. The code defines a function to build a Docker image with optional parameters for image tag, dockerfile path, and context path. In a non-release environment, it may set an additional suffix for copying files from the release directory instead of directly from the current directory due to its large size.",
+        "type": "comment"
+    },
+    "1254": {
+        "file_id": 159,
+        "content": "    ADDITIONAL_SUFFIX_ARGS = \"../\" if RELEASE_ENV else \"microgrid_server_release\"\n    docker_buildargs = f\"--build-arg ADDITIONAL_SUFFIX_ARGS=/{ADDITIONAL_SUFFIX_ARGS}\"  # copy files from release, don't straight from curdir because it is huge.\n    command = f\"{DOCKER} build -t {image_tag} -f {dockerfile_path} --progress plain {docker_buildargs} {context_path}\"\n    logger_print(\"build command:\", command)\n    # command = f\"{env_additional_suffix} {DOCKER} build -t {image_tag} -f {dockerfile_path} --progress plain {context_path}\"\n    # logger_print(command)\n    exit_code = os.system(command)\n    if exit_code:\n        raise Exception(f\"Abnormal exit code {exit_code} for command:\\n{' '*4+command}\")\n    return True\n# import datetime\nupdate_image_basename = \"microgrid_update\"\ngenerate_image_with_tag = (\n    lambda basename, verinfo: f\"{basename}:v{'.'.join([str(i) for i in verinfo])}\"\n)\ngenerate_update_image_with_tag = lambda verinfo: generate_image_with_tag(\n    update_image_basename, verinfo\n)\ninit_verinfo = number_to_version(1)",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:212-232"
+    },
+    "1255": {
+        "file_id": 159,
+        "content": "The code defines ADDITIONAL_SUFFIX_ARGS based on the RELEASE_ENV, builds a Docker image using the specified DOCKER and dockerfile_path, sets build arguments to copy files from the release folder instead of the current directory. It then logs and executes the command using os.system(), raising an exception if there's an abnormal exit code. The code also includes functions for generating image tags based on version information.",
+        "type": "comment"
+    },
+    "1256": {
+        "file_id": 159,
+        "content": "update_image_first_ver_tag = generate_update_image_with_tag(init_verinfo)\nupdate_image_tag = f\"{update_image_basename}:latest\"\n# update_interval = datetime.timedelta(days=config.UPDATE_INTERVAL_IN_DAYS)\n# update_image_file_path = os.path.join(os.path.expanduser(\"~\"), \".microgrid_update\")\nfinal_image_tag = f\"microgrid_docplex:{LATEST}\"\nimage_tag = f\"microgrid_server:{LATEST}\"\nremote_image_tag = f\"agile4im/microgrid_server:{LATEST}\"\nintermediate_image_tag = \"microgrid_init\"\ncontext_path = \"../../\"\nimage_storage_dir = \"images\"\nimage_path = os.path.join(image_storage_dir, f\"{image_tag.replace(':','_')}.tar\")\nimage_storage_gitignore = os.path.join(image_storage_dir, \".gitignore\")\nif os.path.exists(image_storage_dir):\n    if not os.path.isdir(image_storage_dir):\n        raise Exception(\"'%s' exists and is not a directory!\" % image_storage_dir)\nelse:\n    os.mkdir(image_storage_dir)\nwith open(image_storage_gitignore, \"w+\") as f:\n    f.write(\"*\\n\")\ndef list_image_tags():\n    images = client.images.list()\n    image_tags = [tag for image in images for tag in image.tags]",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:233-261"
+    },
+    "1257": {
+        "file_id": 159,
+        "content": "This code sets up image storage directories and configurations for microgrid Docker images. It checks if the image directory exists, creates it if not, and initializes a gitignore file to exclude all files in the directory. The function `list_image_tags()` returns a list of Docker image tags from the current set of available images.",
+        "type": "comment"
+    },
+    "1258": {
+        "file_id": 159,
+        "content": "    return image_tags\nimage_tags = list_image_tags()\nif final_image_tag not in image_tags:\n    if image_tag not in image_tags:\n        logger_print(\"image not found: %s\" % image_tag)\n        if not os.path.exists(image_path):\n            if config.NO_HALFDONE:\n                # run remote pull command.\n                docker_exec(f\"pull {remote_image_tag}\")\n                docker_exec(f\"tag {remote_image_tag} {image_tag}\")\n            else:\n                # first build the image, then export.\n                logger_print(\"building image...\")\n                # client.images.build(\n                #     path=context_path, tag=image_tag, dockerfile=dockerfile_path, quiet=False\n                # )\n                build_image(intermediate_image_tag, dockerfile_init_path, context_path)\n                build_image(image_tag, dockerfile_main_path, context_path)\n                image = client.images.get(image_tag)\n                # image.save()\n                logger_print(\"saving image...\")\n                # not working via api.",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:262-286"
+    },
+    "1259": {
+        "file_id": 159,
+        "content": "This code checks if the final and image tags are present in the list of existing image tags. If not, it either pulls the remote image or builds and saves a new image from the local context.",
+        "type": "comment"
+    },
+    "1260": {
+        "file_id": 159,
+        "content": "                # with open(image_path, \"wb\") as f:\n                #     for chunk in image.save():\n                #         f.write(chunk)\n                docker_exec(f\"save -o {image_path} {image_tag}\")\n        else:\n            logger_print(\"loading image...\")\n            docker_exec(f\"load -i {image_path}\")\n            # with open(image_path, \"rb\") as f:\n            #     data = f.read()\n            #     client.images.load(data)\n    # now patch the image.\n    build_image(final_image_tag, dockerfile_patch_path, context_path)\n# DEPRECATED: may not need to use scheduled update here.\n# import pathlib\n# import time\n# def need_update_image():\n#     if config.FORCE_UPDATE:\n#         logger_print(f\"user forced to update image.\")\n#         return True\n#     ti_c = os.path.getctime(update_image_file_path)\n#     time_now = time.time()\n#     last_update_td = datetime.timedelta(seconds=time_now - ti_c)\n#     if last_update_td > update_interval:\n#         logger_print(\n#             f\"last update time: {last_update_td.days} days ago >= update interval: {update_interval.days} days\"",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:287-317"
+    },
+    "1261": {
+        "file_id": 159,
+        "content": "This code is responsible for handling the loading and patching of Docker images. If an image path is specified, it either loads or saves the image accordingly. If a scheduled update is required, it checks if the update interval has been exceeded and forces an update if necessary. The code also includes deprecated functions related to image updates using file paths and time intervals.",
+        "type": "comment"
+    },
+    "1262": {
+        "file_id": 159,
+        "content": "#         )\n#         logger_print(\"need to update image.\")\n#         return True\n#     return False\n# DEPRECATED: this may hang forever\n# all_containers = client.containers.list(all=True)\n# logger_print(\"stopping running containers...\")\n# for container in progressbar.progressbar(all_containers):\n#     container.stop()\n# logger_print(\"pruning stopped containers...\")\n# client.containers.prune()\n# if need_update_image():\n#     # remove old image first, then build new image\n#     # how does docker build work anyway? does it cache based on file hash?\n#     killAndPruneAllContainers()\n#     docker_exec(f\"image rm {dockerfile_update_path}\")\n#     if build_image(update_image_tag, dockerfile_update_path, context_path) is True:\n#         os.remove(update_image_file_path)\n#         pathlib.Path(update_image_file_path).touch()\n#     else:\n#         raise Exception(\"Image update failed.\")\n# load the exported image.\n# run the command to launch server within image from here.\n# host_path = \"./microgrid_server_release\"\nlog_path = (",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:318-346"
+    },
+    "1263": {
+        "file_id": 159,
+        "content": "This code stops running containers, prunes stopped containers, updates the Docker image if needed, and then loads the exported image to launch the server. It also has a debugging feature to prevent potential hanging issues by checking if an update is necessary before proceeding with image operations.",
+        "type": "comment"
+    },
+    "1264": {
+        "file_id": 159,
+        "content": "    os.path.join(os.path.expanduser(\"~\"), \"logs_container\")\n    if RELEASE_ENV\n    else \"./logs_container\"\n)\nif os.path.isdir(log_path):\n    logger_print(f\"skipping creating logger directory: {log_path}\")\nelif not os.path.exists(log_path):\n    os.mkdir(log_path)\nelse:\n    raise Exception(f\"{log_path} exists but is not a directory.\")\n# if RELEASE_ENV:\n# host_path = \"../.\" + host_path\n# host_mount_path = os.path.abspath(host_path)\n# don't need this workaround when using docker-py.\ndef refine_nt_abspath_for_docker_mount(path: str):\n    if os.name == \"nt\":\n        disk_symbol, pathspec = path.split(\":\")\n        pathspec = pathspec.replace(\"\\\\\", \"/\")\n        path = f\"//{disk_symbol.lower()}{pathspec}\"\n    return path\nhost_log_path = os.path.abspath(log_path)\n# host_log_path = refine_nt_abspath_for_docker_mount(host_log_path)\nkillAndPruneAllContainers()\ndef find_latest_verinfo_of_image_with_latest_image_tags(image_basename: str):\n    image_tags = list_image_tags()\n    return find_latest_verinfo_of_image(image_tags, image_basename)",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:347-379"
+    },
+    "1265": {
+        "file_id": 159,
+        "content": "Code sets the log path based on RELEASE_ENV and creates a directory if it doesn't exist. Adjusts path for NT systems, kills and prunes all containers. Finds latest version info of an image with latest tags.",
+        "type": "comment"
+    },
+    "1266": {
+        "file_id": 159,
+        "content": "def find_latest_image_tag_with_latest_verinfo_of_image_and_latest_image_tags(\n    image_basename: str,\n):\n    verinfo = find_latest_verinfo_of_image_with_latest_image_tags(image_basename)\n    if verinfo is None:\n        return None\n    return generate_image_with_tag(image_basename, verinfo)\ndef find_latest_verinfo_of_image(image_tags: list[str], image_basename: str):\n    latest_verinfo = None\n    for image_tag in image_tags:\n        if image_tag.startswith(image_basename):\n            verpart_ = image_tag.split(\":v\")\n            if len(verpart_) == 2:\n                verpart = verpart_[1]\n                verinfo = tuple([int(i) for i in verpart.split(\".\")])\n                assert len(verinfo) == 3, (\n                    \"invalid version format at: %s\\nhint: must be three positive integers splited by dot, and first two on the right must be smaller than 10\"\n                    % image_tag\n                )\n                if latest_verinfo is None:\n                    latest_verinfo = verinfo\n                elif verinfo > latest_verinfo:",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:382-405"
+    },
+    "1267": {
+        "file_id": 159,
+        "content": "This function finds the latest image tag and its associated version information for a given image basename by iterating over a list of image tags. If an appropriate image tag is found, it returns the generated image with that tag. If no matching tags are found, it returns None. The function also checks if the version format is valid (three positive integers) and updates the latest version information if a newer one is found.",
+        "type": "comment"
+    },
+    "1268": {
+        "file_id": 159,
+        "content": "                    latest_verinfo = verinfo\n                else:\n                    continue\n    if latest_verinfo is None:\n        raise Exception(\n            f\"Could not find any versioned image ({image_basename}) with tag starting with {update_image_basename}\"\n        )\n    logger_print(f\"latest version for image {image_basename}: {latest_verinfo}\")\n    return latest_verinfo\ndef find_latest_verinfo_of_update_image(image_tags: list[str]):\n    return find_latest_verinfo_of_image(image_tags, update_image_basename)\nfrom contextlib import contextmanager\n@contextmanager\ndef check_if_need_to_tag_context(image_tag):\n    info = dict(need_to_tag=True, previous_hash=None)\n    _image_tags = list_image_tags()\n    if image_tag in _image_tags:\n        info[\"need_to_tag\"] = False\n        info[\"previous_hash\"] = get_image_hash(image_tag)\n    def get_need_to_tag():\n        if info[\"need_to_tag\"] == False:\n            # check hash now.\n            current_hash = get_image_hash(image_tag)\n            need_to_tag = info[\"previous_hash\"] != current_hash",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:406-436"
+    },
+    "1269": {
+        "file_id": 159,
+        "content": "This code snippet defines a function find_latest_verinfo_of_update_image() that finds the latest versioned image with a tag starting with update_image_basename. It also includes a contextmanager function, check_if_need_to_tag_context(), to check if an image needs to be tagged based on its current hash and previous hash values. The logger_print() is used for printing the latest version found for the image.",
+        "type": "comment"
+    },
+    "1270": {
+        "file_id": 159,
+        "content": "        return need_to_tag\n    try:\n        yield get_need_to_tag\n    finally:\n        del _image_tags\n        del get_need_to_tag\n        del info\ndef build_and_tag(\n    latest_version_image_tag,\n    latest_image_tag,\n    dockerfile_path,\n    context_path,\n    # override_need_to_tag = False\n):\n    with check_if_need_to_tag_context(latest_image_tag) as get_need_to_tag:\n        build_image(latest_image_tag, dockerfile_path, context_path)\n        # build_image(latest_version_image_tag, dockerfile_path, context_path)\n        need_to_tag = get_need_to_tag()\n    # check if we really want to tag this (is this updated?)\n    if need_to_tag:\n        # if override_need_to_tag or need_to_tag:\n        docker_exec(f\"tag {latest_image_tag} {latest_version_image_tag}\")\n    # docker_exec(f\"tag {latest_version_image_tag} {latest_image_tag}\")\n# update with tagging\nif config.FINAL_IMAGE_TAG != LATEST:\n    logger_print(f\"skipping update because of custom tag: {config.FINAL_IMAGE_TAG}\")\nelif update_image_tag in image_tags:\n    if update_image_first_ver_tag not in image_tags:",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:437-469"
+    },
+    "1271": {
+        "file_id": 159,
+        "content": "This code defines a function `build_and_tag` that builds and tags Docker images. It uses the context manager `check_if_need_to_tag_context` to determine if an image needs to be tagged after building it. The `build_image` function is called with the appropriate image tags, latest and latest version, along with the dockerfile path and context path. If the image needs to be tagged, it executes a Docker command to tag the image. However, if the final image tag is set to LATEST, it skips the update process.",
+        "type": "comment"
+    },
+    "1272": {
+        "file_id": 159,
+        "content": "        logger_print(\n            f\"tagging first versioned final image ({update_image_tag}) build as: {update_image_first_ver_tag}\"\n        )\n        docker_exec(f\"tag {update_image_tag} {update_image_first_ver_tag}\")\n        # image_tags.append(update_image_first_ver_tag)\n    logger_print(\"performing recursive update of final image\")\n    # old_verinfo = find_latest_verinfo_of_update_image(image_tags)\n    old_verinfo = find_latest_verinfo_of_image_with_latest_image_tags(\n        update_image_basename\n    )\n    if old_verinfo > init_verinfo:\n        out_of_date = check_if_latest_builttime_of_image_is_out_of_date(\n            update_image_basename\n        )\n    else:\n        logger_print(\n            f\"forcing update because latest version info equals to initial version info: {init_verinfo}\"\n        )\n        out_of_date = True\n    if out_of_date:\n        latest_verinfo = increment_version(old_verinfo)\n    else:\n        logger_print(f\"using old tag: {old_verinfo} (to save space)\")\n        latest_verinfo = old_verinfo",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:470-494"
+    },
+    "1273": {
+        "file_id": 159,
+        "content": "This code snippet is performing a recursive update of a Docker image. It first tags the initial versioned final image with a specific tag and then checks if the image needs an update based on the current version information. If it's outdated, it increments the version; otherwise, it retains the old tag to save space.",
+        "type": "comment"
+    },
+    "1274": {
+        "file_id": 159,
+        "content": "    latest_verinfo = increment_version(old_verinfo)\n    latest_update_image_tag = generate_update_image_with_tag(latest_verinfo)\n    build_and_tag(\n        latest_update_image_tag,\n        update_image_tag,\n        dockerfile_update_path,\n        # dockerfile_update_self_path,\n        context_path,\n    )\nelse:\n    logger_print(\"building final image (non-recursive)\")\n    build_and_tag(\n        update_image_first_ver_tag,\n        update_image_tag,\n        dockerfile_update_path,\n        context_path,\n    )\nlatest_update_image = (\n    find_latest_image_tag_with_latest_verinfo_of_image_and_latest_image_tags(\n        update_image_basename\n    )\n)\n# build_image(update_image_tag, dockerfile_update_path, context_path)\n# BUG: error while creating mount source path\n# FIX: restart the docker engine (win) if fail to run container (usually caused by unplugging anything mounted by volume)\ncontainer_image_tag = (\n    latest_update_image\n    if config.FINAL_IMAGE_TAG == LATEST\n    else f\"{update_image_basename}:{config.FINAL_IMAGE_TAG}\"",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:496-526"
+    },
+    "1275": {
+        "file_id": 159,
+        "content": "This code segment builds and tags Docker images, updates them if necessary, and retrieves the latest image tag based on the version information. If the final image tag is set to LATEST, it assigns the latest update image tag; otherwise, it uses the specified final image tag. It also handles errors related to mount source path and provides a fix by restarting the Docker engine (for Windows).",
+        "type": "comment"
+    },
+    "1276": {
+        "file_id": 159,
+        "content": ")\ncontainer_env = {DOCKER_IMAGE_TAG: container_image_tag, **config.reduce().dict()}\nlogger_print(\"running container...\")\ntry:\n    container = client.containers.run(\n        # final_image_tag,\n        container_image_tag,\n        # image_tag,\n        environment=container_env,\n        # environment=dict(os.environ),  # may override normal environment variables?\n        # remove=True,\n        remove=False,  # to get the image hash.\n        # command=\"ls -lth microgrid\",\n        # command=\"bash fastapi_tmuxp.sh\",\n        # command=\"bash -c 'cd microgrid/init && bash init.sh && cd ../server && bash fastapi_tmuxp.sh windows'\",\n        command=\"bash -c 'cd microgrid/server && bash fastapi_tmuxp.sh windows'\",\n        # command=\"bash -c 'cd microgrid/server && ls -lth .'\",\n        # command=\"echo 'hello world'\",\n        detach=True,\n        restart_policy={\n            \"Name\": \"on-failure\"\n        },  # restart indefinitely, though might not always work.\n        # detach=False,\n        # we need to monitor this.\n        tty=True,",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:527-551"
+    },
+    "1277": {
+        "file_id": 159,
+        "content": "This code runs a Docker container with the specified image tag, environment variables, command, and configuration. It can be used to run different commands within the container depending on the needs of the application. The container is set to detach from the terminal, restart on failure, and use a tty for better monitoring.",
+        "type": "comment"
+    },
+    "1278": {
+        "file_id": 159,
+        "content": "        ports={f\"{(server_port:=9870)}/tcp\": server_port},\n        volumes={  # if using volumes, you need to copy the contents of the volume to outside to view it.\n            # docker run --rm \\\n            #   --mount source=myvolume,target=/mnt \\\n            #   -v /backup:/backup \\\n            #   alpine cp -r /mnt /backup\n            host_log_path: {\"bind\": \"/root/microgrid/server/logs\", \"mode\": \"rw\"}\n            # \"microgrid_logs\": {\"bind\": \"/root/microgrid/server/logs\", 'mode':'rw'}\n        }\n        # volumes={\n        #     host_mount_path: {\"bind\": (mount_path := \"/root/microgrid\"), \"mode\": \"rw\"}\n        # },\n        # volumes={\"<HOST_PATH>\": {\"bind\": \"<CONTAINER_PATH>\", \"mode\": \"rw\"}},\n        # working_dir=os.path.join(mount_path, \"server\"),\n    )\n    short_id = container.short_id\n    logger_print(\"attaching to: %s\" % short_id)\n    # ref: https://www.howtogeek.com/devops/how-to-detach-from-a-docker-container-without-stopping-it/\n    if os.name == \"nt\":\n        logger_print(\"unable to configure detach keys on windows.\")",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:552-572"
+    },
+    "1279": {
+        "file_id": 159,
+        "content": "This code is configuring Docker container settings, including specifying ports and volumes. It binds the host's log path to the container's logs directory with read-write permissions, and sets the working directory inside the container. The detach keys configuration is mentioned for non-Windows operating systems.",
+        "type": "comment"
+    },
+    "1280": {
+        "file_id": 159,
+        "content": "        os.system(f\"docker attach {short_id}\")\n    else:\n        os.system(f'docker attach {short_id} --detach-keys=\"{config.DETACH_KEYS}\"')\n    # while True:\n#     # exit_code = os.system(f\"docker attach {short_id} --detach-keys '{config.DETACH_KEYS}'\")\n#     # exit_code = os.system(f\"docker attach {short_id} --detach-keys '{config.DETACH_KEYS}'\")\n#     exit_code = os.system(f\"docker attach {short_id}\")\n#     if exit_code == 0:\n#         break\nexcept:\n    import traceback\n    traceback.print_exc()\n    raise Exception(\"Error running new container.\\nYou may restart the docker engine.\")\n# logger_print(container.logs())\n# import rich\n# logger_print(container.__dict__)\n# breakpoint()\ncontainer_id = container.attrs[\"Config\"][\"Hostname\"]\ncontainer_name = container.attrs[\"Name\"].strip(\"/\")\nlogger_print(f\"Container {container_id} ({container_name}) created.\")\nlogger_print(f\"Service available at: http://localhost:{server_port}\")\n# for line in container.logs(stream=True):\n#     logger_print(line.decode('utf-8').strip(), end=None)  # binary string.",
+        "type": "code",
+        "location": "/microgrid_base/docker_launch.py:573-597"
+    },
+    "1281": {
+        "file_id": 159,
+        "content": "This code is a part of a Docker container management system. It uses the `os.system` function to attach to a running Docker container using either the `docker attach` or `docker attach --detach-keys` command based on certain conditions. The code also handles exceptions, prints error messages if any and logs information about the created container and service availability.",
+        "type": "comment"
+    },
+    "1282": {
+        "file_id": 160,
+        "content": "/microgrid_base/download_openapi_json.sh",
+        "type": "filepath"
+    },
+    "1283": {
+        "file_id": 160,
+        "content": "This code downloads the OpenAPI JSON file from a local server at http://localhost:9870/openapi.json and saves it as \"openapi.json\" in the current directory.",
+        "type": "summary"
+    },
+    "1284": {
+        "file_id": 160,
+        "content": "curl -O http://localhost:9870/openapi.json",
+        "type": "code",
+        "location": "/microgrid_base/download_openapi_json.sh:1-1"
+    },
+    "1285": {
+        "file_id": 160,
+        "content": "This code downloads the OpenAPI JSON file from a local server at http://localhost:9870/openapi.json and saves it as \"openapi.json\" in the current directory.",
+        "type": "comment"
+    },
+    "1286": {
+        "file_id": 161,
+        "content": "/microgrid_base/dsl_parser/Makefile",
+        "type": "filepath"
+    },
+    "1287": {
+        "file_id": 161,
+        "content": "This Makefile defines the test target and sets environment variables for executing the tests. It uses pytest to run unittests on Python files, with specific options such as --lf, --lfnf=all, and --capture=tee-sys. The PYTHON variable is set based on the operating system (OS_TYPE), and it calls generate_code.py to generate functional_base.py from functional_base.py.j2.",
+        "type": "summary"
+    },
+    "1288": {
+        "file_id": 161,
+        "content": "# pass environment variables by higher level make invocation.\n.PHONY: test\n# PLATFORM := $(shell python -c \"import os; print(os.name)\")\n# ifeq (${PLATFORM}, )\n# PLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\n# endif\n# ifeq (${PLATFORM}, nt)\n# OS_TYPE = windows\n# else\n# OS_TYPE = macos\n# endif\n# PYTHON_ENV = -X utf8=1\n# ifeq (${OS_TYPE}, macos)\n# CONDA_ENV = rosetta\n# PYTHON = /usr/bin/python3\n# else\n# CONDA_ENV = cplex\n# PYTHON = python ${PYTHON_ENV}\n# endif\n# not unittest!\ntest:\n\tcd test && ${PYTHON} -m pytest --lf --lfnf=all --capture=tee-sys test_dsl.py\n\t# ${PYTHON} textx_syntax.py\nfunctional_base.py: functional_base.py.j2 generate_code.py\n\t${PYTHON} generate_code.py",
+        "type": "code",
+        "location": "/microgrid_base/dsl_parser/Makefile:2-34"
+    },
+    "1289": {
+        "file_id": 161,
+        "content": "This Makefile defines the test target and sets environment variables for executing the tests. It uses pytest to run unittests on Python files, with specific options such as --lf, --lfnf=all, and --capture=tee-sys. The PYTHON variable is set based on the operating system (OS_TYPE), and it calls generate_code.py to generate functional_base.py from functional_base.py.j2.",
+        "type": "comment"
+    },
+    "1290": {
+        "file_id": 162,
+        "content": "/microgrid_base/dsl_parser/README.md",
+        "type": "filepath"
+    },
+    "1291": {
+        "file_id": 162,
+        "content": "This code appears to be related to a programming language or framework. It describes the process of automatic unit conversion based on identified units, defining different contexts for automatic sorting, and preparing three execution stacks - imminent, late, and temporary late. The code also mentions that variables in functional programming are immutable, and suggests using the model on fictitious models before fully delegating it to *.ies files.",
+        "type": "summary"
+    },
+    "1292": {
+        "file_id": 162,
+        "content": "根据识别到的单位 进行自动单位转换\n定义不同语境 根据依赖关系自动排序\nprepare three stacks:\n- imminent execution stack: as final program will return\n- late execution stack: checked after current statement displacement, repeat checking this until no change is detected in IES\n- temporary late execution stack: put current statement to here before checking LES, then check statement inside, either put statement to IES or LES\nin functional programming, variables are immutable (can only be defined once).\ndo not delegate the whole model to *.ies yet. use it on \"fictious\" models first.",
+        "type": "code",
+        "location": "/microgrid_base/dsl_parser/README.md:1-13"
+    },
+    "1293": {
+        "file_id": 162,
+        "content": "This code appears to be related to a programming language or framework. It describes the process of automatic unit conversion based on identified units, defining different contexts for automatic sorting, and preparing three execution stacks - imminent, late, and temporary late. The code also mentions that variables in functional programming are immutable, and suggests using the model on fictitious models before fully delegating it to *.ies files.",
+        "type": "comment"
+    },
+    "1294": {
+        "file_id": 163,
+        "content": "/microgrid_base/dsl_parser/ast_utils.py",
+        "type": "filepath"
+    },
+    "1295": {
+        "file_id": 163,
+        "content": "The function `walkModel` recursively walks through a model, returning the flattened version of it. If the type is a basic type (str, int, float, bool), it returns itself. For iterable types like tuple or list, it applies the function to each element. For other types, it treats it as a dictionary and recursively gets its attributes.",
+        "type": "summary"
+    },
+    "1296": {
+        "file_id": 163,
+        "content": "from typing import Iterable\ndef walkModel(model):\n    modelType = type(model)\n    if modelType in [str, int, float, bool]: return model\n    # elif modelType in [tuple, list]:\n    elif isinstance(model, Iterable):\n        return [walkModel(elem) for elem in model]\n    else:\n        attrs = [attr for attr in dir(model) if not (attr.startswith(\"_\") or attr == \"parent\")]\n        # walk over attributes. treat it as dict.\n        return {attr: walkModel(getattr(model, attr)) for attr in attrs}",
+        "type": "code",
+        "location": "/microgrid_base/dsl_parser/ast_utils.py:1-12"
+    },
+    "1297": {
+        "file_id": 163,
+        "content": "The function `walkModel` recursively walks through a model, returning the flattened version of it. If the type is a basic type (str, int, float, bool), it returns itself. For iterable types like tuple or list, it applies the function to each element. For other types, it treats it as a dictionary and recursively gets its attributes.",
+        "type": "comment"
+    },
+    "1298": {
+        "file_id": 164,
+        "content": "/microgrid_base/dsl_parser/erglang_test/mytest.er",
+        "type": "filepath"
+    },
+    "1299": {
+        "file_id": 164,
+        "content": "This code imports the \"random\" library in Python and assigns it to the variable \"rand\". It then generates a random value between 0 and 10 using the \"choice\" function from the \"random\" library, and stores it in the variable \"val\". Finally, it prints the value of \"val\" on the console.",
+        "type": "summary"
+    }
+}

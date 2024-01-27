@@ -1,0 +1,539 @@
+{
+    "2000": {
+        "file_id": 221,
+        "content": "conda install -n cplex -c conda-forge -y coin-or-cbc scip ipopt",
+        "type": "code",
+        "location": "/microgrid_base/init_solver.sh:1-1"
+    },
+    "2001": {
+        "file_id": 221,
+        "content": "Installing necessary libraries (coin-or-cbc, scip, ipopt) in a conda environment named \"cplex\" for solving optimization problems.",
+        "type": "comment"
+    },
+    "2002": {
+        "file_id": 222,
+        "content": "/microgrid_base/init_update_conda.sh",
+        "type": "filepath"
+    },
+    "2003": {
+        "file_id": 222,
+        "content": "This code runs two shell scripts for initializing and updating Conda packages, specifically cplex and docplex.",
+        "type": "summary"
+    },
+    "2004": {
+        "file_id": 222,
+        "content": "bash init_update_conda_cplex.sh\nbash init_update_conda_docplex.sh",
+        "type": "code",
+        "location": "/microgrid_base/init_update_conda.sh:1-2"
+    },
+    "2005": {
+        "file_id": 222,
+        "content": "This code runs two shell scripts for initializing and updating Conda packages, specifically cplex and docplex.",
+        "type": "comment"
+    },
+    "2006": {
+        "file_id": 223,
+        "content": "/microgrid_base/init_update_conda_cplex.sh",
+        "type": "filepath"
+    },
+    "2007": {
+        "file_id": 223,
+        "content": "This code configures the global index URL for pip and installs packages from a specified URL, ensuring smooth installation of required packages for the microgrid base.",
+        "type": "summary"
+    },
+    "2008": {
+        "file_id": 223,
+        "content": "conda run -n cplex --live-stream --no-capture-output pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple\nconda run -n cplex --live-stream --no-capture-output pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt",
+        "type": "code",
+        "location": "/microgrid_base/init_update_conda_cplex.sh:1-2"
+    },
+    "2009": {
+        "file_id": 223,
+        "content": "This code configures the global index URL for pip and installs packages from a specified URL, ensuring smooth installation of required packages for the microgrid base.",
+        "type": "comment"
+    },
+    "2010": {
+        "file_id": 224,
+        "content": "/microgrid_base/init_update_conda_docplex.sh",
+        "type": "filepath"
+    },
+    "2011": {
+        "file_id": 224,
+        "content": "This code installs DOCPLEX package using pip in a conda environment named \"docplex\" from the PyPI mirror at Tsinghua University, with the requirements specified in \"requirements_docplex.txt\". The \"--live-stream\" and \"--no-capture-output\" options are used to provide real-time updates during the installation process.",
+        "type": "summary"
+    },
+    "2012": {
+        "file_id": 224,
+        "content": "conda run -n docplex --live-stream --no-capture-output pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_docplex.txt",
+        "type": "code",
+        "location": "/microgrid_base/init_update_conda_docplex.sh:1-1"
+    },
+    "2013": {
+        "file_id": 224,
+        "content": "This code installs DOCPLEX package using pip in a conda environment named \"docplex\" from the PyPI mirror at Tsinghua University, with the requirements specified in \"requirements_docplex.txt\". The \"--live-stream\" and \"--no-capture-output\" options are used to provide real-time updates during the installation process.",
+        "type": "comment"
+    },
+    "2014": {
+        "file_id": 225,
+        "content": "/microgrid_base/install_cplex.sh",
+        "type": "filepath"
+    },
+    "2015": {
+        "file_id": 225,
+        "content": "This code is likely running a binary executable called \"cplex_128.bin\" and passing it a command through standard input (stdin) to execute. The command appears to be a series of newlines and numbers, with 2 and 1 being the only visible inputs.",
+        "type": "summary"
+    },
+    "2016": {
+        "file_id": 225,
+        "content": "echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./cplex_128.bin",
+        "type": "code",
+        "location": "/microgrid_base/install_cplex.sh:1-1"
+    },
+    "2017": {
+        "file_id": 225,
+        "content": "This code is likely running a binary executable called \"cplex_128.bin\" and passing it a command through standard input (stdin) to execute. The command appears to be a series of newlines and numbers, with 2 and 1 being the only visible inputs.",
+        "type": "comment"
+    },
+    "2018": {
+        "file_id": 226,
+        "content": "/microgrid_base/install_docker.sh",
+        "type": "filepath"
+    },
+    "2019": {
+        "file_id": 226,
+        "content": "Installs Docker on Ubuntu by downloading the installation script and executing it using sudo. The \"--dry-run\" option can be used for a simulation without actual installation.",
+        "type": "summary"
+    },
+    "2020": {
+        "file_id": 226,
+        "content": "# for ubuntu: https://docs.docker.com/engine/install/ubuntu/\ncurl -fsSL https://get.docker.com -o get-docker.sh\nsudo sh ./get-docker.sh\n# sudo sh ./get-docker.sh --dry-run",
+        "type": "code",
+        "location": "/microgrid_base/install_docker.sh:1-4"
+    },
+    "2021": {
+        "file_id": 226,
+        "content": "Installs Docker on Ubuntu by downloading the installation script and executing it using sudo. The \"--dry-run\" option can be used for a simulation without actual installation.",
+        "type": "comment"
+    },
+    "2022": {
+        "file_id": 227,
+        "content": "/microgrid_base/jinja_template_model_generator.py",
+        "type": "filepath"
+    },
+    "2023": {
+        "file_id": 227,
+        "content": "The code imports modules, defines constants and paths for generating test code using Jinja templates. It reads device type information from JSON files, performs consistency checks, and renders templates. The code generates microgrid and IES optim check codes, updates direction tables, renders templates for device types, and writes generated code to file.",
+        "type": "summary"
+    },
+    "2024": {
+        "file_id": 227,
+        "content": "from log_utils import logger_print\n# serialized connectivity matrix -> connectivity matrix -> verify matrix -> calculation model -> calculate\n# to generate the serialized connectivity matrix, you need structures.\nfrom jinja_utils import *\nimport constants\nconstants_dict = {k: v for k, v in constants.__dict__.items() if not k.startswith(\"_\")}\n# the test code may not be generated.\nfrom param_base import *\nfrom render_type_utils import *\n# topo_code_output_path, topo_code_template_path = code_and_template_path(\"topo_check_v1\")\ntopo_code_v2_output_path, topo_code_v2_template_path = code_and_template_path(\n    \"topo_check_v2\"\n)\n# ies_optim_code_output_path, ies_optim_code_template_path = code_and_template_path(\n#     \"ies_optim\"\n# )\nies_optim_code_output_path, ies_optim_code_template_path = code_and_template_path(\n    \"ies_optim_legacy\"\n)\nMAKEFILE = dict(\n    inputs=[\n        topo_code_v2_template_path,\n        ies_optim_code_template_path,\n        (PEF := \"planning_export_format.json\"),\n        TYPE_UTILS_MICROGRID_PORTS,",
+        "type": "code",
+        "location": "/microgrid_base/jinja_template_model_generator.py:1-33"
+    },
+    "2025": {
+        "file_id": 227,
+        "content": "This code imports necessary modules and defines constants, variables, and paths for generating test code. It uses Jinja templates to generate code based on input parameters, and aims to create topo_check_v2 and ies_optim_legacy code files. The PEF file is also included as an input in the makefile.",
+        "type": "comment"
+    },
+    "2026": {
+        "file_id": 227,
+        "content": "        TYPE_UTILS_EXTRA_PORTS,\n    ],\n    outputs=[topo_code_v2_output_path, ies_optim_code_output_path],\n    args=[],\n)\nimport json\n# delegate consistency checks to type utils. (not implemented yet)\n# make portname mappings being used in topo parsing & modeling\n# migrate to topo_check_v2\nwith open(PEF, \"r\") as f:\n    planningExportFormat = json.loads(f.read())\nif __name__ == \"__main__\":\n    # you need to stop rendering it here.\n    # TYPE_UTILS_MICROGRID_PORTS_DATA\n    # TYPE_UTILS_EXTRA_PORTS_DATA\n    设备类型 = []\n    设备接口名称集合 = {}\n    directionTranslationTable = dict(进=\"输入\", 出=\"输出\", 进出=\"输入输出\")\n    directionLookupTable = {}\n    for dat in [TYPE_UTILS_MICROGRID_PORTS_DATA, TYPE_UTILS_EXTRA_PORTS_DATA]:\n        for supertype, devDict in dat.items():\n            for deviceTypeName, devData in devDict.items():\n                设备类型.append(deviceTypeName)\n                ports = devData[\"ports\"]\n                portNames = ports.keys()\n                设备接口名称集合[deviceTypeName] = set(portNames)\n                portDirectionLookupTable = {}",
+        "type": "code",
+        "location": "/microgrid_base/jinja_template_model_generator.py:34-67"
+    },
+    "2027": {
+        "file_id": 227,
+        "content": "The code is reading device type information from JSON files, populating a list of device types and their associated port names. It also creates dictionaries for looking up input/output directions and performs consistency checks using the TypeUtils module. The code then renders templates based on this data.",
+        "type": "comment"
+    },
+    "2028": {
+        "file_id": 227,
+        "content": "                for portName, portDef in ports.items():\n                    energyFlowDirection = portDef[\"能流方向\"]\n                    direction = directionTranslationTable[energyFlowDirection]\n                    portDirectionLookupTable[portName] = direction\n                directionLookupTable[deviceTypeName] = portDirectionLookupTable\n    topo_check_v2_render_params = dict(\n        设备类型=设备类型, 设备接口名称集合=设备接口名称集合, directionLookupTable=directionLookupTable\n    )\n    load_render_and_format(\n        template_path=topo_code_v2_template_path,\n        output_path=topo_code_v2_output_path,\n        render_params=topo_check_v2_render_params,\n        banner=\"TOPO CHECK CODE V2\",\n    )\n    # load_render_and_format(\n    #     template_path=topo_code_template_path,\n    #     output_path=topo_code_output_path,\n    #     render_params=dict(类型集合分类=类型集合分类, 设备接口集合=设备接口集合, 连接类型映射表=连接类型映射表),\n    #     banner=\"TOPO CHECK CODE\",\n    # )\n    planningExportFormatList = list(planningExportFormat.items())\n    planningExportFormatList.sort(key=lambda x: 0 if x[0] == \"方案详情\" else 1)",
+        "type": "code",
+        "location": "/microgrid_base/jinja_template_model_generator.py:68-92"
+    },
+    "2029": {
+        "file_id": 227,
+        "content": "The code generates microgrid topology check code using Jinja templates. It iterates through device types, updates direction lookup tables, and renders the template for each device type. The generated code is sorted based on planning export format.",
+        "type": "comment"
+    },
+    "2030": {
+        "file_id": 227,
+        "content": "    render_params = dict(\n        设备库=设备库,\n        设备接口集合=设备接口集合,  # if you want more device models, you have to change here, maybe.\n        # but at least you can pass the topology check now, even if with extra non-existant models.\n        frontend_translation_table=frontend_translation_table,\n        planningExportFormatList=planningExportFormatList,\n        **constants_dict,\n        constants=constants_dict,\n    )\n    load_render_and_format(\n        template_path=ies_optim_code_template_path,\n        output_path=ies_optim_code_output_path,\n        render_params=render_params,\n        banner=\"IES OPTIM CODE\",\n    )\n    # test([\"test_topo_check.py\", \"-f\"])\n    # run test code.\n    test([\"test_topo_check.py\"])\n    # tpl = load_template(ies_optim_code_output_path)\n    # result = tpl.render(type_sys=type_sys, dparam=dparam)\n    # logger_print()\n    # logger_print(\"______________________[{}]\".format(\"IES CODE\"))\n    # logger_print(result)\n    # with open(ies_optim_code_output_path, \"w+\") as f:\n    #     f.write(result)",
+        "type": "code",
+        "location": "/microgrid_base/jinja_template_model_generator.py:94-122"
+    },
+    "2031": {
+        "file_id": 227,
+        "content": "This code is generating IES optim code using a template and passing various parameters. It also performs a topology check by running test code after rendering the template. The generated code is then written to a file, and logger print statements provide additional information about the process.",
+        "type": "comment"
+    },
+    "2032": {
+        "file_id": 228,
+        "content": "/microgrid_base/jinja_utils.py",
+        "type": "filepath"
+    },
+    "2033": {
+        "file_id": 228,
+        "content": "The code imports modules and defines functions for Jinja templating, type hint removal, string camelization, and error handling. It performs error checks for Pyright, handles exceptions, uses Jinja2 functions and variables, ensures valid template paths, and injects functions into templates.",
+        "type": "summary"
+    },
+    "2034": {
+        "file_id": 228,
+        "content": "from log_utils import logger_print\nimport subprocess\nfrom tempfile import TemporaryDirectory\n# from humps import kebabize\nimport jinja2\nimport shutil\nimport os\nif not os.environ.get(\"NO_PYTHON_TYPECHECK\", None) == \"True\":\n    import black\n    import pyright_utils  # for checking if really installed.\nelse:\n    pyright_utils = object()\nimport re\n# live share's triple quote issue isn't fixed.\nimport humps  # default to snake case!\nimport ast\ndef remove_typehint(paramDef: str) -> str:\n    tree_def = ast.parse(\"def func({}): ...\".format(paramDef)).body[0]\n    args = []\n    for elem in ast.walk(tree_def):\n        if isinstance(elem, ast.arg):\n            argName = elem.arg  # str\n            args.append(argName)\n    return \",\".join([f\"{argName}={argName}\" for argName in args])\ndef camelize_with_space(string):\n    return humps.camelize(string.replace(\" \", \"-\"))\n# ref: https://www.geeksforgeeks.org/python-program-to-convert-camel-case-string-to-snake-case/\ndef c2s(_str):\n    \"\"\"\n    Camel case to snake case.\n    \"\"\"\n    # return humps.kebabize(_str).replace(\"-\", \"_\")",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:1-44"
+    },
+    "2035": {
+        "file_id": 228,
+        "content": "This code imports necessary modules and defines two functions for type hint removal and string camelization. It also sets up variables based on environment settings and handles a potential issue with triple quote strings. The code imports humps module to handle case conversions, uses ast library for parsing and modifying function definitions, and utilizes os and subprocess modules for execution.",
+        "type": "comment"
+    },
+    "2036": {
+        "file_id": 228,
+        "content": "    # res = [_str[0].lower()]\n    # for c in _str[1:]:\n    #     if c in (\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"):\n    #         res.append(\"_\")\n    #         res.append(c.lower())\n    #     else:\n    #         res.append(c)\n    # return \"\".join(res)\n    return humps.decamelize(_str)\ndef s2c(_str, lower: bool):\n    \"\"\"\n    Snake case to camel case.\n    \"\"\"\n    # assert not _str.startswith(\"_\")\n    # lst = _str.split(\"_\")\n    # first_letter = lst[0][0]\n    # lst[0] = (first_letter.lower() if lower else first_letter.upper()) + lst[0][1:]\n    # for i in range(1, len(lst)):\n    #     lst[i] = lst[i].title()\n    # return \"\".join(lst)\n    return getattr(humps, \"camelize\" if lower else \"pascalize\")(_str)\ndef s2cl(_str):\n    \"\"\"\n    Snake case to camel case (starting with lower letter).\n    \"\"\"\n    return s2c(_str, True)\ndef s2cu(_str):\n    \"\"\"\n    Snake case to camel case (starting with upper letter).\n    \"\"\"\n    return s2c(_str, False)\nclass NeverUndefined(jinja2.StrictUndefined):\n    def __init__(self, *args, **kwargs):\n        # ARGS: (\"parameter 'myvar2' was not provided\",)",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:45-87"
+    },
+    "2037": {
+        "file_id": 228,
+        "content": "The code contains several functions for converting between different case styles. The 'jinja_utils' module provides methods for converting Snake case to camel case (s2c), snake case to camel case with a lowercase start letter (s2cl), and snake case to camel case with an uppercase start letter (s2cu). It also includes a class 'NeverUndefined' that extends 'jinja2.StrictUndefined' for error handling in Jinja templates.",
+        "type": "comment"
+    },
+    "2038": {
+        "file_id": 228,
+        "content": "        # KWARGS: {'name': 'myvar2'}\n        if len(args) == 1:\n            info = args[0]\n        elif \"name\" in kwargs.keys():\n            info = f\"Undefined variable '{kwargs['name']}\"\n        else:\n            infoList = [\"Not allowing any undefined variable.\"]\n            infoList.append(f\"ARGS: {args}\")\n            infoList.append(f\"KWARGS: {kwargs}\")\n            info = \"\\n\".join(infoList)\n        raise Exception(info)\ndef load_render_and_format(\n    template_path: str,\n    output_path: str,\n    render_params: dict,\n    banner: str,\n    needFormat: bool = True,\n):\n    tpl = load_template(template_path)\n    result = tpl.render(**render_params)\n    logger_print()\n    logger_print(\"______________________[{}]\".format(banner))\n    logger_print(result)\n    # import black.Mode\n    output_path_elems = output_path.split(\".\")\n    output_path_elems.insert(-1, \"new\")\n    if os.path.exists(output_path):\n        with open(output_path, \"r\") as f:\n            backup_content = f.read()\n    else:\n        backup_content = \"\"\n    with open(tmp_output_path := \".\".join(output_path_elems), \"w+\") as f:",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:88-124"
+    },
+    "2039": {
+        "file_id": 228,
+        "content": "This function defines a template loading and rendering method that also formats the result. If an undefined variable is present in the parameters, it raises an exception. The code then extracts parts of the output path to create a backup file name, checks if the output file exists and reads its contents for backup purposes, and writes the rendered result to a temporary file named by appending 'new' at the end of the output path.",
+        "type": "comment"
+    },
+    "2040": {
+        "file_id": 228,
+        "content": "        f.write(result)\n    if not needFormat:\n        shutil.move(tmp_output_path, output_path)\n        return\n    try:\n        # TODO: add more test, like checking for undefined variables, before rewriting the source file.\n        # TODO: add rollback mechanism in makefile\n        result = black.format_str(result, mode=black.Mode())\n        logger_print(\"Formatter Ok.\")\n        # with TemporaryDirectory() as TP:\n        with open(output_path, \"w+\") as f:\n            f.write(result)\n        # do further type checking.\n        # typechecker_input_path = os.path.join(\n        #     TP, base_output_path := os.path.basename(output_path)\n        # )\n        # with open(typechecker_input_path, \"w+\") as f:\n        #     f.write(typechecker_input_path)\n        # output = subprocess.run(\n        #     [\"pyright\", typechecker_input_path],\n        #     capture_output=True,\n        #     encoding=\"utf-8\",\n        # )\n        run_result = pyright_utils.run(\n            output_path, capture_output=True, encoding=\"utf-8\"\n        )",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:125-151"
+    },
+    "2041": {
+        "file_id": 228,
+        "content": "Writes formatted result to file, checks if formatting is needed, moves the temporary file to output path, returns early if no formatting was done. Attempts to format the result with black and checks for undefined variables before rewriting the source file. Uses a temporary directory and writes the result into it. Uses pyright_utils to run type checking on the written file.",
+        "type": "comment"
+    },
+    "2042": {
+        "file_id": 228,
+        "content": "        typeErrors = [\n            e.strip().replace(\n                os.path.basename(output_path), os.path.basename(tmp_output_path)\n            )\n            for e in re.findall(\n                pyright_utils.errorRegex, run_result.stdout, re.MULTILINE\n            )\n        ]\n        # breakpoint()\n        if run_result.stderr:\n            typeErrors.append(\"\")\n            typeErrors.append(f\"Pyright error:\\n{run_result.stderr}\")\n        if typeErrors:\n            typeErrors.insert(0, f\"Type error found in file {repr(output_path)}\")\n            raise Exception(f\"\\n{' '*4}\".join(typeErrors))\n        logger_print(\"Pyright Ok.\")\n        os.remove(tmp_output_path)\n    except:\n        import traceback\n        traceback.print_exc()\n        # os.remove(tmp_output_path)\n        with open(output_path, \"w+\") as f:\n            f.write(backup_content)\n        # ref: https://www.geeksforgeeks.org/python-os-utime-method/\n        # do not set this to 0 or something. will cause error.\n        os.utime(\n            output_path,",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:152-179"
+    },
+    "2043": {
+        "file_id": 228,
+        "content": "The code checks for type errors using Pyright and outputs the error messages. If any Pyright errors are found, an exception is raised with the error messages. If stderr contains content, it appends a new line with \"Pyright error: {stderr content}\" to the error list. After processing, if typeErrors is not empty, it inserts a message with the output path and joins all error messages in a formatted string. It also removes a temporary file and writes backup_content to the original output_path if any exceptions occur. The code may be using os.utime() to update the last access and modification times of the output_path without altering its content.",
+        "type": "comment"
+    },
+    "2044": {
+        "file_id": 228,
+        "content": "            times=(\n                os.path.getatime(template_path) - 1000000,\n                os.path.getmtime(template_path) - 1000000,\n            ),\n        )  # to make this older than template, must update!\n        raise Exception(\n            f\"Code check failed.\\nTemporary cache saved to: '{tmp_output_path}'\"\n        )\n    logger_print(\"=\" * 40)\ndef lstrip(string: str):\n    lines = string.split(\"\\n\")\n    result_lines = []\n    for line in lines:\n        result_lines.append(line.lstrip())\n        # if stripped_line := line.lstrip():\n        # result_lines.append(stripped_line)\n    result = \"\\n\".join(result_lines).strip(\"\\n\")\n    return result\ndef code_and_template_path(base_name):\n    code_path = f\"{base_name}.py\"\n    template_path = f\"{code_path}.j2\"\n    return code_path, template_path\njinja2_template_arguments = dict(\n    extensions=[\n        \"jinja2_error.ErrorExtension\",\n        \"jinja2.ext.do\",\n        \"jinja2.ext.loopcontrols\",\n    ],\n    trim_blocks=True,\n    lstrip_blocks=True,\n    # undefined=jinja2.StrictUndefined,",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:180-217"
+    },
+    "2045": {
+        "file_id": 228,
+        "content": "This code appears to contain functions and variables related to Jinja2 templating engine. The \"lstrip\" function strips leading whitespace from each line in a string, while the \"code_and_template_path\" function returns paths for code and template files with .j2 extension. Jinja2TemplateArguments dictionary defines options for Jinja2 templates, including extensions and trim/lstrip settings. There is an error check that raises an Exception if certain conditions are not met, possibly related to timestamps of the template file versus other files.",
+        "type": "comment"
+    },
+    "2046": {
+        "file_id": 228,
+        "content": "    undefined=NeverUndefined,\n)\njinja2_func_dict = dict(\n    list=list,\n    str=str,\n    _dict=dict,\n    _set=set,  # avoid name collision\n    tuple=tuple,\n    ord=ord,\n    len=len,\n    repr=repr,\n    c2s=c2s,\n    # s2c=s2c,\n    s2cl=s2cl,\n    s2cu=s2cu,\n    zip=zip,\n    cws=camelize_with_space,\n    lstrip=lstrip,\n    remove_typehint=remove_typehint,\n    kebabize=humps.kebabize,\n    pascalize=humps.pascalize,\n    # enumerate=enumerate,\n    # eval=eval,\n    # join=myJoin\n)\ndef make_jinja2_func_dict(extra_func_dict={}):\n    func_dict = dict(**jinja2_func_dict, **extra_func_dict)\n    return func_dict\nfrom jinja2 import Template\ndef inject_template_globals(template: Template, func_dict: dict) -> Template:\n    func_dict = make_jinja2_func_dict(func_dict)\n    template.globals.update(func_dict)\n    return template\ndef load_template_text(template_text: str, extra_func_dict={}):\n    tpl = Template(template_text, **jinja2_template_arguments)\n    inject_template_globals(tpl, extra_func_dict)\n    return tpl\ndef load_template(template_path: str, extra_func_dict={}):",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:218-266"
+    },
+    "2047": {
+        "file_id": 228,
+        "content": "This code defines a function make_jinja2_func_dict() that creates a dictionary of Jinja2 functions and optional extra functions. The inject_template_globals() function takes a Jinja2 Template object and a func_dict, updates the template's globals with the combined dictionary of Jinja2 and extra functions, and returns the updated template. The load_template_text() function creates a new Jinja2 Template from a text string, injects extra functions into it using inject_template_globals(), and returns the modified template. Finally, the load_template() function loads a template file path, injects extra functions, and returns the modified template.",
+        "type": "comment"
+    },
+    "2048": {
+        "file_id": 228,
+        "content": "    try:\n        assert template_path.endswith(\".j2\")\n    except:\n        Exception(f\"jinja template path '{template_path}' is malformed.\")\n    env = jinja2.Environment(\n        loader=jinja2.FileSystemLoader(searchpath=[\"./\", \"../\"]),\n        **jinja2_template_arguments,\n    )\n    tpl = env.get_template(template_path)\n    inject_template_globals(tpl, extra_func_dict)\n    return tpl\ndef test(cmd: list, exec=\"python3\" if os.name != \"nt\" else \"python\"):\n    cmd = [exec] + cmd\n    p = subprocess.run(cmd)\n    p.check_returncode()",
+        "type": "code",
+        "location": "/microgrid_base/jinja_utils.py:267-283"
+    },
+    "2049": {
+        "file_id": 228,
+        "content": "Code tries to load Jinja2 template from a given path, throws exception if the template path is malformed, and then returns the loaded template after injecting global variables. The test function runs a subprocess with provided command list and checks its return code.",
+        "type": "comment"
+    },
+    "2050": {
+        "file_id": 229,
+        "content": "/microgrid_base/json_utils.py",
+        "type": "filepath"
+    },
+    "2051": {
+        "file_id": 229,
+        "content": "This code includes a function for traversing and updating JSON objects, supporting nested key-value pairs while preserving order. The `jsonApply` function applies a series of functions to specific locations in the JSON object, creating a deep copy using `copy.deepcopy`, and iterating through each location with `jsonWalk`. Finally, it updates the copied JSON object using `jsonUpdate`.",
+        "type": "summary"
+    },
+    "2052": {
+        "file_id": 229,
+        "content": "from log_utils import logger_print\nimport json\n# it's json-like object, not json serializable object!\ndef jsonWalk(jsonObj, location=[]):\n    # this is not tuple. better convert it first?\n    # mlocation = copy.deepcopy(location)\n    if type(jsonObj) == dict:\n        for key in jsonObj:\n            content = jsonObj[key]\n            if type(content) not in [dict, list, tuple]:\n                yield location + [key], content\n            else:\n                # you really ok with this?\n                for mkey, mcontent in jsonWalk(content, location + [key]):\n                    yield mkey, mcontent\n    elif type(jsonObj) in [\n        list,\n        tuple,\n    ]:  # this is not pure JSON. we only have list and dicts.\n        for key, content in enumerate(jsonObj):\n            # content = jsonObj[key]\n            if type(content) not in [dict, list, tuple]:\n                yield location + [key], content\n            else:\n                for mkey, mcontent in jsonWalk(content, location + [key]):\n                    yield mkey, mcontent",
+        "type": "code",
+        "location": "/microgrid_base/json_utils.py:1-30"
+    },
+    "2053": {
+        "file_id": 229,
+        "content": "This function recursively traverses a JSON-like object, yielding each key-value pair if the value is not a dictionary, list, or tuple. It handles both dictionaries and lists as input, adapting to non-pure JSON structures.",
+        "type": "comment"
+    },
+    "2054": {
+        "file_id": 229,
+        "content": "    else:\n        raise Exception(\"Not a JSON compatible object: {}\".format(type(jsonObj)))\ndef jsonWalk2(jsonObj):\n    jsonObj = jsonify(jsonObj)\n    return jsonWalk(jsonObj)\ndef jsonLocate(jsonObj, location=[]):\n    # logger_print(\"object:\",jsonObj)\n    # logger_print(\"location:\",location)\n    if location != []:\n        # try:\n        return jsonLocate(jsonObj[location[0]], location[1:])\n        # except:\n        #     breakpoint()\n    return jsonObj\ndef jsonUpdate(jsonObj, location=[], update_content=None):\n    if location != []:\n        if type(jsonObj) == dict:\n            target = {\n                location[0]: jsonUpdate(\n                    jsonObj[location[0]],\n                    location=location[1:],\n                    update_content=update_content,\n                )\n            }\n            # logger_print(\"keys:\", location)\n            # logger_print(\"JSONOBJ:\", jsonObj)\n            # logger_print(\"update target:\", target)\n            jsonObj.update(target)\n            return jsonObj\n        elif type(jsonObj) == list:",
+        "type": "code",
+        "location": "/microgrid_base/json_utils.py:31-66"
+    },
+    "2055": {
+        "file_id": 229,
+        "content": "This code defines several functions for manipulating JSON objects. `jsonWalk2` converts an object to JSON and then calls `jsonWalk`, `jsonLocate` recursively finds a location within the JSON, and `jsonUpdate` updates values at specified locations in the JSON.",
+        "type": "comment"
+    },
+    "2056": {
+        "file_id": 229,
+        "content": "            target = jsonUpdate(\n                jsonObj[location[0]],\n                location=location[1:],\n                update_content=update_content,\n            )\n            # logger_print(\"keys:\", location)\n            # logger_print(\"JSONOBJ:\", jsonObj)\n            # logger_print(\"override target:\", target)\n            jsonObj[location[0]] = target\n            return jsonObj\n        else:\n            raise Exception(\"Unsupported JSON update target type:\", type(jsonObj))\n    return update_content\ndef jsonDeleteObject(jsonObj, location: list):\n    assert len(location) > 0\n    obj = jsonObj\n    # logger_print(location, obj)\n    for key in location[:-1]:\n        obj = obj[key]\n    del obj[location[-1]]\n    return jsonObj\n# how to reload module directly, so we can include this function as well?\nimport typing\n# what the fuck is going on here?\n# ImportError: cannot import name 'jsonDeleteAllinstances' from 'lazero.utils.json' (/root/Desktop/works/lazero/lazero/utils/json.py)\n# how to reload module actually, making from <module> import <object> work?",
+        "type": "code",
+        "location": "/microgrid_base/json_utils.py:67-97"
+    },
+    "2057": {
+        "file_id": 229,
+        "content": "This code defines two functions, `jsonUpdateObject` and `jsonDeleteObject`, for updating and deleting objects in a JSON object respectively. The `jsonUpdateObject` function takes a JSON object, a location (list) to update or delete the object, and an optional update_content argument. It recursively updates the key-value pairs in the JSON object until it reaches the target location, then replaces or deletes the specified object as required. If an unsupported type is encountered, it raises an exception. The `jsonDeleteObject` function removes a nested key-value pair from the JSON object by iterating through the given location list and finally deleting the last key in the chain.",
+        "type": "comment"
+    },
+    "2058": {
+        "file_id": 229,
+        "content": "def jsonDeleteAllInstances(\n    jsonObj, isInstance: typing.Callable[[typing.Any], bool], copy=True\n):\n    if copy:\n        jsonObj2 = jsonObj.copy()\n    else:\n        jsonObj2 = jsonObj\n    candidates = []\n    for key, value in jsonWalk(jsonObj2):\n        if isInstance(value):\n            # delete that thing! but how to delete these things once for all?\n            candidates.append(key)\n    candidates.sort(key=lambda x: -x[-1] if type(x[-1]) == int else 1)\n    for candidate in candidates:\n        jsonObj2 = jsonDeleteObject(jsonObj, candidate)\n    return jsonObj2\ndef jsonTupleToList(jsonObj2, copy=True):\n    if copy:\n        jsonObj = jsonObj2.copy()\n    else:\n        jsonObj = jsonObj2\n    candidates = []\n    for key, value in jsonWalk(jsonObj):\n        if type(value) == tuple:\n            candidates.append(key)\n    for candidate in candidates:\n        data = jsonLocate(jsonObj, candidate)\n        data = list(data)\n        jsonObj = jsonUpdate(jsonObj, candidate, data)\n    return jsonObj\ndef jsonify(\n    jsonObj, copy=True, refine=False, isInstance=lambda obj: obj == ...",
+        "type": "code",
+        "location": "/microgrid_base/json_utils.py:100-135"
+    },
+    "2059": {
+        "file_id": 229,
+        "content": "The code defines three functions: `jsonDeleteAllInstances`, `jsonTupleToList`, and `jsonify`. These functions work with JSON data. The first function deletes all instances of a specified type from the JSON object, while maintaining the order. The second function converts tuple values in the JSON object to lists. Lastly, the `jsonify` function can be used to refine the JSON structure and delete specific instance types while copying the original data.",
+        "type": "comment"
+    },
+    "2060": {
+        "file_id": 229,
+        "content": "):  # remove ellipsis\n    jsonObj2 = jsonTupleToList(jsonObj, copy=copy)\n    jsonObj2 = jsonDeleteAllInstances(jsonObj2, isInstance, copy=copy)\n    if refine:\n        return json.loads(json.dumps(jsonObj2))\n    else:\n        return jsonObj2\n#### NEW FUNCTIONS ####\nimport copy\ndef jsonApply(jsonObj, *funcs):\n    jsonObj2 = copy.deepcopy(jsonObj)\n    for location, content in jsonWalk(jsonObj):\n        for func in funcs:\n            content = func(location, content)\n        jsonUpdate(jsonObj2, location, content)\n    return jsonObj2",
+        "type": "code",
+        "location": "/microgrid_base/json_utils.py:136-156"
+    },
+    "2061": {
+        "file_id": 229,
+        "content": "Function `jsonApply` applies a series of functions to specific locations in the JSON object and returns the updated JSON. It uses `copy.deepcopy` for creating a deep copy of the original JSON object, and `jsonWalk` to iterate over each location within the JSON structure. For each location, it applies all provided functions and then updates the copied JSON object with the modified content using `jsonUpdate`.",
+        "type": "comment"
+    },
+    "2062": {
+        "file_id": 230,
+        "content": "/microgrid_base/lib_parse_params.py",
+        "type": "filepath"
+    },
+    "2063": {
+        "file_id": 230,
+        "content": "The code imports libraries, checks OS, defines a function to repair Excel files, parses and extracts data, filters unwanted rows, handles duplicates, updates target_json, interacts with Excel and CSVs, logs row info for debugging, adds values to result dictionary, logs and saves JSON file.",
+        "type": "summary"
+    },
+    "2064": {
+        "file_id": 230,
+        "content": "from log_utils import logger_print\n# first get the titles.\n# 解析设备参数表 可能也适用于设备接口信息解析\nimport openpyxl\nfrom openpyxl.worksheet.worksheet import Worksheet\nimport pandas\nimport rich\nimport numpy\nimport json\nimport os\nif os.name == \"nt\":\n    from win32com.client import Dispatch\n    def repair_excel(excel_path):  # you may need to restart system if this goes wrong.\n        xlapp = Dispatch(\"ket.Application\")  # wps\n        # xlapp = Dispatch(\"Excel.Application\")\n        xlapp.Visible = False\n        xlbook = xlapp.Workbooks.Open(os.path.abspath(excel_path))\n        xlbook.Save()\n        xlbook.Close()\nelse:\n    # in macos\n    def repair_excel(excel_path):\n        import tempfile\n        soffice_bin = \"/Applications/LibreOffice.app/Contents/MacOS/soffice\"\n        with tempfile.TemporaryDirectory() as TD:\n            tmpdir = os.path.abspath(TD)\n            excel_path_abs = os.path.abspath(excel_path)\n            excel_path_base = os.path.basename(excel_path)\n            commandline = f\"'{soffice_bin}' --headless --convert-to 'xlsx:{excel_path_base.split('.')[0]}' --outdir '{tmpdir}' '{excel_path_abs}'\"",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:1-35"
+    },
+    "2065": {
+        "file_id": 230,
+        "content": "This code imports necessary libraries, checks the operating system, and defines a function to repair Excel files. It uses different methods for Windows (Win32com) and macOS (LibreOffice) to convert potentially damaged Excel files into usable format, ensuring compatibility with other parts of the program.",
+        "type": "comment"
+    },
+    "2066": {
+        "file_id": 230,
+        "content": "            os.system(commandline)\n            os.system(f\"mv {os.path.join(tmpdir, excel_path_base)} {excel_path_abs}\")\ndef strip_and_convert_empty_string_as_none(e: str):\n    stripped = e.strip()\n    if stripped == \"\":\n        return None\n    else:\n        return stripped\ndef strip_element_if_is_string(mlist):\n    return [\n        e if not isinstance(e, str) else strip_and_convert_empty_string_as_none(e)\n        for e in mlist\n    ]\ndef main_parser(filepath, sheet_name, output_path, type_utils_parser: bool):\n    # if os.name == \"nt\":\n    sheet1 = extract_sheet_from_excel(filepath, sheet_name)\n    # common parts?\n    # order: category; name (unit), example, delete or not\n    # you need to scan through all cells to find some cell with specific color.\n    # and with some example.\n    # COL: A;B,C,D;F,G,H for all data need to export\n    # after (partial) serialization, you can do something more interesting with it.\n    dims = sheet1.row_dimensions, sheet1.column_dimensions\n    uniqs = {}\n    def getColumnRangePerRow(start, end):",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:36-68"
+    },
+    "2067": {
+        "file_id": 230,
+        "content": "The code appears to be part of a program that processes data from an Excel sheet. It defines functions for parsing and converting elements, extracts a specific sheet from the Excel file based on input parameters, and retrieves column ranges within rows. The program may use these functions to manipulate or process the extracted data further.",
+        "type": "comment"
+    },
+    "2068": {
+        "file_id": 230,
+        "content": "        flag = True\n        for index, row in enumerate(sheet1.rows):\n            if flag:\n                flag = False\n                continue\n            yield index, [col.value for col in row[start:end]]\n    heads = getColumnRangePerRow(0, 1)\n    unwanted_headers = [\"其他\"]\n    # cursor = None\n    headMaps = {}\n    prevHead = None\n    mHeads = []\n    for index, [head] in heads:\n        logger_print(index, head)\n        if head:\n            prevHead = head\n            mHeads.append(head)\n        if prevHead:\n            headMaps.update({index: prevHead})\n    logger_print(headMaps)\n    target_json = {\n        h: {}\n        for h in mHeads\n        if (True if type_utils_parser is False else h not in unwanted_headers)\n    }\n    if type_utils_parser:\n        # breakpoint()\n        deviceNameAndPorts = list(getColumnRangePerRow(1, 3))\n        deviceNameAndPortsWithoutIndex = [row for _, row in deviceNameAndPorts]\n        details = list(getColumnRangePerRow(4, 10))\n        indexs = [i for i, _ in details]\n        details_without_index = [row for _, row in details]",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:69-104"
+    },
+    "2069": {
+        "file_id": 230,
+        "content": "This code parses an Excel sheet, specifically columns headers and data rows. It checks if certain headers are present or not. It creates a dictionary where keys are row indexes and values are column headers. If type_utils_parser is True, it filters out some unwanted headers. Then it creates a target JSON object using the filtered column names. Lastly, it extracts data from specific columns (device name, device ports, details) and separates them into separate lists without indices.",
+        "type": "comment"
+    },
+    "2070": {
+        "file_id": 230,
+        "content": "        # breakpoint()\n        currentDevName = None\n        currentDevData = None\n        prevDevName = None\n        createDevDataTemplate = lambda: {\n            \"ports\": dict(),\n            \"rules\": [],\n            \"requirements\": [],\n        }\n        for i, row_i in enumerate(indexs):\n            head = headMaps[row_i]\n            if head in unwanted_headers:\n                logger_print(\n                    f'skipping row #{row_i} because of \"{head}\" is in unwanted headers ({unwanted_headers}).'\n                )\n                continue\n            devNameOrPortName, portInfo = strip_element_if_is_string(\n                deviceNameAndPortsWithoutIndex[i]\n            )\n            细分类型, 基本类型, 能流方向, 必有工况, 对应规则, 附加要求 = strip_element_if_is_string(\n                details_without_index[i]\n            )\n            if currentDevName is not None:\n                if devNameOrPortName is None:\n                    currentDevName = None\n                else:\n                    if currentDevData is None:\n                        currentDevData = createDevDataTemplate()",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:105-133"
+    },
+    "2071": {
+        "file_id": 230,
+        "content": "The code is iterating through rows and headers, skipping any rows with unwanted headers. It extracts device name or port name along with other details such as type, basic type, direction, must-have scenarios, associated rules, and additional requirements from the rows. If a current device name exists, it checks if the row contains data for that device, and if not, sets the current device name to None. It also creates a new device data template if needed.",
+        "type": "comment"
+    },
+    "2072": {
+        "file_id": 230,
+        "content": "                    portName = devNameOrPortName\n                    assert (\n                        portName not in currentDevData[\"ports\"].keys()\n                    ), f\"duplicate port name found: {currentDevName} -> {portName}\"\n                    currentDevData[\"ports\"][portName] = dict(\n                        info=portInfo, 细分类型=细分类型, 基本类型=基本类型, 能流方向=能流方向, 必有工况=必有工况\n                    )\n                    if 对应规则 is not None:\n                        currentDevData[\"rules\"].append(对应规则)\n                    if 附加要求 is not None:\n                        currentDevData[\"requirements\"].append(附加要求)\n            else:\n                if currentDevData is not None:\n                    prevHead2 = headMaps[row_i - 1]\n                    target_json[prevHead2][prevDevName] = currentDevData\n                    currentDevData = None\n                if portInfo is None:\n                    if devNameOrPortName is not None:\n                        currentDevName = devNameOrPortName\n                        prevDevName = currentDevName",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:134-153"
+    },
+    "2073": {
+        "file_id": 230,
+        "content": "The code is parsing parameters for devices in a microgrid. It checks for duplicate port names and adds new device data to the existing one if it exists, otherwise, creates a new entry. If rules or requirements are present, they are appended accordingly.",
+        "type": "comment"
+    },
+    "2074": {
+        "file_id": 230,
+        "content": "    else:\n        BCD = getColumnRangePerRow(1, 4)\n        FGH = getColumnRangePerRow(5, 8)\n        def checkEmpty(val):\n            if type(val) == str:\n                if val.strip() == \"\":\n                    return None\n            return val\n        def processBCD(_BCD):\n            device_name = None\n            for index, [b, c, d] in _BCD:\n                head = headMaps[index]\n                b, c, d = checkEmpty(b), checkEmpty(c), checkEmpty(d)\n                # logger_print(b,c,d) # value can be None or \"\"\n                if all([elem is None for elem in [b, c, d]]):\n                    logger_print(\"LINE BREAK\")\n                    device_name = None\n                else:\n                    if device_name is None:\n                        device_name = b\n                        target_json[head].update({device_name: []})\n                    else:\n                        target_json[head][device_name].append((b, c, d))\n                    logger_print(\"DEVICE NAME?\", device_name)\n        processBCD(BCD)",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:155-182"
+    },
+    "2075": {
+        "file_id": 230,
+        "content": "This code defines a function that processes BCD (Big Column Data) by checking if each element is empty or not, and updates target_json based on the device name and corresponding values. The processBCD() function iterates through the BCD columns, checks for empty elements, logs LINE BREAK when all elements are empty, and updates the device name and its corresponding values in target_json.",
+        "type": "comment"
+    },
+    "2076": {
+        "file_id": 230,
+        "content": "        processBCD(FGH)\n    logger_print(target_json)\n    with open(output_path, \"w+\") as f:\n        f.write(json.dumps(target_json, indent=4, ensure_ascii=False))\n    logger_print(\"WRITE TO:\", output_path)\ndef extract_sheet_from_excel(filepath, sheet_name):\n    repair_excel(filepath)\n    excel_file = openpyxl.load_workbook(filepath)\n    # excel_file = openpyxl.load_workbook(filepath, read_only=True)\n    logger_print(\"SHEET NAMES:\")\n    logger_print(excel_file.sheetnames)  # ['Sheet1']\n    # from openpyxl.cell.cell import Cell, MergedCell\n    sheet1 = excel_file[sheet_name]\n    if not isinstance(sheet1, Worksheet):\n        raise Exception(\n            f\"sheet {sheet_name} at file '{filepath}' (type: {type(sheet1)}) is not Worksheet\"\n        )\n    return sheet1\ndef csv_parser(filename, output_path):\n    df = pandas.read_csv(filename, header=None)\n    dataClasses = [None, None]\n    result = {}\n    lastEmpty = True\n    for index, row in df.iterrows():\n        # logger_print(row)\n        # logger_print(list(row))\n        list_row = list(row)",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:183-218"
+    },
+    "2077": {
+        "file_id": 230,
+        "content": "The code snippet is a part of a larger program that interacts with Excel files and CSVs. The `extract_sheet_from_excel` function loads an Excel file (`filepath`) and returns the specified sheet (`sheet_name`). It also checks if the sheet is indeed a Worksheet type before returning it. The `csv_parser` function reads a CSV file (`filename`), and iterates over each row in the DataFrame, logging row data for potential debugging purposes.",
+        "type": "comment"
+    },
+    "2078": {
+        "file_id": 230,
+        "content": "        first, second = list_row[:2]\n        # logger_print(dir(row))\n        if first is numpy.nan and second is numpy.nan:\n            lastEmpty = True\n            continue\n        # list_row_types = [(e, type(e)) for e in list_row]\n        # logger_print(list_row_types)\n        # numpy.nan is a float, not an int, so we can't use it as a number\n        if type(first) == str:\n            first = first.strip()\n            if len(first) > 0:\n                dataClasses[0] = first\n        if type(second) == str:\n            second = second.strip()\n            if len(second) > 0:\n                if lastEmpty:\n                    dataClasses[1] = second\n                    lastEmpty = False\n                else:\n                    # now we begin to insert data.\n                    if dataClasses[0] and dataClasses[1]:\n                        if result.get(dataClasses[0], None) is None:\n                            result[dataClasses[0]] = {}\n                        if result[dataClasses[0]].get(dataClasses[1], None) is None:",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:219-242"
+    },
+    "2079": {
+        "file_id": 230,
+        "content": "The code checks if the first and second elements of a list_row are both NaN, then continues. If the first element is a string, it strips any leading/trailing spaces and adds it to dataClasses[0]. If the second element is also a string with non-empty value, and lastEmpty is True, it adds it to dataClasses[1] and sets lastEmpty to False. If both elements are non-empty strings, it checks if result already has dataClasses[0] key; if not, creates an empty dictionary for that key. Then, it checks if the dictionary with key dataClasses[0] has a subkey with dataClasses[1], if not, creates one.",
+        "type": "comment"
+    },
+    "2080": {
+        "file_id": 230,
+        "content": "                            result[dataClasses[0]][dataClasses[1]] = []\n                        result[dataClasses[0]][dataClasses[1]].append(second)\n    logger_print(result)\n    with open(output_path, \"w+\") as f:\n        f.write(json.dumps(result, indent=4, ensure_ascii=False))",
+        "type": "code",
+        "location": "/microgrid_base/lib_parse_params.py:243-247"
+    },
+    "2081": {
+        "file_id": 230,
+        "content": "The code adds an empty list to the result dictionary at the specified data classes indices, appends a value (second) to it, logs and saves the resulting dictionary as a formatted JSON file.",
+        "type": "comment"
+    },
+    "2082": {
+        "file_id": 231,
+        "content": "/microgrid_base/log_infeasible.py",
+        "type": "filepath"
+    },
+    "2083": {
+        "file_id": 231,
+        "content": "This code defines a Pyomo model and uses SolverFactory to solve it, logging infeasible constraints for microgrid log file infeasibility detection. It prints solver status, termination condition, and logging data for debugging purposes.",
+        "type": "summary"
+    },
+    "2084": {
+        "file_id": 231,
+        "content": "from log_utils import logger_print\nfrom pyomo_environ import *\n# from pyomo.environ import (\n#     Param,\n#     ConcreteModel,\n#     Var,\n#     Objective,\n#     ConstraintList,\n#     value,\n#     minimize,\n# )\nfrom pyomo.opt import SolverFactory\nfrom pyomo.util.infeasible import log_infeasible_constraints\nm = ConcreteModel()\nm.LE = set([1, 2, 3])\nm.x = Var(m.LE, initialize=0)\nm.M = Param(initialize=1000000)\ndef obj_rule(m):\n    return sum(m.x[i] * 1 for i in m.LE)\nm.z = Objective(rule=obj_rule, sense=minimize)\nm.cons1 = ConstraintList()\nfor i in m.LE:\n    m.cons1.add(10**2 * m.x[i] >= m.M)\n    m.cons1.add(10**2 * m.x[i] <= -3)\nimport io\nmstream = io.StringIO()\n# import sys\nimport logging\n# logging.basicConfig(stream=sys.stderr, level=logging.INFO)\nlogging.basicConfig(stream=mstream, level=logging.INFO)\nfrom constants import Solver\nsolver = SolverFactory(Solver.cplex)\n# solver = SolverFactory(Solver.glpk)\nsolution = solver.solve(m, tee=True)\n# after solving.\nlog_infeasible_constraints(m, log_expression=True, log_variables=True)",
+        "type": "code",
+        "location": "/microgrid_base/log_infeasible.py:1-49"
+    },
+    "2085": {
+        "file_id": 231,
+        "content": "The code defines a Pyomo model with variables and constraints. It then uses the SolverFactory to solve the model and logs infeasible constraints after solving. The model aims to minimize a sum of x values for different elements in set LE, subjected to certain constraints. The solution is logged into a StringIO object named mstream with INFO level logging.",
+        "type": "comment"
+    },
+    "2086": {
+        "file_id": 231,
+        "content": "logger_print()\nlogger_print(\"SOLVER STATUS?\", solution.solver.status)\nlogger_print(\n    \"TERMINATION CONDITION?\", solution.solver.termination_condition\n)  # infeasible.\n# logging.basicConfig(filename=\"example.log\", encoding=\"utf-8\", level=logging.INFO)\nlogger_print(value(m.z))\nmstream.seek(0)\nlogging_data = mstream.read()\n# alternative:\n# logging_data = mstream.getvalue()\nmstream.truncate(0)\nlogger_print(\"LOGGING DATA:\")\nlogger_print(logging_data)",
+        "type": "code",
+        "location": "/microgrid_base/log_infeasible.py:50-65"
+    },
+    "2087": {
+        "file_id": 231,
+        "content": "This code snippet is part of a microgrid log file infeasibility detection. It prints the solver's status, termination condition, and logging data for debugging purposes, ensuring all necessary information is captured before truncating the stream.",
+        "type": "comment"
+    },
+    "2088": {
+        "file_id": 232,
+        "content": "/microgrid_base/log_infeasible.sh",
+        "type": "filepath"
+    },
+    "2089": {
+        "file_id": 232,
+        "content": "This code sets the PATH environment variable to include CPLEX Studio's directory and runs a Python script named log_infeasible.py, likely for solving optimization problems with CPLEX.",
+        "type": "summary"
+    },
+    "2090": {
+        "file_id": 232,
+        "content": "env PATH=\"/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx:$PATH\" python3 log_infeasible.py",
+        "type": "code",
+        "location": "/microgrid_base/log_infeasible.sh:1-1"
+    },
+    "2091": {
+        "file_id": 232,
+        "content": "This code sets the PATH environment variable to include CPLEX Studio's directory and runs a Python script named log_infeasible.py, likely for solving optimization problems with CPLEX.",
+        "type": "comment"
+    },
+    "2092": {
+        "file_id": 233,
+        "content": "/microgrid_base/macro_test.j2",
+        "type": "filepath"
+    },
+    "2093": {
+        "file_id": 233,
+        "content": "The code snippet is written in Jinja2 template language and includes custom macros. Macro \"mymacro\" takes two arguments and displays their values. Macro \"mycalledmacro\" also takes two arguments, but calls another macro \"caller\", which displays the argument names along with the calling function. The code includes multiple calls to different macros with various arguments, displaying their results.",
+        "type": "summary"
+    },
+    "2094": {
+        "file_id": 233,
+        "content": "{{ test}}\n{% macro mymacro(a,b) -%}\nsource code path: {{ a }}\nfile size: {{ b }}\n{% endmacro %}\n{% macro mycalledmacro(a,b) %}\n1st arg: {{a}}\n{{caller()}}\n2nd arg: {{b}}\n{{caller()}}\n{% endmacro%}\n{{ mymacro(1,2)}}\n{% macro mycalledmacroarg(a,b) %}\n{{ caller(a,b) }}\n{{a}}\n{{b}}\n{% endmacro%}\n----\n{% call mycalledmacro(2,3)%}\n{{ test}}\n{% endcall%}\n----\n{% call mycalledmacro(1,2)%}\nabcdefg\n{%endcall%}\n----\n{% call(arg1, arg2) mycalledmacroarg(3,4)%}\n{{ mymacro(arg1, arg2) }}\n{%endcall%}",
+        "type": "code",
+        "location": "/microgrid_base/macro_test.j2:1-40"
+    },
+    "2095": {
+        "file_id": 233,
+        "content": "The code snippet is written in Jinja2 template language and includes custom macros. Macro \"mymacro\" takes two arguments and displays their values. Macro \"mycalledmacro\" also takes two arguments, but calls another macro \"caller\", which displays the argument names along with the calling function. The code includes multiple calls to different macros with various arguments, displaying their results.",
+        "type": "comment"
+    },
+    "2096": {
+        "file_id": 234,
+        "content": "/microgrid_base/macro_test.py",
+        "type": "filepath"
+    },
+    "2097": {
+        "file_id": 234,
+        "content": "This code imports necessary modules, sets a template path, creates an environment with Jinja2's FileSystemLoader, retrieves the template, renders it with test data, and logs the resulting script using logger_print.",
+        "type": "summary"
+    },
+    "2098": {
+        "file_id": 234,
+        "content": "from log_utils import logger_print\ntemplate_path = \"macro_test.j2\"\nfrom jinja2 import Environment, FileSystemLoader\nenv = Environment(loader=FileSystemLoader(\"./\"))\ntpl = env.get_template(template_path)\nscript = tpl.render(test=\"test_string\")\nlogger_print(script)",
+        "type": "code",
+        "location": "/microgrid_base/macro_test.py:1-11"
+    },
+    "2099": {
+        "file_id": 234,
+        "content": "This code imports necessary modules, sets a template path, creates an environment with Jinja2's FileSystemLoader, retrieves the template, renders it with test data, and logs the resulting script using logger_print.",
+        "type": "comment"
+    }
+}

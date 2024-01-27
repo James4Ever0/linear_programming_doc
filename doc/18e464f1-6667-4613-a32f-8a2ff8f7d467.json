@@ -1,0 +1,10 @@
+{
+    "summary": "This code appends the parent directory to the system path, imports jinja_utils, retrieves code and template paths using the function from jinja_utils, and then loads, renders, and formats the template with specified parameters and banner.",
+    "details": [
+        {
+            "comment": "This code appends the parent directory to the system path, imports jinja_utils, retrieves code and template paths using the function from jinja_utils, and then loads, renders, and formats the template with specified parameters and banner.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/generate_test_model.py\":0-9",
+            "content": "import sys\nsys.path.append(\"../\")\nimport jinja_utils\ncode_path, template_path = jinja_utils.code_and_template_path(\"test_model\")\njinja_utils.load_render_and_format(\n    template_path, code_path, render_params=dict(), banner=\"TEST MODEL CODE\"\n)"
+        }
+    ]
+}

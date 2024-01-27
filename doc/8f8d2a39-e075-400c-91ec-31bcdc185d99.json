@@ -1,0 +1,10 @@
+{
+    "summary": "This code utilizes the Pandoc tool to convert DOCX files, referencing other DOCX files for formatting. It converts algorithm_report_1.docx with reference to algorithm_format_reference.docx and saves as algorithm_converted_1.docx. Another conversion is performed on ../original_example_docstring.docx using reference to ../pandoc-templates/templates/rmd-minion-reference.docx and saved as docstring_converted.docx.",
+    "details": [
+        {
+            "comment": "This code utilizes the Pandoc tool to convert DOCX files, referencing other DOCX files for formatting. It converts algorithm_report_1.docx with reference to algorithm_format_reference.docx and saves as algorithm_converted_1.docx. Another conversion is performed on ../original_example_docstring.docx using reference to ../pandoc-templates/templates/rmd-minion-reference.docx and saved as docstring_converted.docx.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/output_pdf/docx_reference_convert/test_convert.sh\":0-2",
+            "content": "# pandoc algorithm_report_1.docx --reference-doc=algorithm_format_reference.docx -o algorithm_converted_1.docx # this sucks\n# pandoc ../original_example_docstring.docx --reference-doc=../pandoc-templates/templates/rmd-minion-reference.docx -o docstring_converted.docx #looks like hell"
+        }
+    ]
+}

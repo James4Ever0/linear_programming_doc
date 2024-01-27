@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports piecewise_regression and uses it to fit a sinusoidal function with adjustable breakpoints, then plots the data, fit, breakpoints, and confidence intervals. The number of breakpoints can be adjusted for better or worse fits, but too many may lead to non-convergence and instability.",
+    "details": [
+        {
+            "comment": "This code imports piecewise_regression and uses it to fit a sinusoidal function with adjustable breakpoints, then plots the data, fit, breakpoints, and confidence intervals. The number of breakpoints can be adjusted for better or worse fits, but too many may lead to non-convergence and instability.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_piecewise_regression.py\":0-30",
+            "content": "import piecewise_regression\nimport numpy as np\nx_start, x_end, sample_size =0, 5000, 100\n# x_start, x_end, sample_size = -500,500 , 100\nx = np.linspace(x_start, x_end, sample_size)\n# y = x**2\ny = np.sin(x)\nnb =12\n# nb =5\n# this is even.\n# slow? before compilation\n# sometimes the algo does not converge. dangerous.\npw_fit = piecewise_regression.Fit(x, y, n_breakpoints=nb)\n# pw_fit.summary()\nimport matplotlib.pyplot as plt\n# Plot the data, fit, breakpoints and confidence intervals\npw_fit.plot_data(color=\"grey\", s=20)\n# Pass in standard matplotlib keywords to control any of the plots\npw_fit.plot_fit(color=\"red\", linewidth=4)\npw_fit.plot_breakpoints()\npw_fit.plot_breakpoint_confidence_intervals()\nplt.xlabel(\"x\")\nplt.ylabel(\"y\")\nplt.show()\n# plt.close()"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code checks the platform (macOS or Windows) and loads the appropriate tmuxp configuration file accordingly, while also setting environment variables for CPLEX_DIR and CONDA_ENV_NAME.",
+    "details": [
+        {
+            "comment": "This code checks the platform (macOS or Windows) and loads the appropriate tmuxp configuration file accordingly, while also setting environment variables for CPLEX_DIR and CONDA_ENV_NAME.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/fastapi_tmuxp.sh\":0-16",
+            "content": "if [ \"$1\" != \"macos\" ] ; then\n    if [ \"$1\" != \"windows\" ] ; then \n        echo \"supports: [ macos | windows ]\"\n        echo \"unknown platform: $1\"\n        exit 1\n    fi\nfi\necho \"running under: $1\"\nexport NO_PYTHON_TYPECHECK=True\nbash fastapi_terminate_service.sh\nif [ \"$1\" == \"macos\" ] ; then\n    env CPLEX_DIR=\":/Applications/CPLEX_Studio1210/cplex/bin/x86-64_osx/\" CONDA_ENV_NAME=\"rosetta\" tmuxp load fastapi_tmuxp.yml\nelif [ \"$1\" == \"windows\" ] ; then\n    env CPLEX_DIR=\"\" CONDA_ENV_NAME=\"cplex\" tmuxp load fastapi_tmuxp.yml\nfi"
+        }
+    ]
+}

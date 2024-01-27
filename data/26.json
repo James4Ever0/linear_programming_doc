@@ -1,0 +1,540 @@
+{
+    "2600": {
+        "file_id": 290,
+        "content": "        {% set SO.TDF = \"测试{}模型\".format(testName)%}\n    {% endif%}\n    {% if _params != \"\"%}\n        {% do paramStringList.append(_params)%}\n    {% endif%}\n{{caller()}}\n{% if autoSense%}\n    {%call parametrize(\"sense\")%}[minimize, maximize]{%endcall%}\n{% endif%}\ndef test_{{testName}}({{\",\".join(paramStringList)}}):\n    {# {{'#'}} {{_params}} {{autoRegister}} #}\n    {% if isDevice %}\n        {% if autoRegister == true %}\n    测试{{testName}}模型.constraints_register()\n        {% endif%}\n    {% endif%}\n{# def test_{{testName}}({{join(\",\",paramStringList)}}): #}\n    {% do paramStringList.clear() %}\n    {# do not use \"set\" #}\n{% endmacro%}\n{% macro solveModel(objective, sense='sense')%}\n    {# model_wrapper.Objective(expr={{objective}}, sense={{sense if sense == 'sense' else repr(sense)}}) #}\n    model_wrapper.Objective(expr={{objective}}, sense={{sense}})\n    with SolverFactory(Solver.cplex) as solver: # type: ignore\n        TransformationFactory(\"gdp.bigm\").apply_to(model_wrapper.model, bigM=1e8)\n        print(\">>>SOLVING<<<\")",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:61-86"
+    },
+    "2601": {
+        "file_id": 290,
+        "content": "This code defines a macro that sets up a test function for a model, considering parameters and constraints. The macro takes the test name, model objective, and solution sense as inputs and generates a test function definition with the specified parameters. It also handles automatic constraint registration if needed. Additionally, the code applies a Big-M transformation to the model using the GDP library before solving it with CPLEX solver.",
+        "type": "comment"
+    },
+    "2602": {
+        "file_id": 290,
+        "content": "        solver.options[\"timelimit\"] = 5 \n        s_results = solver.solve(model_wrapper.model, tee=True)\n        print(\"SOLVER RESULTS?\")\n        print(s_results)\n        check_solver_result(s_results)\n{% endmacro %}\n# BUG: BigM <= 1e+8\n{# {% call parametrizeTestHelper(\"BinVarMultiplySingle\")%} #}\n{% set commonDevTestParam =\"model_wrapper: ModelWrapper, {ctdf}: 设备模型\".format(ctdf=CTDF) %}\n{% call parametrizeTestHelper(\"BinVarMultiplySingle\", commonDevTestParam, autoSense=false)%}\n    {% call parametrize(\"v0_is_constant\")%}[False, True]{% endcall%}\n    {% call parametrize(\"v0_within, min_v0, max_v0, sense, result\")%}\n    [\n        (Reals, -1, 10, minimize, -1),\n        (Reals, -1, 10, maximize, 10),\n        (NonNegativeReals, 1, 10, minimize, 0),\n        (NonNegativeReals, 1, 10, maximize, 10),\n    ]\n    {%endcall%}\n    {% call parametrize(\"v1_init\")%}[0, 1]{%endcall%}\n    {% call parametrize(\"v0_init\")%}[3]{%endcall%}\n    {% call parametrize(\"v1_within\")%}[Boolean, pytest.param(NonNegativeReals, marks=pytest.mark.xfail)]{% endcall%}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:87-110"
+    },
+    "2603": {
+        "file_id": 290,
+        "content": "This code defines a test for a solver, setting the timelimit to 5 and printing the results. It also checks the solver results and contains various parameters for testing different scenarios with the solver using a BinVarMultiplySingle model. The parameters include v0_is_constant, v0_within, min_v0, max_v0, sense, result, v1_init, v0_init, and v1_within. These parameters are used to test different cases of the model. It also mentions that there is a bug where BigM is set to 1e+8.",
+        "type": "comment"
+    },
+    "2604": {
+        "file_id": 290,
+        "content": "{% endcall %}\n    assert min_v0 <= max_v0\n    if v0_is_constant:\n        v0 = v0_init\n    else:\n        v0 = {{CTDF}}.单变量(\n            \"v0\", within=v0_within, initialize=v0_init, bounds=(min_v0, max_v0)\n        )\n    v1 = {{CTDF}}.单变量(\"v1\", within=v1_within, initialize=v1_init)\n    v_result = {{CTDF}}.BinVarMultiplySingle(v1, v0)\n{{solveModel('v_result')}}\n        print(f\"v0: {value(v0)}\")\n        print(f\"v1: {value(v1)}\")\n        print(f\"PROD: {value(v_result)}\")\n        print(f\"EXPECTED: {result}\")\n        print(f\"ACTUAL: {value(v0)*value(v1)}\")\n        if v0_is_constant:\n            if sense == minimize:\n                result = min(0, v0_init)\n            elif sense == maximize:\n                result = max(0, v0_init)\n            else:\n                assert False, f\"Wrong sense: {sense}\"\n        assert abs(value(v_result) - result) <= EPS\n{% call parametrizeTestHelper(\"VarMultiplySingle\", commonDevTestParam, autoSense=false)%}\n    {% call parametrize(\"v0_min, v0_max, v1_min, v1_max, sense, expected, param\")%}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:111-137"
+    },
+    "2605": {
+        "file_id": 290,
+        "content": "This code is setting up variables and constraints for a multi-variable optimization problem using the CTDF library. It ensures variable bounds, handles constant values, and solves the model using different senses (minimize/maximize). The final result is compared to an expected value for testing purposes.",
+        "type": "comment"
+    },
+    "2606": {
+        "file_id": 290,
+        "content": "    [\n        (1, 5, 2, 4, minimize, 2, 0),\n        (1, 5, 2, 4, maximize, 20, 0),\n        (-1, 3, -2, 4, minimize, -10, -2),\n        (-1, 3, -2, 4, maximize, 8, -2),\n    ]\n    {% endcall %}\n{% endcall %}\n    v0 = {{CTDF}}.变量列表(\"v0\", bounds=(v0_min, v0_max))\n    v0_dict = dict(var=v0, max=v0_max, min=v0_min)\n    v1 = {{CTDF}}.变量列表(\"v1\", bounds=(v1_min, v1_max))\n    v1_dict = dict(var=v1, max=v1_max, min=v1_min)\n    v0_v1 = {{CTDF}}.Multiply(v0_dict, v1_dict, \"v0_v1\")\n    obj_expr = v0_v1[0] + param * (v0[0] + v1[0])\n{{solveModel('obj_expr')}}\n        assert abs(value(obj_expr) - expected) <= EPS\n{% call parametrizeTestHelper(\"单表达式生成指示变量\", commonDevTestParam, autoSense=false) %}\n    {% call parametrize(\"v0_min, v0_max, sense, expected_v0, expected_v1_b_pos, expected_v1_x_pos, expected_v1_b_neg, expected_v1_x_neg, expected_v1_x_abs\")%}\n    [\n        (-1, 5, maximize, 5, 1, 5, 0, 0, 5),\n        (-1, 5, minimize, -1, 0, 0, 1, 1, 1),\n        (-2, 5, minimize, -2, 0, 0, 1, 2, 2),\n    ]\n    {% endcall%}\n{% endcall%}\n    v0 = {{CTDF}}.单变量(\"v0\", bounds=(v0_min, v0_max))",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:138-166"
+    },
+    "2607": {
+        "file_id": 290,
+        "content": "This code is testing a model where there are multiple variables being multiplied together and the result is added to another expression. The expected results for different combinations of variable values are provided, and these are compared with the actual values obtained from the model. This appears to be part of a larger testing framework or script.",
+        "type": "comment"
+    },
+    "2608": {
+        "file_id": 290,
+        "content": "    v1 = {{CTDF}}.单表达式生成指示变量(\"v1\", v0)\n    # v1 = 测试设备模型.单表达式生成指示变量(\"v1\", v0+0)\n{{solveModel('v0')}}\n        assert abs(expected_v0 - value(v0)) <= EPS\n        assert abs(expected_v1_b_pos - value(v1.b_pos)) <= EPS\n        assert abs(expected_v1_x_neg - value(v1.x_neg)) <= EPS\n        assert abs(expected_v1_b_neg - value(v1.b_neg)) <= EPS\n        assert abs(expected_v1_x_pos - value(v1.x_pos)) <= EPS\n        assert abs(expected_v1_x_abs - value(v1.x_abs)) <= EPS\nimport numpy as np\n{% call parametrizeTestHelper(\"Piecewise\", commonDevTestParam, autoSense=false) %}\n    {%call parametrize(\"x_init, y_expected, sense\")%}\n    [\n        (0, 2, minimize),\n        (0, 2, maximize),\n        (0.3, 2.3, minimize),\n        (0.3, 2.3, maximize),\n        (0 - 1, 2, minimize),  # BUG: y = 0 if x is out of bound\n        (0 - 1, 2, maximize),\n        (0 + 3, 4, minimize),\n        (0 + 3, 4, maximize),\n    ]\n    {% endcall %}\n{% endcall %}\n    x = [{{CTDF}}.单变量(\"x\", initialize=x_init, bounds=(x_init, x_init))]\n    y = [{{CTDF}}.单变量(\"y\")]",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:167-195"
+    },
+    "2609": {
+        "file_id": 290,
+        "content": "This code tests a piecewise function by defining different test cases for input and expected output. It uses the single-variable constraint definition format (CTDF) to generate indicator variables v1. The code then solves the model using the solveModel function and performs assertions on the results, checking if they match the expected values within a certain tolerance (EPS). The code also utilizes numpy for numerical computations and uses parameterized testing with different initial conditions and senses of comparison (minimize/maximize) to validate the test cases.",
+        "type": "comment"
+    },
+    "2610": {
+        "file_id": 290,
+        "content": "    x_vals = np.linspace(0, 2, 2)\n    y_vals = x_vals + 2\n    {{CTDF}}.Piecewise(x, y, x_vals.tolist(), y_vals.tolist(), range_list=[0])\n    obj_expr = y[0]\n{{solveModel(\"obj_expr\")}}\n        assert abs(value(obj_expr) - y_expected) <= EPS\n# if use timeout as solver option, usually not so good.\n# you will not get accurate results.\n{% call parametrizeTestHelper(\"柴油\", \"Device\")%}\n    {% call parametrize(\"diesel_rate, fee_rate_per_hour\")%}[(1, 2), (3, 6)]{%endcall%}\n{%endcall%}\n    {# 测试柴油模型.constraints_register() #}\n    {{SO.TDF}}.RangeConstraintMulti(\n        {{SO.TDF}}.燃料接口, expression=lambda x: x == diesel_rate\n    )  # unit: m^3\n    {# obj_expr = 测试柴油模型.总成本年化 #}\n    obj_expr = {{SO.TDF}}.燃料接口[0]\n{{ solveModel(\"obj_expr\")}}\n        val_fee = value({{SO.TDF}}.总成本年化 / 1000) / 8760\n        assert abs(val_fee - fee_rate_per_hour) < EPS\n# 20 is rated power, 10 is halfway.\n{% call parametrizeTestHelper(\"柴油发电\", \"Device\", autoRegister=false, autoSense=false) %}\n@pytest.mark.timeout(30)  # pip3 install pytest-timeout",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:196-222"
+    },
+    "2611": {
+        "file_id": 290,
+        "content": "This code is testing a microgrid model with a diesel generator. It creates linear expressions for x and y values, calls the solveModel function with an objective expression, asserts that the calculated value matches the expected value within a certain error margin, registers constraints for the diesel generator model, sets the objective expression to total fuel interface quantity, solves the model again, calculates the fee rate per hour based on the result, and asserts it is close to the expected fee rate. It also uses pytest-timeout decorator to set a 30 second timeout for the test.",
+        "type": "comment"
+    },
+    "2612": {
+        "file_id": 290,
+        "content": "    {% call parametrize(\"power_output, expected_val, expected_diesel, adcr_expected, expected_diesel_optim\") %}\n    [\n        (10, 10, -(3*2+1*3)/5 * 0.001 * 10, (3*2+1*3)/5*0.001, -3*0.001*10),\n        (20, 20, -(3*2+1*3)/5 * 0.001 * 20, (3*2+1*3)/5*0.001, -1*0.001*20),\n    ]\n    {% endcall %}\n{% endcall %}\n    optim = {{SO.TDF}}.设备信息.unitPlanningAlgorithmSelection == '最佳'\n    if optim:\n        expected_diesel = expected_diesel_optim\n    {{SO.TDF}}.燃料热值 = 1\n    {{SO.TDF}}.constraints_register()\n    {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输出, expression=lambda x: x == power_output)\n    if not optim:\n        assert ({{SO.TDF}}.averageDieselConsumptionRate - adcr_expected) < EPS\n    assert {{SO.TDF}}.averageLoadRate == 0.8\n    obj_expr = {{SO.TDF}}.总成本年化\n    print(\"年化:\", obj_expr)\n{{solveModel(\"obj_expr\", sense='minimize')}}\n        {# if optim: breakpoint() #}\n        print(\"ELECTRICITY:\", value({{SO.TDF}}.电输出[0]), expected_val)\n        {# print(\"ELECTRICITY:\", value({{SO.TDF}}.原电输出[0]), expected_val) #}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:223-244"
+    },
+    "2613": {
+        "file_id": 290,
+        "content": "This code is using a parameterized test for the microgrid_base model, testing different power outputs and their corresponding expected values. If the optimization setting is set to 'best', it asserts that the expected diesel usage is achieved. It also asserts that the average load rate is 0.8 and prints out the annual objective expression. Finally, it solves the model with a minimize objective and may optionally breakpoint if optimization is enabled.",
+        "type": "comment"
+    },
+    "2614": {
+        "file_id": 290,
+        "content": "        print(\"DIESEL:\", value({{SO.TDF}}.柴油输入[0]), expected_diesel)\n        assert abs(value({{SO.TDF}}.电输出[0]) - expected_val) <= EPS\n        {# assert abs(value({{SO.TDF}}.原电输出[0]) - expected_val) <= EPS #}\n        {# assert abs(value({{SO.TDF}}.柴油输入[0]) - expected_diesel) <= EPS #}\n        assert abs(value({{SO.TDF}}.柴油输入[0]) - expected_diesel) <= SMALL_EPS\n        # breakpoint()\n{% call parametrizeTestHelper(\"燃气发电机\", \"Device\", autoRegister=false, autoSense=false) %}\n@pytest.mark.timeout(30)  # pip3 install pytest-timeout\n    {% call parametrize(\"power_output, expected_val, expected_gas, agcr_expected, expected_gas_optim\") %}\n    [\n        (10, 10, -32.85714, 3.285714, -((2*3+3*1)/3)*10),\n        (20, 20, -65.71428, 3.285714, -((2*1+3*2)/3)*20),\n    ]\n    {% endcall %}\n{% endcall %}\n    optim = {{SO.TDF}}.设备信息.unitPlanningAlgorithmSelection == '最佳'\n    if optim:\n        expected_gas = expected_gas_optim\n    expected_hot_water = expected_val * {{SO.TDF}}.设备信息.HotWaterToElectricityRate\n    expected_hot_gas = expected_val * {{SO.TDF}}.设备信息.HotGasToElectricityRate",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:245-266"
+    },
+    "2615": {
+        "file_id": 290,
+        "content": "Checking diesel input and electrical output for a microgrid device, asserting the difference is within expected ranges. Parametrized testing with different power outputs and gas values for the gas-fired combined heat and power (GCHP) unit.",
+        "type": "comment"
+    },
+    "2616": {
+        "file_id": 290,
+        "content": "    {{SO.TDF}}.燃料热值 = 1\n    {{SO.TDF}}.constraints_register()\n    {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输出, expression=lambda x: x == power_output)\n    if not optim:\n        assert ({{SO.TDF}}.averageGasConsumptionRate - agcr_expected) < EPS\n    assert {{SO.TDF}}.averageLoadRate == 0.5\n    obj_expr = {{SO.TDF}}.总成本年化\n    print(\"年化:\", obj_expr)\n{{solveModel(\"obj_expr\", sense='minimize')}}\n        {# if optim: breakpoint() #}\n        print(\"TABLE DS:\", {{SO.TDF}}.DieselToPower_Load)\n        print(\"TABLE NG:\", {{SO.TDF}}.NaturalGasToPower_Load)\n        print(\"ELECTRICITY:\", value({{SO.TDF}}.电输出[0]), expected_val)\n        print(\"GAS:\", value({{SO.TDF}}.天然气输入[0]), expected_gas)\n        print(\"HOT WATER:\", value({{SO.TDF}}.缸套水余热接口[0]), expected_hot_water)\n        print(\"HOT GAS:\", value({{SO.TDF}}.高温烟气余热接口[0]), expected_hot_gas)\n        assert abs(value({{SO.TDF}}.电输出[0]) - expected_val) <= EPS\n        try:\n            assert abs(value({{SO.TDF}}.天然气输入[0]) - expected_gas) <= EPS\n            assert abs(value({{SO.TDF}}.缸套水余热接口[0]) - expected_hot_water) <= EPS",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:267-286"
+    },
+    "2617": {
+        "file_id": 290,
+        "content": "Code is optimizing the total cost of a microgrid model, registering constraints, and asserting average load rate and gas consumption rate. It then solves the model and checks the expected output values against actual values.",
+        "type": "comment"
+    },
+    "2618": {
+        "file_id": 290,
+        "content": "            assert abs(value({{SO.TDF}}.高温烟气余热接口[0]) - expected_hot_gas) <= EPS\n        except:\n            breakpoint()\ndef test_电价模型():\n    {# from ies_optim import 电负荷信息, 分月电价 #}\n    mydata = dict(PriceList=[1] * 12)\n    myInfo = 电负荷信息.parse_obj(\n        dict(\n            设备名称=\"Any\",\n            EnergyConsumption=[1, 2, 3],\n            MaxEnergyConsumption=4,\n            PriceModel=mydata,\n        )\n    )\n    myPriceModel = 分月电价.parse_obj(mydata)\n    print(myInfo)\n    # breakpoint()\n    assert myPriceModel == myInfo.PriceModel\n{% call parametrizeTestHelper(\"DayToMonth\",\"\", autoSense=false)%}\n    {% call parametrize(\"day_index, expected_month\")%}\n    [\n        (1, 0),\n        pytest.param(365, 11, marks=pytest.mark.xfail),\n        (364, 11),\n        (363, 11),\n        (333, 10),\n    ]\n    {%endcall%}\n{%endcall%}\n    {# from ies_optim import convertDaysToMonth #}\n    month_index = convertDaysToMonth(day_index)\n    assert month_index == expected_month\n{% call parametrizeTestHelper(\"分月电价\",\"\", autoSense=false)%}\n    {% call parametrize(\"hour_index, expected_price, power\")%}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:287-324"
+    },
+    "2619": {
+        "file_id": 290,
+        "content": "The code defines a test function `test_电价模型` that checks the monthly electricity price model (`myPriceModel`) against the energy information object (`myInfo.PriceModel`). It also uses various helper functions like `convertDaysToMonth`, `parametrizeTestHelper`, and `parametrize` to test the functionality for different scenarios. The code uses assertions to verify the correctness of the monthly electricity price model.",
+        "type": "comment"
+    },
+    "2620": {
+        "file_id": 290,
+        "content": "    [\n        (2, 4 * 0.0001 * 1, 4),\n        (24 * 40, 4 * 0.0001 * 2, 4),\n        (24 * 30 * 2 + 10, 4 * 0.0001 * 3, 4),\n        pytest.param(8760, 4 * 0.0001 * 12, 4, marks=pytest.mark.xfail),\n        (8779, 4 * 0.0001 * 12, 4),\n    ]\n    {%endcall%}\n{%endcall%}\n    myPriceModel = 分月电价(PriceList=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))\n    mprice = myPriceModel.getFee(power, time_in_day=hour_index)\n    assert abs(mprice - expected_price) == 0\n{# import math #}\n{% call parametrizeTestHelper(\"光伏发电\", \"Device\", autoSense=false, autoRegister=false)%}\n    {% call parametrize(\"illumination, output\")%}[(1, 9.8), (0.5, 4.9),(2,9.8)]{% endcall %}\n{% endcall %}\n    illumination_array = [illumination]*24\n    {{SO.TDF}}.计算参数.光照 = illumination_array\n    {{SO.TDF}}.constraints_register()\n{{ solveModel(\"{tdf}.电接口[0]+{tdf}.电接口[2]\".format(tdf=SO.TDF), sense='maximize') }}\n        devCount = value({{SO.TDF}}.DeviceCount)\n        {# devCount = {{SO.TDF}}.MaxDeviceCount #}\n        assert abs(value({{SO.TDF}}.电接口[0]) - output*devCount)< EPS",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:325-349"
+    },
+    "2621": {
+        "file_id": 290,
+        "content": "This code is setting up a parameterized test for a solar power model. It defines the price model, sets the illumination array, and solves the model to maximize the power output. The expected power outputs are compared with the calculated values using assertions. Marks are assigned for xfail cases due to potential issues in the codebase.",
+        "type": "comment"
+    },
+    "2622": {
+        "file_id": 290,
+        "content": "        assert abs(value({{SO.TDF}}.电接口[2]) - output*devCount)< EPS\n{% call parametrizeTestHelper(\"风力发电\", \"Device\", autoSense=false, autoRegister=false)%}\n    {% call parametrize(\"windspeed, output\")%}[(5,0),(10,0),(20,100*((10/90)**3)),(50,100*(((50-10)/90)**3)), (100,100), (150,100), (200,100), (210, 0)]{% endcall%}\n{% endcall%}\n    windspeed_array = [windspeed]*24\n    # override the windspeed.\n    {{SO.TDF}}.计算参数.风速 = windspeed_array\n    {{SO.TDF}}.constraints_register()\n{# {{ solveModel(\"测试风力发电模型.总成本年化\", sense='minimize') }} #}\n{{ solveModel(\"{tdf}.电接口[0]+{tdf}.电接口[2]\".format(tdf=SO.TDF), sense='maximize') }}\n        devCount = {{SO.TDF}}.设备信息.DeviceCount\n        assert abs(value({{SO.TDF}}.DeviceCount) - devCount)< EPS\n        if {{SO.TDF}}.设备信息.machineType == '标幺值':\n            output = {{SO.TDF}}.设备信息.RatedPower*0.5\n        assert abs(value({{SO.TDF}}.单台发电功率[0]) - output)< EPS\n        assert abs(value({{SO.TDF}}.单台发电功率[2]) - output)< EPS\n        assert abs(value({{SO.TDF}}.电接口[0]) - output*devCount)< EPS",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:350-368"
+    },
+    "2623": {
+        "file_id": 290,
+        "content": "This code tests a wind power model by asserting the calculated values for device count, output, and interface values. It overrides the wind speed and registers the constraints before solving the model to maximize the sum of two interface values related to the device. The code also checks if the machine type is '标幺值' and adjusts the output accordingly.",
+        "type": "comment"
+    },
+    "2624": {
+        "file_id": 290,
+        "content": "        assert abs(value({{SO.TDF}}.电接口[2]) - output*devCount)< EPS\n{# likely to be inversed efficiency. #}\n{% call parametrizeTestHelper(\"双向变流器\", \"Device\")%}\n    {% call parametrize(\"_input, output\")%}[(100, 98), (200,196)]{% endcall%}\n    {% call parametrize(\"direction\")%}[False,True]{% endcall%}\n{% endcall%}\n    if direction:\n        {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.储能端, expression = lambda x: x == -_input)\n    else:\n        {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.线路端, expression = lambda x: x == -_input)\n{{ solveModel(\"{tdf}.总成本年化\".format(tdf=SO.TDF)) }}\n        if direction:\n            assert abs(value({{SO.TDF}}.线路端[0]) - output) < EPS\n            assert abs(value({{SO.TDF}}.线路端[2]) - output) < EPS\n        else:\n            assert abs(value({{SO.TDF}}.储能端[0]) - output) < EPS\n            assert abs(value({{SO.TDF}}.储能端[2]) - output) < EPS\n{% call parametrizeTestHelper(\"变压器\", \"Device\")%}\n    {% call parametrize(\"_input, output\")%}[(10, 8.1), (5,8.1/2)]{% endcall%}\n{% endcall%}\n    unidirected = {{SO.TDF}}.设备信息.direction == 'Directed'",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:369-391"
+    },
+    "2625": {
+        "file_id": 290,
+        "content": "The code is testing the efficiency of a bidirectional converter by comparing the input and output values under different conditions. It then applies range constraints to the device, solves for the total annualized cost, and checks if the input/output values match the expected results for both forward and reverse directions. Additionally, it tests the transformer's efficiency using given inputs and asserts that the difference between the actual and expected output is within a specified threshold (EPS).",
+        "type": "comment"
+    },
+    "2626": {
+        "file_id": 290,
+        "content": "    if unidirected:\n        {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输入, expression = lambda x: x == -_input)\n    else:\n        {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输入, expression = lambda x: x == output)\n{{ solveModel(\"{tdf}.总成本年化\".format(tdf=SO.TDF)) }}\n        if unidirected:\n            assert abs(value({{SO.TDF}}.电输出[2]) - output) < EPS\n        else:\n            assert abs(value({{SO.TDF}}.电输入[2]) - output) < EPS\n{% call parametrizeTestHelper(\"变流器\", \"Device\")%}\n    {% call parametrize(\"_input, output\")%}[(10, 9), (5,9/2)]{% endcall%}\n{% endcall%}\n    {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输入, expression = lambda x: x == -_input)\n{{ solveModel(\"{tdf}.总成本年化\".format(tdf=SO.TDF)) }}\n        assert abs(value({{SO.TDF}}.电输出[2]) - output) < EPS\n{% call parametrizeTestHelper(\"传输线\", \"Device\")%}\n    {% call parametrize(\"_input, output\") %}[(100, 100-1.377), (200, 200-1.377), (1, 0), (1.377, 0), (1.378, 0.001)]{% endcall %}\n    {# {% call parametrize(\"_input, output\")%}[(100, 90), (200,190)]{% endcall%} #}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:392-412"
+    },
+    "2627": {
+        "file_id": 290,
+        "content": "This code is checking the values of a transformer device and a transmission line under different scenarios. It solves the model, asserts that the output values match the expected input/output pairs, and then continues to test other devices. The comments describe the device being tested, its parameters, and the expected output for various input conditions.",
+        "type": "comment"
+    },
+    "2628": {
+        "file_id": 290,
+        "content": "    {# {% call parametrize(\"input_only\") %}[False,True]{% endcall %} #}\n{% endcall %}\n    {# if input_only: #}\n    {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输入, expression=lambda x: x == -_input)\n    {# else:\n        {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电输出, expression=lambda x: x == output) #}\n    {# decay = 1*10 #}\n{{ solveModel(\"{tdf}.SumRange({tdf}.电输出)\".format(tdf=SO.TDF)) }}\n{# {{ solveModel(\"测试传输线模型.总成本年化\")}} #}\n        assert abs(value({{SO.TDF}}.电输出[0]) - output) < EPS\n        assert abs(value({{SO.TDF}}.电输出[2]) - output) < EPS\n        assert abs(-value({{SO.TDF}}.电输入[0]) - _input) < EPS\n        assert abs(-value({{SO.TDF}}.电输入[2]) - _input) < EPS\n{# infeasible! just why? #}\n{# if making no \"more\" constraints we will solve it. #}\n{# you need to parametrize your test. to prevent further issues, use signature based \"yield\" insertion strategy. #}\n{# try to import our stepwise test util. #}\nfrom runtime_override_stepwise import iterate_till_keyword, overwrite_func\n{% call parametrizeTestHelper(\"锂电池\", \"Device\", autoRegister=false) %}",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:413-433"
+    },
+    "2629": {
+        "file_id": 290,
+        "content": "This code sets up a test for a microgrid model by creating constraints, solving the model, and asserting the values of input and output variables. The code also uses parameterization to handle different test cases and import external functions for testing utility.",
+        "type": "comment"
+    },
+    "2630": {
+        "file_id": 290,
+        "content": "{# {% call parametrizeTestHelper(\"锂电池\", \"Device\")%} #}\n    {% call parametrize(\"device_count, total_decay_rate\") %}[(500/20, 500*0.1 )]{% endcall%}\n    {# {% call parametrize(\"ie, eport_constraint_dynamic\")%}enumerate([lambda x: x<=0, lambda x: x == 0, lambda x: x == -40, lambda x: x >= -40]){%endcall%} #}\n    {# with enumerate -> list: 170 items #}\n    {# without: 170 items #}\n    {# {% call parametrize(\"eport_constraint_static\")%}[lambda x: x<=0, lambda x: x == -50, lambda x: x <= -40]{%endcall%} #}\n    {# {% call parametrize(\"eport_constraint_static\")%}[lambda x: x<=0, lambda x: x == -50, lambda x: x <= -40]{%endcall%} #}\n{% endcall%}\n    {# 测试锂电池模型.RangeConstraintMulti(测试锂电池模型.电接口, expression = lambda x: x == 500 * (10/100) / (50/100)) #}\n    {# 测试锂电池模型.RangeConstraintMulti(测试锂电池模型.电接口, expression = lambda x: x == 1) # BUG: cannot discharge #}\n    {# is_dynamic = {{SO.TDF}}.needStorageDecayCompensation #}\n    {# #}\n    {{SO.TDF}}.constraints_register()\n    {# if is_dynamic: #}\n    {# {{SO.TDF}}.",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:434-448"
+    },
+    "2631": {
+        "file_id": 290,
+        "content": "This code is creating test constraints for a lithium-ion battery model. It defines parameters and constraints for different scenarios, including static and dynamic eport constraints. The code also registers the constraints and checks if dynamic constraints are needed based on a specific condition.",
+        "type": "comment"
+    },
+    "2632": {
+        "file_id": 290,
+        "content": "RangeConstraintMulti({{SO.TDF}}.电接口, expression = eport_constraint_dynamic) # means charging the battery. #}\n    {# else: #}\n        {# if ie != 0: return # skip other lambda expressions. #}\n    {# {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电接口, expression = eport_constraint_dynamic if is_dynamic else eport_constraint_static) #}\n    def verify_constraints(i):\n{# \n        if is_dynamic:\n            compensated_decay_rate = value({{SO.TDF}}.CurrentTotalPowerOfDecayCompensated[i])\n        else:\n            compensated_decay_rate = 0 #}\n        delta_capacity = value({{SO.TDF}}.CurrentTotalCapacity[i] *(1-{{SO.TDF}}.sigma*{{SO.TDF}}.计算参数.deltaT)- {{SO.TDF}}.CurrentTotalCapacity[i+1])\n        assert abs(delta_capacity - value({{SO.TDF}}.原电接口.x[i]*{{SO.TDF}}.计算参数.deltaT)) < EPS\n        {# 原电接口_xi = value({{SO.TDF}}.原电接口.x[i])\n        电接口_i = value({{SO.TDF}}.电接口[i])\n        _total_decay_rate = value({{SO.TDF}}.TotalStoragePowerOfDecay)\n        if 原电接口_xi>=0:\n            assert abs( 原电接口_xi * {{SO.TDF}}.Disc",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:448-465"
+    },
+    "2633": {
+        "file_id": 290,
+        "content": "This code applies range constraints to the battery interface and verifies the capacity change, taking into account both dynamic and static constraints. It asserts that the difference between the actual capacity change and the expected capacity change based on the decay rate is within a certain threshold (EPS). The code also checks if the battery charging or discharging, and performs different calculations based on the conditions.",
+        "type": "comment"
+    },
+    "2634": {
+        "file_id": 290,
+        "content": "hargeEfficiency - (_total_decay_rate - compensated_decay_rate) / {{SO.TDF}}.ChargeEfficiency - 电接口_i )< EPS\n        else:\n            assert abs((原电接口_xi - (_total_decay_rate - compensated_decay_rate)) / {{SO.TDF}}.ChargeEfficiency - 电接口_i) < EPS #}\n{{ solveModel(\"{tdf}.总成本年化\".format(tdf=SO.TDF))}}\n        assert abs(value({{SO.TDF}}.DeviceCount)) == device_count\n        {# assert abs(value({{SO.TDF}}.TotalStoragePowerOfDecay) - total_decay_rate) < EPS #}\n        init_capacity = value({{SO.TDF}}.DeviceCount) * {{SO.TDF}}.InitSOC * {{SO.TDF}}.RatedCapacity\n        assert abs(value({{SO.TDF}}.CurrentTotalCapacity[0]) - init_capacity) < EPS\n        for i in range(5):\n            verify_constraints(i)\n        if last_capacity:= value({{SO.TDF}}.CurrentTotalCapacity[len({{SO.TDF}}.计算参数.风速)-1]) < 0:\n            assert abs(last_capacity) <= EPS\n{# \n        print(value({{SO.TDF}}.CurrentTotalPowerOfDecayCompensated[0]))\n        print(value({{SO.TDF}}.CurrentTotalPowerOfDecayCompensated[1]))\n        print(value({{SO.TDF}}.CurrentTotalPowerOfDecayCompensated[2]))",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:465-484"
+    },
+    "2635": {
+        "file_id": 290,
+        "content": "The code is performing assertions for various values and verifying constraints for a microgrid model. It calculates the total capacity, decay rate, and power of decay compensated. The code also solves for the total cost of capital and performs several range-based checks before printing some current total power values.",
+        "type": "comment"
+    },
+    "2636": {
+        "file_id": 290,
+        "content": "        breakpoint()\n        print()\n        print(value({{SO.TDF}}.电接口[0]))\n        print(value({{SO.TDF}}.电接口[1]))\n        print(value({{SO.TDF}}.电接口[2]))\n        print()\n        print(value({{SO.TDF}}.原电接口.x[0]))\n        print(value({{SO.TDF}}.原电接口.x[1]))\n        print(value({{SO.TDF}}.原电接口.x[2]))\n        print()\n        print(value({{SO.TDF}}.CurrentTotalCapacity[0]))\n        print(value({{SO.TDF}}.CurrentTotalCapacity[1])) # this is not the \"real\" total capacity. add \"total min capacity\" first.\n        print(value({{SO.TDF}}.CurrentTotalCapacity[2]))\n        # all zero?\n        # 0.0\n        breakpoint() \n#}\n        {# assert abs(value(测试锂电池模型.CurrentTotalCapacity[0]+ 500 * (测试锂电池模型.设备信息.MinSOC/100)) - 500 * (测试锂电池模型.设备信息.InitSOC/100)) < EPS #}\n{% call parametrizeTestHelper(\"电解槽\", \"Device\")%}\n    {% call parametrize(\"_input, h2_output, heat_output\")%}\n    [\n        (3000,(3000*0.6)/33300,3000*0.4*0.7),\n        (2000,(2000*0.6)/33300,2000*0.4*0.7)\n    ]\n    {% endcall%}\n{% endcall%}\n    {{SO.TDF}}.RangeConstraintMulti({{SO.TDF}}.电接口, expression=lambda x: x == -_input)",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:485-512"
+    },
+    "2637": {
+        "file_id": 290,
+        "content": "This code is printing and debugging values of various electric interface, original electric interface, and current total capacity variables. It includes a breakpoint for inspection and an assertion to check the relationship between CurrentTotalCapacity, InitSOC, and MinSOC variables. There's also a parameterized test case with input values for a device and two output types - h2_output and heat_output, along with a range constraint multiplier applied to electric interfaces.",
+        "type": "comment"
+    },
+    "2638": {
+        "file_id": 290,
+        "content": "{{ solveModel(\"{tdf}.总成本年化\".format(tdf=SO.TDF))}}\n        for i in range(3):\n            assert abs(-value({{SO.TDF}}.电接口[i]) -_input)< EPS\n            assert abs(value({{SO.TDF}}.制氢接口[i]) -h2_output)< EPS\n            assert abs(value({{SO.TDF}}.设备余热接口[i]) -heat_output)< EPS",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model.py.j2:514-518"
+    },
+    "2639": {
+        "file_id": 290,
+        "content": "This code snippet calls a function \"solveModel\" to calculate the totalized levelized cost and then performs three assertions. It checks if the absolute difference between the electrical interface, hydrogen interface, and heat interface values for the specified time-dependent factor (TDF) is within a small tolerance threshold (EPS).",
+        "type": "comment"
+    },
+    "2640": {
+        "file_id": 291,
+        "content": "/microgrid_base/test/test_model_info.py",
+        "type": "filepath"
+    },
+    "2641": {
+        "file_id": 291,
+        "content": "This code defines a function `my_app` that utilizes the Hydra library for configuring and running an application. It takes a config object `cfg` as input, which is loaded from a YAML file. The function converts the configuration to YAML and prints it before printing the original config object and its type and attributes. The code uses rich library for formatted printing.",
+        "type": "summary"
+    },
+    "2642": {
+        "file_id": 291,
+        "content": "# put device model info here.\n# put info into yaml template, which is autogenerated. (suffix: \".tmp\") must be renamed and configured to generate this code.\n# TODO: figure out how to import fixtures between tests.\nimport rich\nimport hydra\nfrom omegaconf import OmegaConf\n# from omegaconf import DictConfig, OmegaConf\n# shall not use that as type.\nfrom typing import Protocol\n# create this using recursion?\nclass myConfig(Protocol):\n    myDb: str\n    class subConfig:\n        mySubConfig: int\n@hydra.main(\n    version_base=None,\n    config_path=\".\",\n    # config_path=\"conf\",\n    config_name=\"test_config\",\n)\ndef my_app(cfg: myConfig) -> None:\n# def my_app(cfg: DictConfig) -> None:\n    # cfg.subConfig.mySubConfig\n    mconfig = OmegaConf.to_yaml(cfg)\n    rich.print(mconfig)\n    print()\n    rich.print(cfg)\n    print(type(cfg), dir(cfg))\n    print(cfg.db.abc) # error by type checker.\nif __name__ == \"__main__\":\n    my_app()",
+        "type": "code",
+        "location": "/microgrid_base/test/test_model_info.py:1-38"
+    },
+    "2643": {
+        "file_id": 291,
+        "content": "This code defines a function `my_app` that utilizes the Hydra library for configuring and running an application. It takes a config object `cfg` as input, which is loaded from a YAML file. The function converts the configuration to YAML and prints it before printing the original config object and its type and attributes. The code uses rich library for formatted printing.",
+        "type": "comment"
+    },
+    "2644": {
+        "file_id": 292,
+        "content": "/microgrid_base/test/test_pwire_select.py",
+        "type": "filepath"
+    },
+    "2645": {
+        "file_id": 292,
+        "content": "Iterates through each power wire value, selects the one closest to given maximum power and assigns it as chosen index and difference.",
+        "type": "summary"
+    },
+    "2646": {
+        "file_id": 292,
+        "content": "Pwire_arr = [1,20,100]\nGivenMaxPower = 20\nind = -1\ndis = -1\nfor _ind, val in enumerate(Pwire_arr):\n    _dis = val - GivenMaxPower\n    if _dis >= 0:\n        if dis < 0 or dis > _dis:\n            dis = _dis\n            ind = _ind\nprint(ind,dis)",
+        "type": "code",
+        "location": "/microgrid_base/test/test_pwire_select.py:1-11"
+    },
+    "2647": {
+        "file_id": 292,
+        "content": "Iterates through each power wire value, selects the one closest to given maximum power and assigns it as chosen index and difference.",
+        "type": "comment"
+    },
+    "2648": {
+        "file_id": 293,
+        "content": "/microgrid_base/test/test_setting_calculated_value.py",
+        "type": "filepath"
+    },
+    "2649": {
+        "file_id": 293,
+        "content": "This code defines a class A that extends BaseModel, and uses @validator to set the attribute 'a' to 2 when setting the attribute 'b'. The class instance b is then created with 'b'='a', and printed. This results in 'a' being updated to 2.",
+        "type": "summary"
+    },
+    "2650": {
+        "file_id": 293,
+        "content": "from pydantic import BaseModel, validator\nclass A(BaseModel):\n    a :int = 1\n    b:str\n    @validator('b')\n    def validate_b(cls, v, values):\n            values['a'] = 2 # working.\n            return v\nb = A(b='a')\nprint(b)",
+        "type": "code",
+        "location": "/microgrid_base/test/test_setting_calculated_value.py:1-12"
+    },
+    "2651": {
+        "file_id": 293,
+        "content": "This code defines a class A that extends BaseModel, and uses @validator to set the attribute 'a' to 2 when setting the attribute 'b'. The class instance b is then created with 'b'='a', and printed. This results in 'a' being updated to 2.",
+        "type": "comment"
+    },
+    "2652": {
+        "file_id": 294,
+        "content": "/microgrid_base/test/test_use_fixture.py",
+        "type": "filepath"
+    },
+    "2653": {
+        "file_id": 294,
+        "content": "This code imports and tests a fixture named \"my_fixture\" from the \"test_common_fixtures\" module, and prints its value.",
+        "type": "summary"
+    },
+    "2654": {
+        "file_id": 294,
+        "content": "from test_common_fixtures import my_fixture\ndef test_use_fixture(my_fixture:str):\n    print(\"GETTING FIXTURE:\")\n    print(my_fixture)",
+        "type": "code",
+        "location": "/microgrid_base/test/test_use_fixture.py:1-5"
+    },
+    "2655": {
+        "file_id": 294,
+        "content": "This code imports and tests a fixture named \"my_fixture\" from the \"test_common_fixtures\" module, and prints its value.",
+        "type": "comment"
+    },
+    "2656": {
+        "file_id": 295,
+        "content": "/microgrid_base/test_class.py",
+        "type": "filepath"
+    },
+    "2657": {
+        "file_id": 295,
+        "content": "The code imports necessary libraries, defines two classes A and B, creates a graph using NetworkX, logs its attributes and connected components, and prints its structure. It also converts the graph to data format using JSON, prints original logger output, and defines an empty dictionary.",
+        "type": "summary"
+    },
+    "2658": {
+        "file_id": 295,
+        "content": "from log_utils import logger_print\nclass A:\n    def __init__(self):\n        ...\n    def B(self):\n        return B(self)\nclass B:\n    def __init__(self, a: A):\n        self.a = a\n        logger_print(\"CLASS NAME?\", self.__class__.__name__)\n        logger_print(\"CREATING B\")\na = A()\nb = a.B()\nimport json\nimport networkx as nx\nimport rich\ngraph_data = {\"a\": 1, \"b\": 2}\nG = nx.Graph(**graph_data)\nG.add_node(1, **{\"val\": 1, \"val2\": 2})\nG.add_node(2, **{\"val\": 1, \"val2\": 2})\nG.add_node(3, **{\"val\": 1, \"val2\": 2})\nG.add_edge(1, 2)\nG.add_edge(2, 3)\nG.add_node(4)\nG.add_node(5)\nG.add_edge(4, 5)\n# G.neighbors(node_id)\nfor n_with_items in G.nodes.items():\n    n, d = n_with_items\n    logger_print(\"NODE\", n, type(n))\n    logger_print(\"DATA\", d, type(d))\n    # G.nodes[n]\nlogger_print()\nG.nodes[2][\"attr2\"] = 2\nlogger_print(G.nodes[2])  # attrs of this node.\nlogger_print()\n# logger_print(list(G.neighbors(1)))\ncomponents = list(nx.connected_components(G))\nlogger_print(components)\nlogger_print()\nlogger_print(G.graph, type(G.graph))  # this is dict.",
+        "type": "code",
+        "location": "/microgrid_base/test_class.py:1-58"
+    },
+    "2659": {
+        "file_id": 295,
+        "content": "Code imports necessary libraries and defines two classes A and B. Class A creates an instance of B in its B method. Then, a graph is created using NetworkX library and various nodes and edges are added. The graph's nodes and neighbors are iterated over, and their attributes are logged. Finally, connected components of the graph are found and logged. The graph structure and type are also printed.",
+        "type": "comment"
+    },
+    "2660": {
+        "file_id": 295,
+        "content": "from networkx.readwrite import json_graph\ndata = json_graph.node_link_data(G)\nlogger_print()\nlogger_print(data)\nG0 = json_graph.node_link_graph(data)\nlogger_print(\"GRAPH DATA?\", G0.graph)\n# attribute just do not collide with id.\nfrom pydantic import BaseModel\nclass BM(BaseModel):\n    a: float\nnew_bm = BM.parse_obj(dict(a=1))\nlogger_print(new_bm)\nfrom typing import Dict\na: Dict[int, dict] = {1: {}}",
+        "type": "code",
+        "location": "/microgrid_base/test_class.py:60-85"
+    },
+    "2661": {
+        "file_id": 295,
+        "content": "Code imports networkx and pydantic libraries, creates a graph object G, converts it to data format using json_graph, prints the original logger output, creates a new BM object using Pydantic's BaseModel, and defines an empty dictionary a of int keys and dict values.",
+        "type": "comment"
+    },
+    "2662": {
+        "file_id": 296,
+        "content": "/microgrid_base/test_json_input_format.py",
+        "type": "filepath"
+    },
+    "2663": {
+        "file_id": 296,
+        "content": "The code reads a JSON input file, parses it using the EnergyFlowGraph class, and creates an object. It logs each mDict in the EnergyFlowGraph and prints information for each one. The code uses various modules to solve the model, create a dictionary list for calculation parameters, solves the model using these parameters, stores simulation results in another dictionary, and writes the output file in JSON format.",
+        "type": "summary"
+    },
+    "2664": {
+        "file_id": 296,
+        "content": "from log_utils import logger_print\n# input_path = \"test_data.json\"\n# input_path = \"test/sample_data/json_from_browser.json\"\ninput_path = \"test/sample_data/input_oom.json\"\n# input_path = \"test/test_topo.json\"\n# input_path = \"template_input.json\"\n# input_path = \"test/missing_param_input_dieselgenerator.json\"\n# input_path = \"test/lithion_battery.json\"\noutput_path = \"export_format_test.json\"\n# this is something different.\nMAKEFILE = dict(inputs=[input_path], outputs=[output_path], args=[])\nimport json\nwith open(input_path, \"r\") as f:\n    data = json.load(f)\n    # data = dict(mDictList=json.load(f))\nfrom ies_optim import EnergyFlowGraph\nfrom topo_check import 拓扑图\nEFG = EnergyFlowGraph.parse_obj(data)\nEFG_dict = EFG.dict()\nEFG2 = EnergyFlowGraph.parse_obj(EFG_dict)\nimport rich\nfrom solve_model import mDictListToCalcParamList, solveModelFromCalcParamList\nfor index, mDict in enumerate(EFG.mDictList):\n    logger_print(mDict)\n    logger_print()\n    logger_print(f\"_____parsing mDict #{index}_____\")\n    topo = 拓扑图.from_json(mDict.dict())",
+        "type": "code",
+        "location": "/microgrid_base/test_json_input_format.py:1-39"
+    },
+    "2665": {
+        "file_id": 296,
+        "content": "The code reads a JSON input file, parses it using the EnergyFlowGraph class, and then creates a new EnergyFlowGraph object from the parsed data. It also logs each mDict in the EnergyFlowGraph and prints information for each one. The logger_print function is used to print messages with different prefixes based on their type. The code uses various modules such as log_utils, rich, and solve_model. The MAKEFILE dictionary is used to specify inputs and outputs for the program.",
+        "type": "comment"
+    },
+    "2666": {
+        "file_id": 296,
+        "content": "    topo.check_consistency\nmDictList = EFG.dict()[\"mDictList\"]\ncalcParamList = mDictListToCalcParamList(mDictList)\nresultList = solveModelFromCalcParamList(calcParamList)\n# breakpoint()\nlogger_print(resultList[0][\"simulationResultTable\"])\nwith open(output_path, \"w\") as f:\n    f.write(json.dumps(resultList, indent=4, ensure_ascii=False))",
+        "type": "code",
+        "location": "/microgrid_base/test_json_input_format.py:40-49"
+    },
+    "2667": {
+        "file_id": 296,
+        "content": "This code checks the consistency of a topology and creates a dictionary list for calculation parameters. It then solves the model using these parameters and stores the simulation results in another dictionary. Finally, it writes the results to an output file in JSON format with proper indentation and without converting special characters to ASCII.",
+        "type": "comment"
+    },
+    "2668": {
+        "file_id": 297,
+        "content": "/microgrid_base/test_neverundefined/template.j2",
+        "type": "filepath"
+    },
+    "2669": {
+        "file_id": 297,
+        "content": "This code defines a macro \"mtest\" that takes three arguments (a, b, c), initializes an empty list, appends the first argument to the list, and returns the current state of the list. The macro is then called without passing any arguments, resulting in an error as it expects at least one argument.",
+        "type": "summary"
+    },
+    "2670": {
+        "file_id": 297,
+        "content": "{% macro mtest(a, b, c) %}\nhappy song\n{% set s = [] %}\n{% do s.append(a) %}\n{{ s }}\n{% endmacro %}\n{{ mtest() }}",
+        "type": "code",
+        "location": "/microgrid_base/test_neverundefined/template.j2:2-9"
+    },
+    "2671": {
+        "file_id": 297,
+        "content": "This code defines a macro \"mtest\" that takes three arguments (a, b, c), initializes an empty list, appends the first argument to the list, and returns the current state of the list. The macro is then called without passing any arguments, resulting in an error as it expects at least one argument.",
+        "type": "comment"
+    },
+    "2672": {
+        "file_id": 298,
+        "content": "/microgrid_base/test_neverundefined/test.py",
+        "type": "filepath"
+    },
+    "2673": {
+        "file_id": 298,
+        "content": "This code imports the necessary modules, defines render_params as an empty dictionary, and uses jinja_utils to load a template from \"template.j2\" into \"output.txt\", without formatting, for the banner \"test_neverundefined\".",
+        "type": "summary"
+    },
+    "2674": {
+        "file_id": 298,
+        "content": "import sys\nsys.path.append(\"../\")\nimport jinja_utils\nrender_params = dict()\njinja_utils.load_render_and_format(\"template.j2\", \"output.txt\", render_params = render_params, banner = \"test_neverundefined\", needFormat=False)",
+        "type": "code",
+        "location": "/microgrid_base/test_neverundefined/test.py:1-5"
+    },
+    "2675": {
+        "file_id": 298,
+        "content": "This code imports the necessary modules, defines render_params as an empty dictionary, and uses jinja_utils to load a template from \"template.j2\" into \"output.txt\", without formatting, for the banner \"test_neverundefined\".",
+        "type": "comment"
+    },
+    "2676": {
+        "file_id": 299,
+        "content": "/microgrid_base/test_neverundefined/test_strict.py",
+        "type": "filepath"
+    },
+    "2677": {
+        "file_id": 299,
+        "content": "The code imports the necessary modules and creates a Jinja2 environment with strict undefined handling, then renders a template named 'template.j2' with the name 'John Doe' and finally prints the rendered output.",
+        "type": "summary"
+    },
+    "2678": {
+        "file_id": 299,
+        "content": "from jinja2 import Environment, FileSystemLoader, StrictUndefined\n# Create Jinja2 environment with the extension\nenv = Environment(\n    loader=FileSystemLoader('.'),\n    undefined=StrictUndefined,\n    extensions=['jinja2.ext.do']\n)\n# Render the template\ntemplate = env.get_template('template.j2')\nrendered = template.render(name='John Doe')\n# Print the rendered output\nprint(rendered)",
+        "type": "code",
+        "location": "/microgrid_base/test_neverundefined/test_strict.py:1-15"
+    },
+    "2679": {
+        "file_id": 299,
+        "content": "The code imports the necessary modules and creates a Jinja2 environment with strict undefined handling, then renders a template named 'template.j2' with the name 'John Doe' and finally prints the rendered output.",
+        "type": "comment"
+    },
+    "2680": {
+        "file_id": 300,
+        "content": "/microgrid_base/test_replace_logger.py.j2",
+        "type": "filepath"
+    },
+    "2681": {
+        "file_id": 300,
+        "content": "Code imports `logger_print` from `log_utils` and defines a function `abc()`, but it doesn't use any logger in the code. It also imports rich library and creates a function `myfunc()` which logs \"hjk\" twice, but the logger is not utilized.",
+        "type": "summary"
+    },
+    "2682": {
+        "file_id": 300,
+        "content": "from log_utils import logger_print\n# there is no logger used\na = 1\nb = 2\ndef abc(): return 1\nlogger_print(\"abc\")\nlogger_print('def')\nimport rich\ndef myfunc():\n    logger_print('hjk')\n    logger_print(\"hjk\")",
+        "type": "code",
+        "location": "/microgrid_base/test_replace_logger.py.j2:1-15"
+    },
+    "2683": {
+        "file_id": 300,
+        "content": "Code imports `logger_print` from `log_utils` and defines a function `abc()`, but it doesn't use any logger in the code. It also imports rich library and creates a function `myfunc()` which logs \"hjk\" twice, but the logger is not utilized.",
+        "type": "comment"
+    },
+    "2684": {
+        "file_id": 301,
+        "content": "/microgrid_base/test_replace_logger_no_template.py",
+        "type": "filepath"
+    },
+    "2685": {
+        "file_id": 301,
+        "content": "Code imports logger_print from log_utils and defines a function myfunc. The function does not use any variables \"a\" or \"b\", and it calls logger_print twice with the same argument, \"hjk\". No logger is used within the defined function abc().",
+        "type": "summary"
+    },
+    "2686": {
+        "file_id": 301,
+        "content": "from log_utils import logger_print\n# there is no logger used\na = 1\nb = 2\ndef abc():\n    return 1\nlogger_print(\"abc\")\nlogger_print(\"def\")\nimport rich\ndef myfunc():\n    logger_print(\"hjk\")\n    logger_print(\"hjk\")",
+        "type": "code",
+        "location": "/microgrid_base/test_replace_logger_no_template.py:1-20"
+    },
+    "2687": {
+        "file_id": 301,
+        "content": "Code imports logger_print from log_utils and defines a function myfunc. The function does not use any variables \"a\" or \"b\", and it calls logger_print twice with the same argument, \"hjk\". No logger is used within the defined function abc().",
+        "type": "comment"
+    },
+    "2688": {
+        "file_id": 302,
+        "content": "/microgrid_base/test_topo_check.py",
+        "type": "filepath"
+    },
+    "2689": {
+        "file_id": 302,
+        "content": "This code simulates microgrid operations using photovoltaic systems and diesel generators, verifying topology through JSON files for comparison, checks constraints, and logs information.",
+        "type": "summary"
+    },
+    "2690": {
+        "file_id": 302,
+        "content": "import os\nos.environ[\"SKIP_ARGENV\"] = \"True\"\nos.environ[\"DOTENV\"] = \".test_topo_env\"\nfrom log_utils import logger_print\nMAKEFILE = dict(inputs=[\"topo_check.py\"], outputs=[\"check_topo\"], args=[])\nfrom config import *\n# ies_env.VAR_INIT_AS_ZERO = \"1\"\n# os.environ[\n#     \"PERCENT_WARNING_THRESHOLD\"\n# ] = \"1\"  # percent value less or equal than this value shal be warned\nimport json\nfrom topo_check import *\n# import rich\ndatalen = 24\n# datalen = 8760\n####################\n# build from code. #\n####################\n# FIXED: 加法器没有\"output\"\ndef print_with_banner(data, banner: str):\n    logger_print()\n    logger_print(\"=\" * 40 + f\"[{banner}]\")\n    logger_print(data)\n    logger_print()\n# you may need pydantic here. verify then import to compute graph.\nfrom ies_optim import *\nfrom export_format_validate import *\n# import numpy as np\n# a = abs(np.random.random((24,))).tolist()\na = [100] * datalen  # this is not random.\n# a = abs(np.random.random((datalen,))).tolist()\n# algoParam = 计算参数(计算步长=\"小时\", 典型日=False, 计算类型=\"仿真模拟\", 风速=a, 光照=a, 气温=a, 年利率=0.1).dict()",
+        "type": "code",
+        "location": "/microgrid_base/test_topo_check.py:1-48"
+    },
+    "2691": {
+        "file_id": 302,
+        "content": "Code imports necessary libraries and sets environment variables before defining a function called \"print_with_banner\" to print data with a banner. It then proceeds to define the algorithm parameters for some calculations. The code includes various comments specifying the lengths of different datasets, and a list 'a' is generated which seems to represent varying values such as wind speed, sunlight intensity, or temperature for 24 hours.",
+        "type": "comment"
+    },
+    "2692": {
+        "file_id": 302,
+        "content": "algoParam = 计算参数(\n    计算目标=\"经济\",\n    # 计算目标=\"经济_环保\",\n    # 计算目标=\"环保\",\n    计算步长=\"小时\",\n    典型日代表的日期=[1],\n    # 典型日代表的日期=[1, 2],\n    典型日=True,\n    # 典型日=False,\n    计算类型=\"设计规划\",\n    风速=a,\n    光照=a,\n    气温=a,\n    贴现率=0.1,\n    # 年利率=0.1,\n).dict()\n# topo = 拓扑图()  # with structure?\ntopo = 拓扑图(**algoParam)  # with structure?\ndevParam = dict(生产厂商=\"Any\", 设备型号=\"Any\", 设备名称=\"Any\")\nP1 = 光伏发电信息(\n    **devParam,\n    Area=10,\n    # too low for percentage\n    PowerConversionEfficiency=90,\n    # PowerConversionEfficiency=0.9,\n    MaxPower=9,\n    PowerDeltaLimit=1,\n    CostPerKilowatt=100,\n    CostPerYearPerKilowatt=100,\n    VariationalCostPerWork=100,\n    Life=20,\n    BuildCostPerKilowatt=10,\n    BuildBaseCost=10,\n    MaxInstallArea=200,\n    MinInstallArea=100,\n    DeviceCount=100,\n).dict()\nPV1 = 光伏发电(topo, param=P1)  # 这种是增加新的光伏发电\nPV2 = 光伏发电(topo, param=P1)\nDSS = 柴油(\n    topo,\n    param=柴油信息(\n        设备名称=\"Any\",\n        Price=(10, \"元/L\"),\n        热值=(10, \"MJ/L\"),\n        CO2=(gasEmission := (10, \"kg/L\")),\n        NOX=gasEmission,\n        SO2=gasEmission,",
+        "type": "code",
+        "location": "/microgrid_base/test_topo_check.py:49-100"
+    },
+    "2693": {
+        "file_id": 302,
+        "content": "Computes economic parameters for a microgrid, creates a topology object with given parameters, defines device parameters for a photovoltaic system, adds two photovoltaic systems to the topology, and defines diesel generator information with gas emission values.",
+        "type": "comment"
+    },
+    "2694": {
+        "file_id": 302,
+        "content": "    ).dict(),\n    # param=柴油信息(设备名称=\"Any\", Price=(10, \"L/元\"), 热值=(10, \"MJ/L\"), CO2=(10, \"kg/L\")).dict(),\n)\np1 = 柴油发电信息(\n    **devParam,\n    RatedPower=21500,\n    PowerDeltaLimit=100,\n    PowerStartupLimit=3.5,\n    CostPerMachine=1,\n    CostPerYearPerMachine=1,\n    VariationalCostPerWork=1,\n    Life=20,\n    BuildCostPerMachine=10,\n    BuildBaseCost=10,\n    DieselToPower_Load=[[2, 10], [3, 50], [1, 100]],\n    DeviceCount=100,\n    MaxDeviceCount=200,\n    MinDeviceCount=100,\n).dict()\n# breakpoint()\nDS = 柴油发电(\n    topo,\n    param=p1,\n)\n# breakpoint()\nDEL1 = 变流器(\n    topo,\n    param=变流器信息(\n        **devParam,\n        RatedPower=20000,\n        CostPerKilowatt=100,\n        CostPerYearPerKilowatt=100,\n        VariationalCostPerWork=100,\n        Life=20,\n        Efficiency=90,\n        BuildCostPerKilowatt=10,\n        BuildBaseCost=10,\n        DeviceCount=1000,\n        MaxDeviceCount=200,\n        MinDeviceCount=100,\n    ).dict(),\n)\nDEL2 = 变压器(\n    topo,\n    param=变压器信息(\n        **devParam,\n        PowerParameter=0.9,\n        LoadRedundancyParameter=1.2,",
+        "type": "code",
+        "location": "/microgrid_base/test_topo_check.py:101-151"
+    },
+    "2695": {
+        "file_id": 302,
+        "content": "This code defines various device parameters and creates instances of diesel generator, transformer, and transformer2 objects. It also performs certain operations on these instances to check the topology of a microgrid system.",
+        "type": "comment"
+    },
+    "2696": {
+        "file_id": 302,
+        "content": "        RatedPower=20000,\n        CostPerKilowatt=100,\n        CostPerYearPerKilowatt=100,\n        VariationalCostPerWork=100,\n        Life=20,\n        Efficiency=90,\n        BuildCostPerKilowatt=10,\n        BuildBaseCost=10,\n        DeviceCount=1000,\n        MaxDeviceCount=200,\n        MinDeviceCount=100,\n    ).dict(),\n)\nLOAD = 电负荷(\n    topo,\n    param=电负荷信息(\n        **devParam,\n        EnergyConsumption=[1] * len(a),\n        MaxEnergyConsumption=10,\n        PriceModel=常数电价(Price=1),\n    ).dict(),\n)\nBAT = 锂电池(\n    topo,\n    param=锂电池信息(\n        **devParam,\n        循环边界条件=\"日间连接\",\n        RatedCapacity=200,\n        CostPerCapacity=100,\n        TotalCapacity=2000,\n        CostPerYearPerCapacity=100,\n        VariationalCostPerWork=100,\n        Life=200000,\n        BatteryDeltaLimit=0.1,\n        ChargeEfficiency=90,\n        DischargeEfficiency=90,\n        BuildCostPerCapacity=10,\n        BuildBaseCost=10,\n        InitSOC=4,\n        BatteryStorageDecay=10,\n        BatteryLife=9000,\n        LifetimeCycleCount=100000000,\n        # TotalDischargeCapacity=1000,",
+        "type": "code",
+        "location": "/microgrid_base/test_topo_check.py:152-195"
+    },
+    "2697": {
+        "file_id": 302,
+        "content": "The code defines a microgrid device with parameters for RatedPower, CostPerKilowatt, CostPerYearPerKilowatt, VariationalCostPerWork, Life, Efficiency, BuildCostPerKilowatt, BuildBaseCost, DeviceCount, MaxDeviceCount, MinDeviceCount. It also defines a load component and a battery component with their respective parameters for the microgrid simulation.",
+        "type": "comment"
+    },
+    "2698": {
+        "file_id": 302,
+        "content": "        MaxSOC=99,\n        MinSOC=4,\n        MaxTotalCapacity=2000,\n        MinTotalCapacity=1000,\n    ).dict(),\n)\nA1 = 母线(topo, \"可连接供电端母线\")\nA2 = 母线(topo, \"可连接供电端母线\")\nA3 = 母线(topo, \"可连接电母线\")\nBC = 双向变流器(\n    topo,\n    param=双向变流器信息(\n        **devParam,\n        RatedPower=10000,\n        Efficiency=90,\n        CostPerKilowatt=100,\n        CostPerYearPerKilowatt=100,\n        VariationalCostPerWork=100,\n        Life=100,\n        BuildCostPerKilowatt=100,\n        BuildBaseCost=100,\n        MaxDeviceCount=2000,\n        MinDeviceCount=1000,\n        DeviceCount=10000,\n    ).dict(),\n)\n连接线(topo, \"不可连接电储能端母线\", BC.储能端, BAT.电接口)\n连接线(topo, \"不可连接柴油母线\", DS.燃料接口, DSS.燃料接口)\n连接线(topo, \"不可连接电母线输入输出\", BC.线路端, A3.id)\n连接线(topo, \"不可连接电母线输入\", DEL1.电输出, A3.id)\n连接线(topo, \"不可连接电母线输出\", A3.id, DEL2.电输入)\n连接线(topo, \"不可连接负荷电母线\", DEL2.电输出, LOAD.电接口)\n连接线(topo, \"不可连接供电端母线输入\", A1.id, PV1.电接口)\n连接线(topo, \"不可连接供电端母线输入\", A2.id, PV2.电接口)\n连接线(topo, \"不可连接供电端母线输入\", A2.id, DS.电接口)\n连接线(topo, \"不可连接供电端母线输出\", A2.id, DEL1.电输入)\n合并线(topo, \"可合并供电端母线\", A1.id, A2.id)\n# L1 = 母线(graph)",
+        "type": "code",
+        "location": "/microgrid_base/test_topo_check.py:196-241"
+    },
+    "2699": {
+        "file_id": 302,
+        "content": "The code is defining a graph topology for a microgrid system. It includes lines, buses (A1, A2, A3), a bi-directional converter (BC), a battery (BAT), diesel generator (DS), load (LOAD), and solar panels (PV1, PV2). The code specifies the connections between these components in the microgrid.",
+        "type": "comment"
+    }
+}

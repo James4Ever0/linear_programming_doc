@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary functions from two different modules, \"log_utils\" and \"ies_optim_legacy\". The \"logger_print\" function is imported to handle logging operations while the \"*\" symbol after \"ies_optim_legacy\" imports all functions present in that module. This suggests that these functions will be used for optimization tasks related to IES (Intelligent Energy Systems).",
+    "details": [
+        {
+            "comment": "This code imports necessary functions from two different modules, \"log_utils\" and \"ies_optim_legacy\". The \"logger_print\" function is imported to handle logging operations while the \"*\" symbol after \"ies_optim_legacy\" imports all functions present in that module. This suggests that these functions will be used for optimization tasks related to IES (Intelligent Energy Systems).",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/ies_optim.py\":0-2",
+            "content": "from log_utils import logger_print\nfrom ies_optim_legacy import *"
+        }
+    ]
+}

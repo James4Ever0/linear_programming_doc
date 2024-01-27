@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the \"Any\" type from the typing module, initializes a variable 'a' with type Any and assigns it a value of 1. It can also be assigned the string '1' as an alternative. This allows for flexible data types in this context.",
+    "details": [
+        {
+            "comment": "The code imports the \"Any\" type from the typing module, initializes a variable 'a' with type Any and assigns it a value of 1. It can also be assigned the string '1' as an alternative. This allows for flexible data types in this context.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/generic.py\":0-2",
+            "content": "from typing import Any\na :Any= 1\n# a = '1'"
+        }
+    ]
+}

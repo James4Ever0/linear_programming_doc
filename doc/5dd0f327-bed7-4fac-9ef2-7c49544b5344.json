@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the `ply.lex` and `ply.yacc` modules for lexical analysis and parsing, respectively. It then creates instances of these classes (`lex` and `yacc`) to perform lexical analysis and parsing on input data.",
+    "details": [
+        {
+            "comment": "The code imports the `ply.lex` and `ply.yacc` modules for lexical analysis and parsing, respectively. It then creates instances of these classes (`lex` and `yacc`) to perform lexical analysis and parsing on input data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/dsl_parser/yacc_init.py\":0-5",
+            "content": "import ply.lex\nimport ply.yacc\n# construct definition within class created by metaclass, or templates\nlex = ply.lex.lex()\nyacc = ply.yacc.yacc()"
+        }
+    ]
+}

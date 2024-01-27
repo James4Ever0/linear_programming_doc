@@ -1,0 +1,10 @@
+{
+    "summary": "The code executes Python's pygments library, formatting the test_code.py file with full lexing and inline line numbers. It generates an HTML output file named \"test_code.html\" that includes the Python code with syntax highlighting.",
+    "details": [
+        {
+            "comment": "The code executes Python's pygments library, formatting the test_code.py file with full lexing and inline line numbers. It generates an HTML output file named \"test_code.html\" that includes the Python code with syntax highlighting.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/chatgpt_convert_latex_to_python/convert_code_to_webpage.cmd\":0-0",
+            "content": "python -m pygments -O full,linenos=inline,lineanchors=line,nobackground -f html -o test_code.html test_code.py"
+        }
+    ]
+}

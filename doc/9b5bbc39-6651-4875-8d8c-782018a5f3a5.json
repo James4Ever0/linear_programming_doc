@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports NumPy and defines lower and upper bounds for x and y variables, sample sizes for both variables, and a function z(x,y) that takes inputs from both variables.",
+    "details": [
+        {
+            "comment": "This code imports NumPy and defines lower and upper bounds for x and y variables, sample sizes for both variables, and a function z(x,y) that takes inputs from both variables.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/linearization_config.py\":0-7",
+            "content": "import numpy as np\nx_lb, x_ub = 0,3\ny_lb, y_ub = 0, 2*np.pi\nx_sample_size = y_sample_size = 100\nz_func = lambda x,y:x*np.sin(y)"
+        }
+    ]
+}

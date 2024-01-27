@@ -1,0 +1,10 @@
+{
+    "summary": "This code is a Jinja template for a Makefile, suggesting that it reduces boilerplate without using Ninja and may involve special variables to simplify the learning process.",
+    "details": [
+        {
+            "comment": "This code is a Jinja template for a Makefile, suggesting that it reduces boilerplate without using Ninja and may involve special variables to simplify the learning process.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/Makefile.j2\":0-1",
+            "content": "{# without ninja, you need macro to reduce boilerplate.#}\n{# or learning special variables? #}"
+        }
+    ]
+}

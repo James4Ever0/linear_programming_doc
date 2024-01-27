@@ -1,0 +1,10 @@
+{
+    "summary": "This code executes a Python script named \"cpExample.py\" and redirects its output to both the console and a file called \"test_log.log\".",
+    "details": [
+        {
+            "comment": "This code executes a Python script named \"cpExample.py\" and redirects its output to both the console and a file called \"test_log.log\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_cpexample.ps1\":0-0",
+            "content": "python .\\cpExample.py | tee test_log.log"
+        }
+    ]
+}

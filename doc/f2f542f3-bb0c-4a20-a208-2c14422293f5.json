@@ -1,0 +1,10 @@
+{
+    "summary": "Checks if the APT cache file exists and updates it if necessary, then verifies if the apt is updated within 7 days. If not, it updates the apt packages and touches the cache file. If 7z is not installed, it installs it using apt-get. Finally, it unpacks the release archive, sets up the environment for the Docker launch, and runs the Docker launch script in the server directory.",
+    "details": [
+        {
+            "comment": "Checks if the APT cache file exists and updates it if necessary, then verifies if the apt is updated within 7 days. If not, it updates the apt packages and touches the cache file. If 7z is not installed, it installs it using apt-get. Finally, it unpacks the release archive, sets up the environment for the Docker launch, and runs the Docker launch script in the server directory.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/reload.sh\":0-36",
+            "content": "APT_UPDATED=~/.apt_updated\n# you can use makefile instead.\nif test -f \"$APT_UPDATED\"; then\n    echo \"$APT_UPDATED exists.\"\nelse\n    echo \"$APT_UPDATED does not exist.\"\n    apt update && touch $APT_UPDATED\nfi\nif [ \"$(find $APT_UPDATED -mtime +7)\" ]; then\n    echo \"Haven't update apt for at least 7 days\"\n    rm $APT_UPDATED && apt update && touch $APT_UPDATED\nelse\n    echo \"Apt is updated\"\nfi\nif which docker; [ \"$?\" -ne 0 ]; then\n    echo \"7z not installed.\"\n    echo \"Setting up now.\"\n    apt install -y p7zip-full\nelse\n    echo \"7z already installed.\"\nfi\n# cp -R microgrid_server_release/server/logs history_logs\nrm -rf microgrid_server_release\n7z x release.7z\ncd microgrid_server_release\ncd init\n# pip3 install -r requirements_docker_launch.txt\n# bash init.sh\nbash init_docker_launch.sh\ncd ..\ncd server\n# mkdir logs\n# cp -R /root/history_logs logs\n# rm -rf logs\n# bash fastapi_tmuxp.sh windows\npython3 docker_launch.py"
+        }
+    ]
+}

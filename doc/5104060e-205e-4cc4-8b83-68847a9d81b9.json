@@ -1,0 +1,10 @@
+{
+    "summary": "The code runs two different profiles of a Python script named \"profile_code.py\" using two separate conda environments: \"pypy\" and \"docplex\". The \"--live-stream\" and \"--no-capture-output\" flags are used to stream the output in real time without capturing it.",
+    "details": [
+        {
+            "comment": "The code runs two different profiles of a Python script named \"profile_code.py\" using two separate conda environments: \"pypy\" and \"docplex\". The \"--live-stream\" and \"--no-capture-output\" flags are used to stream the output in real time without capturing it.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/run_profile.cmd\":0-1",
+            "content": "@REM conda run -n pypy --live-stream --no-capture-output pypy profile_code.py\nconda run -n docplex --live-stream --no-capture-output python profile_code.py"
+        }
+    ]
+}

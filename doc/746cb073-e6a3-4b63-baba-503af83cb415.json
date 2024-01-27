@@ -1,0 +1,10 @@
+{
+    "summary": "This code is likely running a binary executable called \"cplex_128.bin\" and passing it a command through standard input (stdin) to execute. The command appears to be a series of newlines and numbers, with 2 and 1 being the only visible inputs.",
+    "details": [
+        {
+            "comment": "This code is likely running a binary executable called \"cplex_128.bin\" and passing it a command through standard input (stdin) to execute. The command appears to be a series of newlines and numbers, with 2 and 1 being the only visible inputs.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/install_cplex.sh\":0-0",
+            "content": "echo -e \"2\\n\\n1\\n\\n\\n\\n\\n\" | ./cplex_128.bin"
+        }
+    ]
+}

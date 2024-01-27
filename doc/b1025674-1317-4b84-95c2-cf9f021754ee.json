@@ -1,0 +1,10 @@
+{
+    "summary": "The code snippet is a demo sketch for natural gas generator template, not intended to run. It imports logger_print from log_utils and aims to extract load-consumption rate tablet processing from diesel generators.",
+    "details": [
+        {
+            "comment": "The code snippet is a demo sketch for natural gas generator template, not intended to run. It imports logger_print from log_utils and aims to extract load-consumption rate tablet processing from diesel generators.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/natural_gas_generator_template.py\":0-5",
+            "content": "from log_utils import logger_print\n# just for demo purposes (sketch)\n# not for running\n# extract the load-consumption rate tablet processing from diesel generator"
+        }
+    ]
+}

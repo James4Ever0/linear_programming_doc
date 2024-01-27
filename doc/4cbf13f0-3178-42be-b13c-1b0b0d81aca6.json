@@ -1,0 +1,10 @@
+{
+    "summary": "The code generates a PDoc documentation for specified Python files, then archives the Python files along with the generated HTML documentation into a compressed 7z file named \"ies_planning.7z\".",
+    "details": [
+        {
+            "comment": "The code generates a PDoc documentation for specified Python files, then archives the Python files along with the generated HTML documentation into a compressed 7z file named \"ies_planning.7z\".",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/generate_document.cmd\":0-3",
+            "content": "@REM pdoc --http 0.0.0.0:8021 integratedEnergySystemPrototypes.py demo_utils.py cpExample.py\npdoc --html integratedEnergySystemPrototypes.py demo_utils.py cpExample.py config.py\n7z a ies_planning.7z integratedEnergySystemPrototypes.py demo_utils.py cpExample.py config.py html"
+        }
+    ]
+}

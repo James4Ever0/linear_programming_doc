@@ -1,0 +1,15 @@
+{
+    "summary": "The code sets up environment variables and defines execution methods for different OS types. It uses conda environments, with tests run using bash scripts or Python scripts via pytest. The Makefile contains test commands for multiple scripts and rules for generating files needed by these tests.",
+    "details": [
+        {
+            "comment": "The code sets up environment variables for different operating systems and defines the execution method based on OS type. It uses conda environments (rosetta or cplex) and specifies the main executable as a bash script, or a combination of Python scripts using pytest. The purpose is to run tests on various microgrid models.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/Makefile\":1-34",
+            "content": "# PLATFORM := $(shell python -c \"import os; print(os.name)\")\n# ifeq (${PLATFORM}, )\n# PLATFORM := $(shell python3 -c \"import os; print(os.name)\") # executed on macos\n# endif\n# ifeq (${PLATFORM}, nt)\n# OS_TYPE = windows\n# else\n# OS_TYPE = macos\n# endif\n# PYTHON_ENV = -X utf8=1\n# ifeq (${OS_TYPE}, macos)\n# CONDA_ENV = rosetta\n# PYTHON = /usr/bin/python3\n# else\n# CONDA_ENV = cplex\n# PYTHON = python ${PYTHON_ENV}\n# endif\n# CONDA = conda run -n ${CONDA_ENV} --live-stream --no-capture-output\nifeq (${OS_TYPE}, macos)\nMAIN_EXEC=bash run_test.sh\nelse\n# MAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=no\nMAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys\n# MAIN_EXEC=python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys test_model.py\n# MAIN_EXEC=${CONDA} python ${PYTHON_ENV} -m pytest --lf --lfnf=all --capture=tee-sys test_model.py\nendif\n# main: run_test.sh test_model.py common_fixtures.py stepwise\nmain: run_test.sh test_model.py test_export.py test_failsafe.py common_fixtures.py"
+        },
+        {
+            "comment": "This Makefile contains test commands for three Python scripts: test_export.py, test_model.py, and test_failsafe.py. It also includes rules to generate test_model.py from another file (generate_test_model.py), and common_fixtures.py.tmp from dev_info_tmp_gen.py, common_fixtures.py.j2, and test_export.py.j2. Additionally, there is a commented stepwise rule for runtime_override_stepwise.py.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test/Makefile\":35-56",
+            "content": "\tenv VAR_INIT_AS_ZERO=1 ${MAIN_EXEC} test_export.py\n\t${MAIN_EXEC} test_model.py\n\t${PYTHON} test_failsafe.py\nt_export:\n\t${MAIN_EXEC} test_export.py\nt_model:\n\t${MAIN_EXEC} test_model.py\nt_failsafe:\n\t${PYTHON} test_failsafe.py\ntest_model.py: generate_test_model.py test_model.py.j2\n\t${PYTHON} $<\ncommon_fixtures.py.tmp test_export.py: dev_info_tmp_gen.py common_fixtures.py.j2 test_export.py.j2 ../export_format_validate.py\n\t${PYTHON} $<\n# stepwise: runtime_override_stepwise.py\n# \t${PYTHON} $< -t\n# \t${CONDA} python ${PYTHON_ENV} $< -t"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code creates a new shim file called \"ipopt.shim\" with a specified value, and then copies the \"pandoc.exe\" file to \"ipopt.exe\" in the same directory.",
+    "details": [
+        {
+            "comment": "This code creates a new shim file called \"ipopt.shim\" with a specified value, and then copies the \"pandoc.exe\" file to \"ipopt.exe\" in the same directory.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/create_shim_for_ipopt.ps1\":0-2",
+            "content": "# all shims are the same. they just with different names and read different .shim files.\nNew-Item -Path C:/Users/ss/scoop/shims/ipopt.shim -Value 'path = C:\\Users\\ss\\Downloads\\Ipopt-3.14.11-win64-msvs2019-md\\bin\\ipopt.exe'\nCopy-Item -Path C:/Users/ss/scoop/shims/pandoc.exe -Destination C:/Users/ss/scoop/shims/ipopt.exe"
+        }
+    ]
+}

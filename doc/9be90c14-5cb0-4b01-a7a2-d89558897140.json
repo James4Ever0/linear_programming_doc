@@ -1,0 +1,10 @@
+{
+    "summary": "Code snippet demonstrates the usage of pytest framework, Protocol class from typing module, and defines various variables and functions. It also explains how to invoke multiple persistent pytest sessions using ninja and the concept of fixtures in pytest.",
+    "details": [
+        {
+            "comment": "Code snippet demonstrates the usage of pytest framework, Protocol class from typing module, and defines various variables and functions. It also explains how to invoke multiple persistent pytest sessions using ninja and the concept of fixtures in pytest.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/makefile_ninja_pytest_incremental_test/mytest.py\":0-46",
+            "content": "import pytest\nfrom typing import Sequence, TypeVar, Optional, Protocol\nChooseable = TypeVar(\"Chooseable\") # can limit the choice of vars.\n# pytest -s to print to stdout without collecting\n# pytest --capture=tee-sys\nclass mProto(Protocol):\n    mattr:...\n    def mfunc(self, *args, **kwargs): ...\na :mProto\na = 1 # type error\nc = \"abc\"\nc:str\nc:int\nfor b in [1,2,3]:\n    b: mProto\n# ninja -> invoke multiple pytest \"persistant\" sessions, not cleaning cache and not rerunning the test if passed test -> clean cache only by passing target \"clean\" to ninja\ndef demo(mtest: Optional[int] = ...):\n    ...\n@pytest.fixture\ndef mfixture():\n    print(\"fixture running\")\n    return 42\n# seems fixture is to be called every time invoked.\ndef test_request_cache(request):\n    val = request.config.cache.get(\"val\", None)\n    print(f\"Value? {repr(val)}\")\ndef test_fixture(mfixture):\n    print(\"FIXTURE VAL?\", mfixture)\n    assert mfixture == 43\ndef test_fixture2(mfixture):\n    print(\"VAL2?\", mfixture)\n    assert mfixture == 43"
+        }
+    ]
+}

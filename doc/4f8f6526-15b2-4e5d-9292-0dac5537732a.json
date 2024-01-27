@@ -1,0 +1,10 @@
+{
+    "summary": "This code uses the \"flashtext\" library to extract keywords and count their occurrences in a given text. It adds the keywords, \"keywords\" and \"with,\" to the keyword processor, extracts them from the text, and counts their occurrences using a dictionary.",
+    "details": [
+        {
+            "comment": "This code uses the \"flashtext\" library to extract keywords and count their occurrences in a given text. It adds the keywords, \"keywords\" and \"with,\" to the keyword processor, extracts them from the text, and counts their occurrences using a dictionary.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/word_counter.py\":0-23",
+            "content": "mytext = \"\"\"\nmy text with some keywords\nmy text with some keywords\nmy text with some keywords\nmy text with some keywords\nmy_variable_with_index[0]\n\"\"\"\nimport flashtext\n# you may use two different views, one is the element view, another is the array view.\n# array view is simply done by removing bracket enclosed indexes from variable names.\nkeyword_processor = flashtext.KeywordProcessor()\nkeyword_processor.add_keyword('keywords')\nkeyword_processor.add_keyword('with')\nkeywords_found = keyword_processor.extract_keywords(mytext)\nprint(keywords_found)\nkeyword_counts = {}\nfor keyword in keywords_found:\n    keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1\nprint(keyword_counts)"
+        }
+    ]
+}

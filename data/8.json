@@ -1,0 +1,538 @@
+{
+    "800": {
+        "file_id": 99,
+        "content": "    varInfoList = list(varInfoDict.values())\n    return varInfoList\nfrom contextlib import contextmanager\nfrom copy import deepcopy\nclass SkipSettingNoneDict(dict):\n    def __setitem__(self, name, value):\n        if value is not None:\n            super().__setitem__(name, value)\n@contextmanager\ndef varInfoDictContext():\n    class VarInfoDictUpdator:\n        def __init__(self, violation_only: bool = False):\n            self._varInfoDict = SkipSettingNoneDict()\n            self.violation_only = violation_only\n        def update(self, var):\n            if var is not None:\n                varName = str(var)\n                if varName not in self._varInfoDict.keys():\n                    self._varInfoDict[\n                        varName\n                    ] = get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                        var, violation_only=self.violation_only\n                    )\n        @property\n        def varInfoDict(self):\n            return deepcopy(self._varInfoDict)\n        def __del__(self):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:227-262"
+    },
+    "801": {
+        "file_id": 99,
+        "content": "Class \"SkipSettingNoneDict\" is a custom dictionary that doesn't allow None values.\nVarInfoDictUpdator class initializes SkipSettingNoneDict and updates varInfoDict with relevant var info when not None.\nget_violation_of_infeasible_bounds_and_vartype returns violation and vartype of a single var.",
+        "type": "comment"
+    },
+    "802": {
+        "file_id": 99,
+        "content": "            del self._varInfoDict\n    varInfoDictUpdator = VarInfoDictUpdator()\n    try:\n        yield varInfoDictUpdator\n    finally:\n        del varInfoDictUpdator\ndef decompose_linear_constraint_from_terms_and_get_variable_info(terms):\n    with varInfoDictContext() as varInfoDictUpdator:\n        for coef, var in terms:\n            varInfoDictUpdator.update(var)\n            return varInfoDictUpdator.varInfoDict\nfrom pyomo.core.base.var import *\nVarType = Union[Var, _VarData, _GeneralVarData, VarList, SimpleVar, ScalarVar]\nfrom typing import Iterable\ndef walk_expression(expr: Expression):\n    if (args := getattr(expr, \"args\", None)) is not None:\n        if isinstance(args, Iterable):\n            for arg in args:\n                if isinstance(arg, VarType):\n                    yield arg\n                else:\n                    yield from walk_expression(arg)\ndef decompose_nonlinear_constraint_and_get_variable_info_dict(constr: Constraint):\n    with varInfoDictContext() as varInfoDictUpdator:\n        for var in walk_expression(constr.body):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:263-298"
+    },
+    "803": {
+        "file_id": 99,
+        "content": "This code defines functions for obtaining variable information from linear and nonlinear constraints in a mathematical model. It utilizes context management to update the variable dictionary and returns it after processing each constraint. The code also includes utility functions for walking through expressions and handling different types of variables.",
+        "type": "comment"
+    },
+    "804": {
+        "file_id": 99,
+        "content": "            varInfoDictUpdator.update(var)\n        return varInfoDictUpdator.varInfoDict\ndef decompose_constraint_and_get_variable_info(constr: Constraint):\n    is_linear, terms = EXPR.decompose_term(constr.body)\n    # decompose non-linear constraints.\n    if is_linear:\n        varInfoDict = decompose_linear_constraint_from_terms_and_get_variable_info(\n            terms\n        )\n    else:\n        varInfoDict = decompose_nonlinear_constraint_and_get_variable_info_dict(constr)\n    varInfoList = getVarInfoListFromVarInfoDict(varInfoDict)\n    return is_linear, varInfoList\n# TODO: iterate over piecewise constraints.\nimport numpy as np\nfrom pyomo.core.base.piecewise import SimplePiecewise, IndexedPiecewise\nPiecewiseType = Union[Piecewise, SimplePiecewise, IndexedPiecewise]\nfrom typing import Tuple\n# do not use this. we need the data.\n# from pydantic import PrivateAttr\nclass PiecewiseBaseInfo(BaseModel):\n    piecewiseName: str\n    piecewiseTypeName: Literal[\"Piecewise\", \"SimplePiecewise\", \"IndexedPiecewise\"]\n    inputVarInfo: VarInfo",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:299-333"
+    },
+    "805": {
+        "file_id": 99,
+        "content": "Function to decompose constraints and retrieve variable information.\nDecomposes terms in a constraint and retrieves variable information.\nReturns linear constraints, nonlinear constraints.\nPiecewise constraints are not yet supported.",
+        "type": "comment"
+    },
+    "806": {
+        "file_id": 99,
+        "content": "    outputVarInfo: VarInfo\n    input_points: List[float]\n    output_points: List[float]\nclass PiecewiseInfo(PiecewiseBaseInfo):\n    # autogenerated.\n    output_violation: float\n    input_domain_violation: float\n    input_domain: Tuple[float, float]\n    @classmethod\n    def build(cls, piecewiseBaseInfo: PiecewiseBaseInfo, tol=1e-6):\n        input_domain = (\n            min(piecewiseBaseInfo.input_points),\n            max(piecewiseBaseInfo.input_points),\n        )\n        input_point = piecewiseBaseInfo.inputVarInfo.val\n        output_point = piecewiseBaseInfo.outputVarInfo.val\n        input_domain_violation = get_bounds_violation(input_point, *input_domain, tol=0)\n        if input_domain_violation == 0:  # within bound.\n            expected_output = np.interp(\n                input_point,\n                piecewiseBaseInfo.input_points,\n                piecewiseBaseInfo.output_points,\n            )\n            output_violation = abs(output_point - expected_output)\n            output_violation = moderate_violation(output_violation, tol)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:334-363"
+    },
+    "807": {
+        "file_id": 99,
+        "content": "This code defines a class PiecewiseInfo that extends PiecewiseBaseInfo. It takes a piecewise base info as input and builds output_violation and input_domain_violation based on the input's domain violation and output point discrepancy. The method is tolerant to small variations in values with a given tolerance level.",
+        "type": "comment"
+    },
+    "808": {
+        "file_id": 99,
+        "content": "        else:\n            output_violation = 0\n        return cls(\n            **piecewiseBaseInfo.dict(),\n            output_violation=output_violation,\n            input_domain_violation=input_domain_violation,\n            input_domain=input_domain,\n        )\n    @property\n    def has_violation(self):\n        return any(\n            [v != 0 for v in [self.output_violation, self.input_domain_violation]]\n        )\nimport rich\nclass MagicList(list):\n    def append(self, value):\n        if value is not None:\n            super().append(value)\n    def sort_by_attr(self, attr: str, reverse=False):\n        super().sort(key=lambda e: getattr(e, attr), reverse=reverse)\n        return self\n    def filter_by_attr(self, attr: str, negate=False):\n        if negate:\n            ret = filter(lambda e: not getattr(e, attr), self)\n        else:\n            ret = filter(lambda e: getattr(e, attr), self)\n        return MagicList(ret)\nclass ModelInfo:\n    def __init__(self):\n        self.constraints: List[ConstraintInfo] = MagicList()",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:364-403"
+    },
+    "809": {
+        "file_id": 99,
+        "content": "The code defines a class, likely for a microgrid model or optimization problem. It checks for input and output domain violations, has properties to determine if there is any violation, and includes methods to sort and filter list elements based on an attribute.",
+        "type": "comment"
+    },
+    "810": {
+        "file_id": 99,
+        "content": "        self.variables: List[VarInfo] = MagicList()\n        self.piecewises: List[PiecewiseInfo] = MagicList()\nclass ModelScanner:\n    def __init__(self, model: ConcreteModel, tol=1e-6, violation_only=True):\n        self.tol = tol\n        self.model = model\n        self.modelInfo = ModelInfo()\n        self.violation_only = violation_only\n    def constraint(self):\n        # you can deactivate some constraints.\n        # model.constraint.activate()\n        # model.constraint.deactivate()\n        for constr in self.model.component_data_objects(\n            ctype=Constraint, active=True, descend_into=True\n        ):\n            body_value = value(constr.body, exception=False)\n            constraint_bounds = get_var_or_constraint_bounds(constr)\n            constraintName = constr.name\n            if body_value is not None:\n                violation = get_bounds_violation(\n                    body_value, *constraint_bounds, self.tol\n                )\n                if self.violation_only and violation == 0:\n                    continue",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:404-430"
+    },
+    "811": {
+        "file_id": 99,
+        "content": "This code initializes a ModelScanner class and its attributes, allowing the user to deactivate constraints in a model. The constraint method iterates through active Constraint objects in the model, checking if their bodies have violations based on given bounds and tolerance level. If violation_only is True and there is no violation, it continues without adding that constraint's information to the ModelInfo object.",
+        "type": "comment"
+    },
+    "812": {
+        "file_id": 99,
+        "content": "                representation = str(constr.expr)\n                is_linear, varInfoList = decompose_constraint_and_get_variable_info(\n                    constr\n                )\n                constraintInfo = ConstraintInfo(\n                    constraintName=constraintName,\n                    is_linear=is_linear,\n                    variables=varInfoList,\n                    violation=violation,\n                    representation=representation,\n                )\n                self.modelInfo.constraints.append(constraintInfo)\n        return self.modelInfo.constraints\n    def variable(self):\n        for var in self.model.component_data_objects(ctype=Var, descend_into=True):\n            self.modelInfo.variables.append(\n                get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                    var, self.tol, violation_only=self.violation_only\n                )\n            )\n        return self.modelInfo.variables\n    def piecewise(self):\n        for pw in self.model.block_data_objects(active=True, descend_into=True):",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:431-455"
+    },
+    "813": {
+        "file_id": 99,
+        "content": "This code checks the model's variables and constraints for any abnormalities or violations. It decompose the constraint, gathers variable info, and appends to the modelInfo list. The function returns a list of violated constraints and infeasible variables.",
+        "type": "comment"
+    },
+    "814": {
+        "file_id": 99,
+        "content": "            if isinstance(pw, PiecewiseType):\n                piecewiseName = pw.name\n                piecewiseTypeName = type(pw).__name__\n                io_params = {}\n                for key, value in {\"input\": \"domain\", \"output\": \"range\"}.items():\n                    var = getattr(pw, f\"_{value}_var\")\n                    io_params[\n                        f\"{key}VarInfo\"\n                    ] = get_violation_of_infeasible_bounds_and_vartype_of_single_var(\n                        var, self.tol, violation_only=False\n                    )\n                    io_params[f\"{key}_points\"] = getattr(pw, f\"_{value}_pts\")\n                piecewiseBaseInfo = PiecewiseBaseInfo(\n                    piecewiseName=piecewiseName,\n                    piecewiseTypeName=piecewiseTypeName,\n                    **io_params,\n                )\n                piecewiseInfo = PiecewiseInfo.build(piecewiseBaseInfo, tol=self.tol)\n                if self.violation_only and not piecewiseInfo.has_violation:\n                    continue",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:456-479"
+    },
+    "815": {
+        "file_id": 99,
+        "content": "This code is checking if the input variable 'pw' is a PiecewiseType. If so, it extracts the name and type of the piecewise function, as well as relevant parameters (input/output vars, points). It then creates a PiecewiseBaseInfo object with this information and a tolerance value. If violation_only is True and the PiecewiseInfo doesn't have a violation, the loop continues.",
+        "type": "comment"
+    },
+    "816": {
+        "file_id": 99,
+        "content": "                self.modelInfo.piecewises.append(piecewiseInfo)\n        return self.modelInfo.piecewises\n    def all(self):\n        self.constraint()\n        self.variable()\n        self.piecewise()\n        return self.modelInfo\nmodelScanner = ModelScanner(model)\nfor constrInfo in modelScanner.constraint():\n    rich.print(constrInfo)\nprint(\"=\" * 70)\nfor varInfo in modelScanner.variable():\n    rich.print(varInfo)\nprint(\"=\" * 70)\nfor piecewiseInfo in modelScanner.piecewise():\n    rich.print(piecewiseInfo)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_invalid_var_and_constraints.py:480-502"
+    },
+    "817": {
+        "file_id": 99,
+        "content": "The code creates a ModelScanner object, scans for constraints, variables, and piecewise functions in the given model, and prints their information. It returns the modelInfo containing all the constraint, variable, and piecewise information.",
+        "type": "comment"
+    },
+    "818": {
+        "file_id": 100,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py",
+        "type": "filepath"
+    },
+    "819": {
+        "file_id": 100,
+        "content": "This code uses CPLEX solver to solve linear programming models and identifies problematic variables using `decomposeExpression`, solving models twice with/without objective functions while manipulating optimization parameters.",
+        "type": "summary"
+    },
+    "820": {
+        "file_id": 100,
+        "content": "# ref: https://yalmip.github.io/debuggingunbounded\n# solve the model without objective?\n# add bounds to objective expression\n# note that won't indicate all infinite rays\n# you spot one, you fix one.\nMAX_BOUND = 1e8\n# pyomo can utilize any solver without version specific libraries.\nfrom pyomo.environ import *\n# that is during presolve, not during solve.\n# from pyomo.contrib.iis import write_iis\nmodel = ConcreteModel()\nx = model.变量x = Var()\ny = model.变量y = Var()\nmodel.constraint_x_y = Constraint(expr=x + y >= 10)\nz = model.z = Var([0, 1])\nx.setlb(-10)\nx.setub(10)\nobj_expr = 2 * x - 5 + y + z[0] + z[1] + 3 * (z[0] + y) + 10\nobj = model.obj = Objective(expr=obj_expr, sense=minimize)\nmodel.write(filename=\"no_bound.lp\")\n# warning: shall not be NaN\n# from cmath import nan\n# no_obj = model.no_obj = Objective(expr=nan, sense=minimize) # treated as 0\nno_obj = model.no_obj = Objective(expr=0)\n# write_iis(model, \"no_bound.ilp\", \"cplex\")\n# no conflict! how comes? it is unbounded.\nsolver = SolverFactory(\"cplex\")\n# switch lp algorithm",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:1-40"
+    },
+    "821": {
+        "file_id": 100,
+        "content": "This code solves a linear programming model with unbounded objective, which could indicate potential infinite rays. It sets bounds on the objective expression and uses CPLEX solver to solve the model without an objective. The code also writes the LP file (no_bound.lp) for further analysis.",
+        "type": "comment"
+    },
+    "822": {
+        "file_id": 100,
+        "content": "# ref: https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-algorithm-continuous-linear-problems\"\n# working?\n# solver.options['lpmethod'] = 1  # 0(automatic)-6(concurrent)\nsolver.options[\"timelimit\"] = 15\nsolver.options[\"conflict display\"] = 2  # detailed display\n# not working.\n# solver.options['feasopt tolerance'] = 100 # seems not working.\n# solver.options['feasopt mode'] = 5 # 0(default)-5\n# cannot be too big.\n# solver.options['simplex tolerances optimality'] = 1e-1\nsmap_ids = []\nmodel.obj.deactivate()\nresult_no_obj = solver.solve(model, tee=True, logfile=\"no_obj_solver.log\")\nsmap_ids.append(solver._smap_id)\nprint(f\"X={value(x)}, Y={value(y)}\")\nprint()\nprint(\"=\" * 70)\nmodel.no_obj.deactivate()\nmodel.obj.activate()\n# model.bound_obj.deactivate()\nresult_unbound = solver.solve(model, tee=True, logfile=\"unbound_solver.log\")\nsmap_ids.append(solver._smap_id)\nprint()\nprint(\"=\" * 70)\n# no need to create new objective. just limit the objective expression to bounds.\nmodel.debug_obj_lb_constraint = Constraint(expr=obj_expr >= -MAX_BOUND)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:41-71"
+    },
+    "823": {
+        "file_id": 100,
+        "content": "This code is manipulating the optimization parameters and solving the model twice - once without an objective function and once with a bounded objective function. The solver options include setting the method, time limit, conflict display, feasibility tolerance, and optimality tolerance. It also activates and deactivates the objective functions in the model.",
+        "type": "comment"
+    },
+    "824": {
+        "file_id": 100,
+        "content": "model.debug_obj_ub_constraint = Constraint(expr=obj_expr <= MAX_BOUND)\n# mobjVar = model.mobjVar = Var()\n# mobjVar.setub(MAX_BOUND)\n# mobjVar.setlb(-MAX_BOUND)\n# model.constraint_bound_obj = Constraint(expr=mobjVar == obj_expr)\n# bound_obj = model.bound_obj = Objective(expr=mobjVar, sense=minimize)\n# model.obj.deactivate()\n# model.bound_obj.activate()\nresult_bound = solver.solve(model, tee=True, logfile=\"bound_solver.log\")\nsmap_ids.append(solver._smap_id)\n# you still need to set time limit options over this.\nprint(\"UNBOUND TERMINATION CONDITION:\", result_unbound.solver.termination_condition)\nprint(\"BOUND TERMINATION CONDITION:\", result_bound.solver.termination_condition)\n# now analyze what variable is doing havoc to the model.\nfrom pyomo.core.expr import current as EXPR\n# class ExpressionDecomposer(EXPR.SimpleExpressionVisitor):\n#     def __init__(self):\n#         # self.counter = 0\n#         self.varmap = {}\n#     def visit(self, node):\n#         # self.counter += 1\n#         print(node)\n#         print(type(node))",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:72-104"
+    },
+    "825": {
+        "file_id": 100,
+        "content": "The code snippet checks if the CPLEX solver is terminating abnormally due to unbounded or infeasible models. It creates a constraint and objective for a bounding model, solves it, prints the termination conditions, and then proceeds to analyze the expression tree of the model to identify any problematic variables causing issues.",
+        "type": "comment"
+    },
+    "826": {
+        "file_id": 100,
+        "content": "#         # breakpoint()\n#         print(\"_____\")\n#     def finalize(self):\n#         return self.varmap\n# def decomposeExpression(expr):\n#     #\n#     # Create the visitor object\n#     #\n#     visitor = ExpressionDecomposer()\n#     #\n#     # Compute the varmap using the :func:`xbfs` search method.\n#     #\n#     varmap = visitor.xbfs(expr)\n#     return varmap\nfrom typing import TypedDict, Dict\nclass DecomposedExpression(TypedDict):\n    constant: float\n    varNameToVarObject: Dict[str, str]\n    varNameToVarCoefficient: Dict[str, float]\ndef decomposeExpression(expr):\n    const = 0\n    varNameToVarObject = {}\n    varNameToVarCoefficient = {}\n    is_linear, terms = EXPR.decompose_term(expr)\n    if is_linear:\n        for coef, var in terms:\n            if var is None:\n                const += coef\n            else:\n                varName = str(var)\n                varNameToVarObject[varName] = var\n                varNameToVarCoefficient[varName] = (\n                    varNameToVarCoefficient.get(varName, 0) + coef\n                )",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:105-144"
+    },
+    "827": {
+        "file_id": 100,
+        "content": "This code defines a function `decomposeExpression` that takes an expression as input and returns its decomposition into constant, variables, and their coefficients. It uses the `TypedDict` class to define the expected structure of the returned decomposition result in a dictionary format. The function first initializes variables for storing the constant, variable names, and their coefficients. Then, it decomposes the expression using the `decompose_term` function from the `EXPR` module. If the expression is linear, it iterates over its terms and updates the constant and variable dictionaries accordingly.",
+        "type": "comment"
+    },
+    "828": {
+        "file_id": 100,
+        "content": "        return DecomposedExpression(\n            constant=const,\n            varNameToVarObject=varNameToVarObject,\n            varNameToVarCoefficient=varNameToVarCoefficient,\n        )\nfrom typing import List, Tuple\ndef getValueListFromValueDict(valueDict: Dict[str, float]):\n    valueList = list(valueDict.items())\n    return valueList\ndef sortAndDisplayVarValues(\n    valueList: List[Tuple[str, float]], banner: str, head_count=10, reverse=False\n):\n    print(banner.center(70, \"=\"))  # to be commented out\n    valueList.sort(key=lambda x: x[1], reverse=reverse)\n    head_count = min(len(valueList), head_count)\n    message = [f\"reversed: {reverse}\", \"\"]\n    for i in range(head_count):\n        message.append(\"%s\\t%s\" % valueList[i])\n    output = \"\\n\".join(message)\n    print(output)\ndecomposedResult = decomposeExpression(obj_expr)\nif decomposedResult:\n    print(decomposedResult)\n    varNameToVarValue = {}\n    varNameToTermValue = {}\n    for varName, varObj in decomposedResult[\"varNameToVarObject\"].items():\n        varValue = value(varObj)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:145-179"
+    },
+    "829": {
+        "file_id": 100,
+        "content": "This code defines a function to decompose an expression, retrieve variable values, sort and display them. It also includes functions for converting value dictionaries to lists and sorting and displaying variable values in a specified order. The code then decomposes the given expression, retrieves variable values, and sorts/displays them if the decomposition is successful.",
+        "type": "comment"
+    },
+    "830": {
+        "file_id": 100,
+        "content": "        coef = decomposedResult[\"varNameToVarCoefficient\"][\n            varName\n        ]  # seems to be no typeddict type checking in pyright\n        termValue = coef * varValue\n        varNameToVarValue[varName] = varValue\n        varNameToTermValue[varName] = termValue\n    # sort and display\n    valueListOfVarNameToVarValue = getValueListFromValueDict(varNameToVarValue)\n    valueListOfVarNameToTermValue = getValueListFromValueDict(varNameToTermValue)\n    BANNER_VARNAME_TO_VAR_VALUE = \"VAR NAME TO VAR VALUE\"\n    BANNER_VARNAME_TO_TERM_VALUE = \"VAR NAME TO TERM VALUE\"\n    sortAndDisplayVarValues(valueListOfVarNameToVarValue, BANNER_VARNAME_TO_VAR_VALUE)\n    sortAndDisplayVarValues(\n        valueListOfVarNameToVarValue, BANNER_VARNAME_TO_VAR_VALUE, reverse=True\n    )\n    sortAndDisplayVarValues(valueListOfVarNameToTermValue, BANNER_VARNAME_TO_TERM_VALUE)\n    sortAndDisplayVarValues(\n        valueListOfVarNameToTermValue, BANNER_VARNAME_TO_TERM_VALUE, reverse=True\n    )\n    print()\n    obj_val = value(obj_expr)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:180-201"
+    },
+    "831": {
+        "file_id": 100,
+        "content": "This code calculates the coefficient of a variable, multiplies it by the current variable value, and stores both in dictionaries. It then sorts and displays the variable-value pairs in descending order for varNameToVarValue and varNameToTermValue dictionaries before printing the objective function's value.",
+        "type": "comment"
+    },
+    "832": {
+        "file_id": 100,
+        "content": "    obj_const = decomposedResult[\"constant\"]\n    print(\"(OBJ - OBJ_CONST)?\", obj_val - obj_const)\n    print(\"OBJ?\", obj_val)\n    print(\"OBJ_CONST?\", obj_const)\nelse:\n    print(\"objective expression is non-linear.\")\nprint(\"solver smap ids:\", smap_ids)  # three unique ids.\n# pick up the most recent one to translate the log and exported model (lp format).",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model.py:202-210"
+    },
+    "833": {
+        "file_id": 100,
+        "content": "The code checks the objective value, constant objective value and prints them. If the objective expression is non-linear, it prints a message. Finally, it selects the most recent solver SMAP ID to translate the log and exported model.",
+        "type": "comment"
+    },
+    "834": {
+        "file_id": 101,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model_import_external.py",
+        "type": "filepath"
+    },
+    "835": {
+        "file_id": 101,
+        "content": "The code imports necessary modules and defines a model with constraints and variables. It then uses a solver to solve the problem and checks if the model is unbounded or infeasible, logging results as needed.",
+        "type": "summary"
+    },
+    "836": {
+        "file_id": 101,
+        "content": "import sys\n# from pyomo.environ import * # do not do this afterwards, otherwise model.solutions.symbol_map will be always empty.\nsys.path.append(\"../\")\nfrom pyomo_environ import *\nfrom ies_optim import ModelWrapper\nfrom debug_utils import checkInfeasibleOrUnboundedModel\n# @@@@@@@@@@@!!!!!DO NOT DO THIS!!!!!@@@@@@@@@@@\n# from pyomo.environ import *\nimport os\nlog_dir = \"logs\"\nos.system(f\"mkdir {log_dir}\")\nmw = ModelWrapper()\nx = mw.Var(\"变量x\")\ny = mw.Var(\"变量y\")\nmw.Constraint(expr=x + y >= 10)\nx.setlb(-10)\nx.setub(10)\nobj_expr = 2 * x - 5 + y\nobj = mw.Objective(expr=obj_expr, sense=minimize)\nsolver = SolverFactory('cplex')\ncheckInfeasibleOrUnboundedModel(mw, solver, log_dir)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/check_unbounded_model_import_external.py:1-33"
+    },
+    "837": {
+        "file_id": 101,
+        "content": "The code imports necessary modules and defines a model with constraints and variables. It then uses a solver to solve the problem and checks if the model is unbounded or infeasible, logging results as needed.",
+        "type": "comment"
+    },
+    "838": {
+        "file_id": 102,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/conjugate_load_combinations_reduce.py",
+        "type": "filepath"
+    },
+    "839": {
+        "file_id": 102,
+        "content": "This code generates all combinations of conjugate loads for 5 subjects using random values, stores them in a dictionary, and prints the total number of combinations (32).",
+        "type": "summary"
+    },
+    "840": {
+        "file_id": 102,
+        "content": "# find all combinations of conjugate loads\nimport random\nrng = lambda: random.randint(0,1)\narr_size = 8760\nsubject_count = 5\nsubjects = {i: [rng() for _ in range(arr_size)] for i in range(subject_count)}\nfrom frozendict import frozendict\ntotal_combs = set()\nfor arr_i in range(arr_size):\n    comb = {i:subjects[i][arr_i] for i in range(subject_count)}\n    comb = frozendict(comb)\n    total_combs.add(comb)\nprint(total_combs)\nprint(len(total_combs)) # 32",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/conjugate_load_combinations_reduce.py:1-17"
+    },
+    "841": {
+        "file_id": 102,
+        "content": "This code generates all combinations of conjugate loads for 5 subjects using random values, stores them in a dictionary, and prints the total number of combinations (32).",
+        "type": "comment"
+    },
+    "842": {
+        "file_id": 103,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/coptampl_test.py",
+        "type": "filepath"
+    },
+    "843": {
+        "file_id": 103,
+        "content": "This code imports necessary libraries, sets up a mathematical model using Pyomo's ConcreteModel, defines variables and objective function, and solves the problem using COptAMPL Solver. The results are then printed using rich print function.",
+        "type": "summary"
+    },
+    "844": {
+        "file_id": 103,
+        "content": "from pyomo.environ import *\nsolver = SolverFactory(\"coptampl\")\nmodel = ConcreteModel()\nmodel.a = Var(bounds=(-1, 1))\nmodel.b = Var(bounds=(-1, 1))\nmodel.obj = Objective(expr=model.a+model.b, sense=minimize)\n# print(dir(model.obj.expr))\n# breakpoint()\nret = solver.solve(model, tee=True)\nimport rich\nrich.print(ret)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/coptampl_test.py:1-18"
+    },
+    "845": {
+        "file_id": 103,
+        "content": "This code imports necessary libraries, sets up a mathematical model using Pyomo's ConcreteModel, defines variables and objective function, and solves the problem using COptAMPL Solver. The results are then printed using rich print function.",
+        "type": "comment"
+    },
+    "846": {
+        "file_id": 104,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/cplex_persistent.py",
+        "type": "filepath"
+    },
+    "847": {
+        "file_id": 104,
+        "content": "The code imports the necessary libraries and reads an optimized model from a file. It then solves the model and prints its solve status, details, and solution, which appears to be None in this case.",
+        "type": "summary"
+    },
+    "848": {
+        "file_id": 104,
+        "content": "import cplex\nimport docplex\nmodel_fpath = \"no_bound.lp\"\nfrom docplex.mp.model import Model\nfrom docplex.mp.model_reader import ModelReader\nmdl: Model = ModelReader.read(model_fpath, model_name=\"InfeasibelLP\")\nmdl.solve()\nprint(mdl.get_solve_status())\nprint(mdl.get_solve_details())\nprint(mdl.solution) # None.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/cplex_persistent.py:1-13"
+    },
+    "849": {
+        "file_id": 104,
+        "content": "The code imports the necessary libraries and reads an optimized model from a file. It then solves the model and prints its solve status, details, and solution, which appears to be None in this case.",
+        "type": "comment"
+    },
+    "850": {
+        "file_id": 105,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/dill_pickle_model.py",
+        "type": "filepath"
+    },
+    "851": {
+        "file_id": 105,
+        "content": "This code serializes and deserializes a Pyomo model using the dill and pickle libraries. It creates or loads a model, prints its structure, and saves it to a file for later use.",
+        "type": "summary"
+    },
+    "852": {
+        "file_id": 105,
+        "content": "import dill\nimport pickle\nfrom pyomo.environ import *\n# ensure you load all files from pyomo_environ\ndef serializeObjectToFile(obj, filename: str, module=pickle):\n    with open(filename, \"wb\") as f:\n        module.dump(obj, f)\ndef deserializeObjectFromFile(filename: str, module=pickle):\n    with open(filename, \"rb\") as f:\n        obj = module.load(f)\n        return obj\nif __name__ == \"__main__\":\n    fpath = \"model.pickle\"\n    # mode = 'create'\n    mode = \"load\"\n    if mode == \"create\":\n        model = ConcreteModel()\n        model.a = Var()\n        model.b = Var([1, 2])\n        model.const = Constraint(expr=model.a <= model.b[1])\n        model.obj = Objective(expr=model.a + model.b[1], sense=minimize)\n        model.subm = model.clone()\n        model.pprint()\n        print(\"-\" * 60)\n        print(\"writing model to file: \", fpath)\n        print(\"-\" * 60)\n        serializeObjectToFile(model, fpath)\n    elif mode == \"load\":\n        subm: ConcreteModel = deserializeObjectFromFile(fpath)\n        subm.pprint()\n    else:\n        raise Exception(\"Unable to determine action from mode '%s'\" % mode)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/dill_pickle_model.py:1-40"
+    },
+    "853": {
+        "file_id": 105,
+        "content": "This code serializes and deserializes a Pyomo model using the dill and pickle libraries. It creates or loads a model, prints its structure, and saves it to a file for later use.",
+        "type": "comment"
+    },
+    "854": {
+        "file_id": 106,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py",
+        "type": "filepath"
+    },
+    "855": {
+        "file_id": 106,
+        "content": "This code kills the CPLEX process after a specified duration using signals and threads, checks for conflicts in models, writes results to file or raises exceptions. It handles compatibility and error scenarios, and debugging operations are commented out.",
+        "type": "summary"
+    },
+    "856": {
+        "file_id": 106,
+        "content": "# ref: https://zhuanlan.zhihu.com/p/403532735\n# 导入库\nfrom docplex.mp.model import Model\nfrom docplex.mp.model_reader import ModelReader\n# import signal\n# just raise signal.SIGINT in another thread. requires higher python version.\n# from collections import defaultdict\n# import os\n# import sys\n# sys_platform = sys.platform\n# # no process called \"cplex\"\n# if sys_platform == 'win32':\n#     import wmi\n#     import pythoncom\n#     def kill_cplex():\n#         for p in wmi.WMI().Win32_Process(Name=\"cplex.exe\"):\n#             print('killing process:', p)\n#             p.Terminate(Result=1)\n# elif sys_platform in ['darwin', 'linux']:\n#     def kill_cplex():\n#         os.system(\"pkill cplex\")\n# else:\n#     raise Exception(\"unsupported platform: %s\" % sys_platform)\n# # just kill cplex when possible\nimport threading\nimport time\nimport cplex\ndef kill_cplex_after_duration(duration: int):\n    def run():\n        # pythoncom.CoInitialize()\n        print(f\"will kill cplex after {duration} secs.\")\n        time.sleep(duration)\n        print(\"calling kill_cplex\")",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:1-39"
+    },
+    "857": {
+        "file_id": 106,
+        "content": "This code imports the necessary libraries and defines a function to kill the CPLEX process after a specified duration. It checks the current platform, and if it's Windows, it uses WMI to terminate the \"cplex.exe\" process; for macOS and Linux, it uses \"pkill cplex\"; while for other platforms, an exception is raised. Additionally, it initializes a thread to run the kill_cplex_after_duration function after the specified duration.",
+        "type": "comment"
+    },
+    "858": {
+        "file_id": 106,
+        "content": "        # cplex._internal._procedual.refineconflictext\n        # which uses \"cplex._internal._procedual.SigIntHandler\"\n        # \"cplex._internal._pycplex.CPXXrefineconflictext\" is taking forever.\n        # consider override that.\n        # only works on higher python versions.\n        # signal.raise_signal(signal.SIGINT)\n        # kill_cplex()\n        pycplex = cplex._internal._pycplex\n        # that's what you called \"intervention\"\n        getattr(pycplex, \"set_py_terminator\", getattr(pycplex, \"setpyterminate\"))()\n        print(\"exit kill_cplex\")\n    thread = threading.Thread(target=run, daemon=True)\n    thread.start()\nimport traceback\nMAXTIME = 5\n# must install compatible \"cplex\" python package on selevted versions.\n# turns out that we need to install other python versions (<3.7, >3.4) which supported by cplex 12.8\n# install cplex (), docplex, pandas\napi = \"cplex\"\n# api = \"docplex\"\nerror = \"infeasible\"\n# error = \"unbounded\"\n# no hint for unbounded variables?\n# cplex没有提供直接读取string的接口，不得不进行个文件暂存操作\n# temp_input_file_name = \"no_bound.lp\"",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:40-72"
+    },
+    "859": {
+        "file_id": 106,
+        "content": "This code aims to override a function in the cplex_abnormal_exit_condition_debug package. It uses Python signals and threads to interrupt and terminate a CPLEX refineconflictext function that may take too long. The code also mentions compatibility with certain Python versions, installation of specific API versions, and handling different error scenarios. There is a mention about file storage for temporary data as well.",
+        "type": "comment"
+    },
+    "860": {
+        "file_id": 106,
+        "content": "# temp_input_file_name = \"temp.lp\" # later we will give it our unbounded model\ntemp_input_file_name = \"exported.mps\" # feasible?\n# temp_input_file_name = \"E:\\\\works\\\\jubilant-adventure2\\\\microgrid_base\\\\logs\\\\pyomo_2023_08_08_17_15_44_141633+08_00\\\\model.lp\"\nmdl: Model = ModelReader.read(temp_input_file_name, model_name=\"InfeasibelLP\")\nprint(\"model loaded successfully from: %s\" % temp_input_file_name)\nimport sys\nmdl.cplex.set_error_stream(sys.stderr)\nmdl.cplex.set_log_stream(sys.stderr)\nmdl.cplex.set_results_stream(sys.stderr)\nmdl.cplex.set_warning_stream(sys.stderr)\n# 清除临时文件\n# if os.path.exists(temp_input_file_name):\n#     os.remove(temp_input_file_name)\nfrom docplex.mp.conflict_refiner import ConflictRefiner, ConflictRefinerResult\n# import cplex\n# as long as 'cplex' executable is in PATH we are good.\n# from func_timeout import func_timeout\n# import pdb\ndef check_conflict(model) -> bool:\n    has_conflict = False\n    output_table = None\n    try:\n        refiner = ConflictRefiner()  # 先实例化ConflictRefiner类\n        kill_cplex_after_duration(MAXTIME)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:73-100"
+    },
+    "861": {
+        "file_id": 106,
+        "content": "Code imports docplex's ConflictRefiner module and initializes a model using ModelReader.read(). The model is set to output error, log, and results on stderr stream, and the temporary file containing the model is not deleted. A function check_conflict() is defined which uses ConflictRefiner to detect conflicts in the model.",
+        "type": "comment"
+    },
+    "862": {
+        "file_id": 106,
+        "content": "        # pdb.set_trace() # for py3.6\n        res: ConflictRefinerResult = refiner.refine_conflict(model)\n        # res: ConflictRefinerResult = func_timeout(\n        #     MAXTIME,\n        #     refiner.refine_conflict,\n        #     args=(model,),\n        #     kwargs=dict(log_output=True),\n        # )  # 将模型导入该类,调用方法\n        # not (self) writable.\n        # sys.stdin.write(\"\\n\")\n        number_of_conflicts = res.number_of_conflicts\n        print(\"conflict count:\", number_of_conflicts)  # taking too long.\n        has_conflict = number_of_conflicts != 0\n        if has_conflict:\n            # print(dir(res))\n            # breakpoint()\n            output_table = res.as_output_table()\n            # res.display()  # 显示冲突约束\n        del res\n        del refiner\n    except:\n        traceback.print_exc()\n        print(\"conflict check failed\")\n        has_conflict = True\n        output_table = None\n    return has_conflict, output_table\nif error == \"infeasible\":\n    if api == \"cplex\":\n        # 获取cplex.Cplex()类对象\n        c = mdl.cplex",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:101-133"
+    },
+    "863": {
+        "file_id": 106,
+        "content": "The code tries to check for conflicts in a model using the ConflictRefinerResult class. If any conflict is found, it stores it as output_table and returns True. If an error occurs or if the model is considered infeasible, it catches the exception and sets has_conflict to True and output_table to None before returning them.",
+        "type": "comment"
+    },
+    "864": {
+        "file_id": 106,
+        "content": "        # 进行冲突检测\n        # print(dir(c.conflict))\n        # breakpoint()\n        all_constraints = c.conflict.all_constraints()\n        kill_cplex_after_duration(MAXTIME)\n        c.conflict.refine(\n            all_constraints,\n        )\n        # func_timeout(MAXTIME, c.conflict.refine, args=(all_constraints,))\n        # 输出检测信息，再重新读入并在控制台中输出\n        # 需要吐槽的是Cplex并不支持以IOSteam为对象输入输出，因此不得不反复建立临时文件\n        output_fname = \"conflict.txt\"\n        c.conflict.write(output_fname)\n        print(\"conflict written to:\", output_fname)\n        # with open(output_fname, \"r\") as f:\n        #     print(f.read())\n    elif api == \"docplex\":\n        has_conflict, output_table = check_conflict(mdl)\n        if output_table is not None:\n            output_table.to_csv(\"output_table.csv\")\n    else:\n        raise Exception(\"unknown api for model error '%s': %s\" % (error, api))\n# elif error == \"unbounded\":\n#     if api == \"cplex\":\n#         c = mdl.cplex\n#         # print(dir(c))\n#         # sol = mdl.solve(\n#         # log_output=True\n#         # )  # output some solution.",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:134-162"
+    },
+    "865": {
+        "file_id": 106,
+        "content": "The code checks for conflicts or unbounded conditions in a model, either using CPLEX or the docplex API. For CPLEX, it performs conflict detection and refinement, writes the conflict information to a file, and reads and outputs it on the console. For docplex, it checks for conflicts and writes the output table to a CSV file. If an unknown API is encountered, it raises an exception.",
+        "type": "comment"
+    },
+    "866": {
+        "file_id": 106,
+        "content": "#         # breakpoint()\n#         # c.solve()\n#         # c.presolve()\n#         # print(dir(sol))\n#         # raty =c.DualFarkas()\n#         # # ray = c.solution.advanced.get_ray() # no solution exists!\n#         # print(\"RAY?\", ray)\n#     else:\n#         raise Exception(\"unknown api for error '%s': %s\" % (error, api))\nelse:\n    raise Exception(\"unknown error: %s\" % error)",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_conflict_refiner.py:163-173"
+    },
+    "867": {
+        "file_id": 106,
+        "content": "This code snippet appears to contain debugging statements and exception handling. It seems that the program is checking for errors in a CPLEX model's solution, and if an error occurs, it breaks and prints a message or raises an exception. The code includes potential debugging operations such as breakpoints, print statements, and function calls. However, these operations are commented out, suggesting that they were used during the development process but may not be necessary in the final version of the program.",
+        "type": "comment"
+    },
+    "868": {
+        "file_id": 107,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.cmd",
+        "type": "filepath"
+    },
+    "869": {
+        "file_id": 107,
+        "content": "Runs Conda environment with Dash optimization library and executes Python script \"docplex_feasopt.py\", capturing output in real-time without buffering.",
+        "type": "summary"
+    },
+    "870": {
+        "file_id": 107,
+        "content": "conda run -n docplex --live-stream --no-capture-output python docplex_feasopt.py",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.cmd:1-1"
+    },
+    "871": {
+        "file_id": 107,
+        "content": "Runs Conda environment with Dash optimization library and executes Python script \"docplex_feasopt.py\", capturing output in real-time without buffering.",
+        "type": "comment"
+    },
+    "872": {
+        "file_id": 108,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py",
+        "type": "filepath"
+    },
+    "873": {
+        "file_id": 108,
+        "content": "This code reads a model file, initializes a feasopt object, defines callback and stream classes, includes incomplete functions 'group_items' and 'merge_groups', utilizes constraint dictionaries, retrieves constraint info, forms groups for optimization using Docplex, prints constraint counts, and applies feasopt for solution progress checks.",
+        "type": "summary"
+    },
+    "874": {
+        "file_id": 108,
+        "content": "from docplex.mp.model import Model\nfrom docplex.mp.model_reader import ModelReader\nfrom cplex._internal._subinterfaces import _group\n# import cplex\nmodel_fpath = \"converted.mps\"\n# import cplex\nmdl: Model = ModelReader.read(model_fpath, model_name=\"InfeasibelLP\")\nprint(\"model loaded successfully from: %s\" % model_fpath)\nclass GenericCB:\n    def invoke(self, context):\n        print(\"context?\", context)\ncb = GenericCB()\nmdl.cplex.set_callback(cb)  # Register callback.\nimport sys\n# there you go.\nmdl.cplex.set_error_stream(sys.stderr)\nmdl.cplex.set_log_stream(sys.stderr)\nmdl.cplex.set_results_stream(sys.stderr)\nmdl.cplex.set_warning_stream(sys.stderr)\n# help(mdl.cplex.feasopt)\n# breakpoint()\nfeasopt = mdl.cplex.feasopt\n# breakpoint()\n# quadratic & indicator shall never be used.\n# if detected, please show us what names they have.\n# all constraints shall be linear.\n# feasopt.all_constraints()\n# feasopt.upper_bound_constraints()._gp\n# feasopt.lower_bound_constraints()._gp\n# feasopt.linear_constraints()._gp\nfrom typing import List  # , Dict, Callable",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py:1-40"
+    },
+    "875": {
+        "file_id": 108,
+        "content": "Code imports necessary libraries and reads a model file. It defines a callback class, sets up error, log, results, and warning streams to stderr, and initializes a feasopt object for the model, with a note about avoiding non-linear constraints.",
+        "type": "comment"
+    },
+    "876": {
+        "file_id": 108,
+        "content": "from typing_extensions import Literal\ngroup_mode = Literal[\"linear\", \"upper_bound\", \"lower_bound\"]\n# transfunc_map: Dict[group_mode, Callable] = {}\ndef group_items(namelist: List[str], mode: group_mode):\n    # TODO: fix this!\n    which = getattr(feasopt.constraint_type, mode)\n    ret = feasopt._make_group(which, 1, namelist)\n    # conv = feasopt._getconvfunc(which)\n    # # max_num = feasopt._getnum(which)\n    # nameset = set(namelist)\n    # gp = [(1.0, ((which, conv(name)))) for name in nameset]\n    # ret = _group(gp)\n    # # return getattr(feasopt, f\"{mode}_constraints\")(list(set(namelist)))\n    return ret\nfrom functools import reduce\ndef merge_groups(*args: _group):\n    gp = reduce(lambda x, y: getattr(x, \"_gp\", x) + y._gp, args)\n    ret = _group(gp)\n    return ret\nimport pdb\n# pdb.set_trace()\nconstraint_type_constant_map = {\n    key: value\n    for key, value in feasopt.constraint_type.__class__.__dict__.items()\n    if not key.startswith(\"_\")\n}\n# first count our constraints stat.\n# constraint_instance_count_map = {}",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py:41-79"
+    },
+    "877": {
+        "file_id": 108,
+        "content": "Function 'group_items' takes a list of names and a group mode, and returns a group object. The code seems incomplete as it contains TODO comments and an unfinished comment.\n\nThe function 'merge_groups' combines multiple groups into one by concatenating the group lists of the input groups.\n\nThe 'constraint_type_constant_map' is a dictionary that maps constraint type constants to their corresponding values.\n\nThe code also defines the 'constraint_instance_count_map' which seems to be used for counting constraint instances, but its implementation is not present in this snippet.",
+        "type": "comment"
+    },
+    "878": {
+        "file_id": 108,
+        "content": "# mdl.iter_indicator_constraints()\n# mdl.iter_quadratic_constraints()\n# for it in mdl.iter_linear_constraints():\n#     # print(it)\n#     it_name = it.name\n#     print(\"linear constraint %s\" % it_name)\n#     # do you have to view it here?\n#     # breakpoint()\n#     # pdb.set_trace()\nforbidden_constraint_types = [\"quadratic\", \"indicator\"]\nfor ctype, type_const in constraint_type_constant_map.items():\n    # constraint_instance_count_map[ctype] = feasopt._getnum(type_const)\n    instance_count = feasopt._getnum(type_const)\n    print(f\"{ctype}:\\t{instance_count} instances\")\n    # transfunc_map[ctype] = feasopt._getconvfunc(type_const)\n# api_group = feasopt._make_group(feasopt.constraint_type.lower_bound, 1, [\"x4487\", \"x4488\"])\n# print(api_group._gp)\n# print(api_group)\n# # breakpoint()\nlb_group = group_items([\"x4487\", \"x4488\"], \"lower_bound\")\nub_group = group_items([\"x4487\", \"x4488\"], \"upper_bound\")\nlinear_group = group_items([\"c_e_x4508_\", \"c_e_x4507_\"], \"linear\")\nconstraints_group = merge_groups(lb_group, ub_group, linear_group) # working!",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py:80-108"
+    },
+    "879": {
+        "file_id": 108,
+        "content": "This code retrieves constraint information and creates groups of constraints for optimization using the Docplex library. It prints the number of instances for each type of constraint, excluding quadratic and indicator types. It then forms groups of constraints based on their types (\"lower_bound\", \"upper_bound\", \"linear\") and merges these groups together to create a constraints group that can be used in the optimization process.",
+        "type": "comment"
+    },
+    "880": {
+        "file_id": 108,
+        "content": "print(constraints_group)\nprint(constraints_group._gp)\n# # pdb.set_trace()\nfeasopt(constraints_group)\n# feasopt(feasopt.all_constraints())\n# feasopt(api_group)\n# feasopt(lb_group)\n# cplex._internal._aux_functions._group\n# feasopt._make_group\nsol = mdl.cplex.solution  # this is taking eternal. we need to check progress!\nprint(\"*\" * 60)\nprint(sol)\n# relatex_sol =",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/docplex_feasopt.py:109-122"
+    },
+    "881": {
+        "file_id": 108,
+        "content": "Code snippet is calling the \"feasopt\" function on a constraints group and printing the solution. It may be used for optimization purposes and checking progress during the solution process. The code also contains comments indicating alternative options to apply feasopt on different groups of constraints and mentions the eternal time taken by \"mdl.cplex.solution\".",
+        "type": "comment"
+    },
+    "882": {
+        "file_id": 109,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/get_feasopt_sol.cmd",
+        "type": "filepath"
+    },
+    "883": {
+        "file_id": 109,
+        "content": "The code is a command-line script for running CPLEX to solve an optimization problem using the \"feasopt\" solver. It sets a time limit, reads an input file (converted.mps), and outputs the solution in \"feasopt.sol\".",
+        "type": "summary"
+    },
+    "884": {
+        "file_id": 109,
+        "content": "cplex -c \"read converted.mps\" \"set timelimit 30\" \"feasopt all\" \"write feasopt.sol\" \"quit\" \n@REM cannot use 'xml' as output solution file name\n@REM cplex -c \"read converted.mps\" \"set feasopt mode 1\" \"feasopt all\" \"write feasopt.sol\" \"quit\"\n@REM Please specify what to relax (constraints, variables, or all):\n@REM no need for \"quit\"\n@REM Present value for relaxation measure: 0 (default is 0)\n@REM  0 = find minimum-sum relaxation\n@REM  1 = find optimal minimum-sum relaxation\n@REM  2 = find minimum number of relaxations\n@REM  3 = find optimal relaxation with minimum number of relaxations\n@REM  4 = find minimum quadratic-sum relaxation\n@REM  5 = find optimal minimum quadratic-sum relaxation",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/get_feasopt_sol.cmd:1-12"
+    },
+    "885": {
+        "file_id": 109,
+        "content": "The code is a command-line script for running CPLEX to solve an optimization problem using the \"feasopt\" solver. It sets a time limit, reads an input file (converted.mps), and outputs the solution in \"feasopt.sol\".",
+        "type": "comment"
+    },
+    "886": {
+        "file_id": 110,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/get_iis_cplex.cmd",
+        "type": "filepath"
+    },
+    "887": {
+        "file_id": 110,
+        "content": "The code is using the CPLEX optimization software to read a file named \"conflict\" and display all conflict information. This could be related to solving a mixed-integer linear programming problem with potential conflicts in the solution.",
+        "type": "summary"
+    },
+    "888": {
+        "file_id": 110,
+        "content": "cplex -c \"read \" \"tools conflict\" \"display conflict all\"\n@REM cplex -c \"read \" \"conflict\" \"display conflict all\"",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/get_iis_cplex.cmd:1-2"
+    },
+    "889": {
+        "file_id": 110,
+        "content": "The code is using the CPLEX optimization software to read a file named \"conflict\" and display all conflict information. This could be related to solving a mixed-integer linear programming problem with potential conflicts in the solution.",
+        "type": "comment"
+    },
+    "890": {
+        "file_id": 111,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/highspy_solve.py",
+        "type": "filepath"
+    },
+    "891": {
+        "file_id": 111,
+        "content": "This code imports the Highs solver from highspy library, reads a MPS file into the solver, runs the optimization, and prints the model status.",
+        "type": "summary"
+    },
+    "892": {
+        "file_id": 111,
+        "content": "import highspy\nh = highspy.Highs()\nfilename = 'exported.mps'\nh.readModel(filename)\nh.run()\nprint('Model ', filename, ' has status ', h.getModelStatus())",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/highspy_solve.py:1-7"
+    },
+    "893": {
+        "file_id": 111,
+        "content": "This code imports the Highs solver from highspy library, reads a MPS file into the solver, runs the optimization, and prints the model status.",
+        "type": "comment"
+    },
+    "894": {
+        "file_id": 112,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/init.sh",
+        "type": "filepath"
+    },
+    "895": {
+        "file_id": 112,
+        "content": "The code moves two temporary files, a .lp file and a .cplex.log file, to their respective final locations for further use or analysis.",
+        "type": "summary"
+    },
+    "896": {
+        "file_id": 112,
+        "content": "# mv /var/folders/23/y4njnnmn6td1ndrthpj_shk40000gn/T/tmpkkx0lad7.pyomo.lp .\n# mv /var/folders/23/y4njnnmn6td1ndrthpj_shk40000gn/T/tmptemoyncb.cplex.log .",
+        "type": "code",
+        "location": "/microgrid_base/cplex_abnormal_exit_condition_debug/init.sh:1-2"
+    },
+    "897": {
+        "file_id": 112,
+        "content": "The code moves two temporary files, a .lp file and a .cplex.log file, to their respective final locations for further use or analysis.",
+        "type": "comment"
+    },
+    "898": {
+        "file_id": 113,
+        "content": "/microgrid_base/cplex_abnormal_exit_condition_debug/ipopt_persistent.py",
+        "type": "filepath"
+    },
+    "899": {
+        "file_id": 113,
+        "content": "This code imports the \"cyipopt\" library, which is an interface to IPOPT, a nonlinear optimization solver. This library will be used for solving optimization problems in further parts of the code.",
+        "type": "summary"
+    }
+}

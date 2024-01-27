@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports necessary libraries, defines x and y arrays representing a dataset, creates a piecewise linear function, uses optimize.curve_fit to fit the data with the piecewise linear model, generates a plot of the original data points and the fitted curve on the same graph, and displays the resulting plot.",
+    "details": [
+        {
+            "comment": "The code imports necessary libraries, defines x and y arrays representing a dataset, creates a piecewise linear function, uses optimize.curve_fit to fit the data with the piecewise linear model, generates a plot of the original data points and the fitted curve on the same graph, and displays the resulting plot.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test_np_piecewise_curve_fit.py\":0-14",
+            "content": "from scipy import optimize\nimport matplotlib.pyplot as plt\nimport numpy as np\nx = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 14, 15], dtype=float)\ny = np.array([5, 7, 9, 11, 13, 15, 28.92, 42.81, 56.7, 70.59, 84.47, 98.36, 112.25, 126.14, 140.03])\ndef piecewise_linear(x, x0, y0, k1, k2):\n    return np.piecewise(x, [x < x0, x >= x0], [lambda x:k1*x + y0-k1*x0, lambda x:k2*x + y0-k2*x0])\np , e = optimize.curve_fit(piecewise_linear, x, y)\nxd = np.linspace(0, 15, 100)\nplt.plot(x, y, \"o\")\nplt.plot(xd, piecewise_linear(xd, *p))\nplt.show()"
+        }
+    ]
+}

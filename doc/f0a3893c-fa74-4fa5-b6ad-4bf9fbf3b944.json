@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the necessary libraries and reads an optimized model from a file. It then solves the model and prints its solve status, details, and solution, which appears to be None in this case.",
+    "details": [
+        {
+            "comment": "The code imports the necessary libraries and reads an optimized model from a file. It then solves the model and prints its solve status, details, and solution, which appears to be None in this case.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/cplex_persistent.py\":0-12",
+            "content": "import cplex\nimport docplex\nmodel_fpath = \"no_bound.lp\"\nfrom docplex.mp.model import Model\nfrom docplex.mp.model_reader import ModelReader\nmdl: Model = ModelReader.read(model_fpath, model_name=\"InfeasibelLP\")\nmdl.solve()\nprint(mdl.get_solve_status())\nprint(mdl.get_solve_details())\nprint(mdl.solution) # None."
+        }
+    ]
+}

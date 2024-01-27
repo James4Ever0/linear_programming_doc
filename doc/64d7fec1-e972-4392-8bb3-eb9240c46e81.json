@@ -1,0 +1,10 @@
+{
+    "summary": "This code snippet utilizes Jinja2 template language and includes a loop that iterates through \"mylist\", displaying the prefix of each item. It defines a macro named 'test' and calls it twice, both with and without indentation. It also sets variables v1 and v2 to 1 and 2 respectively. Finally, it defines another macro called 'mtest', assigns its output to variable v0, and displays it twice.",
+    "details": [
+        {
+            "comment": "This code snippet utilizes Jinja2 template language and includes a loop that iterates through \"mylist\", displaying the prefix of each item. It defines a macro named 'test' and calls it twice, both with and without indentation. It also sets variables v1 and v2 to 1 and 2 respectively. Finally, it defines another macro called 'mtest', assigns its output to variable v0, and displays it twice.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/jinja_test.j2\":0-26",
+            "content": "{%- for n in mylist -%}\nprefix: {{n}}\n{% endfor %}\n{% macro test()%}\nhappy\nsong\n    sing along\n{% endmacro%}\n{{test() | indent(4)}}\n{{test()}}\n{# {% error(\"exception\",1)%} #}\n{% set v1, v2 = 1,2 %}\n{{v1}}\n{{v2}}\n{% macro mtest()-%}\nhappy song\n{%- endmacro%}\n{% set v0 = mtest()%}\nv0: {{v0}}\nv0: {{v0}}"
+        }
+    ]
+}

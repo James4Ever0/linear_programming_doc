@@ -1,0 +1,10 @@
+{
+    "summary": "This code sets the environment variable FAILSAFE to True and executes a bash script named synth_mock_reload.sh. It's used in a microgrid context, likely for failsafe operations or testing purposes.",
+    "details": [
+        {
+            "comment": "This code sets the environment variable FAILSAFE to True and executes a bash script named synth_mock_reload.sh. It's used in a microgrid context, likely for failsafe operations or testing purposes.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/failsafe_synth_mock_reload.sh\":0-0",
+            "content": "env FAILSAFE=True bash synth_mock_reload.sh"
+        }
+    ]
+}

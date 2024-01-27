@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports logger_print from log_utils and defines a function myfunc. The function does not use any variables \"a\" or \"b\", and it calls logger_print twice with the same argument, \"hjk\". No logger is used within the defined function abc().",
+    "details": [
+        {
+            "comment": "Code imports logger_print from log_utils and defines a function myfunc. The function does not use any variables \"a\" or \"b\", and it calls logger_print twice with the same argument, \"hjk\". No logger is used within the defined function abc().",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_replace_logger_no_template.py\":0-19",
+            "content": "from log_utils import logger_print\n# there is no logger used\na = 1\nb = 2\ndef abc():\n    return 1\nlogger_print(\"abc\")\nlogger_print(\"def\")\nimport rich\ndef myfunc():\n    logger_print(\"hjk\")\n    logger_print(\"hjk\")"
+        }
+    ]
+}

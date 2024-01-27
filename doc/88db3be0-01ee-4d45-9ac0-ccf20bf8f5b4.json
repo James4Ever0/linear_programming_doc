@@ -1,0 +1,10 @@
+{
+    "summary": "This function reads a CSV file, ensures all lines have the same number of comma-separated values by appending extra commas if necessary, and then returns a pandas DataFrame containing the data.",
+    "details": [
+        {
+            "comment": "This function reads a CSV file, ensures all lines have the same number of comma-separated values by appending extra commas if necessary, and then returns a pandas DataFrame containing the data.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/csv_utils.py\":0-27",
+            "content": "from log_utils import logger_print\nimport pandas\ndef fix_csv_and_return_dataframe(csv_path):\n    lines = []\n    line_sep_count_list = []\n    with open(csv_path, \"r\") as f:\n        for line in f.readlines():\n            line_sep_count = line.count(\",\")\n            if line_sep_count == 0:\n                continue\n            lines.append(line)\n            line_sep_count_list.append(line_sep_count)\n    line_sep_count_max = max(line_sep_count_list)\n    for index, line_sep_count in enumerate(line_sep_count_list):\n        lines[index] = lines[index].strip() + \",\" * (\n            line_sep_count_max - line_sep_count\n        )\n    with open(csv_path, \"w+\") as f:\n        for line in lines:\n            f.write(line + \"\\n\")\n    df = pandas.read_csv(csv_path, header=None, on_bad_lines=\"warn\")\n    return df"
+        }
+    ]
+}

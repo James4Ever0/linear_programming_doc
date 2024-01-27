@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines devices and their working conditions, along with rules for using them. It includes a predicate to check the presence of an adder device and related battery/generator devices in given conditions.",
+    "details": [
+        {
+            "comment": "This code defines devices, their working conditions, and rules for using them. It includes a predicate to enumerate all working conditions and apply rules to a set of ports and conditions. The adder device is also defined with its own rules.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro\":0-30",
+            "content": "% Define the devices and their ports\ndevice(battery, [port1]).\ndevice(generator, [port1]).\n% Define the working conditions for each device\nworking_condition(battery, [port1, charging]).\nworking_condition(generator, [port1, output]).\n% Define the rules for using the devices\nrule_battery(port1, charging).\nrule_generator(port1, output).\n% Define the adder device and its rules\ndevice(adder, [port1, port2, port3]).\nworking_condition(adder, [port1, port2, port3, input, output]).\nrule_adder(port1, input).\nrule_adder(port2, input).\nrule_adder(port3, output).\n% Define a predicate to enumerate all working conditions\nenumerate_working_conditions(Conditions) :-\n    findall(Device-Ports-Conditions, (\n        device(Device, Ports),\n        working_condition(Device, Conditions),\n        apply_rules(Ports, Conditions),\n        check_adder(Conditions)\n    ), Conditions).\n% Define a predicate to apply the rules to a set of ports and conditions\napply_rules(Ports, Conditions) :-\n    forall((member(Port, Ports), rule(Device, Port, Condition)),"
+        },
+        {
+            "comment": "This code defines a predicate, \"check_adder\", that verifies the presence of an adder device in a given set of conditions, along with related battery and generator devices.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/chatgpt_typesys_bat_smiple.pro\":31-38",
+            "content": "           member(Device-Condition, Conditions)).\n% Define a predicate to check the adder device\ncheck_adder(Conditions) :-\n    member(adder-[P1, P2, P3, input, output]-C1, Conditions),\n    member(battery-[P1, C2]-C2, Conditions),\n    member(generator-[P2, C3]-C3, Conditions),\n    (member(adder-[P3, input, output]-C4, Conditions) ; C4 = C1)."
+        }
+    ]
+}

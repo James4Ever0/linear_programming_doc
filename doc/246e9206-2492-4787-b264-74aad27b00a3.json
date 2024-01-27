@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports the Plots module, creates an array x from 0 to 10 and assigns sine values to y using . operator, but plot function is not called so no visualization happens. Finally, it prints out X_VALUES and Y_VALUES without any formatting.",
+    "details": [
+        {
+            "comment": "Code imports the Plots module, creates an array x from 0 to 10 and assigns sine values to y using . operator, but plot function is not called so no visualization happens. Finally, it prints out X_VALUES and Y_VALUES without any formatting.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/test_plot.jl\":0-7",
+            "content": "# using Plots\nx=0:10;y=sin.(x);\n# plot(x,y)\nprintln(\"X_VALUES:\")\nprintln(x)\nprintln()\nprintln(\"Y_VALUES:\")\nprintln(y)"
+        }
+    ]
+}

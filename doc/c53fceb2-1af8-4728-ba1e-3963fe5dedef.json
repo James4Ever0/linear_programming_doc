@@ -1,0 +1,10 @@
+{
+    "summary": "Code imports `logger_print` from `log_utils` and defines a function `abc()`, but it doesn't use any logger in the code. It also imports rich library and creates a function `myfunc()` which logs \"hjk\" twice, but the logger is not utilized.",
+    "details": [
+        {
+            "comment": "Code imports `logger_print` from `log_utils` and defines a function `abc()`, but it doesn't use any logger in the code. It also imports rich library and creates a function `myfunc()` which logs \"hjk\" twice, but the logger is not utilized.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/test_replace_logger.py.j2\":0-14",
+            "content": "from log_utils import logger_print\n# there is no logger used\na = 1\nb = 2\ndef abc(): return 1\nlogger_print(\"abc\")\nlogger_print('def')\nimport rich\ndef myfunc():\n    logger_print('hjk')\n    logger_print(\"hjk\")"
+        }
+    ]
+}

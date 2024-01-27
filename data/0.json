@@ -1,0 +1,540 @@
+{
+    "0": {
+        "file_id": 0,
+        "content": "/README.md",
+        "type": "filepath"
+    },
+    "1": {
+        "file_id": 0,
+        "content": "The code linearly approximates nonlinear multivariate functions in an IES modeling framework, including test cases for energy systems and visualization tools. It is part of a larger testing scenario or suite used to test the project's directory structure.",
+        "type": "summary"
+    },
+    "2": {
+        "file_id": 0,
+        "content": "# IES modeling\n## linearization of nonlinear multivariate functions\nno matter how we try to linearize nonlinear functions, we need to know the input ranges.\n### analytical\nfirst taylor series expansion around given input ranges, then using piecewise function as approximation, finally using multivariate linearization trick to introduce intermediate variables.\nthe trick:\n$$xy=z$$\nconvert to\n$$y_1^2 - y_2^2 = z$$\nwhere\n$$y_1 = \\frac{x+y}{2}$$\n$$y_2 = \\frac{x-y}{2}$$\n### sample based\nfirst sample some data points around the given mesh space, then use either neural networks or multivariate piecewise transformation by `pyomo`\n## dependencies preparation\npython==3.7\ninstall `cplex` and `docplex` from IBM CPLEX Studio installation directory, run `python setup.py install` under the corresponding folders (total 2 folders)\ninstall remaining dependencies via `pip install -r requirements.txt`\n## current state\nrudimentary IES modeling, or framework only IES modeling\n## execute these commands for demo\n```bash\npython cpExample.py # a huge demo",
+        "type": "code",
+        "location": "/README.md:1-43"
+    },
+    "3": {
+        "file_id": 0,
+        "content": "This code explains the methodology behind linearizing nonlinear multivariate functions in an IES modeling framework. It covers two approaches: analytical and sample-based, with dependencies preparation instructions and a demo command to run for testing purposes.",
+        "type": "comment"
+    },
+    "4": {
+        "file_id": 0,
+        "content": "python mini_ies_system.py # electricity only\npython mini_heat_system.py # warm water heating\npython mini_refrigeration_system.py # cold water cooling\n```\n## file contents\n|filename | content|\n|-- | -- |\n|integratedEnergySystemPrototypes.py | prototypes of IES systems, define internal constraints, device IO and utils|\n|system_topology_utils.py |visualize system topology|\n|mini_data_log_utils.py| high level wrapper to check model validity, solve model, print parameters and save plots|\n|jinan_changqing-hour.dat| first two columns for intensity of illumination, last two for wind speed|\n|mini_ies_test.py| electricity only test |\n|mini_heat_system.py | heating system test|\n|mini_refrigeration_system.py | cooling system test|\n|result_processlib.py| utils for extracting values from model solution|\n|demo_utils.py|getting resource data and common devices from default parameters, for `cpExample.py`|\n|data_visualize_utils.py|printing solution parameters, device count, and objectives, plotting and saving graphs|\n|config.py| common model parameters|",
+        "type": "code",
+        "location": "/README.md:44-63"
+    },
+    "5": {
+        "file_id": 0,
+        "content": "Running the provided Python scripts will execute test cases for the energy system, warm water heating system, and cold water cooling system respectively. The codebase consists of modules for prototype systems, topology visualization, data logging utilities, resource data, and device count printing. Configuration parameters are also included.",
+        "type": "comment"
+    },
+    "6": {
+        "file_id": 0,
+        "content": "|cpExample.py|a huge test|",
+        "type": "code",
+        "location": "/README.md:64-64"
+    },
+    "7": {
+        "file_id": 0,
+        "content": "This code snippet is copying the file \"Example.py\" and overwriting the destination file with the same name. The comment suggests that it is part of a large test scenario or suite, likely used for testing purposes in the context of the project's directory structure.",
+        "type": "comment"
+    },
+    "8": {
+        "file_id": 1,
+        "content": "/auto_question_device_params.py",
+        "type": "filepath"
+    },
+    "9": {
+        "file_id": 1,
+        "content": "This code imports device parameters, sets up prompts for auto-questions, and logs output. It runs on a CPU without GPU access, uses Termbin for compatibility, generates questions, and saves user answers in a file.",
+        "type": "summary"
+    },
+    "10": {
+        "file_id": 1,
+        "content": "# %%\n# import data from dataset, or from termbin?\n# termbin instead? since we are running on two computers.\n# first let's spin up some RWKV model on CPU.\n# !curl -o device_params.json https://termbin.com/766n\n# you cannot use gpu on this machine.\n# cpu is too damn slow.\n# %%\nimport json\nwith open('device_params.json', 'r', encoding='utf-8') as f:\n    data = json.loads(f.read())\n# %%\n# you can use other models as well. as long as you like.\n# but first let's define the prompt.\nprompt_template = lambda device_type, device_name, device_params: f\"\"\"\n为了建模需要，对设备参数进行确定。\n设备类型: {device_type}\n设备名称: {device_name}\n设备参数: \n{device_params}\n根据参数内容提出你的质疑，可以质疑其中参数的单位，提出对于非必填参数如何参与计算的质疑（如何在不填写非必填参数和填写非必填参数的两种情况下计算出结果），提出是不是应该删除其中的某些参数，增加新的参数，以及对参数增加和删除合理性的质疑。\n\"\"\"\n# %%\n# IGNORE EXAMPLE DATA, WHICH IS THE SECOND ELEM.\n# import os\noutput_path = \"output_auto_questions.log\"\n# since it is slow we don't overwrite.\n# if os.path.exists(output_path):\n#     os.remove(output_path)\ndef fprint(f, content):\n    f.write(content)\n    f.write('\\n')\n    print(content)",
+        "type": "code",
+        "location": "/auto_question_device_params.py:1-51"
+    },
+    "11": {
+        "file_id": 1,
+        "content": "This code imports device parameters from a JSON file, defines a prompt template for generating auto-questions related to the device, and sets up output logging. The code is being run on a machine without GPU access, so it uses a CPU for RWKV model execution. The imported data may come from Termbin due to compatibility issues between two computers.",
+        "type": "comment"
+    },
+    "12": {
+        "file_id": 1,
+        "content": "import pyperclip\nwith open(output_path,'a+', encoding='utf-8') as f:\n    for device_type, devices in data.items():\n        for device_name, device_param_list in devices.items():\n            device_params = []\n            for a, _, c in device_param_list:\n                if c is None:\n                    c = \"\"\n                device_params.append(f\"    {a} {c}\")\n            device_params = \"\\n\".join(device_params)\n            question = prompt_template(device_type,device_name,device_params)\n            fprint(f,\"*\"*20+\"QUESTION\"+\"*\"*20)\n            fprint(f,question)\n            pyperclip.copy(question)\n            fprint(f,\"*\"*20+\"ANSWER\"+\"*\"*20)\n            input(\"CONTINUE?\")\n            answer = pyperclip.paste()\n            fprint(f, answer)\n    #         answer = evaluate(get_request(question), *invokeParams[0])\n    #         print(answer)\n    # SHALL BE ANSWER HERE.",
+        "type": "code",
+        "location": "/auto_question_device_params.py:53-74"
+    },
+    "13": {
+        "file_id": 1,
+        "content": "This code reads data from 'data' dictionary, and for each device type-device name pair, it generates a question using the prompt template. The generated question is then printed to the file along with a header and copied to clipboard. After displaying a \"CONTINUE?\" prompt, the user pastes an answer which is also saved in the file.",
+        "type": "comment"
+    },
+    "14": {
+        "file_id": 2,
+        "content": "/celery_client_test.py",
+        "type": "filepath"
+    },
+    "15": {
+        "file_id": 2,
+        "content": "The code uses the requests library to check task status on a local Celery server, making GET requests with provided IDs. It periodically loops for 20 times and prints relevant data. If revoke occurs before \"SUCCESS,\" it's considered REVOKED.",
+        "type": "summary"
+    },
+    "16": {
+        "file_id": 2,
+        "content": "import requests\nLOOP_COUNT = 20\nbase_url = \"http://localhost:8010\"\nurl = f\"{base_url}/add/2/1\"\nr = requests.get(url)\ndata = r.json()\nprint(\"DATA\", data)\ntask_id = data[\"task_id\"]\nr2 = requests.get(f'{base_url}/add/1/2')\ndata2 = r2.json()\ntask_id2 = data2['task_id']\nurl_new = f\"{base_url}/task_status\"\nimport time\n# import celery.states as S\n# PENDING, RECEIVED, STARTED, SUCCESS, FAILURE, RETRY, REVOKED,\n# how to limit the task threads?\nfor i in range(LOOP_COUNT):\n    print(i)\n    r2 = requests.get(url_new, params=dict(task_id=task_id))\n    data2 = r2.json()\n    print(\"DATA2\", data2)  # STARTED.\n    # till: SUCCESS.\n    r3 = requests.get(url_new, params=dict(task_id=task_id2))\n    data3 = r3.json()\n    print(\"DATA3\", data3)\n    # how many status indicators can it have?\n    time.sleep(1)\nurl_revoke = f\"{base_url}/revoke\"\nr3 = requests.get(url_revoke, params=dict(task_id=task_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)\nr3 = requests.get(url_revoke, params=dict(task_id=task_id))\ndata3 = r3.json()\nprint(\"REVOKE RESULT?\", data3)",
+        "type": "code",
+        "location": "/celery_client_test.py:1-47"
+    },
+    "17": {
+        "file_id": 2,
+        "content": "This code uses the requests library to make HTTP GET requests to a local Celery server. It checks the status of two tasks with different IDs and attempts to revoke one of them. The loop runs 20 times to periodically check the task status, printing relevant data along the way.",
+        "type": "comment"
+    },
+    "18": {
+        "file_id": 2,
+        "content": "time.sleep(1)\nr2 = requests.get(url_new, params=dict(task_id=task_id))\ndata2 = r2.json()\nprint(\n    \"DATA2\", data2\n)  # SUCCESS if revoke after SUCCESS. but if revoke before SUCCESS it is REVOKED.",
+        "type": "code",
+        "location": "/celery_client_test.py:48-53"
+    },
+    "19": {
+        "file_id": 2,
+        "content": "This code is making a GET request to a new URL with the provided task ID, then storing the response in data2. The subsequent print statement displays \"DATA2\" along with the content of data2. If revoke occurs before \"SUCCESS,\" it's considered REVOKED.",
+        "type": "comment"
+    },
+    "20": {
+        "file_id": 3,
+        "content": "/celery_fastapi_test.py",
+        "type": "filepath"
+    },
+    "21": {
+        "file_id": 3,
+        "content": "This FastAPI application manages Celery tasks, handling task status updates and storing task information such as name, status, and execution time. It provides routes for creating and retrieving task status and continuously executes background tasks.",
+        "type": "summary"
+    },
+    "22": {
+        "file_id": 3,
+        "content": "from datetime import datetime\nfrom fastapi import FastAPI, BackgroundTasks\n# do not import the function. import the celery app.\nfrom celery_test import app as celery_app\n# from celery_test import add, app as celery_app\nfrom celery.result import AsyncResult\nimport celery.states as S\nfrom typing import Dict\ntaskDict: Dict[str, AsyncResult] = {}\n# task_name = add.signature().name # working?\n# print(\"TASK NAME?\", task_name) # failed. man what is going on?\napp = FastAPI()\n# import logging\n# log = logging.getLogger(__name__)\n# do not use logging?\nimport datetime\nfrom typing import Any\ntaskInfo: Dict[str, Dict[str, datetime.datetime]] = {}\ntaskResult: Dict[str, Any] = {}\ndef celery_on_message(body: dict):\n    print(\"BODY TYPE?\", type(body))\n    print(\"ON MESSAGE?\", body)\n    task_id = body[\"task_id\"]\n    status = body[\"status\"]\n    if task_id not in taskInfo.keys():\n        taskInfo[task_id] = {}\n    if status not in taskInfo[task_id].keys():\n        taskInfo[task_id][status] = datetime.datetime.now()\n    ###\n    # BODY TYPE? <class 'dict'>",
+        "type": "code",
+        "location": "/celery_fastapi_test.py:1-44"
+    },
+    "23": {
+        "file_id": 3,
+        "content": "Code imports necessary modules and defines variables for storing task information. It creates a FastAPI instance, sets up a celery_on_message function to handle the task status updates from Celery, and prepares data structures to store task information like task name, status, and execution time. The code also includes import statements but does not include the definition of the \"add\" function or how it is used.",
+        "type": "comment"
+    },
+    "24": {
+        "file_id": 3,
+        "content": "    # ON MESSAGE? {'status': 'STARTED', 'result': {'pid': 74297, 'hostname': 'celery@MacBook-Air-M1.local'}, 'traceback': None, 'children': [], 'date_done': None, 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\n    ###\n    # BODY TYPE? <class 'dict'>\n    # ON MESSAGE? {'status': 'SUCCESS', 'result': '14', 'traceback': None, 'children': [], 'date_done': '2023-03-28T09:26:50.382791', 'task_id': 'c7a5a013-36aa-4242-842a-46fb3bb8e9fa'}\ndef background_on_message(task: AsyncResult):\n    value = task.get(on_message=celery_on_message, propagate=False)\n    # shall you not check here.\n    # and not the message callback.\n    # status = task.status\n    # print(\"TASK STATUS?\", status)\n    taskResult[task.id] = value\n    print(\"VALUE TYPE?\", type(value))  # str, '14'\n    print(\"TASK VALUE?\", value)\n# can you check the task status, finished or not, unblockingly?\n# backend does not support on_message callback?\n# the celery backend must use both redis and rabbitmq.\n# also, revoke tasks, if wanted.\n# check the task creation time?",
+        "type": "code",
+        "location": "/celery_fastapi_test.py:45-72"
+    },
+    "25": {
+        "file_id": 3,
+        "content": "The code defines a function `background_on_message` that retrieves a value from a Celery task asynchronously and prints the type and value. The task status is not checked within this function, but it can be obtained separately. The function also stores the result in the `taskResult` dictionary using the task ID as the key. The backend used by Celery must utilize both Redis and RabbitMQ, and tasks can be revoked if desired.",
+        "type": "comment"
+    },
+    "26": {
+        "file_id": 3,
+        "content": "@app.get(\"/add/{a}/{b}\")\ndef add_get(a, b, background_task: BackgroundTasks):\n    # apparently it is not calling celery.\n    # val = add(a,b)\n    args = [a, b]\n    # print(\"\")\n    # never registered. use name instead?\n    from celery_test import MAIN_NAME\n    task_name = f\"{MAIN_NAME}.add\"\n    task: AsyncResult = celery_app.send_task(task_name, args=args)\n    # task:AsyncResult = add.apply_async(args=args)\n    print(\"PENDING CELERY TASK:\", task)  # this has the task id, but this is an object.\n    # print(\"TASK TYPE?\", type(task)) # <class 'celery.result.AsyncResult'>\n    print(\"TASK ID?\", type(task.id), task.id)  # autocompleted.\n    # task.id is of type \"str\"\n    if task.id:\n        background_task.add_task(background_on_message, task)\n        # return \"RECEIVED\"\n        taskDict.update({task.id: task})\n        task_status = task.status\n        if task_status not in S.EXCEPTION_STATES:\n            status = \"RECEIVED\"  # this is not the task status.\n        else:\n            print(\"TASK STATUS\", task_status)\n            status = \"EXCEPTION\"",
+        "type": "code",
+        "location": "/celery_fastapi_test.py:75-100"
+    },
+    "27": {
+        "file_id": 3,
+        "content": "Function add_get is creating a pending Celery task by sending the task to MAIN_NAME. The task is assigned an ID, and if it's not in exception states, its status is set as \"RECEIVED\".",
+        "type": "comment"
+    },
+    "28": {
+        "file_id": 3,
+        "content": "    else:\n        print(\"TASK ID IS NONE.\")\n        status = \"ERROR\"\n    return {\"task_id\": task.id, \"status\": status, \"task_status\": task.status}\n@app.get(\"/task_status\")\ndef get_task_status(task_id: str):\n    task_status = \"MISSING\"\n    if task_id in taskDict.keys():\n        task_status = taskDict[task_id].status\n    print(\"CHECKING TASK:\", task_id)\n    print(\"TASK STATUS:\", task_status)\n    return task_status\n@app.get(\"/revoke\")\ndef revoke_task(task_id: str):\n    if task_id in taskDict.keys():\n        taskDict[task_id].revoke(terminate=True)\n    else:\n        return \"MISSING\"\n    print(\"TERMINATING TASK:\", task_id)\n    return \"REVOKED\"\n@app.get(\"/task_result\")\ndef get_task_result(task_id: str):\n    task_result = taskResult.get(task_id, None)\n    task_status = \"MISSING\"\n    if task_result:\n        task_status = taskDict[task_id].status\n    return dict(task_result=task_result, task_status=task_status)\nimport uvicorn\nuvicorn.run(app, host=\"127.0.0.1\", port=8010)\n# background tasks will be executed even if interrupted.",
+        "type": "code",
+        "location": "/celery_fastapi_test.py:101-139"
+    },
+    "29": {
+        "file_id": 3,
+        "content": "This code appears to be a FastAPI application with several routes for interacting with tasks. The \"/task_status\" route retrieves the status of a given task ID, the \"/revoke\" route revokes a task by its ID, and the \"/task_result\" route returns the result and status of a task. The code also sets up an instance of a FastAPI app to run on 127.0.0.1:8010 using Uvicorn. Background tasks will continue executing even if interrupted.",
+        "type": "comment"
+    },
+    "30": {
+        "file_id": 4,
+        "content": "/celery_test.py",
+        "type": "filepath"
+    },
+    "31": {
+        "file_id": 4,
+        "content": "The code sets up a Celery app, defines tasks and models, uses Redis lock for concurrency management, serializes/deserializes using Pydantic data models, but has concerns over nested handling and shared lock issues. Updates task configuration, sets worker concurrency limit to 1, limits maximum memory per child process, and ensures code is run using celery command line. Starts the worker process, which is blocking.",
+        "type": "summary"
+    },
+    "32": {
+        "file_id": 4,
+        "content": "# hashicorp nomad?\n# test to setup celery task schedule.\n# import sys\n# not working.\n# sys.argv.append('-E')\n# import os\n# os.environ['CELERYD_CONCURRENCY']='1'\nfrom celery import Celery\n# app = Celery(\"tasks\") # not using any broker? it is default!\n# set up pyamqp.\n# app = Celery(\"tasks\", broker=\"pyamqp://guest@localhost//\")\nfrom passwords import redis_password\nredis_url = f\"redis://:{redis_password}@localhost:6379\"\n# MAIN_NAME = \"celery_test\"\nMAIN_NAME = \"tasks\"\napp = Celery(\n    MAIN_NAME,\n    # we ignore the main, see if error persists?\n    # the error persists. continue.\n    broker=\"amqp://guest@localhost:5672//\",\n    backend=redis_url,  # already running, don't know how.\n)\n# need authentication!\nfrom pydantic import BaseModel\nclass AddResult(BaseModel):\n    data: int\nclass AddResultNested(BaseModel):\n    nested_addresult: AddResult\n# import filelock # best way of limiting concurrency? or not?\n# LOCK_FILE = \".celery.lock\"\n# working.\n# import multiprocessing\n# lock = multiprocessing.Lock()\n# use redis lock.\n# from redis import Redis",
+        "type": "code",
+        "location": "/celery_test.py:1-52"
+    },
+    "33": {
+        "file_id": 4,
+        "content": "This code imports Celery, sets up a Celery application with broker and backend configurations, defines two Pydantic models for result classes, and uses Redis lock instead of multiprocessing lock for concurrency management.",
+        "type": "comment"
+    },
+    "34": {
+        "file_id": 4,
+        "content": "# from redis.lock import Lock as RedisLock\n# redis_instance = Redis.from_url(redis_url)\nREDIS_TASK_KEY = \"current_task\"\n# import portalocker\n@app.task\ndef add(x, y):\n    # with portalocker.Lock('.celery.lock','r+', portalocker.LOCK_EX):\n    # with lock:  #the lock is simply working.\n    # with filelock.FileLock(LOCK_FILE): # this lock is not sharing.\n    # with lock:\n    # why not working?\n    # with lock:\n    # still the same?\n    # with RedisLock(redis_instance, name=\"task_id\"): # no one will have the lock.\n    print(\"CALCULATING:\", x, y)\n    # but we plan to do this for 10 seconds.\n    import time\n    time.sleep(10)\n    obj = AddResultNested(\n        nested_addresult=AddResult(data=x + y)\n    ).dict()  # it is also dict. just to make it json serializable. do not pass pydantic data models directly.\n    # what about nested data models?\n    # it also handles the serialization correctly. nevertheless.\n    return AddResultNested.parse_obj(obj).dict() # still being correct.\n    # so you can parse it and dump it.\n    # json in, json out.",
+        "type": "code",
+        "location": "/celery_test.py:53-87"
+    },
+    "35": {
+        "file_id": 4,
+        "content": "The code defines a Celery task called 'add' and attempts to apply a lock for concurrency control. It prints the calculated result after sleeping for 10 seconds, then serializes and deserializes the result using Pydantic data models. The code also imports various libraries for locks and handles JSON serialization/deserialization. However, the chosen locking mechanism is not effective, and there are concerns about nested data model handling and potential issues with sharing the lock.",
+        "type": "comment"
+    },
+    "36": {
+        "file_id": 4,
+        "content": "# print(dir(add))\n# breakpoint()\n# well, how to set this up?\n# what is this for anyway?\napp.conf.update(task_track_started=True)  # still off?\n# print(\"APP CONF?\", app.conf)\n# breakpoint()\n# how to limit the number of concurrencies?\n# just like the commandline config \"-E\"\napp.conf.update(worker_send_task_events=True)\napp.conf.update(worker_concurrency=1) # having the same effect of holding the process-wide lock, but showing the status of \"PENDING\" instead.\n# import pint\n# ureg = pint.UnitRegistry()\n# # 2000_000\nmemory_limit = 20_000_000\n# memory_limit = (20*ureg.GB).to(ureg.kB).magnitude # in kB\n# memory_limit is None by default, means no limit on ram\napp.conf.update(worker_max_memory_per_child=memory_limit)\n# better run this with celery commandline.\nif __name__ == \"__main__\":\n    worker = app.Worker()\n    # print(dir(worker))\n    worker.start()  # blocking for sure.\n    # breakpoint()",
+        "type": "code",
+        "location": "/celery_test.py:90-116"
+    },
+    "37": {
+        "file_id": 4,
+        "content": "Updates task configuration, sets worker concurrency limit to 1, and limits maximum memory per child process. Ensures the code is run using celery command line. Starts the worker process, which will be blocking.",
+        "type": "comment"
+    },
+    "38": {
+        "file_id": 5,
+        "content": "/check_non_convex_quadratic_constraint_in_model.py",
+        "type": "filepath"
+    },
+    "39": {
+        "file_id": 5,
+        "content": "The code is importing the \"Model\" class from the \"docplex.mp.model\" module and creating a new model object named \"model\" for testing purposes, with a breakpoint set to pause execution.",
+        "type": "summary"
+    },
+    "40": {
+        "file_id": 5,
+        "content": "# how to find that thing?\nfrom docplex.mp.model import Model\nmodel = Model('test_model')\nbreakpoint()",
+        "type": "code",
+        "location": "/check_non_convex_quadratic_constraint_in_model.py:1-5"
+    },
+    "41": {
+        "file_id": 5,
+        "content": "The code is importing the \"Model\" class from the \"docplex.mp.model\" module and creating a new model object named \"model\" for testing purposes, with a breakpoint set to pause execution.",
+        "type": "comment"
+    },
+    "42": {
+        "file_id": 6,
+        "content": "/cloudpss_config2.py",
+        "type": "filepath"
+    },
+    "43": {
+        "file_id": 6,
+        "content": "This code reads JSON files, identifies unique prefixes and creates a markdown table for device parameters using pandas DataFrame. The results are printed or saved to file 'f3'.",
+        "type": "summary"
+    },
+    "44": {
+        "file_id": 6,
+        "content": "sources = [\"cloudpss_optim_config2.json\", \"cloudpss_simulation_config2.json\"]\n# sources_curl_get = ['cloudpss_optim.mjson','cloudpss_simu.mjson']\n# must place all components on the graph to get the data.\n# like: https://ies.cloudpss.net:8201/editor/getComponentForHeat/?id=157\n# or: getComponentForCPS\n# but not all components are HeatComponents\n# id is coming from the json containing svg.\nimport json\nimport pandas as pd\n# question: convert pandas dataframe to markdown table.\nfor source in sources:\n    with open(source, \"r\", encoding=\"utf-8\") as f:\n        data = json.loads(f.read())\n    components = data[\"component\"]\n    existing_keys = []\n    for key, val in components.items():\n        key_prefix = key.replace(\"-\", \"_\").split(\"_\")[0]\n        if key_prefix not in [\"defaultApp\"] + existing_keys:\n            existing_keys.append(key_prefix)\n            print(key_prefix)\n            # val_prefix=val\n            # if val_prefix not in ['defaultApp']+existing_vals:\n            #     existing_vals.append(val_prefix)",
+        "type": "code",
+        "location": "/cloudpss_config2.py:1-30"
+    },
+    "45": {
+        "file_id": 6,
+        "content": "This code reads JSON files, extracts component information and checks if there are any unique prefixes for the components. It prints the unique prefixes found in the JSON data.",
+        "type": "comment"
+    },
+    "46": {
+        "file_id": 6,
+        "content": "            #     print(val_prefix)\n            # shall create this table for every device.\n            params = val[\"param\"]\n            input_types = list(params.keys())\n            for input_type in input_types:\n                component_info = []\n                input_data = params[input_type]\n                for k, v in input_data[\"params\"].items():\n                    valDict = {\"ID\": k}\n                    # valDict ={\"InputType\": input_type,\"ID\": k}\n                    valDict.update({k0: v0 for k0, v0 in v.items()})\n                    component_info.append(valDict)\n                df = pd.DataFrame(component_info)\n                print(f\"Data Input {input_type} in {key_prefix}:\")\n                # print(df.to_string(index=False))\n                markdown_table = df.to_markdown(index=False)\n                print(markdown_table)\n            # component_info.append({\"ID\": key, \"Name\":val.get(\"name\"),\"Type\": val.get(\"type\"), \"Thutype\": val.get(\"thutype\")})\n# with open('cloudpss_file.json', 'w+') as f3:",
+        "type": "code",
+        "location": "/cloudpss_config2.py:31-54"
+    },
+    "47": {
+        "file_id": 6,
+        "content": "This code creates a markdown table for each input type of a device's parameters and prints it. It uses a pandas DataFrame to format the table, and possibly writes the data to a file.",
+        "type": "comment"
+    },
+    "48": {
+        "file_id": 6,
+        "content": "#     json.dump(data, f3)",
+        "type": "code",
+        "location": "/cloudpss_config2.py:55-55"
+    },
+    "49": {
+        "file_id": 6,
+        "content": "Saving data in JSON format to file 'f3'.",
+        "type": "comment"
+    },
+    "50": {
+        "file_id": 7,
+        "content": "/cloudpss_config_curl_get.py",
+        "type": "filepath"
+    },
+    "51": {
+        "file_id": 7,
+        "content": "Python code processes JSON files for cloud-based simulation and optimization in electrical devices, using DataFrames, handling pin definitions, and translating parameter names into multiple languages.",
+        "type": "summary"
+    },
+    "52": {
+        "file_id": 7,
+        "content": "sources_curl_get = dict(simu=\"cloudpss_simu.mjson\",optim=\"cloudpss_optim.mjson\", )\n# almost the same as `cloudpss_config2.py`, with slight alternation.\n# choice = \"optim\"\nchoices = sources_curl_get.keys()\nparam_translate_maps = dict(\n    simu=dict(\n        参数分类=[],\n        中文名称=[],  # create it later. join with \"/\"\n        有关设备=[],  # join with \", \"\n    ),\n    optim=dict(参数分类=[], 中文名称=[], 有关设备=[]),\n)\nprelude = \"\"\"\n# 建模仿真和规划设计的输入参数和区别\n规划设计在设备信息库内添加了经济性参数，而建模仿真对某些设备将额定工况变为了多工况的输入。\n<br><br>根据布尔表达式，有的输入项所填写的值决定其他参数是否能够填写。\n<br><br>下面介绍在能流拓扑图中两种模式的输入项区别：\n\"\"\"\nprint(prelude)\nsimu_format_string = \"\"\"\n## 建模仿真参数\n### 参数分类\n{table}\n#### 基础参数\n要指定设备台数\n#### 仿真参数\n配电传输设备除模块化多电平变流器都不具备仿真参数，及管道、采暖制冷负荷、电负荷都不具备\n#### 优化参数\n具备优化参数的设备可选是否优化，部分设备优化参数具有其他参数，例如柔性电负荷的最大负荷\n#### 运行约束\n采暖制冷负荷具备运行约束，供热/制冷最大、最小出口温度。\n### 详细说明\n{detail}\n\"\"\"\noptim_format_string = \"\"\"\n## 规划设计参数\n{table}\n### 机组参数\n在没有选择具体设备时，不能指定设备台数，但可以指定设备额定运行参数。指定了设备类型时，可以指定设备台数，但是不能指定额定运行参数。\n部分参数\n### 运行参数组\n不能指定部分参数，或者可选指定部分参数\n### 计算参数组\n有的设备没有计算参数组，例如吸收式制冷机，余热锅炉\n### 负荷设置\n负荷元件特有的设置\n### 详细说明\n{detail}\n\"\"\"\nformat_strings = {\"simu\": simu_format_string,\"optim\": optim_format_string, }",
+        "type": "code",
+        "location": "/cloudpss_config_curl_get.py:1-68"
+    },
+    "53": {
+        "file_id": 7,
+        "content": "This Python code defines two parameter format strings for simulation and optimization inputs in a cloud-based software. The simulation input includes basic, modeling, and optimization parameters for electrical devices, while the optimization input provides detailed information on group parameters, calculation parameters, and load settings.",
+        "type": "comment"
+    },
+    "54": {
+        "file_id": 7,
+        "content": "import json\nimport pandas as pd\nprint_list = []\ndef append_candidate(*args):\n    global print_list\n    if len(args) == 0:\n        print_list.append(\"\")\n    else:\n        print_list.append(\" \".join(args))\nfor choice in choices:\n    mjson_path = sources_curl_get[choice]\n    # question: convert pandas dataframe to markdown table.\n    headliner = lambda level: \"#\" * level\n    with open(mjson_path, \"r\", encoding=\"utf-8\") as f:\n        lines = f.readlines()\n    level_shift = 1\n    param_class_name_dict = {}\n    existing_keys = []\n    for line in lines:\n        try:\n            data = json.loads(line.strip())\n            param = data[\"ele\"][\"param\"]\n            key_prefix = name = param[\"name\"]\n        except:\n            # obviously we've hit something hard.\n            continue\n        if key_prefix not in existing_keys:\n            existing_keys.append(key_prefix)\n            append_candidate()\n            append_candidate(headliner(level_shift + 2), key_prefix)\n            append_candidate()\n            append_candidate(headliner(level_shift + 3), \"设备信息\")",
+        "type": "code",
+        "location": "/cloudpss_config_curl_get.py:71-112"
+    },
+    "55": {
+        "file_id": 7,
+        "content": "Code reads a JSON file and converts its contents into a markdown table, with appropriate headings. It also keeps track of existing keys to avoid repetition.",
+        "type": "comment"
+    },
+    "56": {
+        "file_id": 7,
+        "content": "            append_candidate()\n            info_keys = [\n                \"classname\",\n                \"name\",\n                \"type\",\n                \"thutype\",\n                \"ver\",\n                \"id\",\n                \"sym\",\n            ]\n            info_markdown = pd.DataFrame([{k: param[k] for k in info_keys}]).to_html()\n            append_candidate(info_markdown)\n            append_candidate()\n            pin = [v for _, v in param[\"pin\"].items()]  # iterate through keys.\n            pin_df = pd.DataFrame(pin)\n            append_candidate(headliner(level_shift + 3), \"针脚定义\")\n            append_candidate()\n            append_candidate(pin_df.to_html())\n            # you can also get conditional pins and connection types.\n            existing_keys = []\n            append_candidate()\n            append_candidate(headliner(level_shift + 3), \"参数填写\")\n            # shall create this table for every device.\n            params = param[\"param\"]\n            input_types = list(params.keys())\n            for input_type in input_types:",
+        "type": "code",
+        "location": "/cloudpss_config_curl_get.py:113-142"
+    },
+    "57": {
+        "file_id": 7,
+        "content": "This code is appending various data to a candidate, including information about the classname, name, type, and other parameters. It then creates a DataFrame for pin definitions and another for parameter filling, iterating through keys and creating headlines with appropriate level shifts. The code also handles conditional pins and connection types.",
+        "type": "comment"
+    },
+    "58": {
+        "file_id": 7,
+        "content": "                if input_type not in param_class_name_dict.keys():\n                    param_class_name_dict[input_type] = {\n                        \"chinese_names\": set(),\n                        \"related_devices\": [],\n                    }\n                component_info = []\n                input_data = params[input_type]\n                param_class_name_dict[input_type][\"chinese_names\"].add(\n                    input_data[\"desc\"]\n                )\n                param_class_name_dict[input_type][\"related_devices\"].append(key_prefix)\n                for k, v in input_data[\"params\"].items():\n                    valDict = {\"ID\": k}\n                    valDict.update({k0: v0 for k0, v0 in v.items()})\n                    component_info.append(valDict)\n                df = pd.DataFrame(component_info)\n                append_candidate()\n                append_candidate(headliner(level_shift + 4), input_type)\n                append_candidate()\n                markdown_table = df.to_html(index=False)\n                append_candidate(markdown_table)",
+        "type": "code",
+        "location": "/cloudpss_config_curl_get.py:143-166"
+    },
+    "59": {
+        "file_id": 7,
+        "content": "This code snippet adds input parameters to a dictionary and generates a DataFrame. The dictionary stores \"chinese_names\" and \"related_devices\" for each input type, which are added with their descriptions as well as the related key prefix. Finally, the DataFrame is converted to HTML format before being appended for further processing.",
+        "type": "comment"
+    },
+    "60": {
+        "file_id": 7,
+        "content": "        else:\n            continue\n        append_candidate()\n    param_translate_maps[choice][\"参数分类\"] = list(param_class_name_dict.keys())\n    param_translate_maps[choice][\"中文名称\"] = [\n        \", \".join(param_class_name_dict[k][\"chinese_names\"])\n        for k in param_translate_maps[choice][\"参数分类\"]\n    ]\n    param_translate_maps[choice][\"有关设备\"] = [\n        \", \".join(param_class_name_dict[k][\"related_devices\"])\n        for k in param_translate_maps[choice][\"参数分类\"]\n    ]\n    table = pd.DataFrame(param_translate_maps[choice]).to_html(index=False)\n    detail = \"\\n\".join(print_list)\n    formatted_string = format_strings[choice].format(table=table, detail=detail)\n    print(formatted_string)\n    print_list = []",
+        "type": "code",
+        "location": "/cloudpss_config_curl_get.py:167-188"
+    },
+    "61": {
+        "file_id": 7,
+        "content": "This code is part of a larger program that seems to involve translating parameter names into multiple languages. The specific chunk of code continues the iteration over a set of choices, populates the \"param_translate_maps\" dictionary with information about each choice, formats this data as a table and additional details, and then prints the result.",
+        "type": "comment"
+    },
+    "62": {
+        "file_id": 8,
+        "content": "/cloudpss_download_component_ports.py",
+        "type": "filepath"
+    },
+    "63": {
+        "file_id": 8,
+        "content": "The code defines two lambda functions, `url_optim` and `url_simul`, which generate URLs for downloading component ports. The URLs include a page parameter that can be customized for different pages. It is uncertain if this function is necessary or not.",
+        "type": "summary"
+    },
+    "64": {
+        "file_id": 8,
+        "content": "url_optim = lambda page: f'https://ies.cloudpss.net:8201/editor/componentheatList/?page={page}'\nurl_simul = lambda page: f'https://ies.cloudpss.net:8202/editor/componentheatList/?page={page}'\n# maybe it is not needed",
+        "type": "code",
+        "location": "/cloudpss_download_component_ports.py:1-4"
+    },
+    "65": {
+        "file_id": 8,
+        "content": "The code defines two lambda functions, `url_optim` and `url_simul`, which generate URLs for downloading component ports. The URLs include a page parameter that can be customized for different pages. It is uncertain if this function is necessary or not.",
+        "type": "comment"
+    },
+    "66": {
+        "file_id": 9,
+        "content": "/cloudpss_extract_component_ports.py",
+        "type": "filepath"
+    },
+    "67": {
+        "file_id": 9,
+        "content": "The code loads and parses data, identifies device types and shapes, searches for specific strings within XML format, iterates through a background's text excluding forbidden words, checks status and msg, and prints page-wise extracted data from the \"cmp\" list.",
+        "type": "summary"
+    },
+    "68": {
+        "file_id": 9,
+        "content": "source = \"cloudpss_component_ports.json\"\nimport json\nfrom bs4 import BeautifulSoup\n# keys = ['母线', '燃气内燃机', '负荷',]\n# values = ['', '<text str=\\\"电接口\\\" x=\\\"15.983333333333334\\\" y=\\\"28.52569986979166\\\" align=\\\"center\\\" valign=\\\"middle\\\" vertical=\\\"0\\\" rotation=\\\"0\\\" localized=\\\"0\\\" align-shape=\\\"0\\\" />', '<text str=\\\"热水接口\\\" x=\\\"24.6356416004801\\\" y=\\\"44.88333333333334\\\" align=\\\"center\\\" valign=\\\"middle\\\" vertical=\\\"0\\\" rotation=\\\"0\\\" localized=\\\"0\\\" align-shape=\\\"0\\\" />',]\nforbidden_words = [\n    \"%CompName\",\n    \"${isNaN(V)?V:Number(V).toFixed(4)}∠${isNaN(Angle)?Angle:Number(Angle).toFixed(2)}°\",\n    \"%VBase\",\n    \"1.0000∠0.00°\",\n    \"115.0 [kV]\",\n]\ncontent = open(source, \"r\", encoding=\"utf-8\").read()\ndata = json.loads(content)\nfor element in data[\"cmp\"]:\n    value = element[\"typename\"]\n    print(\"DEVICE:\", value)\n    print()\n    shape = element[\"shape\"]\n    xml_shape = BeautifulSoup(shape, features=\"xml\")\n    # breakpoint()\n    # xml_shape.find_all(\"background\")[0].find_all(\"text\")[0]['str']\n    for background in xml_shape.find_all(\"background\"):",
+        "type": "code",
+        "location": "/cloudpss_extract_component_ports.py:1-26"
+    },
+    "69": {
+        "file_id": 9,
+        "content": "The code is loading data from 'cloudpss_component_ports.json' and parsing it using JSON module, BeautifulSoup for XML shape manipulation. It iterates through each element in 'data[\"cmp\"]', identifies the device type (e.g., transformer, generator) with its shape in XML format and searches for specific text strings within the shapes, possibly for further processing or analysis.",
+        "type": "comment"
+    },
+    "70": {
+        "file_id": 9,
+        "content": "        for text in background.find_all(\"text\"):\n            string = text[\"str\"]\n            if string not in forbidden_words:\n                print(string)\n    print(\"_\" * 20)\n# assert status == 0\n# assert msg == \"\"\n# totalPage is 4, we need to iterate.\n# page start from 1\n# cmp is the main data list.\n# for key, value in data.items():\n#     print(\"KEY?\", key)\n#     # print(\"VAL?\", value)\n# my_dict = dict(zip(keys, values))\n# print(my_dict)",
+        "type": "code",
+        "location": "/cloudpss_extract_component_ports.py:27-44"
+    },
+    "71": {
+        "file_id": 9,
+        "content": "The code iterates through a background's text, excluding forbidden words, and prints the remaining strings. It then asserts that status is 0 and msg is an empty string, suggesting further checks or error handling. The totalPage variable indicates there are four pages, requiring iteration. Page numbering starts from 1. The code references a main data list called \"cmp\" and uses it to extract keys and values into a dictionary named \"my_dict\", which is then printed.",
+        "type": "comment"
+    },
+    "72": {
+        "file_id": 10,
+        "content": "/cloudpss_jinja_code_generator.py",
+        "type": "filepath"
+    },
+    "73": {
+        "file_id": 10,
+        "content": "This code imports libraries, loads data, sets constants, uses Pint for unit conversion, includes an LRU cache decorator. It calculates new magnitude and unit, generates factor string for Jinja templating, searches keys in excelMap. Handles unit conversion and extraction, appending info to a list based on conditions. Generates Jinja2 templates, converts units, writes content to output file with UTF-8 encoding after enabling environment features and disabling passthrough.",
+        "type": "summary"
+    },
+    "74": {
+        "file_id": 10,
+        "content": "encoding = \"utf-8\"\ntemplate_path = \"cloudpss_model_template.py.j2\"\ntemplate = open(template_path, \"r\", encoding=encoding).read()\nfrom jinja2 import Environment, FileSystemLoader\n# import jinja2\nimport json\n# import rich\nload_path = \"cloudpss_inputs.json\"\nwith open(load_path, \"r\", encoding=\"utf-8\") as f:\n    data = json.loads(f.read())\n    # rich.print(data)\nexcelMap = data[\"excelMap\"]\ndataParams = {\n    \"ratedParam\": \"设备额定运行参数\",\n    \"operationalConstraints\": \"设备运行约束\",\n    \"economicParam\": \"设备经济性参数\",\n    \"OperateParam\": \"设备工况\",\n}\n# 设备额定运行参数\n# 设备运行约束\n# 设备经济性参数\n# 设备工况\n# unknown property:\n# 燃气轮机 -> 挡位 -> dict ({\"route\": \"OperateParams.params\"})\n# 这个参数没有用于建模仿真或者优化\nfrom pint_convert_units import unitFactorCalculator\nfrom typing import Union, List\nfrom pint import UnitRegistry\nfrom functools import lru_cache\n@lru_cache(maxsize=1)\ndef getUnitRegistryAndStandardUnits(\n    unit_definition_file_path: str = \"merged_units.txt\",\n    standard_units_name_list: List[str] = [\n        \"万元\",\n        \"kWh\",\n        \"km\",\n        \"kW\",\n        \"年\",",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:1-49"
+    },
+    "75": {
+        "file_id": 10,
+        "content": "This code imports necessary libraries, loads data from a JSON file, defines constants and parameters for cloud-based power system simulation, and utilizes the Pint unit conversion library. The code also creates a cached function for a UnitRegistry object to ensure efficient usage.",
+        "type": "comment"
+    },
+    "76": {
+        "file_id": 10,
+        "content": "        \"MPa\",\n        \"V\",\n        \"Hz\",\n        \"ohm\",\n        \"one\",\n        \"台\",\n        \"m2\",\n        \"m3\",\n        \"kelvin\",\n        \"metric_ton\", # this is weight.\n        \"p_u_\",\n        \"dimensionless\",\n    ],\n):\n    ureg = UnitRegistry(unit_definition_file_path)\n    standard_units = frozenset(\n        [ureg.Unit(unit_name) for unit_name in standard_units_name_list]\n    )\n    return ureg, standard_units\n@lru_cache(maxsize=1)\ndef getStandardUnits():\n    standard_units = frozenset([])\n    return standard_units\ndef convertToStandardUnit(unit: Union[str, None]):\n    factor_string = unit_hint = \"\"\n    # times factor, not division!\n    # numeric_conversion_dict = {\"percent\": 0.01}\n    if unit:\n        unit = (\n            unit.replace(\"%\", \"percent\")\n            .replace(\"m²\", \"m2\")\n            .replace(\"m³/h\", \"m3/hour\")\n            .replace(\"m³\", \"m3\")\n            .replace(\"t/h\", \"t/hour\")\n            .replace(\"p.u.\", \"p_u_\")\n        )\n        # if unit in numeric_conversion_dict.keys():\n        #     unit_hint = f\"([]) <- ({unit})\"",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:50-91"
+    },
+    "77": {
+        "file_id": 10,
+        "content": "This code defines functions for handling units of measurement. It creates a UnitRegistry, sets standard units based on provided names, and converts input unit to the standard format using replacements for abbreviations and suffixes like \"m²\", \"t/h\", etc. The code also includes a function to retrieve standard units and an LRU cache decorator for efficient caching of results.",
+        "type": "comment"
+    },
+    "78": {
+        "file_id": 10,
+        "content": "        #     factor_string = f\" * {numeric_conversion_dict[unit]}\"\n        ureg, standard_units = getUnitRegistryAndStandardUnits()\n        try:\n            unit_hint = f\"({str(ureg.Unit(unit))})\"\n        except:\n            raise Exception(\"Invalid unit string:\", unit)\n        new_magnitude, new_unit_name = unitFactorCalculator(\n            ureg, standard_units=standard_units, old_unit_name=unit\n        )\n        if new_magnitude != 1:\n            unit_hint = f\"({new_unit_name}) <- {unit_hint}\"\n            factor_string = (\n                f' {\"*\" if new_unit_name != \"kelvin\" else \"+\"} {new_magnitude}'\n            )\n    return unit_hint, factor_string\n# import re\nmylist = []\nfor key, value in excelMap.items():\n    if type(value) == dict:\n        if \"生产厂商\" in value.keys():  # with or without unit?\n            mylist_elem = []\n            mylist_dict_elem = {\n                key: [] for key in [\"设备额定运行参数\", \"设备运行约束\", \"设备经济性参数\", \"设备工况\"]\n            }\n            print(\"DEVICE NAME:\", key)\n            mylist_elem.append(key.replace(\"-\", \"_\"))",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:92-124"
+    },
+    "79": {
+        "file_id": 10,
+        "content": "This code retrieves a unit registry and standard units, calculates the new magnitude and unit based on the old unit, and generates factor string and unit hint for Jinja templating. If the new magnitude is not 1, it updates the unit hint accordingly. The code also searches for keys in an excelMap and appends device name to a list.",
+        "type": "comment"
+    },
+    "80": {
+        "file_id": 10,
+        "content": "            # this is a device for sure.\n            # rich.print(value)\n            for k, v in value.items():\n                if type(v) == str:\n                    if v.split(\".\")[0] in dataParams.keys():\n                        k0 = dataParams[v.split(\".\")[0]]\n                        print(\"K0\", k0, \"K\", k, \"V\", v.split(\".\")[-1])\n                        value_name = k.split(\"(\")[0]\n                        unit = (\n                            k.replace(\"[\", \"(\")\n                            .replace(\"]\", \")\")\n                            .replace(value_name, \"\")\n                            .strip()\n                        )\n                        # replace square brackets with round brackets.\n                        if unit.startswith(\"(\") and unit.endswith(\")\"):\n                            unit = unit[1:-1].strip()\n                            if len(unit) == 0:\n                                raise Exception(\"Invalid Unit:\", unit)\n                        else:\n                            if len(unit) > 0:",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:125-145"
+    },
+    "81": {
+        "file_id": 10,
+        "content": "This code is checking if a value in the 'value' dictionary is a string and contains a specific pattern. If it does, it extracts relevant information from the string and assigns values to 'k0', 'k', and 'v'. It then formats the 'unit' variable by replacing square brackets with parentheses and trims any leading/trailing spaces. If 'unit' is empty after these modifications, it raises an exception.",
+        "type": "comment"
+    },
+    "82": {
+        "file_id": 10,
+        "content": "                                raise Exception(\"Invalid Unit:\", unit)\n                            else:\n                                unit = None\n                        # pattern = r\"(\\w+)\\((\\w+)\\)\"\n                        # result = re.findall(pattern, k)\n                        # if len(result) > 0:\n                        #     value_name, unit = result[0]\n                        #     print(f\"value_name={value_name}\\nunit={unit}\")\n                        # else:\n                        #     value_name = k\n                        #     unit = None\n                        #     print(f\"value_name={value_name}\")\n                        # return value_name, unit\n                        unit_hint, factor = convertToStandardUnit(unit)\n                        comment = f\"单位：{unit_hint} [{k0}]\" if unit else f\"{k0}\"\n                        melem = [value_name, comment, factor]\n                        mylist_dict_elem[k0].append(melem)\n                    else:\n                        if v not in [\"manufacturer\", \"equipType\"]:",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:146-164"
+    },
+    "83": {
+        "file_id": 10,
+        "content": "This code is handling unit conversion and extraction of value name, unit, and factor from a key-value pair. If the unit is invalid or not found, an exception is raised. The extracted information is then appended to a list of dictionary elements in mylist_dict_elem based on certain conditions.",
+        "type": "comment"
+    },
+    "84": {
+        "file_id": 10,
+        "content": "                            print(\">> UNIDENTIFIED PARAM TYPE <<\")\n                        print(k, v)\n                else:\n                    print(\">> UNIDENTIFIED VALUE TYPE <<\")\n                    print(k, type(v), v)\n            mylist_elem.append(mylist_dict_elem)\n            mylist.append(mylist_elem)\n        elif \"负荷名称\" in value.keys():  # load for sure.\n            for k, v in value.items():\n                ...\n        print(\"_\" * 30)\noutput_path = \"cloudpss_jinja_code_output.py\"\nenv_param_list = [\n    (\"温度\", \"°C\"),\n    (\"空气比湿度\", \"kg/kg\"),  # dimensionless. right?\n    (\"太阳辐射强度\", \"W/m2\"),\n    (\"土壤平均温度\", \"°C\"),\n    (\"距地面10m处东向风速\", \"m/s\"),\n    (\"距地面50m处东向风速\", \"m/s\"),\n    (\"距地面10m处北向风速\", \"m/s\"),\n    (\"距地面50m处北向风速\", \"m/s\"),\n]\nenv_param_converted_list = []\nfor name, unit in env_param_list:\n    unit_hint, factor = convertToStandardUnit(unit)\n    elem = [name, unit_hint, factor]\n    env_param_converted_list.append(elem)\n#### GENERATE CODE, WRITE TO output_path, with encoding='utf-8'\nfrom jinja2 import StrictUndefined",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:165-200"
+    },
+    "85": {
+        "file_id": 10,
+        "content": "This code is generating Jinja2 template for Python, handling different types of parameters and converting environmental parameter units to standard units. It then appends them to a list and finally generates the code using Jinja2 template engine, writing it to the specified output file path with UTF-8 encoding.",
+        "type": "comment"
+    },
+    "86": {
+        "file_id": 10,
+        "content": "def main():\n    # enable render option:\n    # `trim_blocks` and `lstrip_blocks`\n    #\n    # disable undefined passthrough:\n    # make sure there won't be blanks to fill. origin: https://ttl255.com/jinja2-tutorial-part-1-introduction-and-variable-substitution/\n    # undefined=StrictUndefined\n    #\n    env = Environment(loader=FileSystemLoader(\"./\"),trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)\n    tpl = env.get_template(template_path)\n    with open(output_path, \"w+\", encoding=encoding) as fout:\n        render_content = tpl.render( # only pass parameter needed for template\n            mylist=mylist,\n            env_param_list=env_param_list,\n            env_param_converted_list=env_param_converted_list,\n            ureg=getUnitRegistryAndStandardUnits()[0],\n        )\n        # render_content = tpl.render(mylist = [\"光伏\",\"风机\",\"燃气轮机\"])\n        fout.write(render_content)\n        # render_content1 = tpl.render(mylist2=[(\"单个光伏板面积\",\"单位：(m²)\",\"\"),(\"最大发电功率\",\"单位：(kW)\",\"\"),\"采购成本\",\"单位：(万元/台)\",\"固定维护成本\",\"单位：(万元/年)\",\"可变维护成本\",\"单位：(万元/kWh) <- (元/kWh)\",\"设计寿命\",\"单位：(年)\"])",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:202-224"
+    },
+    "87": {
+        "file_id": 10,
+        "content": "The code sets up a Jinja environment with trim_blocks and lstrip_blocks enabled for rendering, disables undefined passthrough to avoid filling blanks, and then gets the template, renders it with necessary parameters, and writes the rendered content to an output file.",
+        "type": "comment"
+    },
+    "88": {
+        "file_id": 10,
+        "content": "        # fout.write(render_content1)\nif __name__ == \"__main__\":\n    main()",
+        "type": "code",
+        "location": "/cloudpss_jinja_code_generator.py:225-229"
+    },
+    "89": {
+        "file_id": 10,
+        "content": "This code snippet appears to be at the end of a function or method. It checks if the script is being run directly and if so, calls the main function. The previous line seems like it writes content to a file (fout.write(render_content1)) but is commented out.",
+        "type": "comment"
+    },
+    "90": {
+        "file_id": 11,
+        "content": "/cloudpss_model_revised.py",
+        "type": "filepath"
+    },
+    "91": {
+        "file_id": 11,
+        "content": "The code models device performance with Pyomo, Pydantic, and includes environmental parameters, simulation settings, and device specifications. It creates a PV device class within the \"设备\" parent class and initializes attributes with constraints for costs and environmental factors.",
+        "type": "summary"
+    },
+    "92": {
+        "file_id": 11,
+        "content": "# from pydantic import BaseModel\n# is the BaseModel needed?\nfrom pyomo.environ import *\nfrom dataclasses import dataclass\nimport uuid\nmodel = ConcreteModel()\n@dataclass\nclass 环境:\n    温度: float  # (°C)\n    空气比湿度: float  # (kg/kg)\n    太阳辐射强度: float  # (W/m2)\n    土壤平均温度: float  # (°C)\n    距地面10m处东向风速: float  # (m/s)\n    距地面50m处东向风速: float  # (m/s)\n    距地面10m处北向风谏: float  # (m/s)\n    距地面50m处北向风速: float  # (m/s)\nimport datetime\n@dataclass\nclass 模拟参数:\n    开始时间: datetime.datetime\n    结束时间: datetime.datetime\n    步长: float  # 单位：分钟\n    @property\n    def 仿真时长(self):\n        \"\"\"\n        返回单位: 天\n        \"\"\"\n        return (self.结束时间 - self.开始时间).days  # int\n@dataclass\nclass 设备:\n    def __init__(\n        self,\n        model: ConcreteModel,\n        生产厂商: str,\n        生产型号: str,\n        设备配置台数: int,\n        environ: 环境,\n        simulation_params: 模拟参数,\n        设备额定运行参数: dict = {},  # if any\n        设备运行约束: dict = {},  # if any\n        设备经济性参数: dict = {},  #  if any\n        设备工况: dict = {},  # OperateParam\n        输出类型列表: list = [],\n        输入类型列表: list = [],",
+        "type": "code",
+        "location": "/cloudpss_model_revised.py:1-54"
+    },
+    "93": {
+        "file_id": 11,
+        "content": "The code defines a model for simulating the performance of a device, utilizing Pyomo for mathematical optimization and Pydantic for data validation. It includes environmental parameters, simulation settings, and device specifications. The model uses datetime for time-based calculations and dataclasses for defining classes in a concise way.",
+        "type": "comment"
+    },
+    "94": {
+        "file_id": 11,
+        "content": "    ):\n        self.model = model\n        self.uuid = str(uuid.uuid4())\n        self.生产厂商 = 生产厂商\n        self.生产型号 = 生产型号\n        self.设备额定运行参数 = 设备额定运行参数\n        self.设备运行约束 = 设备运行约束\n        self.设备经济性参数 = 设备经济性参数\n        self.设备工况 = 设备工况\n        self.环境 = environ\n        self.模拟参数 = simulation_params\n        self.设备配置台数 = 设备配置台数 if 设备配置台数 is not None else Var(domain=NonNegativeIntegers)\n        self.输入功率 = {}\n        self.输出功率 = {}\n        self.输入类型列表 = 输入类型列表\n        self.输出类型列表 = 输出类型列表\n        self.建立输入功率(输入类型列表)\n        self.建立输出功率(输出类型列表)\n    def 建立输入功率(self, input_types):\n        for input_type in input_types:\n            self.输入功率[input_type] = VarList()\n            self.model.add_component(\n                f\"{self.uuid}_输入功率_{input_type}\", self.输入功率[input_type]\n            )\n    def 建立输出功率(self, output_types):\n        for output_type in output_types:\n            self.输出功率[output_type] = VarList()\n            self.model.add_component(\n                f\"{self.uuid}_输出功率_{output_type}\", self.输出功率[output_type]",
+        "type": "code",
+        "location": "/cloudpss_model_revised.py:55-88"
+    },
+    "95": {
+        "file_id": 11,
+        "content": "The code defines a class with various parameters including model, UUID, device details, environment, simulation parameters, and number of device configurations. It also initializes input and output power variables, and builds the input and output power lists for different types.",
+        "type": "comment"
+    },
+    "96": {
+        "file_id": 11,
+        "content": "            )\nclass 光伏(设备):\n    def __init__(\n        self,\n        model,\n        生产厂商: str,\n        生产型号: str,\n        设备配置台数: int,\n        environ: 环境,\n        simulation_params: 模拟参数,\n        设备额定运行参数: dict = {},  # if any\n        设备运行约束: dict = {},  # if any\n        设备经济性参数: dict = {},  #  if any\n        设备工况: dict = {},  # OperateParam\n        输出类型列表: list = [\"电\"],\n        输入类型列表: list = [],\n    ):\n        super().__init__(\n            model=model,\n            生产厂商=生产厂商,\n            生产型号=生产型号,\n            设备配置台数=设备配置台数,\n            environ=environ,\n            simulation_params=simulation_params,\n            设备额定运行参数=设备额定运行参数,\n            设备运行约束=设备运行约束,\n            设备经济性参数=设备经济性参数,\n            设备工况=设备工况,\n            输出类型列表=输出类型列表,  # add this later.\n            输入类型列表=输入类型列表,\n        )\n        ## 设置设备额定运行参数 ##\n        self.单个光伏板面积 = self.设备额定运行参数[\"单个光伏板面积\"]\n        \"\"\"单位：(m²)\"\"\"\n        self.光电转换效率 = self.设备额定运行参数[\"光电转换效率\"]\n        \"\"\"单位：(%)\"\"\"\n        self.功率因数 = self.设备额定运行参数[\"功率因数\"]\n        \"\"\"0<x<1\"\"\"\n        ## 设置设备运行约束 ##",
+        "type": "code",
+        "location": "/cloudpss_model_revised.py:89-130"
+    },
+    "97": {
+        "file_id": 11,
+        "content": "This code defines a PV (photovoltaic) device class within the \"设备\" (device) parent class, taking in various parameters such as model, manufacturer, model number, device configuration count, environment, simulation_params, and more. It then sets specific attributes like single solar panel area, conversion efficiency, and power factor based on the provided device operating parameters.",
+        "type": "comment"
+    },
+    "98": {
+        "file_id": 11,
+        "content": "        self.最大发电功率 = self.设备运行约束[\"最大发电功率\"]\n        \"\"\"单位：(kW)\"\"\"\n        ## 设备经济性参数 ##\n        self.采购成本 = self.设备经济性参数[\"采购成本\"]\n        \"\"\"单位：(万元/台)\"\"\"\n        self.固定维护成本 = self.设备经济性参数[\"固定维护成本\"]\n        \"\"\"单位：(万元/年)\"\"\"\n        self.可变维护成本 = self.设备经济性参数[\"可变维护成本\"] / 10000\n        \"\"\"单位：(万元/kWh) <- (元/kWh)\"\"\"\n        self.设计寿命 = self.设备经济性参数[\"设计寿命\"]\n        \"\"\"单位：(年)\"\"\"\n    def add_constraints(self):\n        光照强度 = self.环境.太阳辐射强度\n        Constraint(\n            self.输出功率[\"电\"]\n            <= self.设备配置台数 * self.光电转换效率 * 光照强度 * self.单个光伏板面积 * self.功率因数\n        )\n        Constraint(expr=self.输出功率[\"电\"] <= self.最大发电功率 * self.功率因数)\n    def add_economic_constraints(self):\n        self.成本 = (\n            self.可变维护成本 * sum(self.输出功率[\"电\"]) * self.模拟参数.步长 / 60\n            + self.固定维护成本 * self.模拟参数.仿真时长\n            + self.采购成本 * self.设备配置台数\n        )",
+        "type": "code",
+        "location": "/cloudpss_model_revised.py:131-157"
+    },
+    "99": {
+        "file_id": 11,
+        "content": "This code initializes the maximum power output and various economic parameters such as purchase cost, fixed maintenance cost, variable maintenance cost, and design life. It then adds constraints for power output based on environmental factors like sunlight intensity and implements an economic constraint for overall costs including purchase, maintenance, and operational expenses.",
+        "type": "comment"
+    }
+}

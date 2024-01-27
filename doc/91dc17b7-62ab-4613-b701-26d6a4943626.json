@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines a piecewise objective function model using Pyomo, sets variables and constraints, and minimizes the sum of 'c' multiplied by 'y', while considering bounds and conditions. It enables fast execution time by creating an instance with timing report enabled for each constraint in the set model I.",
+    "details": [
+        {
+            "comment": "The code defines an abstract model for a piecewise objective function using the Pyomo library. It sets up variables, parameters, and constraints, and then creates a piecewise expression to compute the objective value. The objective is to minimize the sum of parameters 'c' multiplied by each variable 'y', given certain bounds and conditions.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py\":0-45",
+            "content": "# abstract2piece.py\n# Similar to abstract2.py, but the objective is now c times x to the fourth power\nfrom pyomo.environ import *\nimport time\nstart_time = time.time()\nmodel = AbstractModel()\nmodel.I = Set()\nmodel.J = Set()\nTopx = 6.1  # range of x variables\nmodel.a = Param(model.I, model.J)\nmodel.b = Param(model.I)\nmodel.c = Param(model.J)\n# the next line declares a variable indexed by the set J\nmodel.x = Var(model.J, domain=NonNegativeReals, bounds=(0, Topx))\nmodel.y = Var(model.J, domain=NonNegativeReals)\n# to avoid warnings, we set breakpoints at or beyond the bounds\nPieceCnt = 100\nbpts = []\nfor i in range(PieceCnt + 2):\n    bpts.append(float((i * Topx) / PieceCnt))\ndef f4(model, j, xp):\n    # we not need j, but it is passed as the index for the constraint\n    return xp**4\nmodel.ComputeObj = Piecewise(\n    model.J, model.y, model.x, pw_pts=bpts, pw_constr_type='EQ', f_rule=f4\n)\ndef obj_expression(model):\n    return summation(model.c, model.y)\nmodel.OBJ = Objective(rule=obj_expression)\ndef ax_constraint_rule(model, i):"
+        },
+        {
+            "comment": "This code defines a constraint for each member of the set model.I and creates an instance with timing report enabled, resulting in fast execution time.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/heatpump_code_reference/pyomo_piecewise_set.py\":46-57",
+            "content": "    # return the expression for the constraint for i\n    return sum(model.a[i, j] * model.x[j] for j in model.J) >= model.b[i]\n# the next line creates one constraint for each member of the set model.I\nmodel.AxbConstraint = Constraint(model.I, rule=ax_constraint_rule)\nend_time = time.time()\nprint('taking time:', end_time-start_time)\n# this is fast.\n# taking time: 0.0009999275207519531\ninstance = model.create_instance(report_timing=True)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code aims to identify the device model causing trouble in the CPLEX abnormal exit condition by counting problematic variables/expressions and sorting/displaying them.",
+    "details": [
+        {
+            "comment": "This code aims to identify the device model causing trouble in the CPLEX abnormal exit condition by counting problematic variables/expressions and sorting/displaying them.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/cplex_abnormal_exit_condition_debug/README.md\":0-2",
+            "content": "find out which model possibly causes the trouble.\ncount problematic variables/expressions which causes the trouble per device model, sort and display."
+        }
+    ]
+}

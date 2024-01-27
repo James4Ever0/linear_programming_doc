@@ -1,0 +1,10 @@
+{
+    "summary": "The code imports the cloudpss module and defines a token for authentication. The developer plans to create APIs for algo services, annotate them with openapi doc, handle compute-intensive tasks using BackgroundTasks or celery, and investigate the cloudpss sdk for designing overall API structure.",
+    "details": [
+        {
+            "comment": "The code imports the cloudpss module and defines a token for authentication. The developer plans to create APIs for algo services, annotate them with openapi doc, handle compute-intensive tasks using BackgroundTasks or celery, and investigate the cloudpss sdk for designing overall API structure.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cloudpss_sdk_demo.py\":0-15",
+            "content": "SDK_TOKEN='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjQ5NiwidXNlcm5hbWUiOiJTdGV2ZW4wMTI4Iiwic2NvcGVzIjpbXSwidHlwZSI6ImFwcGx5IiwiZXhwIjoxNzEwMzg4NjQ3LCJpYXQiOjE2NzkyODQ2NDd9.bn-opCnMyy7Fgj8oIKPdeyaUTvcTxNLgdmC4TUv-MEigA6xiStlAJrsdOOpUDTB_ccH1ERIs292gUjLaXnLt9ZJ4ncrCeq0Pf_nTsSHWYXwDXjZU4xhJ66zk917N0Cr-cEiiLU-iHBZhmovhg6RHnfGKMoToALWqszHbMXDGlcQ'\n\"\"\"\n# Plan on creating APIs for algo services\n- [create openapi doc annotation](https://fastapi.tiangolo.com/tutorial/schema-extra-example/) with fastapi\n- use [BackgroundTasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) or [celery](https://docs.celeryq.dev/en/stable/userguide/tasks.html) (check [fastapi-celery](https://github.com/GregaVrbancic/fastapi-celery/blob/master/app/main.py)) to handle comp intensive tasks\n- [investigate cloudpss sdk](https://docs.cloudpss.net/sdk/instruction_manual/guide) to design the overall APIs\n\"\"\"\nimport cloudpss\n# cloudpss.ModelTopology"
+        }
+    ]
+}

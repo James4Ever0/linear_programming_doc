@@ -1,0 +1,10 @@
+{
+    "summary": "This code is setting the \"Autorun\" value in the Microsoft Command Processor registry key to point to a startup script located at D:\\project\\jubilant-adventure\\startup.cmd, which will run automatically upon system startup.",
+    "details": [
+        {
+            "comment": "This code is setting the \"Autorun\" value in the Microsoft Command Processor registry key to point to a startup script located at D:\\project\\jubilant-adventure\\startup.cmd, which will run automatically upon system startup.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/cmd_startup.cmd\":0-0",
+            "content": "REG ADD \"HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Command Processor\" /v \"Autorun\" /t REG_SZ /d D:\\project\\jubilant-adventure\\startup.cmd"
+        }
+    ]
+}

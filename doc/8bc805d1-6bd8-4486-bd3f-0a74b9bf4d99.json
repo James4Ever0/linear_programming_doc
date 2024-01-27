@@ -1,0 +1,10 @@
+{
+    "summary": "Code generates a set of x and y points using hyperopt library. It defines an objective function and search space, then minimizes the objective over the search space with 100 evaluations. The best result is printed.",
+    "details": [
+        {
+            "comment": "Code generates a set of x and y points using hyperopt library. It defines an objective function and search space, then minimizes the objective over the search space with 100 evaluations. The best result is printed.",
+            "location": "\"/media/root/Prima/works/generated_docs/linear_programming_doc/src/microgrid_base/adaptive_sampling/test.py\":0-41",
+            "content": "from hyperopt import hp\nx_range = (10,1e5)\nsupersample_size = 10000\nfunc = lambda x: x**2\nimport numpy as np\nx_points = np.linspace(*x_range, supersample_size)\ny_points = func(x_points)\nx_points = x_points.tolist()\ny_points = y_points.tolist()\ny_range = (y_points[0], y_points[-1])\n# define an objective function\ndef objective(args):\n    case, val = args\n    if case == 'case 1':\n        return val\n    else:\n        return val ** 2\n# define a search space\nspace = hp.choice('a',\n    [\n        ('case 1', 1 + hp.lognormal('c1', 0, 1)),\n        ('case 2', hp.uniform('c2', -10, 10))\n    ])\n# minimize the objective over the space\nfrom hyperopt import fmin, tpe, space_eval\nbest = fmin(objective, space, algo=tpe.suggest, max_evals=100)\nprint(best)\n# -> {'a': 1, 'c2': 0.01420615366247227}\nprint(space_eval(space, best))\n# -> ('case 2', 0.01420615366247227}"
+        }
+    ]
+}
